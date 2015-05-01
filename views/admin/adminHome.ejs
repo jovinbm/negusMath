@@ -297,12 +297,16 @@
                                     <a ng-href="#!/post/{{hotPost.postIndex}}"
                                        ng-click="goToTop()">{{hotPost.postHeading}}
                                     </a> <br/>
-                                    <span>
-                                        <a href="#!/post/{{hotPost.postIndex}}"
-                                           data-disqus-identifier="{{hotPost.postUniqueCuid}}"
-                                           ng-click="goToTop()">
-                                        </a>
-                                    </span>
+                                <h6 class="text-muted">
+                                    <small class="ng-cloak"><a class="btn-link">{{hotPost.authorName}}</a>
+                                        on
+                                        {{hotPost.postDate}}
+                                    </small>
+                                    <br/>
+                                    <small class="text-muted ng-cloak">
+                                        {{hotPost.theTimeAgo}}
+                                    </small>
+                                </h6>
                                 </p>
                             </li>
                         </ul>
