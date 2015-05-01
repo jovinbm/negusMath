@@ -1,0 +1,59 @@
+<div ng-controller="TrendingCtrl"
+     ng-class="columnClass"
+     class="animated fadeIn">
+
+    <div ng-if="alerts.newQuestionAlert.display == true"
+         class="animated fadeIn" id="trending-newQ-alert">
+        <a ng-href="#/"
+           ng-click="closeAlert('newQuestionAlert')"
+           class="alert-new-post-sentence">
+            <alert ng-model="alerts.newQuestionAlert"
+                   type="{{alerts.newQuestionAlert.type}}">
+                {{alerts.newQuestionAlert.num}} new post(s) available. Click to show
+            </alert>
+        </a>
+    </div>
+
+    <h5 id="trending" class="question-heading"><i class="fa fa-line-chart"></i> Trending</h5>
+
+    <ul class="list-group">
+        <li class="list-group-item ng-cloak"
+            ng-repeat="eachTop in topVotedQuestions"
+            ng-class="[questionReference[eachTop.questionIndex].questionClass]">
+            <h4 class="text-outputs question-header">
+                <a ng-href="#/fullQuestion/{{eachTop.questionIndex}}/"
+                   class="question-heading">
+                    {{eachTop.heading}}
+                </a>
+                <small class="by">by</small>
+                <small class="by sender-name"> {{eachTop.senderName}}</small>
+                <small class="questionTime">on
+                    {{questionReference[eachTop.questionIndex].questionTime}}
+                </small>
+            </h4>
+
+            <p ta-bind
+               ng-model="eachTop.question"
+               class="text-outputs">
+            </p>
+
+            <div class="clearfix">
+                <div class="btn-group btn-group-xs pull-right">
+                    <a ng-href="#/fullQuestion/{{eachTop.questionIndex}}/"
+                       class="btn btn-default btn-xs">View
+                    </a>
+                    <a ng-class="questionReference[eachTop.questionIndex].buttonClass"
+                       ng-click="upVote(eachTop.questionIndex, questionReference[eachTop.questionIndex].upvoted, $event)">{{questionReference[eachTop.questionIndex].buttonWord}}
+                        <span class='glyphicon glyphicon-thumbs-up'
+                              aria-hidden='true'
+                              ng-if="!questionReference[eachTop.questionIndex].upvoted">
+                        </span>
+                    </a>
+                    <a href="#"
+                       target="_self"
+                       class="btn btn-default btn-xs">{{eachTop.votes}}</a>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>

@@ -1,0 +1,64 @@
+<div class="panel panel-default"
+     ng-controller="FullPostController">
+
+    <div class="panel-heading ng-cloak"><a href ng-click="back()"><i class="fa fa-arrow-left"></i> BACK</a>
+        <span class="pull-right">{{currentTime}}</span>
+    </div>
+
+    <div class="panel-body">
+        <ul class="list-unstyled animated fadeIn">
+            <li class="list-unstyled clearfix">
+                <div class="card">
+
+                    <div class="card-content">
+
+                        <h4 class="ng-cloak text-outputs">{{post.postHeading}}</h4>
+
+                        <h6 class="text-muted">
+                            <small class="ng-cloak"><a href="#" target="_self">{{post.authorName}}</a>
+                                on
+                                {{post.postDate}}
+                                                <span class="pull-right">
+                                                    <a href="#!/post/{{post.postIndex}}"
+                                                       data-disqus-identifier="{{post.postUniqueCuid}}"
+                                                       ng-click="goToTop()">
+                                                    </a>
+                                                </span>
+                            </small>
+                            <br/>
+                            <small class="text-muted ng-cloak">
+                                {{post.theTimeAgo}}
+                            </small>
+                        </h6>
+
+                        <div class="postContent">
+                            <div ta-bind
+                                 ng-model="post.postContent"></div>
+                        </div>
+
+
+                    </div>
+
+                    <div class="card-action clearfix">
+
+                        <div class="pull-right">
+                            <a href="#" target="new_blank" class="btn btn-default btn-sm">Pin</a>
+                            <a href="#" target="new_blank" class="btn btn-default btn-sm">Edit</a>
+                            <a href="#" target="new_blank" class="btn btn-default btn-sm">Delete</a>
+                        </div>
+
+                    </div>
+                </div>
+            </li>
+
+            <li class="list-unstyled clearfix">
+                <dir-disqus disqus-shortname="negusmath"
+                            disqus-identifier="{{post.postUniqueCuid}}"
+                            disqus-title="{{ post.postHeading }}"
+                            disqus-url="{{post.postUrl}}"
+                            ready-to-bind="{{postIsLoaded}}">
+                </dir-disqus>
+            </li>
+        </ul>
+    </div>
+</div>

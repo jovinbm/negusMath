@@ -1,0 +1,106 @@
+angular.module('adminHomeApp')
+    .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
+
+            $scope.posts = PostService.getCurrentPosts();
+            $scope.postsCount = PostService.getCurrentPostsCount();
+
+            function getPagePosts() {
+                PostService.getPostsFromServer($stateParams.pageNumber)
+                    .success(function (resp) {
+                        $scope.posts = PostService.updatePosts(resp.postsArray);
+                        updateTimeAgo();
+                        $scope.postsCount = resp.postsCount;
+                    })
+                    .error(function (errResp) {
+                        $scope.responseStatusHandler(errResp);
+                    });
+            }
+
+            getPagePosts();
+
+            //=============function to update timeago on all posts
+            //updates the timeago on all incoming orders using the timeago filter
+            function updateTimeAgo() {
+                $scope.posts.forEach(function (post) {
+                    post.theTimeAgo = $filter('timeago')(post.createdAt);
+
+                    //post date/time it was ordered e.g. Sun, Mar 17..
+                    post.postDate = moment(post.createdAt).format("ddd, MMM D, H:mm");
+                });
+            }
+
+            $interval(updateTimeAgo, 120000, 0, true);
+
+            //==============end of update time ago
+
+            updateTimeAgo();
+
+            //===============socket listeners===============
+
+            $rootScope.$on('newPost', function (event, data) {
+                //newPost goes to page 1, so update only if the page is 1
+                if ($stateParams.pageNumber == 1) {
+                    $scope.posts.unshift(data.post);
+                    updateTimeAgo();
+                }
+                $scope.postCount = data.postCount;
+            });
+
+            $rootScope.$on('reconnect', function () {
+                getPagePosts();
+            });
+
+            $log.info('PostController booted successfully');
+
+        }
+    ])
+
+    .controller('FullPostController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
+            $scope.postIndex = $stateParams.postIndex;
+            $scope.post = {};
+            $scope.postIsLoaded = false;
+
+            function getFullPost() {
+                PostService.getPostFromServer($scope.postIndex)
+                    .success(function (resp) {
+                        $scope.post = resp.thePost;
+                        updateTimeAgo();
+                        addPostUrl();
+                        $scope.responseStatusHandler(resp);
+                        $scope.postIsLoaded = true;
+                    })
+                    .error(function (errResponse) {
+                        $scope.responseStatusHandler(errResponse);
+                    });
+            }
+
+            getFullPost();
+
+            //=============function to update timeago on this post
+            function updateTimeAgo() {
+                $scope.post.theTimeAgo = $filter('timeago')($scope.post.createdAt);
+
+                //post date/time it was ordered e.g. Sun, Mar 17..
+                $scope.post.postDate = moment($scope.post.createdAt).format("ddd, MMM D, H:mm");
+            }
+
+            $interval(updateTimeAgo, 120000, 0, true);
+
+            function addPostUrl() {
+                $scope.post.postUrl = 'http://' + $location.host() + '/adminHome.html#!/post/' + $scope.post.postIndex;
+            }
+
+            //==============end of update time ago
+
+            //===============socket listeners===============
+
+            $rootScope.$on('reconnect', function () {
+                getFullPost();
+            });
+
+            $log.info('FullPostController booted successfully');
+
+        }
+    ]);

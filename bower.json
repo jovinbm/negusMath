@@ -1,0 +1,30 @@
+{
+  "name": "talkF",
+  "version": "0.0.1",
+  "authors": [
+    "Jovin Mwilanga <jovinbeda@hotmail.com>"
+  ],
+  "description": "A question and answer forum",
+  "moduleType": [
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "talkF",
+    "forum"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "toastr": "~2.1.0",
+    "angular-moment": "~0.10.0",
+    "ngFx": "~1.1.0",
+    "angular-utils-disqus": "~0.2.0"
+  }
+}
