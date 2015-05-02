@@ -69,44 +69,43 @@ module.exports = {
         }
     },
 
-    updateQuestion: function (req, res, theUser, theQuestion) {
-        consoleLogger('updateQuestion: UPDATE_QUESTION event handler called');
-        var thisQuestionIndex = theQuestion.questionIndex;
-        if (!(/^\s+$/.test(theQuestion.heading)) &&
-            theQuestion.heading.length != 0 && !(/^\s+$/.test(theQuestion.question)) &&
-            theQuestion.question.length != 0) {
+    updatePost: function (req, res, thePost) {
+        var module = 'updatePost';
+        receivedLogger(module);
 
-            function error(status, err) {
-                consoleLogger("ERROR: updateQuestion event_Handler: " + err);
-                res.status(500).send({msg: 'ERROR: updateQuestion Event Handler: ', err: err});
-                consoleLogger("updateQuestion failed!")
-            }
+        //theNewPost consists of the theNewPost.heading and theNewPost.content
 
-            function made(question) {
-                function updated() {
-                    function done(questionObject) {
-                        ioJs.emitToAll('newQuestion', {
-                            "question": questionObject,
-                            "index": questionObject.questionIndex,
-                            "update": true,
-                            "questionCount": null
-                        });
-                        res.status(200).send({msg: 'updateQuestion success'});
-                        consoleLogger('updateQuestion: Success');
-                    }
+        forms.validateNewPost(req, res, thePost, postValidated);
 
-                    postDB.getOneQuestion(thisQuestionIndex, error, error, done);
+        function postValidated() {
+            postDB.makePostUpdate(req, res, thePost, made);
+
+            function made(post) {
+                postDB.updatePost(post, error, error, updated);
+
+                function updated(updatedPost) {
+                    consoleLogger(successLogger(module));
+                    ioJs.emitToAll('postUpdate', {
+                        "post": updatedPost
+                    });
+                    res.status(200).send({
+                        code: 200,
+                        notify: true,
+                        type: 'success',
+                        msg: 'The post has been updated'
+                    });
                 }
-
-                postDB.updateQuestion(question, thisQuestionIndex, error, error, updated);
             }
+        }
 
-            postDB.makeQuestionUpdate(theQuestion, theUser, made);
-
-        } else {
-            //the question does not pass the checks
-            res.status(500).send({msg: 'updateQuestion did not pass checks'});
-            consoleLogger('updateQuestion: Not executed: Did not pass checks');
+        function error() {
+            consoleLogger(errorLogger(module));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: 'Failed to update post. Please try again'
+            });
         }
     },
 
@@ -200,7 +199,7 @@ module.exports = {
         var temp = {};
         var limit = 10;
 
-        postDB.getPosts(-1, page, limit, error, error, success);
+        postDB.getPosts(-1, page, limit, error_neg_1, error_neg_1, success);
 
         function success(postsArray, postsCount) {
             temp['postsCount'] = postsCount;
@@ -209,7 +208,7 @@ module.exports = {
             res.status(200).send(temp);
         }
 
-        function error() {
+        function error_neg_1() {
             consoleLogger(errorLogger(module));
             res.status(500).send({
                 code: 500,
@@ -225,7 +224,7 @@ module.exports = {
         var module = 'getPost';
         receivedLogger(module);
 
-        postDB.getPost(postIndex, error, error, success);
+        postDB.getPost(postIndex, error_neg_1, postNotFoundError, success);
 
         function success(thePost) {
             res.status(200).send({
@@ -233,7 +232,7 @@ module.exports = {
             });
         }
 
-        function error() {
+        function error_neg_1() {
             consoleLogger(errorLogger(module));
             res.status(500).send({
                 code: 500,
@@ -241,6 +240,18 @@ module.exports = {
                 bannerClass: 'alert alert-dismissible alert-warning',
                 msg: 'Failed to retrieve this post. Please try again or reload this page',
                 disable: true
+            });
+        }
+
+        function postNotFoundError() {
+            //redirects user to home and puts a banner to show that the post is not available
+            consoleLogger(errorLogger(module, 'Requested post not found'));
+            res.status(200).send({
+                thePost: {},
+                code: 200,
+                banner: true,
+                bannerClass: 'alert alert-dismissible alert-warning',
+                msg: "The post you're looking for is either deleted or has never existed before"
             });
         }
     },
@@ -264,7 +275,7 @@ module.exports = {
                 code: 500,
                 notify: true,
                 type: 'warning',
-                msg: 'Failed to retrieve this weeks top posts. Please reload page ',
+                msg: 'Failed to retrieve this weeks top posts. Please reload page '
             });
         }
     },

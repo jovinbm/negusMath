@@ -49,6 +49,13 @@ module.exports = {
         post_handler.newPost(req, res, req.body.newPost);
     },
 
+    updatePost: function (req, res) {
+        var module = 'updatePost';
+        receivedLogger(module);
+        var postUpdate = req.body.postUpdate;
+        post_handler.updatePost(req, res, postUpdate);
+    },
+
     getHotThisWeek: function (req, res) {
         var module = 'getHotThisWeek';
         receivedLogger(module);

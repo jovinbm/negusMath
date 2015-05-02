@@ -11,6 +11,18 @@ angular.module('adminHomeApp')
                         $scope.posts = PostService.updatePosts(resp.postsArray);
                         updateTimeAgo();
                         $scope.postsCount = resp.postsCount;
+
+                        //this function also creates a banner to notify user that there are no posts by mimicing a response and calling the response handler
+                        //used if the user is accessing a page that is beyond the number of posts
+                        if ($scope.posts.length == 0) {
+                            var responseMimic = {
+                                banner: true,
+                                bannerClass: 'alert alert-dismissible alert-success',
+                                msg: "No more posts to show"
+                            };
+                            $scope.responseStatusHandler(responseMimic);
+                            $scope.goToUniversalBanner();
+                        }
                     })
                     .error(function (errResp) {
                         $scope.responseStatusHandler(errResp);
@@ -18,6 +30,12 @@ angular.module('adminHomeApp')
             }
 
             getPagePosts();
+
+            //this functions evaluates to true if object is not empty, useful for ng-show
+            //this function also creates a banner to notify user that there are no posts by mimicing a response and calling the response handler
+            $scope.checkIfPostsIsEmpty = function () {
+                return $scope.posts.length == 0
+            };
 
             //=============function to update timeago on all posts
             //updates the timeago on all incoming orders using the timeago filter
@@ -62,14 +80,25 @@ angular.module('adminHomeApp')
             $scope.post = {};
             $scope.postIsLoaded = false;
 
+            //this functions evaluates to true if object is not empty, useful for ng-show
+            $scope.checkIfPostIsEmpty = function () {
+                return $scope.calcObjectLength($scope.post) == 0
+            };
+
             function getFullPost() {
                 PostService.getPostFromServer($scope.postIndex)
                     .success(function (resp) {
                         $scope.post = resp.thePost;
-                        updateTimeAgo();
-                        addPostUrl();
+                        console.log(resp.thePost);
                         $scope.responseStatusHandler(resp);
-                        $scope.postIsLoaded = true;
+                        //check that there is a post first before starting disqus and other attributes
+                        if ($scope.calcObjectLength($scope.post) != 0) {
+                            updateTimeAgo();
+                            addPostUrl();
+                            $scope.postIsLoaded = true;
+                        }else{
+                            $scope.goToUniversalBanner();
+                        }
                     })
                     .error(function (errResponse) {
                         $scope.responseStatusHandler(errResponse);
@@ -94,10 +123,59 @@ angular.module('adminHomeApp')
 
             //==============end of update time ago
 
+            //=============editing post====================
+
+            //variable that holds the editing or show state in the full-post view.
+            $scope.editingMode = false;
+
+            //make copy of post, useful when the user clicks cancel
+            $scope.postBackup = $scope.post;
+
+            $scope.goIntoPostEditingMode = function () {
+                //make copy of post, useful when the user clicks cancel
+                $scope.postBackup = $scope.post;
+                $scope.editingMode = true;
+            };
+
+            $scope.goIntoFullPostViewMode = function () {
+                $scope.editingMode = false;
+            };
+
+            $scope.submitPostUpdate = function () {
+                if ($scope.post.postContent.length == 0) {
+                    $scope.showToast('warning', 'Please add some content to the post first');
+                } else {
+                    PostService.submitPostUpdate($scope.post)
+                        .success(function (resp) {
+                            $scope.goIntoFullPostViewMode();
+                            $scope.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $scope.responseStatusHandler(errResponse);
+                        })
+                }
+            };
+
+            $scope.cancelPostUpdate = function () {
+                $scope.post = $scope.postBackup;
+                $scope.goIntoFullPostViewMode();
+                $scope.showToast('success', 'Update cancelled');
+            };
+
+            //end of editing post functions================
+
             //===============socket listeners===============
 
+            $rootScope.$on('postUpdate', function (event, data) {
+                $scope.post = data.post;
+                updateTimeAgo();
+            });
+
             $rootScope.$on('reconnect', function () {
-                getFullPost();
+                //only update the post variable if the user is not editing the current post
+                if (!$scope.editingMode) {
+                    getFullPost();
+                }
             });
 
             $log.info('FullPostController booted successfully');

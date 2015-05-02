@@ -1,5 +1,6 @@
 <div class="panel panel-default"
-     ng-controller="PostsController">
+     ng-controller="PostsController"
+     ng-show="!checkIfPostsIsEmpty()">
 
     <div class="panel-heading ng-cloak"><i class="fa fa-leanpub"></i> LATEST POSTS <span
             class="pull-right">{{currentTime}}</span>

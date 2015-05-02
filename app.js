@@ -127,6 +127,7 @@ app.post('/api/reconnect', middleware.ensureAuthenticatedAngular, middleware.add
 app.post('/api/getPosts', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getPosts);
 app.post('/api/getPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getPost);
 app.post('/api/newPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.newPost);
+app.post('/api/updatePost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.updatePost);
 app.post('/api/getHotThisWeek', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getHotThisWeek);
 app.post('/api/updateQuestion', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.updateQuestion);
 app.post('/api/upvote', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.upvote);

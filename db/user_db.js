@@ -28,42 +28,19 @@ function getTheUser(req) {
 
 module.exports = {
 
-
-    updateCuCls: function (openId, customUsername, customLoggedInStatus, error_neg_1, error_0, success) {
-        User.update({id: openId}, {
-                $set: {
-                    customUsername: customUsername,
-                    customLoggedInStatus: customLoggedInStatus
-                }
-            }, function (err) {
-                if (err) {
-                    error_neg_1(-1, err);
-                } else {
-                    success();
-                }
-            }
-        )
-    },
-
-
-    toggleCls: function (openId, newCustomLoggedInStatus, error_neg_1, error_0, success) {
-        User.update({id: openId}, {$set: {customLoggedInStatus: newCustomLoggedInStatus}}).exec(function (err) {
-            if (err) {
-                error_neg_1(-1, err);
-            } else {
-                success();
-            }
-        });
-    },
-
     findUserWithUniqueCuid: function (uniqueCuid, error_neg_1, error_0, success) {
+        var module = 'findUserWithUniqueCuid';
+        receivedLogger(module);
         User.findOne({uniqueCuid: uniqueCuid}, {}).exec(
             function (err, theUser) {
                 if (err) {
+                    consoleLogger(errorLogger(module));
                     error_neg_1(-1, err);
                 } else if (theUser == null || theUser == undefined) {
+                    consoleLogger(successLogger(module, "No user found with the given uniqueCuid"));
                     error_0(0, err);
                 } else {
+                    consoleLogger(successLogger(module));
                     success(theUser);
                 }
             }
@@ -71,13 +48,18 @@ module.exports = {
     },
 
     findUserWithUsername: function (username, error_neg_1, error_0, success) {
+        var module = 'findUserWithUsername';
+        receivedLogger(module);
         User.findOne({username: username}).exec(
             function (err, theUser) {
                 if (err) {
+                    consoleLogger(errorLogger(module));
                     error_neg_1(-1, err);
                 } else if (theUser == null || theUser == undefined) {
+                    consoleLogger(successLogger(module, "No user found with the given username"));
                     success(1, theUser);
                 } else {
+                    consoleLogger(successLogger(module));
                     success(-1, theUser);
                 }
             }
@@ -85,11 +67,15 @@ module.exports = {
     },
 
     checkUserPassword: function (uniqueCuid, password, error_neg_1, errorPasswordBcrypt, success) {
+        var module = 'checkUserPassword';
+        receivedLogger(module);
         User.findOne({uniqueCuid: uniqueCuid}).exec(
             function (err, theUser) {
                 if (err) {
+                    consoleLogger(errorLogger(module));
                     error_neg_1(-1, err);
                 } else if (theUser == null || theUser == undefined) {
+                    consoleLogger(successLogger(module, "No user found with the given uniqueCuid"));
                     error_neg_1(0, err);
                 } else {
                     bcrypt.compare(password, theUser.password, function (err, res) {
@@ -98,9 +84,11 @@ module.exports = {
                             consoleLogger(errorLogger(module, 'error comparing passwords', err));
                             errorPasswordBcrypt(err);
                         } else if (res) {
+                            consoleLogger(successLogger(module));
                             //means the password checks with hash
                             success(1);
                         } else {
+                            consoleLogger(successLogger(module));
                             //passwords don't check
                             success(-1);
                         }
@@ -112,30 +100,39 @@ module.exports = {
 
 
     saveUser: function (theUserObject, error_neg_1, error_0, success) {
+        var module = 'saveUser';
+        receivedLogger(module);
         theUserObject.save(function (err, theSavedUser) {
             if (err) {
-                consoleLogger("ERROR HERE " + err);
+                consoleLogger(errorLogger(module));
                 error_neg_1(-1, err);
             } else {
+                consoleLogger(successLogger(module));
                 success(theSavedUser);
             }
         });
     },
 
     deleteUser: function (theUser, error_neg_1, error_0, success) {
+        var module = 'deleteUser';
+        receivedLogger(module);
         User.
             find({uniqueCuid: theUser.uniqueCuid})
             .remove()
             .exec(function (err) {
                 if (err) {
+                    consoleLogger(errorLogger(module));
                     error_neg_1(-1, err);
                 } else {
+                    consoleLogger(successLogger(module));
                     success();
                 }
             })
     },
 
     updateFullName: function (uniqueCuid, fullName, error_neg_1, error_0, success) {
+        var module = 'updateFullName';
+        receivedLogger(module);
         User
             .update({
                 uniqueCuid: uniqueCuid
@@ -145,8 +142,10 @@ module.exports = {
                 }
             }, function (err) {
                 if (err) {
+                    consoleLogger(errorLogger(module));
                     error_neg_1(-1, err);
                 } else {
+                    consoleLogger(successLogger(module));
                     success();
                 }
             }
@@ -154,6 +153,8 @@ module.exports = {
     },
 
     updateUsername: function (uniqueCuid, username, error_neg_1, error_0, success) {
+        var module = 'updateUsername';
+        receivedLogger(module);
         User
             .update({
                 uniqueCuid: uniqueCuid
@@ -163,8 +164,10 @@ module.exports = {
                 }
             }, function (err) {
                 if (err) {
+                    consoleLogger(errorLogger(module));
                     error_neg_1(-1, err);
                 } else {
+                    consoleLogger(successLogger(module));
                     success();
                 }
             }
@@ -172,6 +175,8 @@ module.exports = {
     },
 
     updateEmail: function (uniqueCuid, email, error_neg_1, error_0, success) {
+        var module = 'updateEmail';
+        receivedLogger(module);
         User
             .update({
                 uniqueCuid: uniqueCuid
@@ -181,8 +186,10 @@ module.exports = {
                 }
             }, function (err) {
                 if (err) {
+                    consoleLogger(errorLogger(module));
                     error_neg_1(-1, err);
                 } else {
+                    consoleLogger(successLogger(module));
                     success();
                 }
             }
@@ -191,6 +198,8 @@ module.exports = {
 
 
     updatePassword: function (uniqueCuid, passwordHash, error_neg_1, error_0, success) {
+        var module = 'updatePassword';
+        receivedLogger(module);
         User
             .update({
                 uniqueCuid: uniqueCuid
@@ -200,8 +209,10 @@ module.exports = {
                 }
             }, function (err) {
                 if (err) {
+                    consoleLogger(errorLogger(module));
                     error_neg_1(-1, err);
                 } else {
+                    consoleLogger(successLogger(module));
                     success();
                 }
             }

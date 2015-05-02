@@ -17,14 +17,36 @@ angular.module('adminHomeApp')
                 $location.path(prevUrl);
             };
 
+            //length of an object
+
+            $scope.calcObjectLength = function (obj) {
+                var len = 0;
+                for (var prop in obj) {
+                    if (obj.hasOwnProperty(prop)) {
+                        len++;
+                    }
+                }
+                return len
+            };
+
+            //end of object lengths
+
             //scrolling functions
             var duration = 0; //milliseconds
             var offset = 40; //pixels; adjust for floating menu, context etc
             //Scroll to #some-id with 30 px "padding"
             //Note: Use this in a directive, not with document.getElementById
+
+            //scrolling to top
             $scope.goToTop = function () {
                 var someElement = angular.element(document.getElementById('top'));
-                $document.scrollToElement(someElement, offset, duration);
+                $document.scrollToElement(someElement, 80, duration);
+            };
+
+            //scrolling to universal banner
+            $scope.goToUniversalBanner = function () {
+                var someElement = angular.element(document.getElementById('universalBanner'));
+                $document.scrollToElement(someElement, 80, duration);
             };
 
             //variable to hold the registered state of the client
@@ -50,6 +72,17 @@ angular.module('adminHomeApp')
             $scope.showNewPostBanner = false;
             $scope.newPostBannerClass = "";
             $scope.newPostBannerMessage = "";
+
+            $scope.clearBanners = function () {
+                $scope.showBanner = false;
+                $scope.showRegistrationBanner = false;
+                $scope.showNewPostBanner = false;
+            };
+
+            //clear banners when the state changes
+            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+                $scope.clearBanners();
+            });
 
             $scope.universalDisableTrue = function () {
                 $scope.universalDisable = true;
@@ -246,8 +279,6 @@ angular.module('adminHomeApp')
                         })
                 }
             };
-
-            //===============end of clamping posts
 
 
             //===============logout functions===============

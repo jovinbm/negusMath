@@ -10,6 +10,11 @@ angular.module('adminHomeApp')
                 $rootScope.$broadcast('newPost', data);
             });
 
+            socket.on('postUpdate', function (data) {
+                //data here has the keys post, postCount
+                $rootScope.$broadcast('postUpdate', data);
+            });
+
             return {
 
                 getCurrentPosts: function () {
@@ -40,6 +45,12 @@ angular.module('adminHomeApp')
                 submitNewPost: function (newPost) {
                     return $http.post('/api/newPost', {
                         newPost: newPost
+                    });
+                },
+
+                submitPostUpdate: function (post) {
+                    return $http.post('/api/updatePost', {
+                        postUpdate: post
                     });
                 }
             };

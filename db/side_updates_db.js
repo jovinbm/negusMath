@@ -28,6 +28,8 @@ function getTheUser(req) {
 
 module.exports = {
     updateNumberOfVisits: function (postIndex, error_neg_1, error_0, success) {
+        var module = 'updateNumberOfVisits';
+        receivedLogger(module);
         Post.update({
                 postIndex: postIndex
             },
@@ -38,8 +40,10 @@ module.exports = {
             })
             .exec(function (err) {
                 if (err) {
+                    consoleLogger(errorLogger(module));
                     error_neg_1(-1, err);
                 } else {
+                    consoleLogger(successLogger(module));
                     success();
                 }
             })

@@ -29,7 +29,93 @@ function getTheUser(req) {
 
 module.exports = {
 
+    getPosts: function (sort, page, limit, error_neg_1, error_0, success) {
+        var module = 'getPosts';
+        receivedLogger(module);
+        var errors = 0;
+        Post.find()
+            .sort({postIndex: sort})
+            .skip((page - 1) * 10)
+            .limit(limit)
+            .exec(function (err, postsArray) {
+                if (err) {
+                    consoleLogger(errorLogger(module));
+                    errors++;
+                    error_neg_1(-1, err);
+                } else if (postsArray == null || postsArray == undefined || postsArray.length == 0) {
+                    consoleLogger(successLogger(module, 'No posts found'));
+                    postsArray = [];
+                }
+                if (errors == 0) {
+                    var postsCount = 0;
+                    Post.count({}, function (err, count) {
+                        if (err) {
+                            consoleLogger(errorLogger(module, 'Failed to count posts', err));
+                            error_neg_1(-1, err);
+                        } else if (count == null || count == undefined) {
+                            postsCount = 0;
+                            consoleLogger(successLogger(module));
+                            success(postsArray, postsCount);
+                        } else {
+                            postsCount = count;
+                            consoleLogger(successLogger(module));
+                            success(postsArray, postsCount);
+                        }
+                    });
+                }
+            });
+    },
+
+    getPost: function (postIndex, error_neg_1, error_0, success) {
+        var module = 'getPost';
+        receivedLogger(module);
+        sideUpdates.updateNumberOfVisits(postIndex, error_neg_1, error_0, done);
+
+        function done() {
+            var errors = 0;
+            Post.findOne({postIndex: postIndex})
+                .exec(function (err, thePost) {
+                    if (err) {
+                        consoleLogger(errorLogger(module));
+                        errors++;
+                        error_neg_1(-1, err);
+                    } else if (thePost == null || thePost == undefined || thePost.length == 0) {
+                        consoleLogger(errorLogger(module, 'No post found with the given postIndex'));
+
+                        //redirect user since the post they are trying to access is not available
+                        error_0(0);
+                    } else {
+                        consoleLogger(successLogger(module));
+                        success(thePost);
+                    }
+                })
+        }
+    },
+
+
+    getHotThisWeek: function (quantity, error_neg_1, error_0, success) {
+        var module = 'getHotThisWeek';
+        receivedLogger(module);
+        Post.find({numberOfVisits: {$gt: 0}})
+            .sort({numberOfVisits: -1})
+            .limit(quantity)
+            .exec(function (err, hotThisWeekArray) {
+                if (err) {
+                    consoleLogger(errorLogger(module));
+                    error_neg_1(-1, err);
+                } else if (hotThisWeekArray.length == 0) {
+                    consoleLogger(successLogger(module, "HotThisWeek is empty"));
+                    success([]);
+                } else {
+                    consoleLogger(successLogger(module));
+                    success(hotThisWeekArray);
+                }
+            });
+    },
+
     makeNewPost: function (req, res, postObject, success) {
+        var module = 'makeNewPost';
+        receivedLogger(module);
         var theUser = getTheUser(req);
         var post = new Post({
             postUniqueCuid: cuid(),
@@ -42,58 +128,114 @@ module.exports = {
             postContent: postObject.postContent,
             postSummary: postObject.postSummary
         });
+        consoleLogger(successLogger(module));
         success(post);
     },
 
-    makeQuestionUpdate: function (questionObject, theUser, success) {
-        var question = {
-            "heading": questionObject.heading,
-            "question": questionObject.question,
-            "shortQuestion": questionObject.shortQuestion,
-            "lastActivity": new Date()
-        };
-        success(question);
-    },
-
-
     saveNewPost: function (post, error_neg_1, error_0, success) {
+        var module = 'saveNewPost';
+        receivedLogger(module);
         post.save(function (err, savedPost) {
             if (err) {
+                consoleLogger(errorLogger(module));
                 error_neg_1(-1, err);
             } else {
                 //this returns an object
+                consoleLogger(successLogger(module));
                 success(savedPost);
             }
         });
     },
 
+    makePostUpdate: function (req, res, postObject, success) {
+        var module = 'makePostUpdate';
+        receivedLogger(module);
+        var theUser = getTheUser(req);
+        var post = {
+            postIndex: postObject.postIndex,
+            postUniqueCuid: postObject.postUniqueCuid,
+            authorUniqueCuid: theUser.uniqueCuid,
+            authorName: theUser.firstName + " " + theUser.lastName,
+            authorUsername: theUser.username,
+            authorEmail: theUser.email,
+            postHeading: postObject.postHeading,
+            postContent: postObject.postContent,
+            postSummary: postObject.postSummary
+        };
+        consoleLogger(successLogger(module));
+        success(post);
+    },
 
-    updateQuestion: function (questionObject, questionIndex, error_neg_1, error_0, success) {
-        Post.update({questionIndex: questionIndex},
-            {
-                $set: {
-                    question: questionObject["question"],
-                    heading: questionObject["heading"],
-                    shortQuestion: questionObject["shortQuestion"],
-                    lastActivity: questionObject["lastActivity"]
-                }
-            }, function (err) {
+
+    updatePost: function (postToUpdate, error_neg_1, error_0, success) {
+        var module = 'updatePost';
+        receivedLogger(module);
+
+        Post.findOne({postIndex: postToUpdate.postIndex})
+            .exec(function (err, thePost) {
                 if (err) {
+                    consoleLogger(errorLogger(module, "findOne", err));
                     error_neg_1(-1, err);
+                } else if (thePost == null || thePost == undefined || thePost.length == 0) {
+                    consoleLogger(errorLogger(module, 'No post found with the given postIndex (wanted to update)'));
+                    //redirect user since the post they are trying to access is not available
+                    error_0(0);
                 } else {
-                    success();
+                    //update the post
+                    thePost.authorUniqueCuid = postToUpdate.authorUniqueCuid;
+                    thePost.authorName = postToUpdate.authorName;
+                    thePost.authorUsername = postToUpdate.authorUsername;
+                    thePost.authorEmail = postToUpdate.authorEmail;
+                    thePost.postHeading = postToUpdate.postHeading;
+                    thePost.postContent = postToUpdate.postContent;
+                    thePost.postSummary = postToUpdate.postSummary;
+
+                    thePost.save(function (err, savedPost) {
+                        if (err) {
+                            consoleLogger(errorLogger(module, 'save', err));
+                            error_neg_1(-1, err);
+                        } else {
+                            //this returns an object
+                            consoleLogger(successLogger(module));
+                            success(savedPost);
+                        }
+                    });
                 }
-            })
+            });
+    },
+
+    getCount: function (error_neg_1, error_0, success) {
+        var module = 'getCount';
+        receivedLogger(module);
+        var questionCount;
+        Post.count({}, function (err, count) {
+            if (err) {
+                consoleLogger(errorLogger(module));
+                error_neg_1(-1, err);
+            } else if (count == null || count == undefined) {
+                questionCount = 0;
+                consoleLogger(successLogger(module));
+                success(questionCount);
+            } else {
+                questionCount = count;
+                consoleLogger(successLogger(module));
+                success(questionCount);
+            }
+        });
     },
 
 
     pushQuestionToAsker: function (openId, index, error_neg_1, error_0, success) {
+        var module = 'pushQuestionToAsker';
+        receivedLogger(module);
         User.update({id: openId}, {
             $addToSet: {askedQuestionsIndexes: index}
         }, function (err) {
             if (err) {
+                consoleLogger(errorLogger(module));
                 error_neg_1(-1, err);
             } else {
+                consoleLogger(successLogger(module));
                 success();
             }
 
@@ -101,96 +243,17 @@ module.exports = {
     },
 
 
-    getCount: function (error_neg_1, error_0, success) {
-        var questionCount;
-        Post.count({}, function (err, count) {
-            if (err) {
-                error_neg_1(-1, err);
-            } else if (count == null || count == undefined) {
-                questionCount = 0;
-                success(questionCount);
-            } else {
-                questionCount = count;
-                success(questionCount);
-            }
-        });
-    },
-
-
-    getPosts: function (sort, page, limit, error_neg_1, error_0, success) {
-        var errors = 0;
-        Post.find()
-            .sort({postIndex: sort})
-            .skip((page - 1) * 10)
-            .limit(limit)
-            .exec(function (err, postsArray) {
-                if (err) {
-                    error_neg_1(-1, err);
-                    errors++;
-                } else if (postsArray == null || postsArray == undefined || postsArray.length == 0) {
-                    postsArray = [];
-                }
-                if (errors == 0) {
-                    var postsCount = 0;
-                    Post.count({}, function (err, count) {
-                        if (err) {
-                            error_neg_1(-1, err);
-                        } else if (count == null || count == undefined) {
-                            postsCount = 0;
-                            success(postsArray, postsCount);
-                        } else {
-                            postsCount = count;
-                            success(postsArray, postsCount);
-                        }
-                    });
-                }
-            });
-    },
-
-    getPost: function (postIndex, error_neg_1, error_0, success) {
-        sideUpdates.updateNumberOfVisits(postIndex, error_neg_1, error_0, done);
-
-        function done() {
-            var errors = 0;
-            Post.findOne({postIndex: postIndex})
-                .exec(function (err, thePost) {
-                    if (err) {
-                        error_neg_1(-1, err);
-                        errors++;
-                    } else if (thePost == null || thePost == undefined || thePost.length == 0) {
-                        thePost = {};
-                        success(thePost);
-                    } else {
-                        success(thePost);
-                    }
-                })
-        }
-    },
-
-
-    getHotThisWeek: function (quantity, error_neg_1, error_0, success) {
-        Post.find({numberOfVisits: {$gt: 0}})
-            .sort({numberOfVisits: -1})
-            .limit(quantity)
-            .exec(function (err, hotThisWeekArray) {
-                if (err) {
-                    error_neg_1(-1, err);
-                } else if (hotThisWeekArray.length == 0) {
-                    success([]);
-                } else {
-                    success(hotThisWeekArray);
-                }
-            });
-    },
-
-
     pushUpvoteToUpvoter: function (openId, upvotedIndex, error_neg_1, error_0, success) {
+        var module = 'pushUpvoteToUpvoter';
+        receivedLogger(module);
         User.update({id: openId}, {
                 $addToSet: {votedQuestionIndexes: upvotedIndex}
             }, function (err) {
                 if (err) {
+                    consoleLogger(errorLogger(module));
                     error_neg_1(-1, err);
                 } else {
+                    consoleLogger(successLogger(module));
                     success();
                 }
             }
@@ -199,12 +262,16 @@ module.exports = {
 
 
     pullUpvoteFromUpvoter: function (openId, upvotedIndex, error_neg_1, error_0, success) {
+        var module = 'pullUpvoteFromUpvoter';
+        receivedLogger(module);
         User.update({id: openId}, {
                 $pull: {votedQuestionIndexes: upvotedIndex}
             }, function (err) {
                 if (err) {
+                    consoleLogger(errorLogger(module));
                     error_neg_1(-1, err);
                 } else {
+                    consoleLogger(successLogger(module));
                     success();
                 }
             }
@@ -213,10 +280,14 @@ module.exports = {
 
 
     changeQuestionVotes: function (upvotedIndex, inc, error_neg_1, error_0, success) {
+        var module = 'changeQuestionVotes';
+        receivedLogger(module);
         Post.update({questionIndex: upvotedIndex}, {$inc: {votes: inc}}, function (err) {
             if (err) {
+                consoleLogger(errorLogger(module));
                 error_neg_1(-1, err);
             } else {
+                consoleLogger(successLogger(module));
                 success();
             }
         })

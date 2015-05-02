@@ -115,9 +115,9 @@
 
     <div id="top"></div>
 
-    <div class="container">
+    <div class="container"
+         id="universalBanner">
         <div ng-class="bannerClass"
-             class="col-lg-8"
              ng-if="showBanner">
             <button type="button" class="close" data-dismiss="alert">×</button>
             <strong>{{bannerMessage}}</strong>
@@ -248,69 +248,71 @@
 
     <section>
         <div class="container">
-            <div class="col-lg-8 ng-cloak" id="postStream">
+            <div class="row">
 
-                <div ui-view></div>
+                <div class="col-lg-8 ng-cloak" id="postStream">
 
-            </div>
+                    <div ui-view></div>
 
+                </div>
 
-            <div class="col-lg-4 ng-cloak" id="sidebar">
-                <div class="panel panel-default">
+                <div class="col-lg-4 col-lg-offset-0">
 
-                    <div class="panel-heading"><i class="fa fa-youtube-play"></i> THIS WEEK'S VIDEO
-                    </div>
+                    <div class="panel panel-default ng-cloak">
 
-                    <div class="panel-body">
-                        <ul class="list-unstyled animated fadeIn">
-                            <li class="list-unstyled clearfix">
-                                <div class="card">
+                        <div class="panel-heading"><i class="fa fa-youtube-play"></i> THIS WEEK'S VIDEO
+                        </div>
 
-                                    <div class="card-content">
-                                        <div class="embed-responsive embed-responsive-16by9">
-                                            <iframe class="embed-responsive-item"
-                                                    src="https://www.youtube.com/embed/adKP2CzKaFM" frameborder="0"
-                                                    allowfullscreen></iframe>
+                        <div class="panel-body">
+                            <ul class="list-unstyled animated fadeIn">
+                                <li class="list-unstyled clearfix">
+                                    <div class="card">
+
+                                        <div class="card-content">
+                                            <div class="embed-responsive embed-responsive-16by9">
+                                                <iframe class="embed-responsive-item"
+                                                        src="https://www.youtube.com/embed/adKP2CzKaFM" frameborder="0"
+                                                        allowfullscreen></iframe>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div ng-controller="HotController"
-                 class="col-lg-4 ng-cloak" id="sidebar"
-                 ng-if="hotThisWeek.length != 0">
-                <div class="panel panel-default">
-
-                    <div class="panel-heading"><i class="fa fa-fire"></i> HOT THIS WEEK
+                                </li>
+                            </ul>
+                        </div>
                     </div>
 
-                    <div class="panel-body">
+                    <div class="panel panel-default ng-cloak"
+                         ng-controller="HotController"
+                         ng-if="hotThisWeek.length != 0">
 
-                        <ul class="list-group">
-                            <li class="list-group-item"
-                                ng-repeat="hotPost in hotThisWeek">
-                                <p class="ng-cloak text-outputs">
-                                    <a ng-href="#!/post/{{hotPost.postIndex}}"
-                                       ng-click="goToTop()">{{hotPost.postHeading}}
-                                    </a> <br/>
-                                <h6 class="text-muted">
-                                    <small class="ng-cloak"><a class="btn-link">{{hotPost.authorName}}</a>
-                                        on
-                                        {{hotPost.postDate}}
-                                    </small>
-                                    <br/>
-                                    <small class="text-muted ng-cloak">
-                                        {{hotPost.theTimeAgo}}
-                                    </small>
-                                </h6>
-                                </p>
-                            </li>
-                        </ul>
+                        <div class="panel-heading"><i class="fa fa-fire"></i> HOT THIS WEEK
+                        </div>
+
+                        <div class="panel-body">
+
+                            <ul class="list-group">
+                                <li class="list-group-item"
+                                    ng-repeat="hotPost in hotThisWeek">
+                                    <p class="ng-cloak text-outputs">
+                                        <a ng-href="#!/post/{{hotPost.postIndex}}"
+                                           ng-click="goToTop()">{{hotPost.postHeading}}
+                                        </a> <br/>
+                                    <h6 class="text-muted">
+                                        <small class="ng-cloak"><a class="btn-link">{{hotPost.authorName}}</a>
+                                            on
+                                            {{hotPost.postDate}}
+                                        </small>
+                                        <br/>
+                                        <small class="text-muted ng-cloak">
+                                            {{hotPost.theTimeAgo}}
+                                        </small>
+                                    </h6>
+                                    </p>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
+
                 </div>
             </div>
 
