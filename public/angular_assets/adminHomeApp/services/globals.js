@@ -1,7 +1,7 @@
 angular.module('adminHomeApp')
 
-    .factory('globals', ['$window', '$rootScope', 'socketService',
-        function ($window, $rootScope, socketService) {
+    .factory('globals', ['$q', '$window', '$rootScope', 'socketService',
+        function ($q, $window, $rootScope, socketService) {
             var userData = {};
             return {
 

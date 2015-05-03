@@ -3,7 +3,7 @@
 
     <div ng-show="!checkIfPostIsEmpty()">
         <div class="panel-heading ng-cloak"><a href ng-click="back()"><i class="fa fa-arrow-left"></i> BACK</a>
-            <span class="pull-right">{{currentTime}}</span>
+            <span class="pull-right">{{post.postDate}}</span>
         </div>
 
         <div class="panel-body">
@@ -17,12 +17,7 @@
                             <h4 class="ng-cloak text-outputs">{{post.postHeading}}</h4>
 
                             <h6 class="text-muted">
-                                <small class="ng-cloak"><a class="btn-link">{{post.authorName}}</a>
-                                    on
-                                    {{post.postDate}}
-                                </small>
-                                <br/>
-                                <small class="text-muted ng-cloak">
+                                <small class="ng-cloak"><a class="btn-link">{{post.authorName}}, </a>
                                     {{post.theTimeAgo}}
                                 </small>
                             </h6>

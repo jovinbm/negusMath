@@ -89,14 +89,13 @@ angular.module('adminHomeApp')
                 PostService.getPostFromServer($scope.postIndex)
                     .success(function (resp) {
                         $scope.post = resp.thePost;
-                        console.log(resp.thePost);
                         $scope.responseStatusHandler(resp);
                         //check that there is a post first before starting disqus and other attributes
                         if ($scope.calcObjectLength($scope.post) != 0) {
                             updateTimeAgo();
                             addPostUrl();
                             $scope.postIsLoaded = true;
-                        }else{
+                        } else {
                             $scope.goToUniversalBanner();
                         }
                     })

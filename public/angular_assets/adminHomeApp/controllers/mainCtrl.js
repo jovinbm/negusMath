@@ -254,7 +254,7 @@ angular.module('adminHomeApp')
             $scope.newPostModel = {
                 postHeading: "",
                 postContent: "",
-                postSummary: "",
+                postSummary: ""
             };
 
             $scope.submitNewPost = function () {

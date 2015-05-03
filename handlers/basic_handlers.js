@@ -3,7 +3,8 @@ var consoleLogger = require('../functions/basic.js').consoleLogger;
 var ioJs = require('../functions/io.js');
 var postDB = require('../db/post_db.js');
 
-var fileName = 'basic_handlers.js';
+var fileName = 'basic_handlers.j';
+var fileName2 = 'basic_handlers.ssss';
 
 var receivedLogger = function (module) {
     var rL = require('../functions/basic.js').receivedLogger;
