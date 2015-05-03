@@ -51,4 +51,5 @@ gulp.task('watch', function () {
 });
 
 // Default Task
-gulp.task('default', ['minifyIndexAppJS', 'minifyAdminHomeAppJS', 'minifyAllCSS', 'watch']);
+gulp.task('default', ['minifyIndexAppJS', 'minifyAdminHomeAppJS', 'minifyAllCSS']);
+//gulp.task('default', ['minifyIndexAppJS', 'minifyAdminHomeAppJS', 'minifyAllCSS', 'watch']);
