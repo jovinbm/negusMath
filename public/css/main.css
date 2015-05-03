@@ -6,7 +6,15 @@
 }
 
 body {
-    font-family: "Roboto Slab", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: 'Source Sans Pro', sans-serif;
+    /*font-family: "Roboto Slab", "Helvetica Neue", Helvetica, Arial, sans-serif;*/
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+.navbar {
+    font-size: 15px
 }
 
 .text-outputs {
@@ -109,7 +117,7 @@ div.alert.alert-success, div.alert.alert-warning, div.alert.alert-info {
 }
 
 .navbar-default .navbar-brand {
-    font-family: "Kaushan Script", "Helvetica Neue", Helvetica, Arial, cursive;
+    /*font-family: "Kaushan Script", "Helvetica Neue", Helvetica, Arial, cursive;*/
     color: #fed136;
 }
 
