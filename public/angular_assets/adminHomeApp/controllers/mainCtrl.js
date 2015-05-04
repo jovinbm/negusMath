@@ -49,6 +49,31 @@ angular.module('adminHomeApp')
                 $document.scrollToElement(someElement, 80, duration);
             };
 
+            //making videos responsive
+            $scope.makeVideoIframesResponsive = function (theElementString) {
+                //convert the element to string
+                var theElement = $("<div>" + theElementString + "</div>");
+
+                //find the video iframe elements
+                var imgElement = $('img.ta-insert-video', theElement);
+
+                //only perform operation if there are iframes available
+                if (imgElement.length > 0) {
+
+                    //add class and wrap in div
+                    var imgWrappedInDiv = imgElement
+                        .addClass('embed-responsive-item')
+                        .wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
+
+                    //replace in original
+                    theElement.find('img').replaceWith(imgWrappedInDiv);
+                }
+
+                return theElement.html();
+
+            };
+
+
             //variable to hold the registered state of the client
             $scope.clientIsRegistered = false;
 

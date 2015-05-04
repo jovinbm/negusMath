@@ -95,9 +95,18 @@ angular.module('adminHomeApp')
                             updateTimeAgo();
                             addPostUrl();
                             $scope.postIsLoaded = true;
+
+                            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
+                            function preparePostContent() {
+                                $scope.post.postContent = $scope.makeVideoIframesResponsive($scope.post.postContent);
+                            }
+
+                            preparePostContent();
+
                         } else {
                             $scope.goToUniversalBanner();
                         }
+
                     })
                     .error(function (errResponse) {
                         $scope.responseStatusHandler(errResponse);

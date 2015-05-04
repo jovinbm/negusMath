@@ -51,7 +51,7 @@ function getTheUser(req) {
     return req.customData.theUser;
 }
 
-mongoose.connect(databaseURL);
+mongoose.connect(databaseURL2);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error: Problem while attempting to connect to database'));
 db.once('open', function () {

@@ -80,10 +80,8 @@ textAngular.run([function(){
 }]);
 
 textAngular.directive("textAngular", [
-	'$compile', '$timeout', 'taOptions', 'taSelection', 'taExecCommand',
-	'textAngularManager', '$window', '$document', '$animate', '$log', '$q', '$parse',
-	function($compile, $timeout, taOptions, taSelection, taExecCommand,
-		textAngularManager, $window, $document, $animate, $log, $q, $parse){
+	'$compile', '$timeout', 'taOptions', 'taSelection', 'taExecCommand', 'textAngularManager', '$window', '$document', '$animate', '$log', '$q',
+	function($compile, $timeout, taOptions, taSelection, taExecCommand, textAngularManager, $window, $document, $animate, $log, $q){
 		return {
 			require: '?ngModel',
 			scope: {},
@@ -93,7 +91,7 @@ textAngular.directive("textAngular", [
 				var _keydown, _keyup, _keypress, _mouseup, _focusin, _focusout,
 					_originalContents, _toolbars,
 					_serial = (attrs.serial) ? attrs.serial : Math.floor(Math.random() * 10000000000000000),
-					_taExecCommand, _resizeMouseDown, _updateSelectedStylesTimeout;
+					_taExecCommand, _resizeMouseDown;
 				
 				scope._name = (attrs.name) ? attrs.name : 'textAngularEditor' + _serial;
 
@@ -193,10 +191,10 @@ textAngular.directive("textAngular", [
 				scope.reflowPopover = function(_el){
 					/* istanbul ignore if: catches only if near bottom of editor */
 					if(scope.displayElements.text[0].offsetHeight - 51 > _el[0].offsetTop){
-						scope.displayElements.popover.css('top', _el[0].offsetTop + _el[0].offsetHeight + scope.displayElements.scrollWindow[0].scrollTop + 'px');
+						scope.displayElements.popover.css('top', _el[0].offsetTop + _el[0].offsetHeight + 'px');
 						scope.displayElements.popover.removeClass('top').addClass('bottom');
 					}else{
-						scope.displayElements.popover.css('top', _el[0].offsetTop - 54 + scope.displayElements.scrollWindow[0].scrollTop + 'px');
+						scope.displayElements.popover.css('top', _el[0].offsetTop - 54 + 'px');
 						scope.displayElements.popover.removeClass('bottom').addClass('top');
 					}
 					var _maxLeft = scope.displayElements.text[0].offsetWidth - scope.displayElements.popover[0].offsetWidth;
@@ -343,14 +341,7 @@ textAngular.directive("textAngular", [
 						}
 					});
 				}
-				
-				if(attrs.taPaste){
-					scope._pasteHandler = function(_html){
-						return $parse(attrs.taPaste)(scope.$parent, {$html: _html});
-					};
-					scope.displayElements.text.attr('ta-paste', '_pasteHandler($html)');
-				}
-				
+
 				// compile the scope with the text and html elements only - if we do this with the main element it causes a compile loop
 				$compile(scope.displayElements.scrollWindow)(scope);
 				$compile(scope.displayElements.html)(scope);
@@ -410,11 +401,7 @@ textAngular.directive("textAngular", [
 				};
 				scope.displayElements.html.on('blur', _focusout);
 				scope.displayElements.text.on('blur', _focusout);
-				
-				scope.displayElements.text.on('paste', function(event){
-					element.triggerHandler('paste', event);
-				});
-				
+
 				// Setup the default toolbar tools, this way allows the user to add new tools like plugins.
 				// This is on the editor for future proofing if we find a better way to do this.
 				scope.queryFormatBlockState = function(command){
@@ -468,7 +455,7 @@ textAngular.directive("textAngular", [
 						scope.displayElements.forminput.val(ngModel.$viewValue);
 						// if the editors aren't focused they need to be updated, otherwise they are doing the updating
 						/* istanbul ignore else: don't care */
-						if(!scope._elementSelectTriggered){
+						if(!scope._elementSelectTriggered && $document[0].activeElement !== scope.displayElements.html[0] && $document[0].activeElement !== scope.displayElements.text[0]){
 							// catch model being null or undefined
 							scope.html = ngModel.$viewValue || '';
 						}
@@ -558,15 +545,13 @@ textAngular.directive("textAngular", [
 				// loop through all the tools polling their activeState function if it exists
 				scope.updateSelectedStyles = function(){
 					var _selection;
-					/* istanbul ignore next: This check is to ensure multiple timeouts don't exist */
-					if(_updateSelectedStylesTimeout) $timeout.cancel(_updateSelectedStylesTimeout);
 					// test if the common element ISN'T the root ta-text node
 					if((_selection = taSelection.getSelectionElement()) !== undefined && _selection.parentNode !== scope.displayElements.text[0]){
 						_toolbars.updateSelectedStyles(angular.element(_selection));
 					}else _toolbars.updateSelectedStyles();
 					// used to update the active state when a key is held down, ie the left arrow
 					/* istanbul ignore else: browser only check */
-					if(scope._bUpdateSelectedStyles) _updateSelectedStylesTimeout = $timeout(scope.updateSelectedStyles, 200);
+					if(scope._bUpdateSelectedStyles) $timeout(scope.updateSelectedStyles, 200);
 				};
 				// start updating on keydown
 				_keydown = function(){

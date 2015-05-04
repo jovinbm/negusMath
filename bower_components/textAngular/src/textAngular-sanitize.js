@@ -341,7 +341,7 @@ function htmlParser(html, handler) {
       }
 
     } else {
-      html = html.replace(new RegExp("([^]*)<\\s*\\/\\s*" + stack.last() + "[^>]*>", 'i'),
+      html = html.replace(new RegExp("(.*)<\\s*\\/\\s*" + stack.last() + "[^>]*>", 'i'),
         function(all, text) {
           text = text.replace(COMMENT_REGEXP, "$1").replace(CDATA_REGEXP, "$1");
 
@@ -530,8 +530,6 @@ function validStyles(styleAttr){
 				(key === 'width' || key === 'height') && (
 					value.match(/[0-9\.]*(px|em|rem|%)/)
 				)
-			|| // Reference #520
-				(key === 'direction' && value.match(/^ltr|rtl|initial|inherit$/))
 			) result += key + ': ' + value + ';';
 		}
 	});
@@ -542,7 +540,7 @@ function validStyles(styleAttr){
 function validCustomTag(tag, attrs, lkey, value){
 	// catch the div placeholder for the iframe replacement
     if (tag === 'img' && attrs['ta-insert-video']){
-        if(lkey === 'ta-insert-video' || lkey === 'allowfullscreen' || lkey === 'frameborder' || (lkey === 'contenteditable' && value === 'false')) return true;
+        if(lkey === 'ta-insert-video' || lkey === 'allowfullscreen' || lkey === 'frameborder' || (lkey === 'contenteditble' && value === 'false')) return true;
     }
     return false;
 }

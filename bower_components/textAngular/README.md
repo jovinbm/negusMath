@@ -4,7 +4,7 @@ textAngular v1.3.0
 [![Build Status](https://travis-ci.org/fraywing/textAngular.png?branch=master)](https://travis-ci.org/fraywing/textAngular) [![Coverage Status](https://coveralls.io/repos/fraywing/textAngular/badge.png)](https://coveralls.io/r/fraywing/textAngular)
 
 
-Demo is available at: http://www.textangular.com (Or editable [Plunkr Demo](http://plnkr.co/edit/tpl:RaBEszV5xrAZ0VRoZ7PM))
+Demo is available at: http://www.textangular.com (Or editable [Plunkr Demo](http://plnkr.co/edit/tpl:iwVyu2?p=preview))
 
 #### Upgrading From 1.2.2 or earlier
 
@@ -18,7 +18,7 @@ To upgrade from version 1.2.2 or earlier you need to follow these steps:
 1. `AngularJS` ≥ `1.2.x`
 2. `Rangy` ≥ `1.2.x`, Both rangy-core and rangy-saveselection are required. (There is a minified combination of these two included in the dist folder)
 3. `Font-Awesome` ≥ `4.x` for the default icons on the toolbar
-1. `Bootstrap` ≥ `3.x` for the default styles (Can use `bootstrap-css-only` as in bower requirements)
+1. `Bootstrap` ≥ `3.x` for the default styles
 
 ### Where to get it
 
@@ -113,7 +113,7 @@ See Issue [#240](https://github.com/fraywing/textAngular/issues/240) for specifi
 
 ## Developer Notes
 
-When checking out, you need a node.js installation, running `npm install` and then `bower install` will get you setup with everything to run the unit tests and minification.
+When checking out, you need a node.js installation, running `npm install` will get you setup with everything to run the unit tests and minification.
 All changes should be done in the lib folder, running `grunt compile` to compile the app or use `grunt watch` to compile the files as you save them.
 When you are ready to create A PR check that `grunt` passes without errors and you have created tests for your feature if necessary.
 

@@ -57,15 +57,15 @@ if(_browserDetect.webkit) {
 		globalContentEditableBlur = false;
 	}, false); // add global click handler
 	angular.element(document).ready(function () {
-		angular.element(document.body).append(angular.element('<input id="textAngular-editableFix-010203040506070809" class="ta-hidden-input" unselectable="on" tabIndex="-1">'));
+		angular.element(document.body).append(angular.element('<input id="textAngular-editableFix-010203040506070809" style="width:1px;height:1px;border:none;margin:0;padding:0;position:absolute; top: -10000px; left: -10000px;" unselectable="on" tabIndex="-1">'));
 	});
 }
 
 // Gloabl to textAngular REGEXP vars for block and list elements.
 
-var BLOCKELEMENTS = /^(address|article|aside|audio|blockquote|canvas|dd|div|dl|fieldset|figcaption|figure|footer|form|h1|h2|h3|h4|h5|h6|header|hgroup|hr|noscript|ol|output|p|pre|section|table|tfoot|ul|video)$/i;
-var LISTELEMENTS = /^(ul|li|ol)$/i;
-var VALIDELEMENTS = /^(address|article|aside|audio|blockquote|canvas|dd|div|dl|fieldset|figcaption|figure|footer|form|h1|h2|h3|h4|h5|h6|header|hgroup|hr|noscript|ol|output|p|pre|section|table|tfoot|ul|video|li)$/i;
+var BLOCKELEMENTS = /^(address|article|aside|audio|blockquote|canvas|dd|div|dl|fieldset|figcaption|figure|footer|form|h1|h2|h3|h4|h5|h6|header|hgroup|hr|noscript|ol|output|p|pre|section|table|tfoot|ul|video)$/ig;
+var LISTELEMENTS = /^(ul|li|ol)$/ig;
+var VALIDELEMENTS = /^(address|article|aside|audio|blockquote|canvas|dd|div|dl|fieldset|figcaption|figure|footer|form|h1|h2|h3|h4|h5|h6|header|hgroup|hr|noscript|ol|output|p|pre|section|table|tfoot|ul|video|li)$/ig;
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/Trim#Compatibility
 /* istanbul ignore next: trim shim for older browsers */
@@ -88,7 +88,7 @@ function validElementString(string){
 	Custom stylesheet for the placeholders rules.
 	Credit to: http://davidwalsh.name/add-rules-stylesheets
 */
-var sheet, addCSSRule, removeCSSRule, _addCSSRule, _removeCSSRule, _getRuleIndex;
+var sheet, addCSSRule, removeCSSRule, _addCSSRule, _removeCSSRule;
 /* istanbul ignore else: IE <8 test*/
 if(_browserDetect.ie > 8 || _browserDetect.ie === undefined){
 	var _sheets = document.styleSheets;
@@ -113,7 +113,7 @@ if(_browserDetect.ie > 8 || _browserDetect.ie === undefined){
 			if(_browserDetect.webkit) style.appendChild(document.createTextNode(""));
 
 			// Add the <style> element to the page, add as first so the styles can be overridden by custom stylesheets
-			document.getElementsByTagName('head')[0].appendChild(style);
+			document.head.appendChild(style);
 
 			return style.sheet;
 		})();
@@ -125,9 +125,9 @@ if(_browserDetect.ie > 8 || _browserDetect.ie === undefined){
 	};
 	_addCSSRule = function(_sheet, selector, rules){
 		var insertIndex;
-		var insertedRule;
+		
 		// This order is important as IE 11 has both cssRules and rules but they have different lengths - cssRules is correct, rules gives an error in IE 11
-		/* istanbul ignore next: browser catches */
+		/* istanbul ignore else: firefox catch */
 		if(_sheet.cssRules) insertIndex = Math.max(_sheet.cssRules.length - 1, 0);
 		else if(_sheet.rules) insertIndex = Math.max(_sheet.rules.length - 1, 0);
 		
@@ -138,35 +138,32 @@ if(_browserDetect.ie > 8 || _browserDetect.ie === undefined){
 		else {
 			_sheet.addRule(selector, rules, insertIndex);
 		}
-		/* istanbul ignore next: browser catches */
-		if(sheet.rules) insertedRule = sheet.rules[insertIndex];
-		else if(sheet.cssRules) insertedRule = sheet.cssRules[insertIndex];
-		// return the inserted stylesheet rule
-		return insertedRule;
+		// return the index of the stylesheet rule
+		return insertIndex;
 	};
 
-	_getRuleIndex = function(rule, rules) {
-		var i, ruleIndex;
-		for (i=0; i < rules.length; i++) {
-			/* istanbul ignore else: check for correct rule */
-			if (rules[i].cssText === rule.cssText) {
-				ruleIndex = i;
-				break;
-			}
-		}
-		return ruleIndex;
+	removeCSSRule = function(index){
+		_removeCSSRule(sheet, index);
 	};
-
-	removeCSSRule = function(rule){
-		_removeCSSRule(sheet, rule);
-	};
-	/* istanbul ignore next: tests are browser specific */
-	_removeCSSRule = function(sheet, rule){
-		var ruleIndex = _getRuleIndex(rule, sheet.cssRules || sheet.rules);
+	_removeCSSRule = function(sheet, index){
+		/* istanbul ignore else: untestable IE option */
 		if(sheet.removeRule){
-			sheet.removeRule(ruleIndex);
+			sheet.removeRule(index);
 		}else{
-			sheet.deleteRule(ruleIndex);
+			sheet.deleteRule(index);
 		}
 	};
+}
+
+// recursive function that returns an array of angular.elements that have the passed attribute set on them
+function getByAttribute(element, attribute){
+	var resultingElements = [];
+	var childNodes = element.children();
+	if(childNodes.length){
+		angular.forEach(childNodes, function(child){
+			resultingElements = resultingElements.concat(getByAttribute(angular.element(child), attribute));
+		});
+	}
+	if(element.attr(attribute) !== undefined) resultingElements.push(element);
+	return resultingElements;
 }
