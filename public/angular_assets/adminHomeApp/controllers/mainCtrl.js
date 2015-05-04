@@ -282,9 +282,33 @@ angular.module('adminHomeApp')
                 postSummary: ""
             };
 
+            $scope.postSummaryIsEmpty = true;
+            $scope.postSummaryHasExceededMaximum = false;
+
+            $scope.checkIfPostSummaryIsEmpty = function () {
+                if ($scope.newPostModel.postSummary.length == 0) {
+                    $scope.postSummaryIsEmpty = true;
+                }
+                else {
+                    $scope.postSummaryIsEmpty = false;
+                }
+                return $scope.postSummaryIsEmpty
+            };
+
+            $scope.checkPostSummaryMaxLength = function (maxLength) {
+                if ($scope.newPostModel.postSummary.length > maxLength) {
+                    $scope.postSummaryHasExceededMaximum = true;
+                } else {
+                    $scope.postSummaryHasExceededMaximum = false;
+                }
+                return $scope.postSummaryHasExceededMaximum
+            };
+
             $scope.submitNewPost = function () {
                 if ($scope.newPostModel.postContent.length == 0) {
                     $scope.showToast('warning', 'Please add some content to the post first');
+                } else if ($scope.newPostModel.postSummary.length > 1600) {
+                    $scope.showToast('warning', 'The post summary cannot exceed 1600 characters');
                 } else {
                     var newPost = {
                         postHeading: $scope.newPostModel.postHeading,

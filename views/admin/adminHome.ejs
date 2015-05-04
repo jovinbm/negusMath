@@ -189,32 +189,24 @@
                                                 </div>
 
                                                 <div class="form-group">
+                                                    <p><strong>Post Summary</strong></p>
 
-                                                    <div class="form-group">
-                                                        <label for="textArea">Post Summary</label>
+                                                    <text-angular
+                                                            name="newPostSummary"
+                                                            ng-model="newPostModel.postSummary">
+                                                    </text-angular>
 
-                                                        <div>
-                                                            <textarea class="form-control postSummary"
-                                                                      rows="10"
-                                                                      name="postSummary"
-                                                                      ng-model="newPostModel.postSummary"
-                                                                      required
-                                                                      ng-maxlength="1600"
-                                                                      id="textArea">
-                                                            </textarea>
-                                                            <span class="form-error-notice"
-                                                                  ng-show="newPostForm.postSummary.$error.required"
-                                                                  ng-if='newPostForm.postSummary.$dirty'>
-                                <small>This is a required field:</small>
-                            </span>
-                            <span class="form-error-notice"
-                                  ng-show="newPostForm.postSummary.$error.maxlength"
-                                  ng-if='newPostForm.postSummary.$dirty'>
-                                <small>Maximum length required is 1600:</small>
-                            </span>
-                                                            <span class="help-block">This will represent this post in the list of all posts. Limited to 1600 characters. Users will be able to click a 'read more' link to see the main content of the post</span>
-                                                        </div>
-                                                    </div>
+                                                    <span class="form-error-notice"
+                                                          ng-show="checkIfPostSummaryIsEmpty()">
+                                                <small>This is a required field:</small>
+                                                </span>
+
+                                                <span class="form-error-notice"
+                                                      ng-show="checkPostSummaryMaxLength(1600)">
+                                                <small>Maximum length required is 1600:</small>
+                                                </span>
+
+                                                    <span class="help-block">This will represent this post in the list of all posts. Limited to 1600 characters. Users will be able to click a 'read more' link to see the main content of the post</span>
                                                 </div>
 
                                             </form>
@@ -231,7 +223,7 @@
                                                    href ng-click="hideNewPost(); goToTop();">Cancel</a>
                                                 <a class="btn btn-default btn-sm"
                                                    href ng-click="submitNewPost(); goToTop();"
-                                                   ng-disabled="newPostForm.$invalid">POST</a>
+                                                   ng-disabled="newPostForm.$invalid || postSummaryIsEmpty || postSummaryHasExceededMaximum">POST</a>
                                             </div>
 
                                         </div>

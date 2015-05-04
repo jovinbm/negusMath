@@ -88,33 +88,53 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <p><strong>Content</strong></p>
 
-                                    <div class="form-group">
-                                        <label for="editPostSummary">Post Summary</label>
+                                    <text-angular
+                                            name="editPostSummary"
+                                            ng-model="post.postSummary">
+                                    </text-angular>
+                                    <span class="form-error-notice"
+                                          ng-show="checkIfEditPostSummaryIsEmpty()">
+                                                <small>This is a required field:</small>
+                                                </span>
 
-                                        <div>
-                                                            <textarea class="form-control editPostSummary"
-                                                                      rows="10"
-                                                                      name="editPostSummary"
-                                                                      ng-model="post.postSummary"
-                                                                      required
-                                                                      ng-maxlength="1600"
-                                                                      id="editPostSummary">
-                                                            </textarea>
-                                                            <span class="form-error-notice"
-                                                                  ng-show="editPostForm.editPostSummary.$error.required"
-                                                                  ng-if='editPostForm.editPostSummary.$dirty'>
-                                <small>This is a required field:</small>
-                            </span>
-                            <span class="form-error-notice"
-                                  ng-show="editPostForm.editPostSummary.$error.maxlength"
-                                  ng-if='editPostForm.editPostSummary.$dirty'>
-                                <small>Maximum length required is 1600:</small>
-                            </span>
-                                            <span class="help-block">This will represent this post in the list of all posts. Limited to 1600 characters. Users will be able to click a 'read more' link to see the main content of the post</span>
-                                        </div>
-                                    </div>
+                                                <span class="form-error-notice"
+                                                      ng-show="checkEditPostSummaryMaxLength(1600)">
+                                                <small>Maximum length required is 1600:</small>
+                                                </span>
+
+                                    <span class="help-block">This will represent this post in the list of all posts. Limited to 1600 characters. Users will be able to click a 'read more' link to see the main content of the post</span>
                                 </div>
+
+                                <!--<div class="form-group">-->
+
+                                <!--<div class="form-group">-->
+                                <!--<label for="editPostSummary">Post Summary</label>-->
+
+                                <!--<div>-->
+                                <!--<textarea class="form-control editPostSummary"-->
+                                <!--rows="10"-->
+                                <!--name="editPostSummary"-->
+                                <!--ng-model="post.postSummary"-->
+                                <!--required-->
+                                <!--ng-maxlength="1600"-->
+                                <!--id="editPostSummary">-->
+                                <!--</textarea>-->
+                                <!--<span class="form-error-notice"-->
+                                <!--ng-show="editPostForm.editPostSummary.$error.required"-->
+                                <!--ng-if='editPostForm.editPostSummary.$dirty'>-->
+                                <!--<small>This is a required field:</small>-->
+                                <!--</span>-->
+                                <!--<span class="form-error-notice"-->
+                                <!--ng-show="editPostForm.editPostSummary.$error.maxlength"-->
+                                <!--ng-if='editPostForm.editPostSummary.$dirty'>-->
+                                <!--<small>Maximum length required is 1600:</small>-->
+                                <!--</span>-->
+                                <!--<span class="help-block">This will represent this post in the list of all posts. Limited to 1600 characters. Users will be able to click a 'read more' link to see the main content of the post</span>-->
+                                <!--</div>-->
+                                <!--</div>-->
+                                <!--</div>-->
 
                             </form>
 

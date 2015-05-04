@@ -427,9 +427,33 @@ angular.module('adminHomeApp')
                 postSummary: ""
             };
 
+            $scope.postSummaryIsEmpty = true;
+            $scope.postSummaryHasExceededMaximum = false;
+
+            $scope.checkIfPostSummaryIsEmpty = function () {
+                if ($scope.newPostModel.postSummary.length == 0) {
+                    $scope.postSummaryIsEmpty = true;
+                }
+                else {
+                    $scope.postSummaryIsEmpty = false;
+                }
+                return $scope.postSummaryIsEmpty
+            };
+
+            $scope.checkPostSummaryMaxLength = function (maxLength) {
+                if ($scope.newPostModel.postSummary.length > maxLength) {
+                    $scope.postSummaryHasExceededMaximum = true;
+                } else {
+                    $scope.postSummaryHasExceededMaximum = false;
+                }
+                return $scope.postSummaryHasExceededMaximum
+            };
+
             $scope.submitNewPost = function () {
                 if ($scope.newPostModel.postContent.length == 0) {
                     $scope.showToast('warning', 'Please add some content to the post first');
+                } else if ($scope.newPostModel.postSummary.length > 1600) {
+                    $scope.showToast('warning', 'The post summary cannot exceed 1600 characters');
                 } else {
                     var newPost = {
                         postHeading: $scope.newPostModel.postHeading,
@@ -481,6 +505,13 @@ angular.module('adminHomeApp')
             $scope.posts = PostService.getCurrentPosts();
             $scope.postsCount = PostService.getCurrentPostsCount();
 
+            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
+            function preparePostSummaryContent() {
+                $scope.posts.forEach(function (post) {
+                    post.postSummary = $scope.makeVideoIframesResponsive(post.postSummary);
+                });
+            }
+
             function getPagePosts() {
                 PostService.getPostsFromServer($stateParams.pageNumber)
                     .success(function (resp) {
@@ -498,6 +529,9 @@ angular.module('adminHomeApp')
                             };
                             $scope.responseStatusHandler(responseMimic);
                             $scope.goToUniversalBanner();
+                        } else {
+                            //parse the posts and prepare them, eg, making iframes responsive
+                            preparePostSummaryContent();
                         }
                     })
                     .error(function (errResp) {
@@ -537,6 +571,7 @@ angular.module('adminHomeApp')
                 if ($stateParams.pageNumber == 1) {
                     $scope.posts.unshift(data.post);
                     updateTimeAgo();
+                    preparePostSummaryContent();
                 }
                 $scope.postCount = data.postCount;
             });
@@ -625,9 +660,33 @@ angular.module('adminHomeApp')
                 $scope.editingMode = false;
             };
 
+            $scope.editPostSummaryIsEmpty = true;
+            $scope.editPostSummaryHasExceededMaximum = false;
+
+            $scope.checkIfEditPostSummaryIsEmpty = function () {
+                if ($scope.post.postSummary.length == 0) {
+                    $scope.editPostSummaryIsEmpty = true;
+                }
+                else {
+                    $scope.editPostSummaryIsEmpty = false;
+                }
+                return $scope.editPostSummaryIsEmpty
+            };
+
+            $scope.checkEditPostSummaryMaxLength = function (maxLength) {
+                if ($scope.post.postSummary.length > maxLength) {
+                    $scope.editPostSummaryHasExceededMaximum = true;
+                } else {
+                    $scope.editPostSummaryHasExceededMaximum = false;
+                }
+                return $scope.editPostSummaryHasExceededMaximum
+            };
+
             $scope.submitPostUpdate = function () {
                 if ($scope.post.postContent.length == 0) {
                     $scope.showToast('warning', 'Please add some content to the post first');
+                } else if ($scope.post.postSummary.length > 1600) {
+                    $scope.showToast('warning', 'The post summary cannot exceed 1600 characters');
                 } else {
                     PostService.submitPostUpdate($scope.post)
                         .success(function (resp) {
