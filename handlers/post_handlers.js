@@ -110,88 +110,6 @@ module.exports = {
     },
 
 
-    upvote: function (req, res, theUser, upvotedIndex, inc) {
-        consoleLogger("upvote: upvote event handler called");
-        var upvotedArray = theUser.votedQuestionIndexes;
-        var errorCounter = 0;
-        switch (inc) {
-            case 1:
-                //check to see if the user already upvoted this question to avoid repetition
-                if (upvotedArray.indexOf(upvotedIndex) > -1) {
-                    repetitionResponse();
-                    errorCounter++;
-                } else {
-                    upvotedArray.push(upvotedIndex);
-                }
-                break;
-            case -1:
-                //check to see if the user already upvoted this question to avoid repetition
-                if (upvotedArray.indexOf(upvotedIndex) == -1) {
-                    repetitionResponse();
-                    errorCounter++;
-                } else if (upvotedArray.indexOf(upvotedIndex) != -1) {
-                    upvotedArray.splice(upvotedArray.indexOf(upvotedIndex), 1);
-                }
-                break;
-            default:
-                errorCounter++;
-                consoleLogger("ERROR: upvote event handler: switch statement got unexpected value");
-                res.status(500).send({
-                    msg: 'ERROR: upvote event handler: switch statement got unexpected value'
-                });
-                consoleLogger('upvote: failed!');
-        }
-
-        function error(status, err) {
-            if (status == -1) {
-                consoleLogger("ERROR: upvote event handler: Error while executing db operations" + err);
-                res.status(500).send({
-                    msg: 'ERROR: upvote event handler: Error while executing db operations',
-                    err: err
-                });
-                consoleLogger('upvote: failed!');
-            } else if (status == 0) {
-                //this will mostly be returned be the findTopVotedQuestions query
-                ioJs.emitToOne(theUser.socketRoom, "upvotedIndexes", upvotedArray);
-                ioJs.emitToAll('topVoted', []);
-                res.status(200).send({msg: "upvote: partial ERROR: Status:200: query returned null/undefined: There might also be no top voted object"});
-                consoleLogger('**partial ERROR!: Status:200 upvote event handler: failure: query returned NULL/UNDEFINED: There might be no top voted object');
-            }
-        }
-
-        function success() {
-            function done() {
-                function found(topVotedArrayOfObjects) {
-
-                    ioJs.emitToAll('topVoted', topVotedArrayOfObjects);
-                    ioJs.emitToOne(theUser.socketRoom, 'upvotedIndexes', upvotedArray);
-                    res.status(200).send({msg: 'upvote success'});
-                    consoleLogger('upvote: Success');
-                }
-
-                postDB.findTopVotedQuestions(-1, 10, error, error, found);
-            }
-
-            postDB.changeQuestionVotes(upvotedIndex, inc, error, error, done);
-        }
-
-        function repetitionResponse() {
-            res.status(200).send({msg: 'upvote success: There was an upvote/downvote repetition'});
-            consoleLogger('upvote success: There was an upvote/downvote repetition');
-        }
-
-        if (errorCounter == 0) {
-            switch (inc) {
-                case 1:
-                    postDB.pushUpvoteToUpvoter(req.user.id, upvotedIndex, error, error, success);
-                    break;
-                case -1:
-                    postDB.pullUpvoteFromUpvoter(req.user.id, upvotedIndex, error, error, success);
-                    break;
-            }
-        }
-    },
-
     getPosts: function (req, res, page) {
         var module = 'getPosts';
         receivedLogger(module);
@@ -219,6 +137,7 @@ module.exports = {
             });
         }
     },
+
 
     getPost: function (req, res, postIndex) {
         var module = 'getPost';
@@ -278,38 +197,6 @@ module.exports = {
                 msg: 'Failed to retrieve this weeks top posts. Please reload page '
             });
         }
-    },
-
-
-    retrieveQuestion: function (req, res, theUser, questionIndex) {
-        consoleLogger("getQuestions: getQuestions called");
-        var temp = {};
-
-        function error(status, err) {
-            if (status == -1) {
-                consoleLogger("retrieveQuestion handler: GetQuestions: Error while retrieving questions" + err);
-                res.status(500).send({
-                    msg: 'retrieveQuestion: retrieveQuestion: Error while retrieving questions',
-                    err: err
-                });
-                consoleLogger('retrieveQuestion: failed!');
-            } else if (status == 0) {
-                temp['question'] = [];
-                temp['upvotedIndexes'] = theUser.votedQuestionIndexes;
-                res.status(200).send(temp);
-                consoleLogger('retrieveQuestion: Did not find any questions');
-            }
-        }
-
-
-        function success(question) {
-            temp['question'] = question;
-            temp['upvotedIndexes'] = theUser.votedQuestionIndexes;
-            res.status(200).send(temp);
-        }
-
-        postDB.getOneQuestion(questionIndex, error, error, success)
     }
-
 
 };

@@ -207,90 +207,21 @@ module.exports = {
     getCount: function (error_neg_1, error_0, success) {
         var module = 'getCount';
         receivedLogger(module);
-        var questionCount;
+        var postCount;
         Post.count({}, function (err, count) {
             if (err) {
                 consoleLogger(errorLogger(module));
                 error_neg_1(-1, err);
             } else if (count == null || count == undefined) {
-                questionCount = 0;
+                postCount = 0;
                 consoleLogger(successLogger(module));
-                success(questionCount);
+                success(postCount);
             } else {
-                questionCount = count;
+                postCount = count;
                 consoleLogger(successLogger(module));
-                success(questionCount);
+                success(postCount);
             }
         });
-    },
-
-
-    pushQuestionToAsker: function (openId, index, error_neg_1, error_0, success) {
-        var module = 'pushQuestionToAsker';
-        receivedLogger(module);
-        User.update({id: openId}, {
-            $addToSet: {askedQuestionsIndexes: index}
-        }, function (err) {
-            if (err) {
-                consoleLogger(errorLogger(module));
-                error_neg_1(-1, err);
-            } else {
-                consoleLogger(successLogger(module));
-                success();
-            }
-
-        });
-    },
-
-
-    pushUpvoteToUpvoter: function (openId, upvotedIndex, error_neg_1, error_0, success) {
-        var module = 'pushUpvoteToUpvoter';
-        receivedLogger(module);
-        User.update({id: openId}, {
-                $addToSet: {votedQuestionIndexes: upvotedIndex}
-            }, function (err) {
-                if (err) {
-                    consoleLogger(errorLogger(module));
-                    error_neg_1(-1, err);
-                } else {
-                    consoleLogger(successLogger(module));
-                    success();
-                }
-            }
-        )
-    },
-
-
-    pullUpvoteFromUpvoter: function (openId, upvotedIndex, error_neg_1, error_0, success) {
-        var module = 'pullUpvoteFromUpvoter';
-        receivedLogger(module);
-        User.update({id: openId}, {
-                $pull: {votedQuestionIndexes: upvotedIndex}
-            }, function (err) {
-                if (err) {
-                    consoleLogger(errorLogger(module));
-                    error_neg_1(-1, err);
-                } else {
-                    consoleLogger(successLogger(module));
-                    success();
-                }
-            }
-        )
-    },
-
-
-    changeQuestionVotes: function (upvotedIndex, inc, error_neg_1, error_0, success) {
-        var module = 'changeQuestionVotes';
-        receivedLogger(module);
-        Post.update({questionIndex: upvotedIndex}, {$inc: {votes: inc}}, function (err) {
-            if (err) {
-                consoleLogger(errorLogger(module));
-                error_neg_1(-1, err);
-            } else {
-                consoleLogger(successLogger(module));
-                success();
-            }
-        })
     }
 
 

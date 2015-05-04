@@ -49,6 +49,7 @@ module.exports = {
         post_handler.newPost(req, res, req.body.newPost);
     },
 
+
     updatePost: function (req, res) {
         var module = 'updatePost';
         receivedLogger(module);
@@ -56,64 +57,11 @@ module.exports = {
         post_handler.updatePost(req, res, postUpdate);
     },
 
+
     getHotThisWeek: function (req, res) {
         var module = 'getHotThisWeek';
         receivedLogger(module);
         var quantity = 7;
         post_handler.getHotThisWeek(req, res, quantity);
-    },
-
-
-    updateQuestion: function (req, res) {
-        basic.consoleLogger('UPDATE_QUESTION event received');
-        var theQuestion = req.body;
-
-        function error(status, err) {
-            if (status == -1 || status == 0) {
-                res.status(500).send({msg: 'ERROR: updateQuestionPOST: Could not retrieve user', err: err});
-                basic.consoleLogger("ERROR: updateQuestionPOST: Could not retrieve user: " + err);
-            }
-        }
-
-        function success(theUser) {
-            if (theUser.customLoggedInStatus == 1) {
-                post_handler.updateQuestion(req, res, theUser, theQuestion);
-            }
-            //TODO -- redirect to custom login
-        }
-
-        userDB.findUser(req.user.id, error, error, success);
-    },
-
-
-    upvote: function (req, res) {
-        basic.consoleLogger('UPVOTE event received');
-        var upvotedIndex = req.body.upvoteIndex;
-        var inc = req.body.inc;
-
-        function error(status, err) {
-            if (status == -1 || status == 0) {
-                res.status(500).send({msg: 'ERROR: upvotePOST: Could not retrieve user', err: err});
-                basic.consoleLogger("ERROR: upvotePOST: Could not retrieve user: " + err);
-            }
-        }
-
-        function success(theUser) {
-            if (theUser.customLoggedInStatus == 1) {
-                if (inc == -1 || theUser.votedQuestionIndexes.indexOf(upvotedIndex) == -1) {
-                    post_handler.upvote(req, res, theUser, upvotedIndex, inc);
-                } else {
-                    //upvote process did not pass checks
-                    res.status(200).send({msg: 'upvote did not pass checks'});
-                    basic.consoleLogger('upvote: Not executed: Did not pass checks');
-                }
-            } else {
-                //TODO -- redirect to login
-            }
-        }
-
-        userDB.findUser(req.user.id, error, error, success);
     }
-
-
 };

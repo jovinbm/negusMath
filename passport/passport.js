@@ -21,7 +21,6 @@ function getTheUser(req) {
 
 var basic = require('../functions/basic.js');
 var consoleLogger = require('../functions/basic.js').consoleLogger;
-consoleLogger("ENVIRONMENT = " + process.env.NODE_ENV);
 
 var cuid = require('cuid');
 var userDB = require('../db/user_db.js');

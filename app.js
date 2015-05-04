@@ -17,7 +17,7 @@ var compression = require('compression');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 var passport = require('passport');
-LocalStrategy = require('passport-local').Strategy;
+var LocalStrategy = require('passport-local').Strategy;
 var mongoose = require('mongoose');
 var autoIncrement = require('mongoose-auto-increment');
 var moment = require('moment');
@@ -52,6 +52,7 @@ function getTheUser(req) {
     return req.customData.theUser;
 }
 
+consoleLogger("ENVIRONMENT = " + process.env.NODE_ENV);
 mongoose.connect(databaseURL);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error: Problem while attempting to connect to database'));
@@ -122,16 +123,12 @@ app.post('/api/logoutClient', middleware.ensureAuthenticatedAngular, middleware.
 
 //info api
 app.get('/api/getUserData', loginAPI.getUserData);
-app.post('/api/startUp', middleware.ensureAuthenticatedAngular, middleware.addUserData, basicAPI.startUp);
-app.post('/api/reconnect', middleware.ensureAuthenticatedAngular, middleware.addUserData, basicAPI.reconnect);
 
 app.post('/api/getPosts', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getPosts);
 app.post('/api/getPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getPost);
 app.post('/api/newPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.newPost);
 app.post('/api/updatePost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.updatePost);
 app.post('/api/getHotThisWeek', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getHotThisWeek);
-app.post('/api/updateQuestion', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.updateQuestion);
-app.post('/api/upvote', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.upvote);
 
 //error handlers
 // catch 404 and forward to error handler
