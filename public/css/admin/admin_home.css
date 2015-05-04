@@ -2,7 +2,7 @@ body {
     padding-top: 70px;
     /*color: #fff;*/
     background-attachment: scroll;
-    background-image: url(/public/imgs/cover/ocean.jpg);
+    background-image: url(/public/imgsmin/cover/ocean.jpg);
     background-position: center center;
     background-repeat: none;
     -webkit-background-size: cover;

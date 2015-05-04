@@ -9,6 +9,8 @@ var ngAnnotate = require('gulp-ng-annotate');
 var sourcemaps = require('gulp-sourcemaps');
 var minifyCss = require('gulp-minify-css');
 var ext_replace = require('gulp-ext-replace');
+var imagemin = require('gulp-imagemin');
+var pngquant = require('imagemin-pngquant');
 
 // Concatenate & Minify JS
 gulp.task('minifyAdminHomeAppJS', function () {
@@ -44,6 +46,16 @@ gulp.task('minifyAllCSS', function () {
         .pipe(gulp.dest('public/cssmin/'));
 });
 
+gulp.task('minifyAllImages', function () {
+    return gulp.src('public/imgs/**/*')
+        .pipe(imagemin({
+            progressive: true,
+            svgoPlugins: [{removeViewBox: false}],
+            use: [pngquant()]
+        }))
+        .pipe(gulp.dest('public/imgsmin'));
+});
+
 // Watch Files For Changes
 gulp.task('watch', function () {
     gulp.watch('public/angular_assets/adminHomeApp/**/*.js', ['minifyAdminHomeAppJS']);
@@ -51,5 +63,5 @@ gulp.task('watch', function () {
 });
 
 // Default Task
-gulp.task('default', ['minifyIndexAppJS', 'minifyAdminHomeAppJS', 'minifyAllCSS']);
+gulp.task('default', ['minifyIndexAppJS', 'minifyAdminHomeAppJS', 'minifyAllCSS', 'minifyAllImages']);
 //gulp.task('default', ['minifyIndexAppJS', 'minifyAdminHomeAppJS', 'minifyAllCSS', 'watch']);
