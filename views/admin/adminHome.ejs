@@ -239,7 +239,7 @@
         </div>
     </section>
 
-    <section>
+    <section id="postsSection">
         <div class="container">
             <div class="row">
 
@@ -253,12 +253,25 @@
 
                     <div class="panel panel-default ng-cloak">
 
-                        <div class="panel-heading"><i class="fa fa-youtube-play"></i> THIS WEEK'S VIDEO
+                        <div class="panel-heading"><i class="fa fa-youtube-play"></i> THIS WEEK'S VIDEOS
                         </div>
 
                         <div class="panel-body">
-                            <ul class="list-unstyled animated fadeIn">
-                                <li class="list-unstyled clearfix">
+                            <ul class="list-unstyled animated fadeIn videosThisWeek">
+                                <li class="list-unstyled clearfix post">
+                                    <div class="card">
+
+                                        <div class="card-content">
+                                            <div class="embed-responsive embed-responsive-16by9">
+                                                <iframe class="embed-responsive-item"
+                                                        src="https://www.youtube.com/embed/adKP2CzKaFM" frameborder="0"
+                                                        allowfullscreen></iframe>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+
+                                <li class="list-unstyled clearfix post">
                                     <div class="card">
 
                                         <div class="card-content">
@@ -283,8 +296,8 @@
 
                         <div class="panel-body">
 
-                            <ul class="list-group">
-                                <li class="list-group-item"
+                            <ul class="list-group hotThisWeek">
+                                <li class="list-group-item post"
                                     ng-repeat="hotPost in hotThisWeek">
                                     <p class="ng-cloak text-outputs">
                                         <a ng-href="#!/post/{{hotPost.postIndex}}"
@@ -414,17 +427,14 @@
         </div>
     </section>
 
-
     <footer>
         <div class="container">
             <div class="row">
                 <div class="col-md-12 clearfix text-center">
-                    <span class="copyright pull-left">Copyright &copy; 2015 NegusMath Inc</span>
-                    <ul class="list-inline quicklinks pull-right">
-                        <li><a href="http://dlp.io/terms.html" target="_blank">Privacy Policy</a>
-                        </li>
-                        <li><a href="http://dlp.io/terms.html" target="_blank">Terms of Use</a>
-                        </li>
+                    <ul class="list-unstyled quicklinks">
+                        <li class="copyright">Copyright &copy; 2015 NegusMath Inc</li>
+                        <li><a href="#" target="_self">Privacy Policy</a></li>
+                        <li><a href="#" target="_self">Terms of Use</a></li>
                     </ul>
                 </div>
             </div>

@@ -1,6 +1,5 @@
 body {
     padding-top: 70px;
-    /*color: #fff;*/
     background-attachment: scroll;
     background-image: url(/public/imgsmin/cover/ocean.jpg);
     background-position: center center;
@@ -39,11 +38,6 @@ body {
     background-image: none;
 }
 
-.panel-heading {
-    font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-weight: 700;
-}
-
 section {
     padding: 30px 0;
 }
@@ -54,45 +48,66 @@ section {
     }
 }
 
-/*section#newPostSection {*/
-    /*padding-top: 40px;*/
-/*}*/
+@media (max-width: 767px) {
+    section#postsSection {
+        padding: 0;
+    }
+}
 
-section h2.section-heading {
+.panel-heading {
+    font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 700;
+}
+
+@media (max-width: 767px) {
+    .postHeading {
+        font-size: 15px;
+    }
+
+    .postBy {
+        font-size: 11px;
+    }
+}
+
+div.panel-body {
+    padding: 0;
+}
+
+div#disqus-div {
+    padding: 1.3em;
+}
+
+div.card {
     margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 40px;
-    color: #f6bf01;
+    margin-bottom: 0;
 }
 
-.section-heading-small-20 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    font-size: 20px;
+li.post {
+    margin-bottom: 0.7em;
 }
 
-section h3.section-subheading {
-    margin-bottom: 75px;
-    text-transform: none;
-    font-family: "Droid Serif", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 25px;
-    font-style: italic;
-    font-weight: 400;
-    color: #f6bf01;
+ul.videosThisWeek {
+    margin-bottom: 0;
 }
 
-.service-heading {
-    margin: 15px 0;
-    text-transform: none;
+ul.hotThisWeek {
+    margin-bottom: 0;
 }
 
-.service-heading {
-    margin: 20px 0;
-    text-transform: none;
+@media (min-width: 768px) {
+    div#postStream {
+        padding-left: 0;
+        padding-right: 0;
+        background-color: #fff;
+    }
 }
 
-textarea.postSummary {
-    background-color: rgb(240, 240, 240);
+@media (max-width: 767px) {
+    div#postStream {
+        padding-left: 0;
+        padding-right: 0;
+        background-color: #fff;
+    }
 }
 
 section#contact {

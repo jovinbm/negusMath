@@ -1,74 +1,71 @@
-<div class="panel panel-default"
-     ng-controller="PostsController"
+<div ng-controller="PostsController"
      ng-show="!checkIfPostsIsEmpty()">
 
-    <div class="panel-heading ng-cloak"><i class="fa fa-leanpub"></i> LATEST POSTS <span
-            class="pull-right">{{currentTime}}</span>
+    <div class="panel-heading ng-cloak visible-lg visible-md"><i class="fa fa-leanpub"></i> LATEST POSTS <span
+            class="pull-right visible-lg">{{currentTime}}</span>
     </div>
 
-    <div class="panel-body">
-        <ul class="list-unstyled animated fadeIn">
-            <li class="list-unstyled clearfix"
-                ng-repeat="post in posts">
-                <div class="card">
+    <ul class="list-unstyled animated fadeIn">
+        <li class="list-unstyled post clearfix"
+            ng-repeat="post in posts">
+            <div class="card">
 
-                    <div class="card-content">
+                <div class="card-content">
 
-                        <h4 class="ng-cloak text-outputs"><a ng-href="#!/post/{{post.postIndex}}"
-                                                             ng-click="goToTop()">{{post.postHeading}}</a></h4>
+                    <h5 class="ng-cloak text-outputs postHeading"><a ng-href="#!/post/{{post.postIndex}}"
+                                                                     ng-click="goToTop()">{{post.postHeading}}</a></h5>
 
-                        <h6 class="text-muted">
-                            <small class="ng-cloak"><a class="btn-link">{{post.authorName}}</a>
-                                on
-                                {{post.postDate}}
-                            </small>
-                            <br/>
-                            <small class="text-muted ng-cloak">
-                                {{post.theTimeAgo}}
-                            </small>
-                        </h6>
+                    <h6 class="text-muted postBy">
+                        <small class="ng-cloak"><a class="btn-link">{{post.authorName}}</a>
+                            on
+                            {{post.postDate}}
+                        </small>
+                        <br/>
+                        <small class="text-muted ng-cloak">
+                            {{post.theTimeAgo}}
+                        </small>
+                    </h6>
 
-                        <div class="postContent">
-                            <div ta-bind
-                                 ng-model="post.postSummary"></div>
-                        </div>
-
-
+                    <div class="postContent">
+                        <div ta-bind
+                             ng-model="post.postSummary"></div>
                     </div>
-                    <div class="card-action clearfix">
 
-                        <div class="pull-right">
-                            <a ng-href="#!/post/{{post.postIndex}}"
-                               ng-click="goToTop()"
-                               class="btn btn-default btn-sm">Read More</a>
-                        </div>
 
-                    </div>
                 </div>
-            </li>
+                <div class="card-action clearfix">
 
-            <li class="list-unstyled clearfix">
-                <div class="card">
-
-                    <div class="card-content">
-
-                        <h4 class="text-outputs">Relativistic dynamics - Solution to Sample Question </h4>
-
-                        <h6 class="text-muted">
-                            <small><a class="btn-link">Salash Tolan</a> on {{currentTime}}
-                            </small>
-                        </h6>
-
-                        <div class="embed-responsive embed-responsive-16by9">
-                            <iframe class="embed-responsive-item"
-                                    src="https://www.youtube.com/embed/adKP2CzKaFM" frameborder="0"
-                                    allowfullscreen></iframe>
-                        </div>
-
-
+                    <div class="pull-right">
+                        <a ng-href="#!/post/{{post.postIndex}}"
+                           ng-click="goToTop()"
+                           class="btn btn-default btn-sm">Read More</a>
                     </div>
+
                 </div>
-            </li>
-        </ul>
-    </div>
+            </div>
+        </li>
+
+        <li class="list-unstyled clearfix">
+            <div class="card">
+
+                <div class="card-content">
+
+                    <h4 class="text-outputs">Relativistic dynamics - Solution to Sample Question </h4>
+
+                    <h6 class="text-muted">
+                        <small><a class="btn-link">Salash Tolan</a> on {{currentTime}}
+                        </small>
+                    </h6>
+
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe class="embed-responsive-item"
+                                src="https://www.youtube.com/embed/adKP2CzKaFM" frameborder="0"
+                                allowfullscreen></iframe>
+                    </div>
+
+
+                </div>
+            </div>
+        </li>
+    </ul>
 </div>

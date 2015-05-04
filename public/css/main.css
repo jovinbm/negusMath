@@ -6,11 +6,10 @@
 }
 
 body {
-    font-family: 'Source Sans Pro', sans-serif;
-    /*font-family: "Roboto Slab", "Helvetica Neue", Helvetica, Arial, sans-serif;*/
-    font-weight: 500;
-    font-size: 18px;
-    line-height: 1.5;
+    font-family: "Roboto Slab", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #222;
+    font-size: 15px;
+    line-height: 1.7em;
 }
 
 /*make all images responsive*/
