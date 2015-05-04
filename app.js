@@ -13,6 +13,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var compression = require('compression');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 var passport = require('passport');
@@ -68,7 +69,7 @@ postSchema.plugin(autoIncrement.plugin, {
     startAt: 1
 });
 
-
+app.use(compression());
 app.use(favicon(__dirname + '/public/favicon.ico'));
 
 app.use("/bower_components", express.static(path.join(__dirname, '/bower_components')));
