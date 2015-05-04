@@ -93,6 +93,12 @@ header .local_login_heading {
     background-color: #fed136;
 }
 
+.btn-config {
+    border-color: #fed136;
+    text-transform: uppercase;
+    font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
 .btn-xl:hover,
 .btn-xl:focus,
 .btn-xl:active,
