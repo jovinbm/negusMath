@@ -224,10 +224,12 @@ angular.module('indexApp')
                             $scope.isRandomClient = false;
                         }
 
-                        //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
-                        socket.emit('joinRoom', {
-                            room: resp.userData.uniqueCuid
-                        });
+                        if ($scope.userData.isRegistered == 'yes') {
+                            //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
+                            socket.emit('joinRoom', {
+                                room: resp.userData.uniqueCuid
+                            });
+                        }
 
                         $scope.responseStatusHandler(resp);
                         $scope.isLoadingFalse();

@@ -144,8 +144,8 @@ angular.module('clientHomeApp')
         }
     ]);
 angular.module('clientHomeApp')
-    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$document', '$state', '$stateParams',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $document, $state, $stateParams) {
+    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$document', '$state', '$stateParams', 'logoutService',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $document, $state, $stateParams, logoutService) {
 
             //listens for state changes
             $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
@@ -380,11 +380,55 @@ angular.module('clientHomeApp')
 
             //***************end time functions***********************
 
+            //initial requests
+            function initialRequests() {
+                socketService.getUserData()
+                    .success(function (resp) {
+                        $scope.userData = globals.userData(resp.userData);
+                        if ($scope.userData.isRegistered == 'yes') {
+                            $scope.clientIsRegistered = true;
+                        } else {
+                            $scope.clientIsRegistered = false;
+                        }
+
+                        if ($scope.userData.isRegistered == 'yes') {
+                            //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
+                            socket.emit('joinRoom', {
+                                room: resp.userData.uniqueCuid
+                            });
+                        }
+
+                        $scope.responseStatusHandler(resp);
+                    })
+                    .error(function (errResponse) {
+                        $scope.responseStatusHandler(errResponse);
+                    });
+            }
+
+            socket.on('joined', function () {
+                console.log("JOIN SUCCESS");
+            });
+
+            initialRequests();
+
 
             //function to go to landing page
             $scope.goToLandingPage = function () {
                 $window.location.href = 'index';
             };
+
+            //===============logout functions===============
+            $scope.logoutClient = function () {
+                logoutService.logoutClient()
+                    .success(function (resp) {
+                        $scope.responseStatusHandler(resp);
+                    })
+                    .error(function (errResponse) {
+                        $scope.responseStatusHandler(errResponse);
+                    });
+            };
+
+            //=============end of logout===================
 
             //===============socket listeners===============
 
@@ -846,9 +890,23 @@ angular.module('clientHomeApp')
     .factory('socketService', ['$log', '$http', '$rootScope',
         function ($log, $http, $rootScope) {
             return {
+                getUserData: function () {
+                    return $http.get('/api/getUserData');
+                },
+
                 sendContactUs: function (contactUsModel) {
                     return $http.post('/contactUs', contactUsModel);
                 }
             }
         }
-    ]);
+    ])
+
+    .factory('logoutService', ['$http',
+        function ($http) {
+            return {
+
+                logoutClient: function () {
+                    return $http.post('/api/logoutClient');
+                }
+            }
+        }]);

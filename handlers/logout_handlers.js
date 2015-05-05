@@ -32,7 +32,6 @@ module.exports = {
         consoleLogger(successLogger(module));
         res.status(200).send({
             code: 200,
-            notify: false,
             redirect: true,
             redirectPage: "/index"
         });

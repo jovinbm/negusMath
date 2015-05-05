@@ -1,6 +1,7 @@
 var path = require('path');
 var basic = require('../functions/basic.js');
 var consoleLogger = require('../functions/basic.js').consoleLogger;
+var middleware = require('../functions/middleware.js');
 
 var fileName = 'router.js';
 
@@ -36,9 +37,28 @@ module.exports = {
         receivedLogger(module);
 
         if (req.isAuthenticated()) {
-            res.render('admin/adminHome.ejs');
+            //gets user details from checkIfUserIsAdminReturn middleware which calls success with an
+            //object with 3 keys: 'success' = boolean, true if succeded, 'userdata' and
+            //'isAdmin'
+            middleware.checkUserIsAdminAndReturn(req, res, error, success);
+
+            function success(details) {
+                if (details.isAdmin) {
+                    res.render('admin/adminHome.ejs');
+                    consoleLogger(successLogger(module));
+                } else {
+                    res.render('client/clientHome.ejs');
+                    consoleLogger(successLogger(module));
+                }
+            }
+
+            function error() {
+                consoleLogger(errorLogger(module));
+            }
+
         } else {
             res.render('client/clientHome.ejs');
+            consoleLogger(successLogger(module));
         }
 
     },

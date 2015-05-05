@@ -46,9 +46,23 @@ angular.module('clientHomeApp')
     .factory('socketService', ['$log', '$http', '$rootScope',
         function ($log, $http, $rootScope) {
             return {
+                getUserData: function () {
+                    return $http.get('/api/getUserData');
+                },
+
                 sendContactUs: function (contactUsModel) {
                     return $http.post('/contactUs', contactUsModel);
                 }
             }
         }
-    ]);
+    ])
+
+    .factory('logoutService', ['$http',
+        function ($http) {
+            return {
+
+                logoutClient: function () {
+                    return $http.post('/api/logoutClient');
+                }
+            }
+        }]);
