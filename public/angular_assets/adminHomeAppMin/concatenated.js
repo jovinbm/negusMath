@@ -541,11 +541,13 @@ angular.module('adminHomeApp')
             $scope.showSuggestedPosts = false;
 
             $scope.showThePostsOnly = function () {
+                $scope.showHideLoadingBanner(false);
                 $scope.showPosts = true;
                 $scope.showSuggestedPosts = false;
             };
 
             $scope.showSuggestedPostsOnly = function () {
+                $scope.showHideLoadingBanner(false);
                 $scope.showPosts = false;
                 $scope.showSuggestedPosts = true;
             };
@@ -559,6 +561,7 @@ angular.module('adminHomeApp')
 
             //function used to fill in with suggested posts in case no posts are received
             function getSuggestedPosts() {
+                $scope.showHideLoadingBanner(true);
                 //empty the suggestedPosts
                 $scope.suggestedPosts = [];
                 PostService.getSuggestedPostsFromServer()
@@ -581,6 +584,7 @@ angular.module('adminHomeApp')
                             $scope.suggestedPosts = [];
                             $scope.showSuggestedPosts = false;
                             $scope.goToUniversalBanner();
+                            $scope.showHideLoadingBanner(false);
                         }
 
                     })
@@ -594,6 +598,7 @@ angular.module('adminHomeApp')
             }
 
             function getPagePosts() {
+                $scope.showHideLoadingBanner(true);
                 PostService.getPostsFromServer($stateParams.pageNumber)
                     .success(function (resp) {
                         //this function  creates a banner to notify user that there are no posts by mimicing a response and calling the response handler
@@ -697,9 +702,9 @@ angular.module('adminHomeApp')
             };
 
             $scope.showSuggestedPostsOnly = function () {
+                $scope.showHideLoadingBanner(false);
                 $scope.showPost = false;
                 $scope.showSuggestedPosts = true;
-                $scope.showHideLoadingBanner(false);
             };
 
             $scope.postIsLoaded = false;
@@ -729,6 +734,7 @@ angular.module('adminHomeApp')
                             $scope.suggestedPosts = [];
                             $scope.showSuggestedPosts = false;
                             $scope.goToUniversalBanner();
+                            $scope.showHideLoadingBanner(false);
                         }
 
                     })
