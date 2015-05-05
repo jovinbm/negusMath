@@ -1,6 +1,7 @@
 angular.module('clientHomeApp', [
     'ui.bootstrap',
     'angular-loading-bar',
+    'cfp.loadingBar',
     'angulartics',
     'angulartics.google.analytics',
     'angularMoment',

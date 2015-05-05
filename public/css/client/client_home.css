@@ -6,6 +6,19 @@ div#universalBanner {
     padding: 0;
 }
 
+div#loading-card {
+    display: table;
+    height: 100vh;
+    width: 100%;
+}
+
+div#loading-card-content {
+    display: table-cell;
+    vertical-align: middle;
+    /*height: 100%;*/
+    width: 100%;
+}
+
 section {
     padding: 30px 0;
 }

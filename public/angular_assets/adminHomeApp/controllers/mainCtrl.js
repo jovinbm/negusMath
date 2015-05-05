@@ -1,6 +1,6 @@
 angular.module('adminHomeApp')
-    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'logoutService', 'PostService', '$document', '$state', '$stateParams',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, logoutService, PostService, $document, $state, $stateParams) {
+    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'logoutService', 'PostService', '$document', '$state', '$stateParams', 'cfpLoadingBar',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, logoutService, PostService, $document, $state, $stateParams, cfpLoadingBar) {
 
             //listens for state changes
             $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
@@ -172,6 +172,22 @@ angular.module('adminHomeApp')
 
             //===============isLoading functions to disable elements while content is loading or processing===============
             $scope.isLoading = false;
+            $scope.isLoadingPercentage = 0;
+            $scope.changeIsLoadingPercentage = function (num) {
+                $scope.isLoadingPercentage = num;
+            };
+
+            $rootScope.$on('cfpLoadingBar:loading', function (event, resp) {
+                $scope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.$on('cfpLoadingBar:loaded', function (event, resp) {
+                $scope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.$on('cfpLoadingBar:completed', function (event, resp) {
+                $scope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
 
             $scope.isLoadingTrue = function () {
                 $scope.isLoading = true;
