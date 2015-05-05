@@ -92,6 +92,26 @@ module.exports = {
         }
     },
 
+    getSuggestedPosts: function (quantity, error_neg_1, error_0, success) {
+        var module = 'getSuggestedPosts';
+        receivedLogger(module);
+        Post.find({numberOfVisits: {$gt: 0}})
+            .sort({numberOfVisits: -1})
+            .limit(quantity)
+            .exec(function (err, postsArray) {
+                if (err) {
+                    consoleLogger(errorLogger(module));
+                    error_neg_1(-1, err);
+                } else if (postsArray.length == 0) {
+                    consoleLogger(successLogger(module, "SuggestedPosts is empty"));
+                    success([]);
+                } else {
+                    consoleLogger(successLogger(module));
+                    success(postsArray);
+                }
+            });
+    },
+
 
     getHotThisWeek: function (quantity, error_neg_1, error_0, success) {
         var module = 'getHotThisWeek';

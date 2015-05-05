@@ -329,6 +329,7 @@ angular.module('adminHomeApp')
                 }
             };
 
+            //=====================end of submitting post
 
             //===============logout functions===============
             $scope.logoutClient = function () {

@@ -122,6 +122,8 @@ a.active {
 div.alert.alert-success, div.alert.alert-warning, div.alert.alert-info {
     margin-top: 0.5em;
     margin-bottom: 0.5em;
+    /*margin-left: 0;*/
+    /*margin-right: 0;*/
 }
 
 .center_text {

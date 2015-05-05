@@ -114,12 +114,12 @@ module.exports = {
         var module = 'getPosts';
         receivedLogger(module);
 
-        var temp = {};
         var limit = 10;
 
         postDB.getPosts(-1, page, limit, error_neg_1, error_neg_1, success);
 
         function success(postsArray, postsCount) {
+            var temp = {};
             temp['postsCount'] = postsCount;
             temp['postsArray'] = postsArray;
             consoleLogger(successLogger(module));
@@ -135,6 +135,27 @@ module.exports = {
                 msg: 'Failed to retrieve your personalized posts. Please reload this page',
                 disable: true
             });
+        }
+    },
+
+    getSuggestedPosts: function (req, res, quantity) {
+        var module = 'getSuggestedPosts';
+        receivedLogger(module);
+
+        postDB.getSuggestedPosts(quantity, error, error, success);
+
+        function success(postsArray) {
+            var temp = {};
+            temp['postsArray'] = postsArray;
+            consoleLogger(successLogger(module));
+            res.status(200).send(temp);
+        }
+
+        function error() {
+            var temp = {};
+            temp['postsArray'] = [];
+            consoleLogger(successLogger(module));
+            res.status(200).send(temp);
         }
     },
 

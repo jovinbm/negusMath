@@ -35,6 +35,13 @@ module.exports = {
         post_handler.getPosts(req, res, page);
     },
 
+    getSuggestedPosts: function (req, res) {
+        var module = 'getSuggestedPosts';
+        receivedLogger(module);
+        var quantity = 4;
+        post_handler.getSuggestedPosts(req, res, quantity);
+    },
+
     getPost: function (req, res) {
         var module = 'getPost';
         receivedLogger(module);

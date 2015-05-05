@@ -31,6 +31,10 @@ angular.module('adminHomeApp')
                     })
                 },
 
+                getSuggestedPostsFromServer: function () {
+                    return $http.post('/api/getSuggestedPosts', {})
+                },
+
                 updatePosts: function (postsArray) {
                     posts = postsArray;
                     return postsArray;

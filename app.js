@@ -125,6 +125,7 @@ app.post('/api/logoutClient', middleware.ensureAuthenticatedAngular, middleware.
 app.get('/api/getUserData', loginAPI.getUserData);
 
 app.post('/api/getPosts', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getPosts);
+app.post('/api/getSuggestedPosts', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getSuggestedPosts);
 app.post('/api/getPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getPost);
 app.post('/api/newPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.newPost);
 app.post('/api/updatePost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.updatePost);
