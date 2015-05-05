@@ -2,6 +2,13 @@ angular.module('clientHomeApp')
     .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$document', '$state', '$stateParams', 'logoutService', 'cfpLoadingBar',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $document, $state, $stateParams, logoutService, cfpLoadingBar) {
 
+            //variable to show or hide disqus if window.host contains negusmath
+            if ($location.host().search("harvardgrill") !== -1) {
+                $scope.showDisqus = true;
+            } else {
+                $scope.showDisqus = false;
+            }
+
             //listens for state changes
             $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
                 $scope.currentState = toState.name;

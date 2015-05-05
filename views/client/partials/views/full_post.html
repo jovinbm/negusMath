@@ -62,9 +62,10 @@
                     </div>
                 </li>
 
-                <li class="list-unstyled clearfix">
+                <li class="list-unstyled clearfix"
+                    ng-show="showDisqus">
                     <div id="disqus-div">
-                        <dir-disqus disqus-shortname="negusmath"
+                        <dir-disqus disqus-shortname="negusmathproduction"
                                     disqus-identifier="{{post.postUniqueCuid}}"
                                     disqus-title="{{ post.postHeading }}"
                                     disqus-url="{{post.postUrl}}"

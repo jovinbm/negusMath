@@ -148,6 +148,13 @@ angular.module('adminHomeApp')
     .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'logoutService', 'PostService', '$document', '$state', '$stateParams', 'cfpLoadingBar',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, logoutService, PostService, $document, $state, $stateParams, cfpLoadingBar) {
 
+            //variable to show or hide disqus if window.host contains negusmath
+            if ($location.host().search("harvardgrill") !== -1) {
+                $scope.showDisqus = true;
+            } else {
+                $scope.showDisqus = false;
+            }
+
             //listens for state changes
             $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
                 $scope.currentState = toState.name;
