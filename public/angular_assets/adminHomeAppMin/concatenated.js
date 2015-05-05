@@ -323,6 +323,15 @@ angular.module('adminHomeApp')
                 $scope.isLoadingPercentage = num;
             };
 
+            //hides or shows the loading splash screen
+            $scope.showHideLoadingBanner = function (bool) {
+                if (bool) {
+                    $('#loading-splash-card').removeClass('hidden');
+                } else {
+                    $('#loading-splash-card').addClass('hidden');
+                }
+            };
+
             $rootScope.$on('cfpLoadingBar:loading', function (event, resp) {
                 $scope.isLoadingPercentage = cfpLoadingBar.status() * 100
             });
@@ -680,6 +689,7 @@ angular.module('adminHomeApp')
             $scope.showSuggestedPosts = false;
 
             $scope.showThePostOnly = function () {
+                $scope.showHideLoadingBanner(false);
                 $scope.showPost = true;
                 $scope.showSuggestedPosts = false;
             };
@@ -687,12 +697,14 @@ angular.module('adminHomeApp')
             $scope.showSuggestedPostsOnly = function () {
                 $scope.showPost = false;
                 $scope.showSuggestedPosts = true;
+                $scope.showHideLoadingBanner(false);
             };
 
             $scope.postIsLoaded = false;
 
             //function used to fill in with suggested posts in case no posts are received
             function getSuggestedPosts() {
+                $scope.showHideLoadingBanner(true);
                 //empty the suggestedPosts
                 $scope.suggestedPosts = [];
                 PostService.getSuggestedPostsFromServer()
@@ -728,6 +740,7 @@ angular.module('adminHomeApp')
             }
 
             function getFullPost() {
+                $scope.showHideLoadingBanner(true);
                 PostService.getPostFromServer($scope.postIndex)
                     .success(function (resp) {
                         $scope.post = resp.thePost;

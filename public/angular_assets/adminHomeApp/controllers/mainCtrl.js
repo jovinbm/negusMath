@@ -177,6 +177,15 @@ angular.module('adminHomeApp')
                 $scope.isLoadingPercentage = num;
             };
 
+            //hides or shows the loading splash screen
+            $scope.showHideLoadingBanner = function (bool) {
+                if (bool) {
+                    $('#loading-splash-card').removeClass('hidden');
+                } else {
+                    $('#loading-splash-card').addClass('hidden');
+                }
+            };
+
             $rootScope.$on('cfpLoadingBar:loading', function (event, resp) {
                 $scope.isLoadingPercentage = cfpLoadingBar.status() * 100
             });

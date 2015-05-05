@@ -12,11 +12,13 @@ angular.module('clientHomeApp')
             $scope.showSuggestedPosts = false;
 
             $scope.showThePostsOnly = function () {
+                $scope.showHideLoadingBanner(false);
                 $scope.showPosts = true;
                 $scope.showSuggestedPosts = false;
             };
 
             $scope.showSuggestedPostsOnly = function () {
+                $scope.showHideLoadingBanner(false);
                 $scope.showPosts = false;
                 $scope.showSuggestedPosts = true;
             };
@@ -30,6 +32,7 @@ angular.module('clientHomeApp')
 
             //function used to fill in with suggested posts in case no posts are received
             function getSuggestedPosts() {
+                $scope.showHideLoadingBanner(true);
                 //empty the suggestedPosts
                 $scope.suggestedPosts = [];
                 PostService.getSuggestedPostsFromServer()
@@ -57,6 +60,7 @@ angular.module('clientHomeApp')
                     })
                     .error(function (errResp) {
                         $scope.goToUniversalBanner();
+                        $scope.showHideLoadingBanner(false);
                         //empty the suggestedPosts
                         $scope.suggestedPosts = [];
                         $scope.showSuggestedPosts = false;
@@ -65,6 +69,7 @@ angular.module('clientHomeApp')
             }
 
             function getPagePosts() {
+                $scope.showHideLoadingBanner(true);
                 PostService.getPostsFromServer($stateParams.pageNumber)
                     .success(function (resp) {
                         //this function  creates a banner to notify user that there are no posts by mimicing a response and calling the response handler
@@ -162,11 +167,13 @@ angular.module('clientHomeApp')
             $scope.showSuggestedPosts = false;
 
             $scope.showThePostOnly = function () {
+                $scope.showHideLoadingBanner(false);
                 $scope.showPost = true;
                 $scope.showSuggestedPosts = false;
             };
 
             $scope.showSuggestedPostsOnly = function () {
+                $scope.showHideLoadingBanner(false);
                 $scope.showPost = false;
                 $scope.showSuggestedPosts = true;
             };
@@ -175,6 +182,7 @@ angular.module('clientHomeApp')
 
             //function used to fill in with suggested posts in case no posts are received
             function getSuggestedPosts() {
+                $scope.showHideLoadingBanner(true);
                 //empty the suggestedPosts
                 $scope.suggestedPosts = [];
                 PostService.getSuggestedPostsFromServer()
@@ -202,6 +210,7 @@ angular.module('clientHomeApp')
                     })
                     .error(function (errResp) {
                         $scope.goToUniversalBanner();
+                        $scope.showHideLoadingBanner(false);
                         //empty the suggestedPosts
                         $scope.suggestedPosts = [];
                         $scope.showSuggestedPosts = false;
@@ -210,6 +219,7 @@ angular.module('clientHomeApp')
             }
 
             function getFullPost() {
+                $scope.showHideLoadingBanner(true);
                 PostService.getPostFromServer($scope.postIndex)
                     .success(function (resp) {
                         $scope.post = resp.thePost;
