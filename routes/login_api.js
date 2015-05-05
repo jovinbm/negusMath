@@ -44,7 +44,9 @@ module.exports = {
             //means this is just a random unregistered visitor
             consoleLogger(successLogger(module));
             res.status(200).send({
-                userData: {}
+                userData: {
+                    isRandomClient: true
+                }
             });
         }
 
@@ -61,6 +63,7 @@ module.exports = {
                 } else {
                     //remove private data
                     theSavedUser.password = "";
+                    theSavedUser.isRandomClient = false;
                     consoleLogger(successLogger(module));
                     return res.status(200).send({
                         userData: theSavedUser

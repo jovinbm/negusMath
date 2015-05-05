@@ -4,6 +4,7 @@ angular.module('indexApp')
 
             //variable to hold the registered state of the client
             $scope.clientIsRegistered = false;
+            $scope.isRandomClient = true;
 
             //===============request error handler===============
 
@@ -135,6 +136,14 @@ angular.module('indexApp')
                     $scope.userData = globals.userData(resp.userData);
                     if ($scope.userData.isRegistered == 'yes') {
                         $scope.clientIsRegistered = true;
+                    } else {
+                        $scope.clientIsRegistered = false;
+                    }
+
+                    if ($scope.userData.isRandomClient) {
+                        $scope.isRandomClient = true;
+                    } else {
+                        $scope.isRandomClient = false;
                     }
 
                     //join a socketRoom for websocket connection, equivalent to user's uniqueCuid

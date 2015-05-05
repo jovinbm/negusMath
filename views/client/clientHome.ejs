@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="adminHomeApp" ng-controller="MainController">
+<html lang="en" ng-app="clientHomeApp" ng-controller="MainController">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -45,7 +45,7 @@
     <!-- loads custom css file -->
     <link rel="stylesheet" href="/public/cssmin/main.min.css">
     <link rel="stylesheet" href="/public/cssmin/cards.min.css">
-    <link rel="stylesheet" href="/public/cssmin/admin/admin_home.min.css">
+    <link rel="stylesheet" href="/public/cssmin/client/client_home.min.css">
 
     <title>Negus Math - College Level Advanced Mathematics for Kenya Students</title>
 </head>
@@ -73,43 +73,14 @@
         <!--this navbar will be collapsed on mobile-->
         <div class="collapse navbar-collapse navHeaderCollapse">
             <ul class="nav navbar-nav navbar-right ng-cloak">
-
                 <li ng-class="{'active': currentState == 'home'}">
                     <a ng-href="#!/home/1">Home
                     </a>
                 </li>
-
-                <li ui-sref-active="active">
-                    <a ui-sref="users">Users
-                    </a>
-                </li>
-
-                <li class="dropdown">
-
-                    <a href="#"
-                       target="_self"
-                       class="dropdown-toggle" data-toggle="dropdown">
-                        {{userData.firstName}}<b class="caret"></b>
-                    </a>
-
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="#"
-                               target="_self"
-                               ng-click="logoutClient()">Logout
-                            </a>
-                        </li>
-                    </ul>
+                <li>
+                    <a href ng-click="goToLandingPage()">Login</a>
                 </li>
             </ul>
-
-            <a type="button"
-               class="btn btn-primary btn-sm navbar-btn pull-right"
-               href ng-click="showNewPost(); goToTop();"
-               role="button">
-                <i class="fa fa-pencil"></i> New Post
-            </a>
-
         </div>
     </div>
 </nav>
@@ -127,120 +98,6 @@
             <strong>{{bannerMessage}}</strong>
         </div>
     </div>
-
-    <section id="newPostSection" ng-show="newPost" class="ng-cloak">
-        <div class="container">
-            <div class="row">
-                <div id="newPost">
-
-                    <div class="panel panel-default">
-
-                        <div class="panel-heading"><i class="fa fa-leanpub"></i> NEW POST <span class="pull-right">{{currentTime}}</span>
-                        </div>
-
-                        <div class="panel-body">
-
-                            <div ng-class="newPostBannerClass"
-                                 ng-if="showNewPostBanner">
-                                <button type="button" class="close" data-dismiss="alert">×</button>
-                                <strong>{{newPostBannerMessage}}</strong>
-                            </div>
-
-                            <ul class="list-unstyled animated fadeIn">
-                                <li class="list-unstyled clearfix">
-                                    <div class="card">
-
-                                        <div class="card-content">
-
-                                            <form name="newPostForm">
-
-                                                <div class="padding-bottom-15">
-
-                                                    <!--Heading field-->
-                                                    <div class="form-group">
-                                                        <label for="postHeading"><strong>Heading</strong></label>
-                                                        <input type="text"
-                                                               class="form-control"
-                                                               id="postHeading"
-                                                               placeholder="Enter heading"
-                                                               ng-model="newPostModel.postHeading"
-                                                               ng-minlength="10"
-                                                               required
-                                                               ng-disabled="isLoading || universalDisable"
-                                                               name="postHeading">
-
-                            <span class="form-error-notice"
-                                  ng-show="newPostForm.postHeading.$error.required"
-                                  ng-if='newPostForm.postHeading.$dirty'>
-                                <small>This is a required field:</small>
-                            </span>
-                            <span class="form-error-notice"
-                                  ng-show="newPostForm.postHeading.$error.minlength"
-                                  ng-if='newPostForm.postHeading.$dirty'>
-                                <small>Minimum length required is 10:</small>
-                            </span>
-                                                    </div>
-
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <p><strong>Content</strong></p>
-
-                                                    <text-angular
-                                                            name="newPostMainContent"
-                                                            ng-model="newPostModel.postContent"></text-angular>
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <p><strong>Post Summary</strong></p>
-
-                                                    <text-angular
-                                                            name="newPostSummary"
-                                                            ng-model="newPostModel.postSummary">
-                                                    </text-angular>
-
-                                                    <span class="form-error-notice"
-                                                          ng-show="checkIfPostSummaryIsEmpty()">
-                                                <small>This is a required field:</small>
-                                                </span>
-
-                                                <span class="form-error-notice"
-                                                      ng-show="checkPostSummaryMaxLength(1600)">
-                                                <small>Maximum length required is 1600:</small>
-                                                </span>
-
-                                                    <span class="help-block">This will represent this post in the list of all posts. Limited to 1600 characters. Users will be able to click a 'read more' link to see the main content of the post</span>
-                                                </div>
-
-                                            </form>
-
-                                        </div>
-
-                                        <div class="card-action clearfix ng-cloak">
-
-                                            <div class="pull-right">
-                                                <a class="btn btn-default btn-sm"
-                                                   href ng-click="hideNewPost(); goToTop();">Save
-                                                    Draft</a>
-                                                <a class="btn btn-default btn-sm"
-                                                   href ng-click="hideNewPost(); goToTop();">Cancel</a>
-                                                <a class="btn btn-default btn-sm"
-                                                   href ng-click="submitNewPost(); goToTop();"
-                                                   ng-disabled="newPostForm.$invalid || postSummaryIsEmpty || postSummaryHasExceededMaximum">POST</a>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </li>
-
-                            </ul>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </section>
 
     <section id="postsSection">
         <div class="container">
@@ -516,7 +373,7 @@
 <script src='//cdnjs.cloudflare.com/ajax/libs/textAngular/1.3.0/dist/textAngular-sanitize.min.js'></script>
 <script src='//cdnjs.cloudflare.com/ajax/libs/textAngular/1.3.0/dist/textAngular-rangy.min.js'></script>
 
-<script type="text/javascript" src="/public/angular_assets/adminHomeAppMin/concatenated.min.js"></script>
+<script type="text/javascript" src="/public/angular_assets/clientHomeAppMin/concatenated.min.js"></script>
 <!--<script type="text/javascript" src="/public/angular_assets/adminHomeAppMin/concatenated.js"></script>-->
 
 <!--disqus comment count pull-->

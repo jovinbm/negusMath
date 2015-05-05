@@ -1,0 +1,124 @@
+<div class="panel panel-default"
+     ng-controller="FullPostController">
+
+    <!--the full post-->
+    <div ng-show="showPost">
+        <div class="panel-heading ng-cloak"><a href ng-click="back()"><i class="fa fa-arrow-left"></i> BACK</a>
+            <span class="pull-right">{{post.postDate}}</span>
+        </div>
+
+        <div class="panel-body">
+            <ul class="list-unstyled animated fadeIn">
+                <li class="list-unstyled clearfix"
+                    ng-show="!editingMode">
+                    <div class="card">
+
+                        <div class="card-content">
+
+                            <h1 class="ng-cloak text-outputs postHeading">{{post.postHeading}}</h1>
+
+                            <h3 class="text-muted postBy">
+                                <small class="ng-cloak"><a class="btn-link">{{post.authorName}}, </a>
+                                    {{post.theTimeAgo}}
+                                </small>
+                            </h3>
+
+                            <div class="postContent">
+                                <div ta-bind
+                                     ng-model="post.postContent"></div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </li>
+
+                <li class="list-unstyled clearfix">
+                    <div id="disqus-div">
+                        <dir-disqus disqus-shortname="negusmath"
+                                    disqus-identifier="{{post.postUniqueCuid}}"
+                                    disqus-title="{{ post.editPostHeading }}"
+                                    disqus-url="{{post.postUrl}}"
+                                    ready-to-bind="{{postIsLoaded}}">
+                        </dir-disqus>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!--showing suggested posts-->
+    <div ng-show="showSuggestedPosts">
+        <div class="panel-heading ng-cloak"><i class="fa fa-leanpub"></i> SUGGESTED POSTS
+            <span class="pull-right">
+            <a ng-href="#!/home/1"><i class="fa fa-arrow-left"></i> Home</a>
+            </span>
+        </div>
+
+        <ul class="list-unstyled animated fadeIn">
+            <li class="list-unstyled post clearfix"
+                ng-repeat="post in suggestedPosts">
+                <div class="card">
+
+                    <div class="card-content">
+
+                        <h2 class="ng-cloak text-outputs postHeading"><a ng-href="#!/post/{{post.postIndex}}"
+                                                                         ng-click="goToTop()">{{post.postHeading}}</a>
+                        </h2>
+
+                        <h3 class="text-muted postBy">
+                            <small class="ng-cloak"><a class="btn-link">{{post.authorName}}</a>
+                                on
+                                {{post.postDate}}
+                            </small>
+                            <br/>
+                            <small class="text-muted ng-cloak">
+                                {{post.theTimeAgo}}
+                            </small>
+                        </h3>
+
+                        <div class="postContent">
+                            <div ta-bind
+                                 ng-model="post.postSummary"></div>
+                        </div>
+
+
+                    </div>
+                    <div class="card-action clearfix">
+
+                        <div class="pull-right">
+                            <a ng-href="#!/post/{{post.postIndex}}"
+                               ng-click="goToTop()"
+                               class="btn btn-default btn-sm">Read More</a>
+                        </div>
+
+                    </div>
+                </div>
+            </li>
+
+            <li class="list-unstyled clearfix">
+                <div class="card">
+
+                    <div class="card-content">
+
+                        <h2 class="text-outputs postHeading">Relativistic dynamics - Solution to Sample Question </h2>
+
+                        <h3 class="text-muted postBy">
+                            <small><a class="btn-link">Salash Tolan</a> on {{currentTime}}
+                            </small>
+                        </h3>
+
+                        <div class="embed-responsive embed-responsive-16by9">
+                            <iframe class="embed-responsive-item"
+                                    src="https://www.youtube.com/embed/adKP2CzKaFM" frameborder="0"
+                                    allowfullscreen></iframe>
+                        </div>
+
+
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+</div>

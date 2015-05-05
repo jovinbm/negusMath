@@ -31,6 +31,18 @@ module.exports = {
         res.render('index/index.ejs');
     },
 
+    renderHome_Html: function (req, res) {
+        var module = 'renderHome_Html';
+        receivedLogger(module);
+
+        if (req.isAuthenticated()) {
+            res.render('admin/adminHome.ejs');
+        } else {
+            res.render('client/clientHome.ejs');
+        }
+
+    },
+
     adminHome_Html: function (req, res) {
         var module = 'adminHome_Html';
         receivedLogger(module);

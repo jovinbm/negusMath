@@ -59,6 +59,7 @@ a.active {
 }
 
 .btn-xl {
+    margin: 0.6em;
     padding: 20px 40px;
     border-color: #fed136;
     border-radius: 3px;

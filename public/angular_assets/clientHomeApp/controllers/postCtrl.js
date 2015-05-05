@@ -1,4 +1,4 @@
-angular.module('adminHomeApp')
+angular.module('clientHomeApp')
     .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
 
@@ -274,80 +274,6 @@ angular.module('adminHomeApp')
             }
 
             //==============end of update time ago
-
-            //=============editing post====================
-
-            //variable that holds the editing or show state in the full-post view.
-            $scope.editingMode = false;
-
-            //make copy of post, useful when the user clicks cancel
-            $scope.postBackup = $scope.post;
-
-            $scope.goIntoPostEditingMode = function () {
-                //make copy of post, useful when the user clicks cancel
-                $scope.postBackup = $scope.post;
-                $scope.editingMode = true;
-            };
-
-            $scope.goIntoFullPostViewMode = function () {
-                $scope.editingMode = false;
-            };
-
-            $scope.editPostSummaryIsEmpty = true;
-            $scope.editPostSummaryHasExceededMaximum = false;
-
-            $scope.checkIfEditPostSummaryIsEmpty = function () {
-                if ($scope.post.postSummary) {
-                    if ($scope.post.postSummary.length == 0) {
-                        $scope.editPostSummaryIsEmpty = true;
-                    }
-                    else {
-                        $scope.editPostSummaryIsEmpty = false;
-                    }
-                    return $scope.editPostSummaryIsEmpty
-                } else {
-                    return true;
-                }
-
-            };
-
-            $scope.checkEditPostSummaryMaxLength = function (maxLength) {
-                if ($scope.post.postSummary) {
-                    if ($scope.post.postSummary.length > maxLength) {
-                        $scope.editPostSummaryHasExceededMaximum = true;
-                    } else {
-                        $scope.editPostSummaryHasExceededMaximum = false;
-                    }
-                    return $scope.editPostSummaryHasExceededMaximum
-                } else {
-                    return true;
-                }
-            };
-
-            $scope.submitPostUpdate = function () {
-                if ($scope.post.postContent.length == 0) {
-                    $scope.showToast('warning', 'Please add some content to the post first');
-                } else if ($scope.post.postSummary.length > 1600) {
-                    $scope.showToast('warning', 'The post summary cannot exceed 1600 characters');
-                } else {
-                    PostService.submitPostUpdate($scope.post)
-                        .success(function (resp) {
-                            $scope.goIntoFullPostViewMode();
-                            $scope.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $scope.responseStatusHandler(errResponse);
-                        })
-                }
-            };
-
-            $scope.cancelPostUpdate = function () {
-                $scope.post = $scope.postBackup;
-                $scope.goIntoFullPostViewMode();
-                $scope.showToast('success', 'Update cancelled');
-            };
-
-            //end of editing post functions================
 
             //===============socket listeners===============
 

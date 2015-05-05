@@ -7,7 +7,7 @@ var express = require('express');
 var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 2000;
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
@@ -78,6 +78,8 @@ app.use("/public", express.static(path.join(__dirname, '/public')));
 app.use("/views", express.static(path.join(__dirname, '/views')));
 app.use("/error", express.static(path.join(__dirname, '/public/error')));
 
+app.use(require('prerender-node').set('prerenderServiceUrl', 'https://jbmprerender.herokuapp.com/'));
+
 app.use(logger('dev'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -110,9 +112,9 @@ app.get('/socket.io/socket.io.js', function (req, res) {
 });
 
 //getting files
-app.get('/', routes.index_Html);
-app.get('/index.html', routes.index_Html);
-app.get('/adminHome.html', middleware.ensureAuthenticated, middleware.addUserData, routes.adminHome_Html);
+app.get('/', routes.renderHome_Html);
+app.get('/forums', routes.renderHome_Html);
+app.get('/index', routes.index_Html);
 
 //login api
 app.post('/createAccount', loginAPI.createAccount);
@@ -124,12 +126,19 @@ app.post('/api/logoutClient', middleware.ensureAuthenticatedAngular, middleware.
 //info api
 app.get('/api/getUserData', loginAPI.getUserData);
 
-app.post('/api/getPosts', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getPosts);
-app.post('/api/getSuggestedPosts', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getSuggestedPosts);
-app.post('/api/getPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getPost);
+app.post('/api/getPosts', postAPI.getPosts);
+app.post('/api/getSuggestedPosts', postAPI.getSuggestedPosts);
+app.post('/api/getPost', postAPI.getPost);
 app.post('/api/newPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.newPost);
 app.post('/api/updatePost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.updatePost);
-app.post('/api/getHotThisWeek', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getHotThisWeek);
+app.post('/api/getHotThisWeek', postAPI.getHotThisWeek);
+
+//app.post('/api/getPosts', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getPosts);
+//app.post('/api/getSuggestedPosts', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getSuggestedPosts);
+//app.post('/api/getPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getPost);
+//app.post('/api/newPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.newPost);
+//app.post('/api/updatePost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.updatePost);
+//app.post('/api/getHotThisWeek', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getHotThisWeek);
 
 //error handlers
 // catch 404 and forward to error handler

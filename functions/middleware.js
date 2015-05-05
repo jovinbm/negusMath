@@ -29,6 +29,7 @@ module.exports = {
     ensureAuthenticated: function (req, res, next) {
         var module = "ensureAuthenticated";
         receivedLogger(module);
+        next();
 
         if (req.isAuthenticated()) {
             consoleLogger(successLogger(module));
@@ -42,6 +43,7 @@ module.exports = {
     ensureAuthenticatedAngular: function (req, res, next) {
         var module = "ensureAuthenticatedAngular";
         receivedLogger(module);
+        next();
         if (req.isAuthenticated()) {
             consoleLogger(successLogger(module));
             next();

@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1 maximum-scale=1, user-scalable=no">
     <meta name="description" content="Negus Math - College Level Advanced Mathematics for Kenya Students"/>
     <meta name="author" content="Jovin Mwilanga"/>
+    <!--ajax crawlable-->
+    <meta name="fragment" content="!"/>
     <link rel="author" href="https://plus.google.com/+JovinMwilanga"/>
 
     <!--bootstrap-->
@@ -119,9 +121,9 @@
                        class="btn btn-md btn-default btn-config">SIGN IN
                     </a>
                 </div>
-                <div ng-if="clientIsRegistered"
+                <div ng-if="clientIsRegistered || isRandomClient"
                      class="ng-cloak">
-                    <a href="/adminHome.html"
+                    <a href="/forums"
                        class="btn btn-xl">Continue to the forums
                     </a>
                 </div>
