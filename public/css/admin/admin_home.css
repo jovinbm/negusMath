@@ -23,6 +23,16 @@ section {
     font-weight: 700;
 }
 
+@media (min-width: 768px) {
+    .postHeading {
+        font-size: 18px;
+    }
+
+    .postBy {
+        font-size: 15px;
+    }
+}
+
 @media (max-width: 767px) {
     .postHeading {
         font-size: 15px;
