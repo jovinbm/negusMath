@@ -771,7 +771,7 @@ angular.module('adminHomeApp')
             $interval(updateTimeAgo, 120000, 0, true);
 
             function addPostUrl() {
-                $scope.post.postUrl = 'http://' + $location.host() + '/forums#!/post/' + $scope.post.postIndex;
+                $scope.post.postUrl = 'http://' + $location.host() + '/forums/#!/post/' + $scope.post.postIndex;
             }
 
             //==============end of update time ago
