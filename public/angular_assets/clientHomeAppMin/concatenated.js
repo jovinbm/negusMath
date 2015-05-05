@@ -700,7 +700,6 @@ angular.module('clientHomeApp')
                             $scope.showThePostOnly();
                             updateTimeAgo();
                             addPostUrl();
-                            $scope.postIsLoaded = true;
 
                             //function that parses and prepares the post content e.g. making iframes in html string to be responsive
                             function preparePostContent() {
@@ -708,6 +707,7 @@ angular.module('clientHomeApp')
                             }
 
                             preparePostContent();
+                            $scope.postIsLoaded = true;
 
                         } else {
                             //empty the post
@@ -751,7 +751,8 @@ angular.module('clientHomeApp')
             $interval(updateTimeAgo, 120000, 0, true);
 
             function addPostUrl() {
-                $scope.post.postUrl = 'http://' + $location.host() + '/#!/post/' + $scope.post.postIndex;
+                //$scope.post.postUrl = 'http://' + $location.host() + '/#!/post/' + $scope.post.postIndex;
+                $scope.post.postUrl = 'http://www.negusmath.com/#!/post/' + $scope.post.postIndex;
             }
 
             //==============end of update time ago
