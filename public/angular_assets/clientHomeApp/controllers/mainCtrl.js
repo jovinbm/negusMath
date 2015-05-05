@@ -175,11 +175,15 @@ angular.module('clientHomeApp')
 
             //hides or shows the loading splash screen
             $scope.showHideLoadingBanner = function (bool) {
-                if (bool) {
-                    $('#loading-splash-card').removeClass('hidden');
-                } else {
-                    $('#loading-splash-card').addClass('hidden');
-                }
+                $scope.showHideLoadingBanner = function (bool) {
+                    if (bool) {
+                        $('#loading-splash-card').removeClass('hidden');
+                        $('.hideMobileLoading').addClass('hidden-xs hidden-sm');
+                    } else {
+                        $('#loading-splash-card').addClass('hidden');
+                        $('.hideMobileLoading').removeClass('hidden-xs hidden-sm');
+                    }
+                };
             };
 
             $rootScope.$on('cfpLoadingBar:loading', function (event, resp) {

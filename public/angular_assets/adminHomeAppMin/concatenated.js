@@ -327,8 +327,10 @@ angular.module('adminHomeApp')
             $scope.showHideLoadingBanner = function (bool) {
                 if (bool) {
                     $('#loading-splash-card').removeClass('hidden');
+                    $('.hideMobileLoading').addClass('hidden-xs hidden-sm');
                 } else {
                     $('#loading-splash-card').addClass('hidden');
+                    $('.hideMobileLoading').removeClass('hidden-xs hidden-sm');
                 }
             };
 
