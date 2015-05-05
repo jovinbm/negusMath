@@ -36,7 +36,7 @@ module.exports = {
             next();
         } else {
             consoleLogger(errorLogger(module, 'user authentication failed'));
-            res.redirect('index.html');
+            res.redirect('index');
         }
     },
 
@@ -58,7 +58,7 @@ module.exports = {
                 msg: 'You are not logged in. Please reload page',
                 disable: true,
                 redirect: true,
-                redirectPage: '/index.html'
+                redirectPage: '/index'
             });
         }
     },

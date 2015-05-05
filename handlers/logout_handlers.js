@@ -34,7 +34,7 @@ module.exports = {
             code: 200,
             notify: false,
             redirect: true,
-            redirectPage: "/index.html"
+            redirectPage: "/index"
         });
     }
 };

@@ -74,7 +74,7 @@
         <div class="collapse navbar-collapse navHeaderCollapse">
             <ul class="nav navbar-nav navbar-right ng-cloak">
                 <li ng-class="{'active': currentState == 'home'}">
-                    <a ng-href="#!/home/1">Home
+                    <a ng-href="/#!/home/1">Home
                     </a>
                 </li>
                 <li>
@@ -161,7 +161,7 @@
                                 <li class="list-group-item post"
                                     ng-repeat="hotPost in hotThisWeek">
                                     <p class="ng-cloak text-outputs">
-                                        <a ng-href="#!/post/{{hotPost.postIndex}}"
+                                        <a ng-href="/#!/post/{{hotPost.postIndex}}"
                                            ng-click="goToTop()">{{hotPost.postHeading}}
                                         </a> <br/>
                                     <h6 class="text-muted">

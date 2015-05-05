@@ -116,7 +116,7 @@ module.exports = {
                     });
                 } else {
                     consoleLogger(successLogger(module));
-                    var redirectPage = '/index.html';
+                    var redirectPage = '/index';
                     return res.status(200).send({
                         code: 200,
                         msg: "You have successfully logged in",
@@ -238,7 +238,7 @@ module.exports = {
                                 res.status(200).send({
                                     code: 200,
                                     redirect: true,
-                                    redirectPage: '/index.html'
+                                    redirectPage: '/index'
                                 });
 
                                 //send a welcome email
