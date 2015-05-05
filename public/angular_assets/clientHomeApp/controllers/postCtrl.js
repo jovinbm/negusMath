@@ -236,7 +236,11 @@ angular.module('clientHomeApp')
                             }
 
                             preparePostContent();
-                            $scope.postIsLoaded = true;
+
+                            //check first that this is a production env --> showDisqus before bootstrapping disqus
+                            if ($scope.showDisqus) {
+                                $scope.postIsLoaded = true;
+                            }
 
                         } else {
                             //empty the post

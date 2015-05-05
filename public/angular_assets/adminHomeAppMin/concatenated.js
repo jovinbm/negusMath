@@ -149,7 +149,7 @@ angular.module('adminHomeApp')
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, logoutService, PostService, $document, $state, $stateParams, cfpLoadingBar) {
 
             //variable to show or hide disqus if window.host contains negusmath
-            if ($location.host().search("harvardgrill") !== -1) {
+            if ($location.host().search("negusmath") !== -1) {
                 $scope.showDisqus = true;
             } else {
                 $scope.showDisqus = false;
@@ -772,7 +772,11 @@ angular.module('adminHomeApp')
                             }
 
                             preparePostContent();
-                            $scope.postIsLoaded = true;
+
+                            //check first that this is a production env --> showDisqus before bootstrapping disqus
+                            if ($scope.showDisqus) {
+                                $scope.postIsLoaded = true;
+                            }
 
                         } else {
                             //empty the post
