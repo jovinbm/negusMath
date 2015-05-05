@@ -1,41 +1,5 @@
 body {
     padding-top: 70px;
-    background-attachment: scroll;
-    background-image: url(/public/imgsmin/cover/ocean.jpg);
-    background-position: center center;
-    background-repeat: none;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    background-size: cover;
-    -o-background-size: cover;
-}
-
-.btn-xl {
-    padding: 20px 40px;
-    border-color: #fed136;
-    border-radius: 3px;
-    text-transform: uppercase;
-    font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    color: #fff;
-    background-color: #fed136;
-}
-
-.btn-xl:hover,
-.btn-xl:focus,
-.btn-xl:active,
-.btn-xl.active,
-.open .dropdown-toggle.btn-xl {
-    border-color: #f6bf01;
-    color: #fff;
-    background-color: #fec503;
-}
-
-.btn-xl:active,
-.btn-xl.active,
-.open .dropdown-toggle.btn-xl {
-    background-image: none;
 }
 
 section {
@@ -104,6 +68,12 @@ ul.hotThisWeek {
 
 @media (max-width: 767px) {
     div#postStream {
+        padding-left: 0;
+        padding-right: 0;
+        background-color: #fff;
+    }
+
+    div#sideBarColumn {
         padding-left: 0;
         padding-right: 0;
         background-color: #fff;
