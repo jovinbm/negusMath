@@ -24,11 +24,11 @@ angular.module('clientHomeApp', [
         $stateProvider
             .state('home', {
                 url: '/home/:pageNumber',
-                templateUrl: 'views/admin/partials/views/post_stream.html'
+                templateUrl: 'views/client/partials/views/post_stream.html'
             })
             .state('post', {
                 url: '/post/:postIndex',
-                templateUrl: 'views/admin/partials/views/full_post.html'
+                templateUrl: 'views/client/partials/views/full_post.html'
             })
             .state("otherwise", {url: '/home/1'});
 
