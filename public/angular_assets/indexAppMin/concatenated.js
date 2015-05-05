@@ -81,9 +81,6 @@ angular.module('indexApp')
     .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'logoutService',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, logoutService) {
 
-            //variable to hold the registered state of the client
-            $scope.clientIsRegistered = false;
-            $scope.isRandomClient = true;
 
             //===============request error handler===============
 
@@ -210,35 +207,42 @@ angular.module('indexApp')
             //===============end of toastr show functions===============
 
             //initial requests
-            socketService.getUserData()
-                .success(function (resp) {
-                    $scope.userData = globals.userData(resp.userData);
-                    if ($scope.userData.isRegistered == 'yes') {
-                        $scope.clientIsRegistered = true;
-                    } else {
-                        $scope.clientIsRegistered = false;
-                    }
+            function initialRequests() {
+                $scope.isLoadingTrue();
+                socketService.getUserData()
+                    .success(function (resp) {
+                        $scope.userData = globals.userData(resp.userData);
+                        if ($scope.userData.isRegistered == 'yes') {
+                            $scope.clientIsRegistered = true;
+                        } else {
+                            $scope.clientIsRegistered = false;
+                        }
 
-                    if ($scope.userData.isRandomClient) {
-                        $scope.isRandomClient = true;
-                    } else {
-                        $scope.isRandomClient = false;
-                    }
+                        if ($scope.userData.isRandomClient) {
+                            $scope.isRandomClient = true;
+                        } else {
+                            $scope.isRandomClient = false;
+                        }
 
-                    //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
-                    socket.emit('joinRoom', {
-                        room: resp.userData.uniqueCuid
+                        //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
+                        socket.emit('joinRoom', {
+                            room: resp.userData.uniqueCuid
+                        });
+
+                        $scope.responseStatusHandler(resp);
+                        $scope.isLoadingFalse();
+                    })
+                    .error(function (errResponse) {
+                        $scope.responseStatusHandler(errResponse);
+                        $scope.isLoadingFalse();
                     });
-
-                    $scope.responseStatusHandler(resp);
-                })
-                .error(function (errResponse) {
-                    $scope.responseStatusHandler(errResponse);
-                });
+            }
 
             socket.on('joined', function () {
                 console.log("JOIN SUCCESS");
             });
+
+            initialRequests();
 
 
             //variable to hold state between local login and creating a new account

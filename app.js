@@ -113,7 +113,6 @@ app.get('/socket.io/socket.io.js', function (req, res) {
 
 //getting files
 app.get('/', routes.renderHome_Html);
-app.get('/forums', routes.renderHome_Html);
 app.get('/index', routes.index_Html);
 
 //login api
