@@ -17,6 +17,7 @@ angular.module('adminHomeApp', [
         //views
         $http.get('views/admin/partials/views/post_stream.html', {cache: $templateCache});
         $http.get('views/admin/partials/views/full_post.html', {cache: $templateCache});
+        $http.get('views/search/search_results.html', {cache: $templateCache});
     })
 
     .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
@@ -30,6 +31,10 @@ angular.module('adminHomeApp', [
             .state('post', {
                 url: '/post/:postIndex',
                 templateUrl: 'views/admin/partials/views/full_post.html'
+            })
+            .state('search', {
+                url: '/search/?q',
+                templateUrl: 'views/search/search_results.html'
             })
             .state("otherwise", {url: '/home/1'});
 
@@ -156,6 +161,21 @@ angular.module('adminHomeApp')
             $scope.changeDocumentTitle = function (newTitle) {
                 if (newTitle) {
                     document.title = newTitle;
+                }
+            };
+
+            //google search box
+            $scope.googleSearchModel = {
+                searchQuery: ""
+            };
+
+            $scope.performGoogleSiteSearch = function () {
+                if ($scope.googleSearchModel.searchQuery.length > 0) {
+                    if ($location.port()) {
+                        $window.location.href = 'http://' + $location.host() + ':' + $location.port() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
+                    } else {
+                        $window.location.href = 'http://' + $location.host() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
+                    }
                 }
             };
 

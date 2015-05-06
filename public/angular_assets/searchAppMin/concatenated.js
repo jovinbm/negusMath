@@ -1,4 +1,4 @@
-angular.module('clientHomeApp', [
+angular.module('searchApp', [
     'ui.bootstrap',
     'angular-loading-bar',
     'cfp.loadingBar',
@@ -8,42 +8,16 @@ angular.module('clientHomeApp', [
     'ui.router',
     'duScroll',
     'ngFx',
-    'ngAnimate',
-    'textAngular',
-    'ngSanitize',
-    'angularUtils.directives.dirDisqus'
+    'ngAnimate'
 ])
     .run(function ($templateCache, $http) {
         //views
         $http.get('views/client/partials/views/post_stream.html', {cache: $templateCache});
         $http.get('views/client/partials/views/full_post.html', {cache: $templateCache});
         $http.get('views/search/search_results.html', {cache: $templateCache});
-    })
+    });
 
-    .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
-        $urlRouterProvider.otherwise("/home/1");
-
-        $stateProvider
-            .state('home', {
-                url: '/home/:pageNumber',
-                templateUrl: 'views/client/partials/views/post_stream.html'
-            })
-            .state('post', {
-                url: '/post/:postIndex',
-                templateUrl: 'views/client/partials/views/full_post.html'
-            })
-            .state('search', {
-                url: '/search/?q',
-                templateUrl: 'views/search/search_results.html'
-            })
-            .state("otherwise", {url: '/home/1'});
-
-        $locationProvider
-            .html5Mode(false)
-            .hashPrefix('!');
-    }]);
-
-angular.module('clientHomeApp')
+angular.module('searchApp')
     .filter("timeago", function () {
         //time: the time
         //local: compared to what time? default: now
@@ -103,7 +77,7 @@ angular.module('clientHomeApp')
 
 
 
-angular.module('clientHomeApp')
+angular.module('searchApp')
     .controller('HotController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams', 'HotService',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams, HotService) {
 
@@ -149,7 +123,7 @@ angular.module('clientHomeApp')
 
         }
     ]);
-angular.module('clientHomeApp')
+angular.module('searchApp')
     .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$document', '$state', '$stateParams', 'logoutService', 'cfpLoadingBar',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $document, $state, $stateParams, logoutService, cfpLoadingBar) {
 
@@ -172,19 +146,12 @@ angular.module('clientHomeApp')
             $scope.performGoogleSiteSearch = function () {
                 if ($scope.googleSearchModel.searchQuery.length > 0) {
                     if ($location.port()) {
-                        $window.location.href = 'http://' + $location.host() + ':' + $location.port() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
+                        $window.location.href = 'http://' + $location.host() + ':' + $location.port() + '/#!/search/?q=' + $scope.googleSearchModel.searchQuery;
                     } else {
-                        $window.location.href = 'http://' + $location.host() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
+                        $window.location.href = 'http://' + $location.host() + '/#!/search/?q=' + $scope.googleSearchModel.searchQuery;
                     }
                 }
             };
-
-            //variable to show or hide disqus if window.host contains negusmath
-            if ($location.host().search("negusmath") !== -1) {
-                $scope.showDisqus = true;
-            } else {
-                $scope.showDisqus = false;
-            }
 
             //listens for state changes
             $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
@@ -507,324 +474,7 @@ angular.module('clientHomeApp')
 
         }
     ]);
-angular.module('clientHomeApp')
-    .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
-
-            //change to default document title
-            $scope.defaultDocumentTitle();
-
-            $scope.posts = PostService.getCurrentPosts();
-            $scope.postsCount = PostService.getCurrentPostsCount();
-
-            $scope.suggestedPosts = [];
-
-            //variable that determines whether to show posts/suggested posts or not
-            $scope.showPosts = false;
-            $scope.showSuggestedPosts = false;
-
-            $scope.showThePostsOnly = function () {
-                $scope.showHideLoadingBanner(false);
-                $scope.showPosts = true;
-                $scope.showSuggestedPosts = false;
-            };
-
-            $scope.showSuggestedPostsOnly = function () {
-                $scope.showHideLoadingBanner(false);
-                $scope.showPosts = false;
-                $scope.showSuggestedPosts = true;
-            };
-
-            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
-            function preparePostSummaryContent() {
-                $scope.posts.forEach(function (post) {
-                    post.postSummary = $scope.makeVideoIframesResponsive(post.postSummary);
-                });
-            }
-
-            //function used to fill in with suggested posts in case no posts are received
-            function getSuggestedPosts() {
-                $scope.showHideLoadingBanner(true);
-                //empty the suggestedPosts
-                $scope.suggestedPosts = [];
-                PostService.getSuggestedPostsFromServer()
-                    .success(function (resp) {
-                        if ((resp.postsArray.length > 0)) {
-                            $scope.showSuggestedPostsOnly();
-                            $scope.suggestedPosts = resp.postsArray;
-                            updateTimeAgo();
-
-                            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
-                            function prepareSuggestedPostsSummaryContent() {
-                                $scope.suggestedPosts.forEach(function (post) {
-                                    post.postSummary = $scope.makeVideoIframesResponsive(post.postSummary);
-                                });
-                            }
-
-                            prepareSuggestedPostsSummaryContent();
-                        } else {
-                            //empty the suggestedPosts
-                            $scope.suggestedPosts = [];
-                            $scope.showSuggestedPosts = false;
-                            $scope.goToUniversalBanner();
-                        }
-
-                    })
-                    .error(function (errResp) {
-                        $scope.goToUniversalBanner();
-                        $scope.showHideLoadingBanner(false);
-                        //empty the suggestedPosts
-                        $scope.suggestedPosts = [];
-                        $scope.showSuggestedPosts = false;
-                        $scope.responseStatusHandler(errResp);
-                    });
-            }
-
-            function getPagePosts() {
-                $scope.showHideLoadingBanner(true);
-                PostService.getPostsFromServer($stateParams.pageNumber)
-                    .success(function (resp) {
-                        //this function  creates a banner to notify user that there are no posts by mimicing a response and calling the response handler
-                        //used if the user is accessing a page that is beyond the number of posts
-                        if (resp.postsArray.length == 0) {
-
-                            //empty the postsArray
-                            $scope.posts = [];
-
-                            var responseMimic = {
-                                banner: true,
-                                bannerClass: 'alert alert-dismissible alert-success',
-                                msg: "No more posts to show"
-                            };
-                            $scope.responseStatusHandler(responseMimic);
-                            $scope.showPosts = false;
-                            getSuggestedPosts();
-                            $scope.goToUniversalBanner();
-                        } else {
-                            $scope.posts = PostService.updatePosts(resp.postsArray);
-                            $scope.showThePostsOnly();
-                            updateTimeAgo();
-                            if (resp.postCount) {
-                                $scope.postsCount = resp.postsCount;
-                            }
-                            //parse the posts and prepare them, eg, making iframes responsive
-                            preparePostSummaryContent();
-                        }
-                    })
-                    .error(function (errResp) {
-                        $scope.responseStatusHandler(errResp);
-                        //empty the postsArray
-                        $scope.posts = [];
-                        $scope.showPosts = false;
-                        getSuggestedPosts();
-                    });
-            }
-
-            getPagePosts();
-
-            //this functions evaluates to true if object is not empty, useful for ng-show
-            //this function also creates a banner to notify user that there are no posts by mimicing a response and calling the response handler
-            $scope.checkIfPostsIsEmpty = function () {
-                return $scope.posts.length == 0
-            };
-
-            //=============function to update timeago on all posts
-            //updates the timeago on all incoming orders using the timeago filter
-            function updateTimeAgo() {
-                $scope.posts.forEach(function (post) {
-                    post.theTimeAgo = $filter('timeago')(post.createdAt);
-
-                    //post date/time it was ordered e.g. Sun, Mar 17..
-                    post.postDate = moment(post.createdAt).format("ddd, MMM D, H:mm");
-                });
-            }
-
-            $interval(updateTimeAgo, 120000, 0, true);
-
-            //==============end of update time ago
-
-            updateTimeAgo();
-
-            //===============socket listeners===============
-
-            $rootScope.$on('newPost', function (event, data) {
-                //newPost goes to page 1, so update only if the page is 1
-                if ($stateParams.pageNumber == 1) {
-                    $scope.posts.unshift(data.post);
-                    updateTimeAgo();
-                    preparePostSummaryContent();
-                }
-                if (data.postCount) {
-                    $scope.postCount = data.postCount;
-                }
-            });
-
-            $rootScope.$on('reconnect', function () {
-                getPagePosts();
-            });
-
-            $log.info('PostController booted successfully');
-
-        }
-    ])
-
-    .controller('FullPostController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
-            $scope.postIndex = $stateParams.postIndex;
-            $scope.post = {};
-            $scope.suggestedPosts = [];
-
-            //variable that determines whether to show posts/suggested posts or not
-            $scope.showPost = false;
-            $scope.showSuggestedPosts = false;
-
-            $scope.showThePostOnly = function () {
-                $scope.showHideLoadingBanner(false);
-                $scope.showPost = true;
-                $scope.showSuggestedPosts = false;
-            };
-
-            $scope.showSuggestedPostsOnly = function () {
-                $scope.showHideLoadingBanner(false);
-                $scope.showPost = false;
-                $scope.showSuggestedPosts = true;
-            };
-
-            $scope.postIsLoaded = false;
-
-            //function used to fill in with suggested posts in case no posts are received
-            function getSuggestedPosts() {
-                $scope.showHideLoadingBanner(true);
-                //empty the suggestedPosts
-                $scope.suggestedPosts = [];
-                PostService.getSuggestedPostsFromServer()
-                    .success(function (resp) {
-                        if ((resp.postsArray.length > 0)) {
-                            $scope.showSuggestedPostsOnly();
-                            $scope.suggestedPosts = resp.postsArray;
-                            updateTimeAgo();
-
-                            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
-                            function prepareSuggestedPostsSummaryContent() {
-                                $scope.suggestedPosts.forEach(function (post) {
-                                    post.postSummary = $scope.makeVideoIframesResponsive(post.postSummary);
-                                });
-                            }
-
-                            prepareSuggestedPostsSummaryContent();
-                        } else {
-                            //empty the suggestedPosts
-                            $scope.suggestedPosts = [];
-                            $scope.showSuggestedPosts = false;
-                            $scope.goToUniversalBanner();
-                        }
-
-                    })
-                    .error(function (errResp) {
-                        $scope.goToUniversalBanner();
-                        $scope.showHideLoadingBanner(false);
-                        //empty the suggestedPosts
-                        $scope.suggestedPosts = [];
-                        $scope.showSuggestedPosts = false;
-                        $scope.responseStatusHandler(errResp);
-                    });
-            }
-
-            function getFullPost() {
-                $scope.showHideLoadingBanner(true);
-                PostService.getPostFromServer($scope.postIndex)
-                    .success(function (resp) {
-                        $scope.post = resp.thePost;
-                        $scope.responseStatusHandler(resp);
-                        //check that there is a post first before starting disqus and other attributes
-                        if ($scope.calcObjectLength($scope.post) != 0) {
-
-                            //change the document title
-                            $scope.changeDocumentTitle($scope.post.postHeading);
-
-                            $scope.showThePostOnly();
-                            updateTimeAgo();
-                            addPostUrl();
-
-                            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
-                            function preparePostContent() {
-                                $scope.post.postContent = $scope.makeVideoIframesResponsive($scope.post.postContent);
-                            }
-
-                            preparePostContent();
-
-                            //check first that this is a production env --> showDisqus before bootstrapping disqus
-                            if ($scope.showDisqus) {
-                                $scope.postIsLoaded = true;
-                            }
-
-                        } else {
-                            //empty the post
-                            $scope.post = {};
-                            $scope.showPost = false;
-                            getSuggestedPosts();
-                            $scope.goToUniversalBanner();
-                        }
-
-                    })
-                    .error(function (errResponse) {
-                        $scope.responseStatusHandler(errResponse);
-                        //empty the post
-                        $scope.post = {};
-                        $scope.showPost = false;
-                        getSuggestedPosts();
-                    });
-            }
-
-            getFullPost();
-
-            //=============function to update timeago on this post
-            function updateTimeAgo() {
-                if ($scope.post) {
-                    $scope.post.theTimeAgo = $filter('timeago')($scope.post.createdAt);
-
-                    //post date/time it was ordered e.g. Sun, Mar 17..
-                    $scope.post.postDate = moment($scope.post.createdAt).format("ddd, MMM D, H:mm");
-                }
-
-                if ($scope.suggestedPosts) {
-                    $scope.suggestedPosts.forEach(function (post) {
-                        post.theTimeAgo = $filter('timeago')(post.createdAt);
-
-                        //post date/time it was ordered e.g. Sun, Mar 17..
-                        post.postDate = moment(post.createdAt).format("ddd, MMM D, H:mm");
-                    });
-                }
-            }
-
-            $interval(updateTimeAgo, 120000, 0, true);
-
-            function addPostUrl() {
-                //$scope.post.postUrl = 'http://' + $location.host() + '/#!/post/' + $scope.post.postIndex;
-                $scope.post.postUrl = 'http://www.negusmath.com/#!/post/' + $scope.post.postIndex;
-            }
-
-            //==============end of update time ago
-
-            //===============socket listeners===============
-
-            $rootScope.$on('postUpdate', function (event, data) {
-                $scope.post = data.post;
-                updateTimeAgo();
-            });
-
-            $rootScope.$on('reconnect', function () {
-                //only update the post variable if the user is not editing the current post
-                if (!$scope.editingMode) {
-                    getFullPost();
-                }
-            });
-
-            $log.info('FullPostController booted successfully');
-
-        }
-    ]);
-angular.module('clientHomeApp')
+angular.module('searchApp')
 
     .factory('globals', ['$q', '$window', '$rootScope', 'socketService',
         function ($q, $window, $rootScope, socketService) {
@@ -841,7 +491,7 @@ angular.module('clientHomeApp')
                 }
             };
         }]);
-angular.module('clientHomeApp')
+angular.module('searchApp')
     .factory('HotService', ['$log', '$http', '$window', '$rootScope', 'socket', 'socketService', 'globals',
         function ($log, $http, $window, $rootScope, socket, socketService, globals) {
 
@@ -868,7 +518,7 @@ angular.module('clientHomeApp')
                 }
             };
         }]);
-angular.module('clientHomeApp')
+angular.module('searchApp')
     .factory('mainService', ['$log', '$window', '$rootScope', 'socket', 'socketService', 'globals',
         function ($log, $window, $rootScope, socket, socketService, globals) {
 
@@ -883,7 +533,7 @@ angular.module('clientHomeApp')
                 }
             };
         }]);
-angular.module('clientHomeApp')
+angular.module('searchApp')
     .factory('PostService', ['$log', '$http', '$window', '$rootScope', 'socket', 'socketService', 'globals',
         function ($log, $http, $window, $rootScope, socket, socketService, globals, $stateParams) {
 
@@ -932,7 +582,7 @@ angular.module('clientHomeApp')
                 }
             };
         }]);
-angular.module('clientHomeApp')
+angular.module('searchApp')
 
     .factory('socket', ['$log', '$location', '$rootScope',
         function ($log, $location, $rootScope) {

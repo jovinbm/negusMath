@@ -63,10 +63,10 @@ module.exports = {
 
     },
 
-    adminHome_Html: function (req, res) {
-        var module = 'adminHome_Html';
+    search_Html: function (req, res) {
+        var module = 'search_Html';
         receivedLogger(module);
 
-        res.render('admin/adminHome.ejs');
+        res.render('search/search_results.ejs');
     }
 };

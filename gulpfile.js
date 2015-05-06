@@ -49,6 +49,18 @@ gulp.task('minifyIndexAppJS', function () {
         .pipe(gulp.dest('public/angular_assets/indexAppMin'));
 });
 
+gulp.task('minifySearchAppJS', function () {
+    return gulp.src('public/angular_assets/searchApp/**/*.js')
+        .pipe(sourcemaps.init())
+        .pipe(concat('concatenated.js'))
+        .pipe(gulp.dest('public/angular_assets/searchAppMin'))
+        .pipe(rename('concatenated.min.js'))
+        .pipe(ngAnnotate())
+        .pipe(uglify())
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest('public/angular_assets/searchAppMin'));
+});
+
 gulp.task('minifyAllCSS', function () {
     return gulp.src('public/css/**/*.css')
         .pipe(sourcemaps.init())
@@ -75,5 +87,5 @@ gulp.task('minifyAllImages', function () {
 //});
 
 // Default Task
-gulp.task('default', ['minifyIndexAppJS', 'minifyAdminHomeAppJS', 'minifyClientHomeAppJS', 'minifyAllCSS', 'minifyAllImages']);
+gulp.task('default', ['minifyIndexAppJS', 'minifySearchAppJS', 'minifyAdminHomeAppJS', 'minifyClientHomeAppJS', 'minifyAllCSS', 'minifyAllImages']);
 //gulp.task('default', ['minifyIndexAppJS', 'minifyAdminHomeAppJS', 'minifyAllCSS', 'watch']);

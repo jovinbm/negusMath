@@ -13,6 +13,21 @@ angular.module('clientHomeApp')
                 }
             };
 
+            //google search box
+            $scope.googleSearchModel = {
+                searchQuery: ""
+            };
+
+            $scope.performGoogleSiteSearch = function () {
+                if ($scope.googleSearchModel.searchQuery.length > 0) {
+                    if ($location.port()) {
+                        $window.location.href = 'http://' + $location.host() + ':' + $location.port() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
+                    } else {
+                        $window.location.href = 'http://' + $location.host() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
+                    }
+                }
+            };
+
             //variable to show or hide disqus if window.host contains negusmath
             if ($location.host().search("negusmath") !== -1) {
                 $scope.showDisqus = true;

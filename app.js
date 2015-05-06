@@ -114,6 +114,7 @@ app.get('/socket.io/socket.io.js', function (req, res) {
 //getting files
 app.get('/', routes.renderHome_Html);
 app.get('/index', routes.index_Html);
+app.get('/search', routes.search_Html);
 
 //login api
 app.post('/createAccount', loginAPI.createAccount);

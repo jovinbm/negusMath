@@ -17,6 +17,7 @@ angular.module('clientHomeApp', [
         //views
         $http.get('views/client/partials/views/post_stream.html', {cache: $templateCache});
         $http.get('views/client/partials/views/full_post.html', {cache: $templateCache});
+        $http.get('views/search/search_results.html', {cache: $templateCache});
     })
 
     .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
@@ -30,6 +31,10 @@ angular.module('clientHomeApp', [
             .state('post', {
                 url: '/post/:postIndex',
                 templateUrl: 'views/client/partials/views/full_post.html'
+            })
+            .state('search', {
+                url: '/search/?q',
+                templateUrl: 'views/search/search_results.html'
             })
             .state("otherwise", {url: '/home/1'});
 

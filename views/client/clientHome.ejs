@@ -48,6 +48,26 @@
     <link rel="stylesheet" href="/public/cssmin/cards.min.css">
     <link rel="stylesheet" href="/public/cssmin/client/client_home.min.css">
 
+    <!--overiding some bootstrap css for better google search rendering-->
+    <style>
+        /*AM22 - To make google search box appear correct - START*/
+        input.gsc-input, .gsc-input-box, .gsc-input-box-hover, .gsc-input-box-focus, .gsc-search-button {
+            box-sizing: content-box;
+            line-height: normal;
+        }
+
+        /*AM22 - To make google search box appear correct - END*/
+
+        /*AM22 - To make google search results tabs appear correct - START*/
+        .gsc-tabsArea div {
+            /*By default, Google custom search CSS sets it as AUTO, which shows scroll bars*/
+            overflow: visible;
+        }
+
+        /*AM22 - To make google search results tabs appear correct - END*/
+
+    </style>
+
     <title>Negus Math - College Level Advanced Mathematics for Kenya Students</title>
 </head>
 
@@ -118,6 +138,42 @@
              ng-if="showBanner">
             <button type="button" class="close" data-dismiss="alert">×</button>
             <strong>{{bannerMessage}}</strong>
+        </div>
+    </div>
+
+    <!--google search box-->
+    <div class="container">
+        <div class="row">
+
+            <script>
+                (function() {
+                    var cx = '015143383863257171180:q1wmf565j34';
+                    var gcse = document.createElement('script');
+                    gcse.type = 'text/javascript';
+                    gcse.async = true;
+                    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
+                            '//cse.google.com/cse.js?cx=' + cx;
+                    var s = document.getElementsByTagName('script')[0];
+                    s.parentNode.insertBefore(gcse, s);
+                })();
+            </script>
+            <gcse:search></gcse:search>
+
+            <!--<form id="google-site-search">-->
+                <!--<div class="input-group">-->
+                    <!--<input type="text"-->
+                           <!--class="form-control"-->
+                           <!--placeholder="Search Site"-->
+                           <!--aria-describedby="search-addon"-->
+                           <!--ng-model="googleSearchModel.searchQuery">-->
+                    <!--<span class="input-group-addon"-->
+                          <!--id="search-addon"-->
+                          <!--ng-click="performGoogleSiteSearch()">-->
+                        <!--<i class="fa fa-search"></i>-->
+                    <!--</span>-->
+                <!--</div>-->
+            <!--</form>-->
+
         </div>
     </div>
 
@@ -398,21 +454,6 @@
 
 <script type="text/javascript" src="/public/angular_assets/clientHomeAppMin/concatenated.min.js"></script>
 <!--<script type="text/javascript" src="/public/angular_assets/adminHomeAppMin/concatenated.js"></script>-->
-
-<!--disqus comment count pull-->
-<script type="text/javascript">
-    /* * * CONFIGURATION VARIABLES * * */
-    var disqus_shortname = 'negusmath';
-
-    /* * * DON'T EDIT BELOW THIS LINE * * */
-    (function () {
-        var s = document.createElement('script');
-        s.async = true;
-        s.type = 'text/javascript';
-        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
-        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
-    }());
-</script>
 
 </body>
 </html>

@@ -1,6 +1,6 @@
-angular.module('adminHomeApp')
-    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'logoutService', 'PostService', '$document', '$state', '$stateParams', 'cfpLoadingBar',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, logoutService, PostService, $document, $state, $stateParams, cfpLoadingBar) {
+angular.module('searchApp')
+    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$document', '$state', '$stateParams', 'logoutService', 'cfpLoadingBar',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $document, $state, $stateParams, logoutService, cfpLoadingBar) {
 
             //manipulating document title
             $scope.defaultDocumentTitle = function () {
@@ -21,19 +21,12 @@ angular.module('adminHomeApp')
             $scope.performGoogleSiteSearch = function () {
                 if ($scope.googleSearchModel.searchQuery.length > 0) {
                     if ($location.port()) {
-                        $window.location.href = 'http://' + $location.host() + ':' + $location.port() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
+                        $window.location.href = 'http://' + $location.host() + ':' + $location.port() + '/#!/search/?q=' + $scope.googleSearchModel.searchQuery;
                     } else {
-                        $window.location.href = 'http://' + $location.host() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
+                        $window.location.href = 'http://' + $location.host() + '/#!/search/?q=' + $scope.googleSearchModel.searchQuery;
                     }
                 }
             };
-
-            //variable to show or hide disqus if window.host contains negusmath
-            if ($location.host().search("negusmath") !== -1) {
-                $scope.showDisqus = true;
-            } else {
-                $scope.showDisqus = false;
-            }
 
             //listens for state changes
             $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
@@ -105,10 +98,6 @@ angular.module('adminHomeApp')
                 return theElement.html();
 
             };
-
-
-            //variable to hold the registered state of the client
-            $scope.clientIsRegistered = false;
 
             //===============request error handler===============
 
@@ -212,13 +201,15 @@ angular.module('adminHomeApp')
 
             //hides or shows the loading splash screen
             $scope.showHideLoadingBanner = function (bool) {
-                if (bool) {
-                    $('#loading-splash-card').removeClass('hidden');
-                    $('.hideMobileLoading').addClass('hidden-xs hidden-sm');
-                } else {
-                    $('#loading-splash-card').addClass('hidden');
-                    $('.hideMobileLoading').removeClass('hidden-xs hidden-sm');
-                }
+                $scope.showHideLoadingBanner = function (bool) {
+                    if (bool) {
+                        $('#loading-splash-card').removeClass('hidden');
+                        $('.hideMobileLoading').addClass('hidden-xs hidden-sm');
+                    } else {
+                        $('#loading-splash-card').addClass('hidden');
+                        $('.hideMobileLoading').removeClass('hidden-xs hidden-sm');
+                    }
+                };
             };
 
             $rootScope.$on('cfpLoadingBar:loading', function (event, resp) {
@@ -299,97 +290,42 @@ angular.module('adminHomeApp')
 
             //***************end time functions***********************
 
-
-            //====================element controllers==========holding states for hidden and visible elements
-            //new post
-            $scope.newPost = false;
-            $scope.showNewPost = function () {
-                $scope.newPost = true;
-            };
-            $scope.hideNewPost = function () {
-                $scope.newPost = false;
-            };
-            //end of new post
-            //====================end of element controllers
-
             //initial requests
-            socketService.getUserData()
-                .success(function (resp) {
-                    $scope.userData = globals.userData(resp.userData);
-                    if ($scope.userData.isRegistered == 'yes') {
-                        $scope.clientIsRegistered = true;
-                    }
+            function initialRequests() {
+                socketService.getUserData()
+                    .success(function (resp) {
+                        $scope.userData = globals.userData(resp.userData);
+                        if ($scope.userData.isRegistered == 'yes') {
+                            $scope.clientIsRegistered = true;
+                        } else {
+                            $scope.clientIsRegistered = false;
+                        }
 
-                    //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
-                    socket.emit('joinRoom', {
-                        room: resp.userData.uniqueCuid
+                        if ($scope.userData.isRegistered == 'yes') {
+                            //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
+                            socket.emit('joinRoom', {
+                                room: resp.userData.uniqueCuid
+                            });
+                        }
+
+                        $scope.responseStatusHandler(resp);
+                    })
+                    .error(function (errResponse) {
+                        $scope.responseStatusHandler(errResponse);
                     });
-
-                    $scope.responseStatusHandler(resp);
-                })
-                .error(function (errResponse) {
-                    $scope.responseStatusHandler(errResponse);
-                });
+            }
 
             socket.on('joined', function () {
                 console.log("JOIN SUCCESS");
             });
 
-            //===============new post controllers===========
-            $scope.newPostModel = {
-                postHeading: "",
-                postContent: "",
-                postSummary: ""
+            initialRequests();
+
+
+            //function to go to landing page
+            $scope.goToLandingPage = function () {
+                $window.location.href = 'index';
             };
-
-            $scope.postSummaryIsEmpty = true;
-            $scope.postSummaryHasExceededMaximum = false;
-
-            $scope.checkIfPostSummaryIsEmpty = function () {
-                if ($scope.newPostModel.postSummary.length == 0) {
-                    $scope.postSummaryIsEmpty = true;
-                }
-                else {
-                    $scope.postSummaryIsEmpty = false;
-                }
-                return $scope.postSummaryIsEmpty
-            };
-
-            $scope.checkPostSummaryMaxLength = function (maxLength) {
-                if ($scope.newPostModel.postSummary.length > maxLength) {
-                    $scope.postSummaryHasExceededMaximum = true;
-                } else {
-                    $scope.postSummaryHasExceededMaximum = false;
-                }
-                return $scope.postSummaryHasExceededMaximum
-            };
-
-            $scope.submitNewPost = function () {
-                if ($scope.newPostModel.postContent.length == 0) {
-                    $scope.showToast('warning', 'Please add some content to the post first');
-                } else if ($scope.newPostModel.postSummary.length > 1600) {
-                    $scope.showToast('warning', 'The post summary cannot exceed 1600 characters');
-                } else {
-                    var newPost = {
-                        postHeading: $scope.newPostModel.postHeading,
-                        postContent: $scope.newPostModel.postContent,
-                        postSummary: $scope.newPostModel.postSummary
-                    };
-                    PostService.submitNewPost(newPost).
-                        success(function (resp) {
-                            $scope.hideNewPost();
-                            $scope.responseStatusHandler(resp);
-                            $scope.newPostModel.postHeading = "";
-                            $scope.newPostModel.postContent = "";
-                            $scope.newPostModel.postSummary = "";
-                        })
-                        .error(function (errResponse) {
-                            $scope.responseStatusHandler(errResponse);
-                        })
-                }
-            };
-
-            //=====================end of submitting post
 
             //===============logout functions===============
             $scope.logoutClient = function () {
@@ -403,7 +339,6 @@ angular.module('adminHomeApp')
             };
 
             //=============end of logout===================
-
 
             //===============socket listeners===============
 
