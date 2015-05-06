@@ -148,6 +148,17 @@ angular.module('adminHomeApp')
     .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'logoutService', 'PostService', '$document', '$state', '$stateParams', 'cfpLoadingBar',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, logoutService, PostService, $document, $state, $stateParams, cfpLoadingBar) {
 
+            //manipulating document title
+            $scope.defaultDocumentTitle = function () {
+                document.title = "Negus Math - College Level Advanced Mathematics for Kenya Students";
+            };
+
+            $scope.changeDocumentTitle = function (newTitle) {
+                if (newTitle) {
+                    document.title = newTitle;
+                }
+            };
+
             //variable to show or hide disqus if window.host contains negusmath
             if ($location.host().search("negusmath") !== -1) {
                 $scope.showDisqus = true;
@@ -538,6 +549,9 @@ angular.module('adminHomeApp')
     .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
 
+            //change to default document title
+            $scope.defaultDocumentTitle();
+
             $scope.posts = PostService.getCurrentPosts();
             $scope.postsCount = PostService.getCurrentPostsCount();
 
@@ -762,6 +776,10 @@ angular.module('adminHomeApp')
                         $scope.responseStatusHandler(resp);
                         //check that there is a post first before starting disqus and other attributes
                         if ($scope.calcObjectLength($scope.post) != 0) {
+
+                            //change the document title
+                            $scope.changeDocumentTitle($scope.post.postHeading);
+
                             $scope.showThePostOnly();
                             updateTimeAgo();
                             addPostUrl();

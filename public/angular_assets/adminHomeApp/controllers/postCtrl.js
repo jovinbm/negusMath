@@ -2,6 +2,9 @@ angular.module('adminHomeApp')
     .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
 
+            //change to default document title
+            $scope.defaultDocumentTitle();
+
             $scope.posts = PostService.getCurrentPosts();
             $scope.postsCount = PostService.getCurrentPostsCount();
 
@@ -226,6 +229,10 @@ angular.module('adminHomeApp')
                         $scope.responseStatusHandler(resp);
                         //check that there is a post first before starting disqus and other attributes
                         if ($scope.calcObjectLength($scope.post) != 0) {
+
+                            //change the document title
+                            $scope.changeDocumentTitle($scope.post.postHeading);
+
                             $scope.showThePostOnly();
                             updateTimeAgo();
                             addPostUrl();

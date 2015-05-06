@@ -2,6 +2,17 @@ angular.module('adminHomeApp')
     .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'logoutService', 'PostService', '$document', '$state', '$stateParams', 'cfpLoadingBar',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, logoutService, PostService, $document, $state, $stateParams, cfpLoadingBar) {
 
+            //manipulating document title
+            $scope.defaultDocumentTitle = function () {
+                document.title = "Negus Math - College Level Advanced Mathematics for Kenya Students";
+            };
+
+            $scope.changeDocumentTitle = function (newTitle) {
+                if (newTitle) {
+                    document.title = newTitle;
+                }
+            };
+
             //variable to show or hide disqus if window.host contains negusmath
             if ($location.host().search("negusmath") !== -1) {
                 $scope.showDisqus = true;
