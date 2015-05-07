@@ -133,13 +133,6 @@ app.post('/api/newPost', middleware.ensureAuthenticatedAngular, middleware.addUs
 app.post('/api/updatePost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.updatePost);
 app.post('/api/getHotThisWeek', postAPI.getHotThisWeek);
 
-//app.post('/api/getPosts', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getPosts);
-//app.post('/api/getSuggestedPosts', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getSuggestedPosts);
-//app.post('/api/getPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getPost);
-//app.post('/api/newPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.newPost);
-//app.post('/api/updatePost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.updatePost);
-//app.post('/api/getHotThisWeek', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.getHotThisWeek);
-
 //error handlers
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
