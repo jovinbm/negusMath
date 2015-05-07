@@ -81,11 +81,14 @@ gulp.task('minifyAllImages', function () {
 });
 
 // Watch Files For Changes
-//gulp.task('watch', function () {
-//    gulp.watch('public/angular_assets/adminHomeApp/**/*.js', ['minifyAdminHomeAppJS']);
-//    gulp.watch('public/css/**/*.css', ['minifyAllCSS']);
-//});
+gulp.task('watch', function () {
+    gulp.watch('public/angular_assets/adminHomeApp/**/*.js', ['minifyAdminHomeAppJS']);
+    gulp.watch('public/angular_assets/clientHomeApp/**/*.js', ['minifyClientHomeAppJS']);
+    gulp.watch('public/angular_assets/indexApp/**/*.js', ['minifyIndexAppJS']);
+    gulp.watch('public/angular_assets/searchApp/**/*.js', ['minifySearchAppJS']);
+    gulp.watch('public/imgs/**/*', ['minifyAllImages']);
+    gulp.watch('public/css/**/*.css', ['minifyAllCSS']);
+});
 
 // Default Task
-gulp.task('default', ['minifyIndexAppJS', 'minifySearchAppJS', 'minifyAdminHomeAppJS', 'minifyClientHomeAppJS', 'minifyAllCSS', 'minifyAllImages']);
-//gulp.task('default', ['minifyIndexAppJS', 'minifyAdminHomeAppJS', 'minifyAllCSS', 'watch']);
+gulp.task('default', ['minifyIndexAppJS', 'minifySearchAppJS', 'minifyAdminHomeAppJS', 'minifyClientHomeAppJS', 'minifyAllCSS', 'minifyAllImages', 'watch']);

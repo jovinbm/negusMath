@@ -277,9 +277,9 @@ module.exports = {
             error('The post content cannot be empty');
         }
 
-        if (theNewPost.postSummary.length > 1600 && errors == 0) {
+        if (theNewPost.postSummary.length > 1000 && errors == 0) {
             ++errors;
-            error('The post summary cannot be more than 1600 characters');
+            error('The html length of the post summary cannot be more than 1000 characters');
         }
 
         if (errors == 0) {

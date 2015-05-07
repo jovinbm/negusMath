@@ -1,6 +1,6 @@
 var basic = require('../functions/basic.js');
 var consoleLogger = require('../functions/basic.js').consoleLogger;
-var User = require("../database/users/user_model.js");
+var User = require("../database/users/user.js");
 var bcrypt = require('bcrypt');
 var sideUpdates = require('./side_updates_db.js');
 
@@ -34,7 +34,7 @@ module.exports = {
         User.findOne({uniqueCuid: uniqueCuid}, {}).exec(
             function (err, theUser) {
                 if (err) {
-                    consoleLogger(errorLogger(module));
+                    consoleLogger(errorLogger(module, err));
                     error_neg_1(-1, err);
                 } else if (theUser == null || theUser == undefined) {
                     consoleLogger(successLogger(module, "No user found with the given uniqueCuid"));
@@ -53,7 +53,7 @@ module.exports = {
         User.findOne({username: username}).exec(
             function (err, theUser) {
                 if (err) {
-                    consoleLogger(errorLogger(module));
+                    consoleLogger(errorLogger(module, err));
                     error_neg_1(-1, err);
                 } else if (theUser == null || theUser == undefined) {
                     consoleLogger(successLogger(module, "No user found with the given username"));
@@ -72,7 +72,7 @@ module.exports = {
         User.findOne({uniqueCuid: uniqueCuid}).exec(
             function (err, theUser) {
                 if (err) {
-                    consoleLogger(errorLogger(module));
+                    consoleLogger(errorLogger(module, err));
                     error_neg_1(-1, err);
                 } else if (theUser == null || theUser == undefined) {
                     consoleLogger(successLogger(module, "No user found with the given uniqueCuid"));
@@ -104,7 +104,7 @@ module.exports = {
         receivedLogger(module);
         theUserObject.save(function (err, theSavedUser) {
             if (err) {
-                consoleLogger(errorLogger(module));
+                consoleLogger(errorLogger(module, err));
                 error_neg_1(-1, err);
             } else {
                 consoleLogger(successLogger(module));
@@ -121,7 +121,7 @@ module.exports = {
             .remove()
             .exec(function (err) {
                 if (err) {
-                    consoleLogger(errorLogger(module));
+                    consoleLogger(errorLogger(module, err));
                     error_neg_1(-1, err);
                 } else {
                     consoleLogger(successLogger(module));
@@ -142,7 +142,7 @@ module.exports = {
                 }
             }, function (err) {
                 if (err) {
-                    consoleLogger(errorLogger(module));
+                    consoleLogger(errorLogger(module, err));
                     error_neg_1(-1, err);
                 } else {
                     consoleLogger(successLogger(module));
@@ -164,7 +164,7 @@ module.exports = {
                 }
             }, function (err) {
                 if (err) {
-                    consoleLogger(errorLogger(module));
+                    consoleLogger(errorLogger(module, err));
                     error_neg_1(-1, err);
                 } else {
                     consoleLogger(successLogger(module));
@@ -186,7 +186,7 @@ module.exports = {
                 }
             }, function (err) {
                 if (err) {
-                    consoleLogger(errorLogger(module));
+                    consoleLogger(errorLogger(module, err));
                     error_neg_1(-1, err);
                 } else {
                     consoleLogger(successLogger(module));
@@ -209,7 +209,7 @@ module.exports = {
                 }
             }, function (err) {
                 if (err) {
-                    consoleLogger(errorLogger(module));
+                    consoleLogger(errorLogger(module, err));
                     error_neg_1(-1, err);
                 } else {
                     consoleLogger(successLogger(module));

@@ -567,6 +567,7 @@ angular.module('clientHomeApp')
                             $scope.suggestedPosts = [];
                             $scope.showSuggestedPosts = false;
                             $scope.goToUniversalBanner();
+                            $scope.showHideLoadingBanner(false);
                         }
 
                     })
@@ -594,7 +595,7 @@ angular.module('clientHomeApp')
                             var responseMimic = {
                                 banner: true,
                                 bannerClass: 'alert alert-dismissible alert-success',
-                                msg: "No more posts to show"
+                                msg: "No posts available for this page"
                             };
                             $scope.responseStatusHandler(responseMimic);
                             $scope.showPosts = false;
@@ -717,6 +718,7 @@ angular.module('clientHomeApp')
                             $scope.suggestedPosts = [];
                             $scope.showSuggestedPosts = false;
                             $scope.goToUniversalBanner();
+                            $scope.showHideLoadingBanner(false);
                         }
 
                     })

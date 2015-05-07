@@ -24,7 +24,7 @@ var consoleLogger = require('../functions/basic.js').consoleLogger;
 
 var cuid = require('cuid');
 var userDB = require('../db/user_db.js');
-var User = require("../database/users/user_model.js");
+var User = require("../database/users/user.js");
 var bcrypt = require('bcrypt');
 var forms = require('../functions/forms.js');
 

@@ -1,8 +1,8 @@
 var basic = require('../functions/basic.js');
 var consoleLogger = require('../functions/basic.js').consoleLogger;
 var cuid = require('cuid');
-var Post = require("../database/posts/post_model.js");
-var User = require("../database/users/user_model.js");
+var Post = require("../database/posts/post.js");
+var User = require("../database/users/user.js");
 var sideUpdates = require('./side_updates_db.js');
 
 var fileName = 'post_db.js';
@@ -39,7 +39,7 @@ module.exports = {
             .limit(limit)
             .exec(function (err, postsArray) {
                 if (err) {
-                    consoleLogger(errorLogger(module));
+                    consoleLogger(errorLogger(module, err));
                     errors++;
                     error_neg_1(-1, err);
                 } else if (postsArray == null || postsArray == undefined || postsArray.length == 0) {
@@ -76,7 +76,7 @@ module.exports = {
             Post.findOne({postIndex: postIndex})
                 .exec(function (err, thePost) {
                     if (err) {
-                        consoleLogger(errorLogger(module));
+                        consoleLogger(errorLogger(module, err));
                         errors++;
                         error_neg_1(-1, err);
                     } else if (thePost == null || thePost == undefined || thePost.length == 0) {
@@ -100,7 +100,7 @@ module.exports = {
             .limit(quantity)
             .exec(function (err, postsArray) {
                 if (err) {
-                    consoleLogger(errorLogger(module));
+                    consoleLogger(errorLogger(module, err));
                     error_neg_1(-1, err);
                 } else if (postsArray.length == 0) {
                     consoleLogger(successLogger(module, "SuggestedPosts is empty"));
@@ -121,7 +121,7 @@ module.exports = {
             .limit(quantity)
             .exec(function (err, hotThisWeekArray) {
                 if (err) {
-                    consoleLogger(errorLogger(module));
+                    consoleLogger(errorLogger(module, err));
                     error_neg_1(-1, err);
                 } else if (hotThisWeekArray.length == 0) {
                     consoleLogger(successLogger(module, "HotThisWeek is empty"));
@@ -157,7 +157,7 @@ module.exports = {
         receivedLogger(module);
         post.save(function (err, savedPost) {
             if (err) {
-                consoleLogger(errorLogger(module));
+                consoleLogger(errorLogger(module, err));
                 error_neg_1(-1, err);
             } else {
                 //this returns an object
@@ -230,7 +230,7 @@ module.exports = {
         var postCount;
         Post.count({}, function (err, count) {
             if (err) {
-                consoleLogger(errorLogger(module));
+                consoleLogger(errorLogger(module, err));
                 error_neg_1(-1, err);
             } else if (count == null || count == undefined) {
                 postCount = 0;
@@ -240,6 +240,20 @@ module.exports = {
                 postCount = count;
                 consoleLogger(successLogger(module));
                 success(postCount);
+            }
+        });
+    },
+
+    searchForPosts: function (queryString, quantity, error_neg_1, error_0, success) {
+        var module = 'searchForPosts';
+        receivedLogger(module);
+        Post.textSearch(queryString, function (err, output) {
+            if (err) {
+                consoleLogger(errorLogger(module, err));
+                error_neg_1(-1, err);
+            } else {
+                consoleLogger(successLogger(module));
+                success(output);
             }
         });
     }

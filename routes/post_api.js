@@ -70,5 +70,15 @@ module.exports = {
         receivedLogger(module);
         var quantity = 7;
         post_handler.getHotThisWeek(req, res, quantity);
+    },
+
+
+    searchForPosts: function (req, res) {
+        var module = 'searchForPosts';
+        receivedLogger(module);
+        var quantity = 10;
+        var queryString = req.body.queryString;
+        consoleLogger("*****queryString = " + queryString);
+        post_handler.searchForPosts(req, res, queryString, quantity);
     }
 };

@@ -47,26 +47,6 @@
     <link rel="stylesheet" href="/public/cssmin/cards.min.css">
     <link rel="stylesheet" href="/public/cssmin/admin/admin_home.min.css">
 
-    <!--overiding some bootstrap css for better google search rendering-->
-    <style>
-        /*AM22 - To make google search box appear correct - START*/
-        input.gsc-input, .gsc-input-box, .gsc-input-box-hover, .gsc-input-box-focus, .gsc-search-button {
-            box-sizing: content-box;
-            line-height: normal;
-        }
-
-        /*AM22 - To make google search box appear correct - END*/
-
-        /*AM22 - To make google search results tabs appear correct - START*/
-        .gsc-tabsArea div {
-            /*By default, Google custom search CSS sets it as AUTO, which shows scroll bars*/
-            overflow: visible;
-        }
-
-        /*AM22 - To make google search results tabs appear correct - END*/
-
-    </style>
-
     <title>Negus Math - College Level Advanced Mathematics for Kenya Students</title>
 </head>
 
@@ -148,41 +128,26 @@
         </div>
     </div>
 
-    <!--google search box-->
-    <div class="container">
-        <div class="row">
+    <!--&lt;!&ndash;search box&ndash;&gt;-->
+    <!--<div class="container">-->
+    <!--<div class="row">-->
+    <!--<form id="site-search">-->
+    <!--<div class="input-group">-->
+    <!--<input type="text"-->
+    <!--class="form-control"-->
+    <!--placeholder="Search Site"-->
+    <!--aria-describedby="search-addon"-->
+    <!--ng-model="googleSearchModel.searchQuery">-->
+    <!--<span class="input-group-addon"-->
+    <!--id="search-addon"-->
+    <!--ng-click="performGoogleSiteSearch()">-->
+    <!--<i class="fa fa-search"></i>-->
+    <!--</span>-->
+    <!--</div>-->
+    <!--</form>-->
 
-            <script>
-                (function () {
-                    var cx = '015143383863257171180:q1wmf565j34';
-                    var gcse = document.createElement('script');
-                    gcse.type = 'text/javascript';
-                    gcse.async = true;
-                    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
-                            '//cse.google.com/cse.js?cx=' + cx;
-                    var s = document.getElementsByTagName('script')[0];
-                    s.parentNode.insertBefore(gcse, s);
-                })();
-            </script>
-            <gcse:search></gcse:search>
-
-            <!--<form id="google-site-search">-->
-            <!--<div class="input-group">-->
-            <!--<input type="text"-->
-            <!--class="form-control"-->
-            <!--placeholder="Search Site"-->
-            <!--aria-describedby="search-addon"-->
-            <!--ng-model="googleSearchModel.searchQuery">-->
-            <!--<span class="input-group-addon"-->
-            <!--id="search-addon"-->
-            <!--ng-click="performGoogleSiteSearch()">-->
-            <!--<i class="fa fa-search"></i>-->
-            <!--</span>-->
-            <!--</div>-->
-            <!--</form>-->
-
-        </div>
-    </div>
+    <!--</div>-->
+    <!--</div>-->
 
     <section id="newPostSection" ng-show="newPost" class="ng-cloak">
         <div class="container">
@@ -261,11 +226,11 @@
                                                 </span>
 
                                                 <span class="form-error-notice"
-                                                      ng-show="checkPostSummaryMaxLength(1600)">
-                                                <small>Maximum length required is 1600:</small>
+                                                      ng-show="checkPostSummaryMaxLength(1000)">
+                                                <small>Maximum html length required is 1000:</small>
                                                 </span>
 
-                                                    <span class="help-block">This will represent this post in the list of all posts. Limited to 1600 characters. Users will be able to click a 'read more' link to see the main content of the post</span>
+                                                    <span class="help-block">This will represent this post in the list of all posts. Limited to 1000 characters. Users will be able to click a 'read more' link to see the main content of the post</span>
                                                 </div>
 
                                             </form>

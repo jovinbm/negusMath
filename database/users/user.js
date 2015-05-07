@@ -13,4 +13,5 @@ var userSchema = new Schema({
     createdAt: {type: Date, default: Date.now, unique: false, index: true}
 });
 
-module.exports = userSchema;
+var User = mongoose.model('User', userSchema);
+module.exports = User;

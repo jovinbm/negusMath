@@ -518,8 +518,8 @@ angular.module('adminHomeApp')
             $scope.submitNewPost = function () {
                 if ($scope.newPostModel.postContent.length == 0) {
                     $scope.showToast('warning', 'Please add some content to the post first');
-                } else if ($scope.newPostModel.postSummary.length > 1600) {
-                    $scope.showToast('warning', 'The post summary cannot exceed 1600 characters');
+                } else if ($scope.newPostModel.postSummary.length > 1000) {
+                    $scope.showToast('warning', 'The post summary cannot exceed 1000 characters');
                 } else {
                     var newPost = {
                         postHeading: $scope.newPostModel.postHeading,
@@ -916,8 +916,8 @@ angular.module('adminHomeApp')
             $scope.submitPostUpdate = function () {
                 if ($scope.post.postContent.length == 0) {
                     $scope.showToast('warning', 'Please add some content to the post first');
-                } else if ($scope.post.postSummary.length > 1600) {
-                    $scope.showToast('warning', 'The post summary cannot exceed 1600 characters');
+                } else if ($scope.post.postSummary.length > 1000) {
+                    $scope.showToast('warning', 'The post summary cannot exceed 1000 characters');
                 } else {
                     PostService.submitPostUpdate($scope.post)
                         .success(function (resp) {

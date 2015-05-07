@@ -13,14 +13,24 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var methodOverride = require('method-override');
 var compression = require('compression');
 var session = require('express-session');
 var MongoStore = require('connect-mongo')(session);
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var mongoose = require('mongoose');
-var autoIncrement = require('mongoose-auto-increment');
 var moment = require('moment');
+
+console.log("ENVIRONMENT = " + process.env.NODE_ENV);
+
+//mongoose.set('debug', true);
+mongoose.connect(databaseURL);
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error: Problem while attempting to connect to database'));
+db.once('open', function () {
+    console.log("Successfully connected to database");
+});
 
 var basic = require('./functions/basic.js');
 var consoleLogger = require('./functions/basic.js').consoleLogger;
@@ -52,24 +62,6 @@ function getTheUser(req) {
     return req.customData.theUser;
 }
 
-consoleLogger("ENVIRONMENT = " + process.env.NODE_ENV);
-mongoose.connect(databaseURL);
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error: Problem while attempting to connect to database'));
-db.once('open', function () {
-    consoleLogger("Successfully connected to database");
-});
-
-autoIncrement.initialize(mongoose.connection);
-
-//mongoose models that require access to connection params
-var postSchema = require('./database/posts/post_schema.js');
-postSchema.plugin(autoIncrement.plugin, {
-    model: 'Post',
-    field: 'postIndex',
-    startAt: 1
-});
-
 app.use(compression());
 app.use(favicon(__dirname + '/public/favicon.ico'));
 
@@ -82,6 +74,7 @@ app.use(require('prerender-node').set('prerenderServiceUrl', 'https://jbmprerend
 
 app.use(logger('dev'));
 app.use(bodyParser.urlencoded({extended: false}));
+app.use(methodOverride());
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(session({
@@ -132,21 +125,42 @@ app.post('/api/getPost', postAPI.getPost);
 app.post('/api/newPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.newPost);
 app.post('/api/updatePost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.updatePost);
 app.post('/api/getHotThisWeek', postAPI.getHotThisWeek);
+app.post('/api/searchForPosts', postAPI.searchForPosts);
 
 //error handlers
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-    var err = new Error('Not Found');
-    err.status = 404;
+function logErrors(err, req, res, next) {
+    console.error(err.stack);
     next(err);
-});
+}
 
-// error handlers
-app.use(function (err, req, res, next) {
-    consoleLogger(errorLogger('404 Handler', 'New 404 DEVELOPMENT error'));
-    res.status(err.status);
-    res.sendFile(path.join(__dirname, './public/error/', '404.html'));
-});
+function clientErrorHandler(err, req, res, next) {
+    if (req.xhr) {
+        console.log("XHR ERROR HANDLED by clientErrorHandler");
+        //if this is an ajax request
+        res.status(500).send({
+            code: 500,
+            notify: true,
+            type: 'error',
+            banner: true,
+            bannerClass: 'alert alert-dismissible alert-warning',
+            msg: 'An error occurred. Please reload page',
+            disable: true
+        });
+    } else {
+        //request is not ajax, forward error
+        next(err);
+    }
+}
+
+function errorHandler(err, req, res, next) {
+    console.log("NON XHR ERROR HANDLED by errorHandler");
+    res.status(500);
+    res.sendFile(path.join(__dirname, './public/error/', '500.html'));
+}
+
+app.use(logErrors);
+app.use(clientErrorHandler);
+app.use(errorHandler);
 
 server.listen(port, function () {
     consoleLogger("Server listening at port " + port);

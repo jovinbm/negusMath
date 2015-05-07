@@ -218,6 +218,31 @@ module.exports = {
                 msg: 'Failed to retrieve this weeks top posts. Please reload page '
             });
         }
+    },
+
+
+    searchForPosts: function (req, res, queryString, quantity) {
+        var module = 'searchForPosts';
+        receivedLogger(module);
+
+        postDB.searchForPosts(queryString, quantity, error, error, success);
+
+        function success(results) {
+            consoleLogger(successLogger(module));
+            res.status(200).send({
+                results: results
+            });
+        }
+
+        function error() {
+            consoleLogger(errorLogger(module));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: 'Something went wrong while trying to fetch the results. Please try again'
+            });
+        }
     }
 
 };

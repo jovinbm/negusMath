@@ -1,7 +1,7 @@
 var basic = require('../functions/basic.js');
 var consoleLogger = require('../functions/basic.js').consoleLogger;
-var User = require("../database/users/user_model.js");
-var Post = require("../database/posts/post_model.js");
+var User = require("../database/users/user.js");
+var Post = require("../database/posts/post.js");
 var bcrypt = require('bcrypt');
 var cuid = require('cuid');
 
@@ -40,7 +40,7 @@ module.exports = {
             })
             .exec(function (err) {
                 if (err) {
-                    consoleLogger(errorLogger(module));
+                    consoleLogger(errorLogger(module, err));
                     error_neg_1(-1, err);
                 } else {
                     consoleLogger(successLogger(module));
