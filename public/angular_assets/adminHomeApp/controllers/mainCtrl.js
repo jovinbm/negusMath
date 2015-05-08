@@ -13,29 +13,10 @@ angular.module('adminHomeApp')
                 }
             };
 
-            //google search box
-            $scope.googleSearchModel = {
-                searchQuery: ""
-            };
-
-            $scope.performGoogleSiteSearch = function () {
-                if ($scope.googleSearchModel.searchQuery.length > 0) {
-                    if ($location.port()) {
-                        $window.location.href = 'http://' + $location.host() + ':' + $location.port() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
-                    } else {
-                        $window.location.href = 'http://' + $location.host() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
-                    }
-                }
-            };
-
             //variable to show or hide disqus if window.host contains negusmath
-            if ($location.host().search("negusmath") !== -1) {
-                $scope.showDisqus = true;
-            } else {
-                $scope.showDisqus = false;
-            }
+            $scope.showDisqus = $location.host().search("negusmath") !== -1;
 
-            //listens for state changes
+            //listens for state changes, used to activate active states
             $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
                 $scope.currentState = toState.name;
             });
@@ -51,7 +32,6 @@ angular.module('adminHomeApp')
             };
 
             //length of an object
-
             $scope.calcObjectLength = function (obj) {
                 var len = 0;
                 for (var prop in obj) {
@@ -199,7 +179,6 @@ angular.module('adminHomeApp')
                 $scope.responseStatusHandler(resp);
             });
 
-
             //===============end of request error handler===============
 
 
@@ -300,18 +279,6 @@ angular.module('adminHomeApp')
             //***************end time functions***********************
 
 
-            //====================element controllers==========holding states for hidden and visible elements
-            //new post
-            $scope.newPost = false;
-            $scope.showNewPost = function () {
-                $scope.newPost = true;
-            };
-            $scope.hideNewPost = function () {
-                $scope.newPost = false;
-            };
-            //end of new post
-            //====================end of element controllers
-
             //initial requests
             socketService.getUserData()
                 .success(function (resp) {
@@ -335,7 +302,33 @@ angular.module('adminHomeApp')
                 console.log("JOIN SUCCESS");
             });
 
+            //search functionality
+            $scope.googleSearchModel = {
+                searchQuery: ""
+            };
+
+            $scope.performGoogleSiteSearch = function () {
+                if ($scope.googleSearchModel.searchQuery.length > 0) {
+                    if ($location.port()) {
+                        $window.location.href = 'http://' + $location.host() + ':' + $location.port() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
+                    } else {
+                        $window.location.href = 'http://' + $location.host() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
+                    }
+                }
+            };
+            //end of search functionality
+
             //===============new post controllers===========
+
+            //new post
+            $scope.newPost = false;
+            $scope.showNewPost = function () {
+                $scope.newPost = true;
+            };
+            $scope.hideNewPost = function () {
+                $scope.newPost = false;
+            };
+
             $scope.newPostModel = {
                 postHeading: "",
                 postContent: "",
