@@ -31,8 +31,19 @@ module.exports = {
     getPosts: function (req, res) {
         var module = 'getPosts';
         receivedLogger(module);
-        var page = req.body.page;
-        post_handler.getPosts(req, res, page);
+        if (req.body.page) {
+            var page = req.body.page;
+            post_handler.getPosts(req, res, page);
+        } else {
+            consoleLogger(errorLogger(module, 'Some request fields missing'));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'error',
+                msg: 'An error has occurred. Please reload page',
+                disable: true
+            });
+        }
     },
 
     getSuggestedPosts: function (req, res) {
@@ -45,8 +56,19 @@ module.exports = {
     getPost: function (req, res) {
         var module = 'getPost';
         receivedLogger(module);
-        var postIndex = req.body.postIndex;
-        post_handler.getPost(req, res, postIndex);
+        if (req.body.postIndex) {
+            var postIndex = req.body.postIndex;
+            post_handler.getPost(req, res, postIndex);
+        } else {
+            consoleLogger(errorLogger(module, 'Some request fields missing'));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'error',
+                msg: 'An error has occurred. Please reload page',
+                disable: true
+            });
+        }
     },
 
 
@@ -60,8 +82,18 @@ module.exports = {
     updatePost: function (req, res) {
         var module = 'updatePost';
         receivedLogger(module);
-        var postUpdate = req.body.postUpdate;
-        post_handler.updatePost(req, res, postUpdate);
+        if (req.body.postUpdate) {
+            var postUpdate = req.body.postUpdate;
+            post_handler.updatePost(req, res, postUpdate);
+        } else {
+            consoleLogger(errorLogger(module, 'Some request fields missing'));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'error',
+                msg: 'An error has occurred. Please try again'
+            });
+        }
     },
 
 
@@ -76,9 +108,27 @@ module.exports = {
     searchForPosts: function (req, res) {
         var module = 'searchForPosts';
         receivedLogger(module);
-        var quantity = 10;
-        var queryString = req.body.queryString;
-        consoleLogger("*****queryString = " + queryString);
-        post_handler.searchForPosts(req, res, queryString, quantity);
+        if (req.body.queryString && req.body.requestedPage) {
+            var quantity = 100;
+            var requestedPage = req.body.requestedPage;
+            var queryString = req.body.queryString;
+            var postSearchUniqueCuid;
+
+            if (req.body.postSearchUniqueCuid) {
+                postSearchUniqueCuid = req.body.postSearchUniqueCuid;
+            } else {
+                postSearchUniqueCuid = null;
+            }
+
+            post_handler.searchForPosts(req, res, queryString, quantity, postSearchUniqueCuid, requestedPage);
+        } else {
+            consoleLogger(errorLogger(module, 'Some request fields missing'));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'error',
+                msg: 'An error has occurred. Please try again'
+            });
+        }
     }
 };

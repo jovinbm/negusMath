@@ -2,6 +2,7 @@ var userDB = require('../db/user_db.js');
 var basic = require('../functions/basic.js');
 var consoleLogger = require('../functions/basic.js').consoleLogger;
 var path = require('path');
+var cheerio = require('cheerio');
 
 var fileName = 'forms_db.js';
 
@@ -272,15 +273,51 @@ module.exports = {
             error('The post summary does not seem to be right. Please check and try again');
         }
 
-        if (theNewPost.postSummary.length == 0 && errors == 0) {
+        var postSummary = cheerio(theNewPost.postSummary).text();
+
+        if (postSummary.length == 0 && errors == 0) {
             ++errors;
             error('The post content cannot be empty');
         }
 
-        if (theNewPost.postSummary.length > 1000 && errors == 0) {
+        if (postSummary.length > 2000 && errors == 0) {
             ++errors;
-            error('The html length of the post summary cannot be more than 1000 characters');
+            error('The post summary cannot exceed 2000 characters');
         }
+
+        if (errors == 0) {
+            consoleLogger(successLogger(module));
+            success();
+        }
+
+        function error(errorMessage) {
+            consoleLogger(errorLogger(module, errorMessage));
+            res.status(500).send({
+                code: 500,
+                newPostBanner: true,
+                bannerClass: 'alert alert-dismissible alert-warning',
+                msg: errorMessage
+            });
+        }
+    },
+
+    validatePostsSearchQuery: function (req, res, queryString, success) {
+        var module = 'validatePostsSearchQuery';
+        receivedLogger(module);
+        var errors = 0;
+
+        //validate query no whitespace
+        //check that at least at least one character is non-whitespace
+        if (!(noWhiteSpaceRegex.test(queryString)) && errors == 0) {
+            ++errors;
+            error('The search cannot be empty');
+        }
+
+        if (queryString.length == 0 && errors == 0) {
+            ++errors;
+            error('The search cannot be empty');
+        }
+
 
         if (errors == 0) {
             consoleLogger(successLogger(module));

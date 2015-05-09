@@ -100,6 +100,7 @@ module.exports = {
                     msg: info || err
                 });
             }
+
             if (!user) {
                 return res.status(401).send({
                     code: 401,
@@ -108,6 +109,12 @@ module.exports = {
                     msg: info || err
                 });
             }
+
+            //before logging the user in, remove him from his current session which might be a random tracking session
+            if (req.isAuthenticated()) {
+                req.logout();
+            }
+
             req.logIn(user, function (err) {
                 if (err) {
                     consoleLogger(errorLogger('req.login', err, err));

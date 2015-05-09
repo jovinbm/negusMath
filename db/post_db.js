@@ -2,6 +2,7 @@ var basic = require('../functions/basic.js');
 var consoleLogger = require('../functions/basic.js').consoleLogger;
 var cuid = require('cuid');
 var Post = require("../database/posts/post.js");
+var searchDB = require("./search_db.js");
 var User = require("../database/users/user.js");
 var sideUpdates = require('./side_updates_db.js');
 
@@ -62,6 +63,29 @@ module.exports = {
                             success(postsArray, postsCount);
                         }
                     });
+                }
+            });
+    },
+
+    getPostsWithUniqueCuids: function (theArray, error_neg_1, error_0, success) {
+        var module = 'getPostsWithUniqueCuids';
+        receivedLogger(module);
+        Post.find({
+            postUniqueCuid: {
+                $in: theArray
+            }
+        })
+            .exec(function (err, postsArray) {
+                if (err) {
+                    consoleLogger(errorLogger(module, err));
+                    error_neg_1(-1, err);
+                } else if (postsArray == null || postsArray == undefined || postsArray.length == 0) {
+                    consoleLogger(successLogger(module, 'No posts found'));
+                    postsArray = [];
+                    success(postsArray);
+                } else {
+                    consoleLogger(successLogger(module));
+                    success(postsArray);
                 }
             });
     },
@@ -244,19 +268,124 @@ module.exports = {
         });
     },
 
-    searchForPosts: function (queryString, quantity, error_neg_1, error_0, success) {
+    //searchForPosts: function (queryString, quantity, page, resultObject, error_neg_1, error_0, success) {
+    searchForPosts: function (queryString, quantity, postSearchUniqueCuid, requestedPage, error_neg_1, error_0, success) {
         var module = 'searchForPosts';
         receivedLogger(module);
-        Post.textSearch(queryString, function (err, output) {
-            if (err) {
-                consoleLogger(errorLogger(module, err));
-                error_neg_1(-1, err);
-            } else {
-                consoleLogger(successLogger(module));
-                success(output);
+
+        //this function parses the result object from database and spits out an object that contains the uniqueCuids of results,
+        // the refined page, and the total count of searched items
+        function parseSearchObject(theRequestedPage, resultDatabaseObject) {
+            //the resultObject is an object whose keys are page numbers in tens, and value is
+            //an array which contains the post references for the posts that match the query
+            //inside the objects in the array, each has 2 keys: score and obj == post
+            var returnValue = {
+                queryString: queryString,
+                postUniqueCuids: [],
+                page: theRequestedPage,
+                totalResults: resultDatabaseObject.resultObject.totalResults,
+                postSearchUniqueCuid: resultDatabaseObject.searchUniqueCuid
+            };
+
+            //check to see if the given page number exceeds the total pages in the object
+            if (theRequestedPage > resultDatabaseObject.resultObject.lastPage) {
+                returnValue.page = resultDatabaseObject.resultObject.lastPage;
             }
-        });
+
+            //check to see if the given page numberis negative
+            if (theRequestedPage < 1) {
+                returnValue.page = 1;
+            }
+
+
+            //place the uniqueCuids, using the corrected page
+            resultDatabaseObject.resultObject[returnValue.page].forEach(function (post) {
+                returnValue.postUniqueCuids.push(post.obj.postUniqueCuid);
+            });
+            return returnValue;
+        }
+
+        //===================1: If the browser provided a searchUniqueCuid, check to see if the searchUniqueCuid
+        //exists, (WHICH MUST COINCIDE WITH THE QUERY STRING is so, retrieve the postSearchObject and parse
+        if (postSearchUniqueCuid) {
+            searchDB.getPostSearch(postSearchUniqueCuid, queryString, error_neg_1, searchObjectNotAvailable, searchObjectAvailable);
+        } else {
+            searchObjectNotAvailable();
+        }
+
+        function searchObjectAvailable(postSearchObject) {
+            consoleLogger(successLogger(module, 'Search was available in post searches, RETURNING CACHED/CURSORED SEARCH'));
+            var returnValue = parseSearchObject(requestedPage, postSearchObject);
+            success(returnValue);
+        }
+
+        //===================2: if it does not exists, make a new search, save it, and parse it
+        function searchObjectNotAvailable() {
+            consoleLogger(successLogger(module, 'Search was not previously available, MAKING NEW SEARCH'));
+            var options = {
+                project: {
+                    postUniqueCuid: 1,
+                    postIndex: 1,
+                    postHeading: 1,
+                    postTags: 1
+                },
+                limit: quantity
+            };
+
+            Post.textSearch(queryString, options, function (err, output) {
+                if (err) {
+                    consoleLogger(errorLogger(module, 'textSearch', err));
+                    error_neg_1(-1, err);
+                } else {
+                    //output is an object that contains 3 major keys:
+                    //1:"results" = array of objects with 2 keys: "score" and "object" <--carries the post
+                    //2:"stats" = result metadata containing: nscanned (number), nscannedObjects(number), n(number), timeMicros(number)
+                    //3:"ok" == 1 if search went well
+
+                    //prepare an object that contains pages and postUniqueCuids of the current search results: 10 post uniqueCuids for each page key
+                    var resultObject = {};
+                    var page = 1;
+                    var len = output.results.length;
+
+                    //check to see that there are results
+                    if (len > 0) {
+                        for (var i = 0, j = 1; i < len; i++, j++) {
+                            if (j > 10) {
+                                page++;
+                                j = 1;
+                            }
+                            //check to see if the page property exists first
+                            if (!resultObject[page]) {
+                                resultObject[page] = []
+                            }
+                            //push the result
+                            resultObject[page].push(output.results[i]);
+                        }
+                    } else {
+                        //means the results are empty
+                        resultObject[page] = [];
+                    }
+
+                    //push the number of pages and total results into the result object
+                    resultObject['lastPage'] = page;
+                    resultObject['totalResults'] = output.stats.n;
+
+                    //make the new postSearch pointer
+                    searchDB.makeNewPostSearch(queryString, resultObject, made);
+
+                    //save it
+                    function made(rawPostSearchObject) {
+                        searchDB.saveNewPostSearch(rawPostSearchObject, error_neg_1, error_neg_1, saved);
+                    }
+
+                    function saved(savedPostSearchObject) {
+                        var returnValue = parseSearchObject(requestedPage, savedPostSearchObject);
+                        consoleLogger(successLogger(module));
+                        success(returnValue);
+                    }
+                }
+            });
+        }
+
     }
-
-
 };

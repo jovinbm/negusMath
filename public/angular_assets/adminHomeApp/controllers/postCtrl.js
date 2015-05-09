@@ -349,8 +349,8 @@ angular.module('adminHomeApp')
             $scope.submitPostUpdate = function () {
                 if ($scope.post.postContent.length == 0) {
                     $scope.showToast('warning', 'Please add some content to the post first');
-                } else if ($scope.post.postSummary.length > 1000) {
-                    $scope.showToast('warning', 'The post summary cannot exceed 1000 characters');
+                } else if ($scope.post.postSummary.length > 2000) {
+                    $scope.showToast('warning', 'The post summary cannot exceed 2000 characters');
                 } else {
                     PostService.submitPostUpdate($scope.post)
                         .success(function (resp) {

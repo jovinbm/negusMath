@@ -96,7 +96,19 @@ a.active {
     color: rgb(169, 68, 66);
     margin-top: 0.9em;
     margin-bottom: 0.9em;
-    font-size: 0.9em;
+    font-size: 0.7em;
+}
+
+.form-help-notice {
+    margin-top: 0.9em;
+    margin-bottom: 0.9em;
+    font-size: 0.7em;
+}
+
+.required-star {
+    /*content: ' *';*/
+    display: inline;
+    color: rgb(169, 68, 66);
 }
 
 .card_date {

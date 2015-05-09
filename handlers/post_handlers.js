@@ -221,27 +221,38 @@ module.exports = {
     },
 
 
-    searchForPosts: function (req, res, queryString, quantity) {
+    searchForPosts: function (req, res, queryString, quantity, postSearchUniqueCuid, requestedPage) {
         var module = 'searchForPosts';
         receivedLogger(module);
 
-        postDB.searchForPosts(queryString, quantity, error, error, success);
+        forms.validatePostsSearchQuery(req, res, queryString, postsSearchQueryValidated);
 
-        function success(results) {
-            consoleLogger(successLogger(module));
-            res.status(200).send({
-                results: results
-            });
-        }
+        function postsSearchQueryValidated() {
 
-        function error() {
-            consoleLogger(errorLogger(module));
-            res.status(500).send({
-                code: 500,
-                notify: true,
-                type: 'warning',
-                msg: 'Something went wrong while trying to fetch the results. Please try again'
-            });
+            postDB.searchForPosts(queryString, quantity, postSearchUniqueCuid, requestedPage, error, error, success);
+
+            function success(resultValue) {
+                //gets a return value with the postUniqueCuids
+                postDB.getPostsWithUniqueCuids(resultValue.postUniqueCuids, error, found, found);
+
+                function found(postsArray) {
+                    resultValue["postsArray"] = postsArray;
+                    consoleLogger(successLogger(module));
+                    res.status(200).send({
+                        results: resultValue
+                    });
+                }
+            }
+
+            function error() {
+                consoleLogger(errorLogger(module));
+                res.status(500).send({
+                    code: 500,
+                    notify: true,
+                    type: 'warning',
+                    msg: 'Something went wrong while trying to fetch the results. Please try again'
+                });
+            }
         }
     }
 

@@ -11,7 +11,8 @@ angular.module('adminHomeApp', [
     'ngAnimate',
     'textAngular',
     'ngSanitize',
-    'angularUtils.directives.dirDisqus'
+    'angularUtils.directives.dirDisqus',
+    'ngTagsInput'
 ])
     .run(function ($templateCache, $http) {
         //views
