@@ -108,7 +108,6 @@ module.exports = {
     mainSearch: function (req, res) {
         var module = 'mainSearch';
         receivedLogger(module);
-        consoleLogger("*****************************" + JSON.stringify(req.body));
         if (req.body.queryString && req.body.requestedPage) {
             var quantity = 100;
             var requestedPage = req.body.requestedPage;
