@@ -221,15 +221,15 @@ module.exports = {
     },
 
 
-    searchForPosts: function (req, res, queryString, quantity, postSearchUniqueCuid, requestedPage) {
-        var module = 'searchForPosts';
+    mainSearch: function (req, res, queryString, quantity, searchUniqueCuid, requestedPage) {
+        var module = 'mainSearch';
         receivedLogger(module);
 
-        forms.validatePostsSearchQuery(req, res, queryString, postsSearchQueryValidated);
+        forms.validateMainSearchQuery(req, res, queryString, mainSearchQueryValidated);
 
-        function postsSearchQueryValidated() {
+        function mainSearchQueryValidated() {
 
-            postDB.searchForPosts(queryString, quantity, postSearchUniqueCuid, requestedPage, error, error, success);
+            postDB.mainSearch(queryString, quantity, searchUniqueCuid, requestedPage, error, error, success);
 
             function success(resultValue) {
                 //gets a return value with the postUniqueCuids

@@ -90,57 +90,70 @@ module.exports = {
     localUserLogin: function (req, res, next) {
         var module = 'app.post /localUserLogin';
         receivedLogger(module);
-        passport.authenticate('local', function (err, user, info) {
+        if (req.body.username && req.body.password) {
+            passport.authenticate('local', function (err, user, info) {
 
-            if (err) {
-                return res.status(500).send({
-                    code: 500,
-                    banner: true,
-                    bannerClass: 'alert alert-dismissible alert-warning',
-                    msg: info || err
-                });
-            }
-
-            if (!user) {
-                return res.status(401).send({
-                    code: 401,
-                    banner: true,
-                    bannerClass: 'alert alert-dismissible alert-warning',
-                    msg: info || err
-                });
-            }
-
-            //before logging the user in, remove him from his current session which might be a random tracking session
-            if (req.isAuthenticated()) {
-                req.logout();
-            }
-
-            req.logIn(user, function (err) {
                 if (err) {
-                    consoleLogger(errorLogger('req.login', err, err));
                     return res.status(500).send({
                         code: 500,
                         banner: true,
                         bannerClass: 'alert alert-dismissible alert-warning',
-                        msg: "A problem occurred when trying to log you in. Please try again"
-                    });
-                } else {
-                    consoleLogger(successLogger(module));
-                    var redirectPage = '/index';
-                    return res.status(200).send({
-                        code: 200,
-                        msg: "You have successfully logged in",
-                        redirect: true,
-                        redirectPage: redirectPage
+                        msg: info || err
                     });
                 }
+
+                if (!user) {
+                    return res.status(401).send({
+                        code: 401,
+                        banner: true,
+                        bannerClass: 'alert alert-dismissible alert-warning',
+                        msg: info || err
+                    });
+                }
+
+                //before logging the user in, remove him from his current session which might be a random tracking session
+                if (req.isAuthenticated()) {
+                    req.logout();
+                }
+
+                req.logIn(user, function (err) {
+                    if (err) {
+                        consoleLogger(errorLogger('req.login', err, err));
+                        return res.status(500).send({
+                            code: 500,
+                            banner: true,
+                            bannerClass: 'alert alert-dismissible alert-warning',
+                            msg: "A problem occurred when trying to log you in. Please try again"
+                        });
+                    } else {
+                        consoleLogger(successLogger(module));
+                        var redirectPage = '/index';
+                        return res.status(200).send({
+                            code: 200,
+                            msg: "You have successfully logged in",
+                            redirect: true,
+                            redirectPage: redirectPage
+                        });
+                    }
+                });
+            })(req, res, next);
+        } else {
+            res.status(401).send({
+                code: 401,
+                notify: false,
+                type: 'error',
+                banner: true,
+                bannerClass: 'alert alert-dismissible alert-warning',
+                msg: 'An error occurred. Some fields missing. Please try again'
             });
-        })(req, res, next);
+        }
     },
 
 
     createAccount: function (req, res) {
         var module = "createAccount";
+
+        //the request argument are passed to the form validator which ensures that they are not null or undefined
 
         var invitationCode = req.body.invitationCode;
 
@@ -165,7 +178,7 @@ module.exports = {
 
 
             //this function validates the form and calls formValidated on success
-            forms.validateRegistrationForm(req, res, firstName, lastName, username, email, password, req.body.password2, formValidated);
+            forms.validateRegistrationForm(req, res, firstName, lastName, username, email, password, req.body.password2, invitationCode, formValidated);
 
             function formValidated() {
                 //check that nobody is using that username

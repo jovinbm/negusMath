@@ -303,16 +303,18 @@ angular.module('adminHomeApp')
             });
 
             //search functionality
-            $scope.googleSearchModel = {
-                searchQuery: ""
+            $scope.mainSearchModel = {
+                queryString: "",
+                postSearchUniqueCuid: "",
+                requestedPage: 1
             };
 
-            $scope.performGoogleSiteSearch = function () {
-                if ($scope.googleSearchModel.searchQuery.length > 0) {
+            $scope.performMainSearch = function () {
+                if ($scope.mainSearchModel.queryString.length > 0) {
                     if ($location.port()) {
-                        $window.location.href = 'http://' + $location.host() + ':' + $location.port() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
+                        $window.location.href = "http://" + $location.host() + ":" + $location.port() + "/#!/search/" + $scope.mainSearchModel.queryString + "/1";
                     } else {
-                        $window.location.href = 'http://' + $location.host() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
+                        $window.location.href = "http://" + $location.host() + "/#!/search/" + $scope.mainSearchModel.queryString + "/1";
                     }
                 }
             };
@@ -361,15 +363,46 @@ angular.module('adminHomeApp')
             };
 
             $scope.submitNewPost = function () {
-                if ($scope.newPostModel.postContent.length == 0) {
+                var errors = 0;
+                var numberOfTags = 0;
+
+                //validate the tags
+                $scope.newPostModel.postTags.forEach(function (tag) {
+                    numberOfTags++;
+                    if (errors == 0) {
+                        if (tag.text.length < 3 && errors == 0) {
+                            errors++;
+                            $scope.showToast('warning', 'Minimum allowed length for each tag is 3 characters');
+                        }
+
+                        if (tag.text.length > 30 && errors == 0) {
+                            errors++;
+                            $scope.showToast('warning', 'Maximum allowed length for each tag is 30 characters');
+                        }
+                    }
+                });
+
+                if (numberOfTags > 5 && errors == 0) {
+                    errors++;
+                    $scope.showToast('warning', 'Only a maximum of 5 tags are allowed per post');
+                }
+
+                if ($scope.newPostModel.postContent.length == 0 && errors == 0) {
+                    errors++;
                     $scope.showToast('warning', 'Please add some content to the post first');
-                } else if ($("<div>" + $scope.newPostModel.postSummary + "</div>").text().length > 2000) {
+                }
+
+                if ($("<div>" + $scope.newPostModel.postSummary + "</div>").text().length > 2000 && errors == 0) {
+                    errors++;
                     $scope.showToast('warning', 'The post summary cannot exceed 2000 characters');
-                } else {
+                }
+
+                if (errors == 0) {
                     var newPost = {
                         postHeading: $scope.newPostModel.postHeading,
                         postContent: $scope.newPostModel.postContent,
-                        postSummary: $scope.newPostModel.postSummary
+                        postSummary: $scope.newPostModel.postSummary,
+                        postTags: $scope.newPostModel.postTags
                     };
                     PostService.submitNewPost(newPost).
                         success(function (resp) {

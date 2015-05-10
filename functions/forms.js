@@ -31,10 +31,18 @@ var passwordRegex = /^[a-zA-Z0-9_]*$/;
 var noWhiteSpaceRegex = /\S/;
 
 module.exports = {
-    validateRegistrationForm: function (req, res, firstName, lastName, username, email, password1, password2, success) {
+    validateRegistrationForm: function (req, res, firstName, lastName, username, email, password1, password2, invitationCode, success) {
         var module = 'validateRegistrationForm';
         receivedLogger(module);
         var errors = 0;
+
+        //check that all arguments exist i.e. all fields are not null
+        for (var i = 0, len = arguments.length; i < len; i++) {
+            if (arguments[i] == null || arguments[i] == undefined) {
+                errors++;
+                error('An error occurred. Some fields missing. Please try again');
+            }
+        }
 
         //check the firstName
         if (firstName.length > 30 && errors == 0) {
@@ -108,6 +116,14 @@ module.exports = {
         receivedLogger(module);
         var errors = 0;
 
+        //check that all arguments exist i.e. all fields are not null
+        for (var i = 0, len = arguments.length; i < len; i++) {
+            if (arguments[i] == null || arguments[i] == undefined) {
+                errors++;
+                error('An error occurred. Some fields missing. Please try again');
+            }
+        }
+
         //check the username
         if (!(usernameRegex.test(username)) && errors == 0) {
             ++errors;
@@ -143,6 +159,14 @@ module.exports = {
         receivedLogger(module);
         var errors = 0;
 
+        //check that all arguments exist i.e. all fields are not null
+        for (var i = 0, len = arguments.length; i < len; i++) {
+            if (arguments[i] == null || arguments[i] == undefined) {
+                errors++;
+                error('An error occurred. Some fields missing. Please try again');
+            }
+        }
+
         //check passwords
         if (!(passwordRegex.test(password)) && errors == 0) {
             ++errors;
@@ -169,6 +193,14 @@ module.exports = {
         var module = 'validateContactUs';
         receivedLogger(module);
         var errors = 0;
+
+        //check that all arguments exist i.e. all fields are not null
+        for (var i = 0, len = arguments.length; i < len; i++) {
+            if (arguments[i] == null || arguments[i] == undefined) {
+                errors++;
+                error('An error occurred. Some fields missing. Please try again');
+            }
+        }
 
         //check the email
         if (!(emailRegex.test(email)) && errors == 0) {
@@ -208,6 +240,14 @@ module.exports = {
         //this function does not respond to the request itself, rather it returns a status of 1 or -1
         var errors = 0;
 
+        //check that all arguments exist i.e. all fields are not null
+        for (var i = 0, len = arguments.length; i < len; i++) {
+            if (arguments[i] == null || arguments[i] == undefined) {
+                errors++;
+                error('An error occurred. Some fields missing. Please try again');
+            }
+        }
+
         //check the username
         if (!(usernameRegex.test(username)) && errors == 0) {
             ++errors;
@@ -242,7 +282,21 @@ module.exports = {
         receivedLogger(module);
         var errors = 0;
 
+        //check that all arguments exist i.e. all fields are not null
+        for (var i = 0, len = arguments.length; i < len; i++) {
+            if (arguments[i] == null || arguments[i] == undefined) {
+                errors++;
+                error('An error occurred. Some fields missing. Please try again');
+            }
+        }
+
+        //check that all fields in the new post are available
+
         //validate heading
+        if ((theNewPost.postHeading == null || theNewPost.postHeading == undefined) && errors == 0) {
+            ++errors;
+            error('Missing heading field');
+        }
         //check that at least at least one character is non-whitespace
         if (!(noWhiteSpaceRegex.test(theNewPost.postHeading)) && errors == 0) {
             ++errors;
@@ -255,6 +309,10 @@ module.exports = {
         }
 
         //validate content
+        if ((theNewPost.postContent == null || theNewPost.postContent == undefined) && errors == 0) {
+            ++errors;
+            error('Missing content field');
+        }
         //check that at least at least one character is non-whitespace
         if (!(noWhiteSpaceRegex.test(theNewPost.postContent)) && errors == 0) {
             ++errors;
@@ -267,6 +325,10 @@ module.exports = {
         }
 
         //validate summary
+        if ((theNewPost.postSummary == null || theNewPost.postSummary == undefined) && errors == 0) {
+            ++errors;
+            error('Missing summary field');
+        }
         //check that at least at least one character is non-whitespace
         if (!(noWhiteSpaceRegex.test(theNewPost.postSummary)) && errors == 0) {
             ++errors;
@@ -285,6 +347,35 @@ module.exports = {
             error('The post summary cannot exceed 2000 characters');
         }
 
+        //validate tags
+        if ((theNewPost.postTags == null || theNewPost.postTags == undefined) && errors == 0) {
+            ++errors;
+            error('Missing postTags field');
+        }
+        if (errors == 0) {
+            var tags = theNewPost.postTags;
+            var numberOfTags = 0;
+            tags.forEach(function (tag) {
+                numberOfTags++;
+                if (errors == 0) {
+                    if (tag.text.length < 3 && errors == 0) {
+                        errors++;
+                        error('Minimum allowed length for each tag is 3 characters');
+                    }
+
+                    if (tag.text.length > 30 && errors == 0) {
+                        errors++;
+                        error('Maximum allowed length for each tag is 30 characters');
+                    }
+                }
+            });
+
+            if (numberOfTags > 5 && errors == 0) {
+                errors++;
+                error('Only a maximum of 10 tags are allowed per post');
+            }
+        }
+
         if (errors == 0) {
             consoleLogger(successLogger(module));
             success();
@@ -301,10 +392,18 @@ module.exports = {
         }
     },
 
-    validatePostsSearchQuery: function (req, res, queryString, success) {
-        var module = 'validatePostsSearchQuery';
+    validateMainSearchQuery: function (req, res, queryString, success) {
+        var module = 'validateMainSearchQuery';
         receivedLogger(module);
         var errors = 0;
+
+        //check that all arguments exist i.e. all fields are not null
+        for (var i = 0, len = arguments.length; i < len; i++) {
+            if (arguments[i] == null || arguments[i] == undefined) {
+                errors++;
+                error('An error occurred. Some fields missing. Please try again');
+            }
+        }
 
         //validate query no whitespace
         //check that at least at least one character is non-whitespace

@@ -133,24 +133,38 @@
 
     <!--&lt;!&ndash;search box&ndash;&gt;-->
     <!--<div class="container">-->
-    <!--<div class="row">-->
-    <!--<form id="site-search">-->
-    <!--<div class="input-group">-->
-    <!--<input type="text"-->
-    <!--class="form-control"-->
-    <!--placeholder="Search Site"-->
-    <!--aria-describedby="search-addon"-->
-    <!--ng-model="googleSearchModel.searchQuery">-->
-    <!--<span class="input-group-addon"-->
-    <!--id="search-addon"-->
-    <!--ng-click="performGoogleSiteSearch()">-->
-    <!--<i class="fa fa-search"></i>-->
-    <!--</span>-->
-    <!--</div>-->
-    <!--</form>-->
+        <!--<div class="row">-->
+            <!--<form id="site-search">-->
+                <!--<div class="input-group">-->
+                    <!--<input type="text"-->
+                           <!--class="form-control"-->
+                           <!--placeholder="Search"-->
+                           <!--ng-model="mainSearchModel.queryString">-->
+                    <!--<span class="input-group-btn">-->
+                        <!--<button class="btn btn-default"-->
+                                <!--type="button"-->
+                                <!--ng-click="performMainSearch()"><i class="fa fa-search"></i></button>-->
+                    <!--</span>-->
+                <!--</div>-->
+            <!--</form>-->
 
+        <!--</div>-->
     <!--</div>-->
-    <!--</div>-->
+
+    <div class="container">
+        <div class="row">
+            <form id="site-search">
+                <div class="input-group">
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Search"
+                           ng-model="mainSearchModel.queryString">
+                    <span class="input-group-addon" id="search-addon">
+                        <a href ng-click="performMainSearch()"><i class="fa fa-search"></i></a></span>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <section id="newPostSection" ng-show="newPost" class="ng-cloak">
         <div class="container">
@@ -235,7 +249,8 @@
                                                 <small>Maximum html length required is 2000:</small>
                                                 </span>
                                                     <br/>
-                                                    <small class="form-help-notice">The post summary represents the post in the list
+                                                    <small class="form-help-notice">The post summary represents the post
+                                                        in the list
                                                         of all posts. Limited to 2000 characters. Users will be able to
                                                         click a 'read more' link to see the main content of the post
                                                     </small>
@@ -249,7 +264,7 @@
                                                                 placeholder="Add tags"
                                                                 min-length="3"
                                                                 max-length="30"
-                                                                max-tags="2">
+                                                                max-tags="5">
                                                         <!--<auto-complete source="loadTags($query)"></auto-complete>-->
                                                     </tags-input>
                                                     <small class="form-help-notice">Enter up to ten tags</small>

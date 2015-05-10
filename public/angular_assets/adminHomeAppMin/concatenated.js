@@ -14,7 +14,9 @@ angular.module('adminHomeApp', [
     'angularUtils.directives.dirDisqus',
     'ngTagsInput'
 ])
-    .run(function ($templateCache, $http) {
+    .run(function ($templateCache, $http, $rootScope, $state, $stateParams) {
+        $rootScope.$state = $state;
+        $rootScope.$stateParams = $stateParams;
         //views
         $http.get('views/admin/partials/views/post_stream.html', {cache: $templateCache});
         $http.get('views/admin/partials/views/full_post.html', {cache: $templateCache});
@@ -34,7 +36,7 @@ angular.module('adminHomeApp', [
                 templateUrl: 'views/admin/partials/views/full_post.html'
             })
             .state('search', {
-                url: '/search/?q',
+                url: '/search/:queryString/:page',
                 templateUrl: 'views/search/search_results.html'
             })
             .state("otherwise", {url: '/home/1'});
@@ -146,7 +148,7 @@ angular.module('adminHomeApp')
                 getHotThisWeek();
             });
 
-            $log.info('PostController booted successfully');
+            $log.info('HotController booted successfully');
 
         }
     ]);
@@ -455,16 +457,18 @@ angular.module('adminHomeApp')
             });
 
             //search functionality
-            $scope.googleSearchModel = {
-                searchQuery: ""
+            $scope.mainSearchModel = {
+                queryString: "",
+                postSearchUniqueCuid: "",
+                requestedPage: 1
             };
 
-            $scope.performGoogleSiteSearch = function () {
-                if ($scope.googleSearchModel.searchQuery.length > 0) {
+            $scope.performMainSearch = function () {
+                if ($scope.mainSearchModel.queryString.length > 0) {
                     if ($location.port()) {
-                        $window.location.href = 'http://' + $location.host() + ':' + $location.port() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
+                        $window.location.href = "http://" + $location.host() + ":" + $location.port() + "/#!/search/" + $scope.mainSearchModel.queryString + "/1";
                     } else {
-                        $window.location.href = 'http://' + $location.host() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
+                        $window.location.href = "http://" + $location.host() + "/#!/search/" + $scope.mainSearchModel.queryString + "/1";
                     }
                 }
             };
@@ -513,15 +517,46 @@ angular.module('adminHomeApp')
             };
 
             $scope.submitNewPost = function () {
-                if ($scope.newPostModel.postContent.length == 0) {
+                var errors = 0;
+                var numberOfTags = 0;
+
+                //validate the tags
+                $scope.newPostModel.postTags.forEach(function (tag) {
+                    numberOfTags++;
+                    if (errors == 0) {
+                        if (tag.text.length < 3 && errors == 0) {
+                            errors++;
+                            $scope.showToast('warning', 'Minimum allowed length for each tag is 3 characters');
+                        }
+
+                        if (tag.text.length > 30 && errors == 0) {
+                            errors++;
+                            $scope.showToast('warning', 'Maximum allowed length for each tag is 30 characters');
+                        }
+                    }
+                });
+
+                if (numberOfTags > 5 && errors == 0) {
+                    errors++;
+                    $scope.showToast('warning', 'Only a maximum of 5 tags are allowed per post');
+                }
+
+                if ($scope.newPostModel.postContent.length == 0 && errors == 0) {
+                    errors++;
                     $scope.showToast('warning', 'Please add some content to the post first');
-                } else if ($("<div>" + $scope.newPostModel.postSummary + "</div>").text().length > 2000) {
+                }
+
+                if ($("<div>" + $scope.newPostModel.postSummary + "</div>").text().length > 2000 && errors == 0) {
+                    errors++;
                     $scope.showToast('warning', 'The post summary cannot exceed 2000 characters');
-                } else {
+                }
+
+                if (errors == 0) {
                     var newPost = {
                         postHeading: $scope.newPostModel.postHeading,
                         postContent: $scope.newPostModel.postContent,
-                        postSummary: $scope.newPostModel.postSummary
+                        postSummary: $scope.newPostModel.postSummary,
+                        postTags: $scope.newPostModel.postTags
                     };
                     PostService.submitNewPost(newPost).
                         success(function (resp) {
@@ -575,18 +610,18 @@ angular.module('adminHomeApp')
             $scope.suggestedPosts = [];
 
             //variable that determines whether to show posts/suggested posts or not
-            $scope.showPosts = false;
+            $scope.mainSearchResultsPosts = false;
             $scope.showSuggestedPosts = false;
 
             $scope.showThePostsOnly = function () {
                 $scope.showHideLoadingBanner(false);
-                $scope.showPosts = true;
+                $scope.mainSearchResultsPosts = true;
                 $scope.showSuggestedPosts = false;
             };
 
             $scope.showSuggestedPostsOnly = function () {
                 $scope.showHideLoadingBanner(false);
-                $scope.showPosts = false;
+                $scope.mainSearchResultsPosts = false;
                 $scope.showSuggestedPosts = true;
             };
 
@@ -652,7 +687,7 @@ angular.module('adminHomeApp')
                                 msg: "No more posts to show"
                             };
                             $scope.responseStatusHandler(responseMimic);
-                            $scope.showPosts = false;
+                            $scope.mainSearchResultsPosts = false;
                             getSuggestedPosts();
                             $scope.goToUniversalBanner();
                         } else {
@@ -670,7 +705,7 @@ angular.module('adminHomeApp')
                         $scope.responseStatusHandler(errResp);
                         //empty the postsArray
                         $scope.posts = [];
-                        $scope.showPosts = false;
+                        $scope.mainSearchResultsPosts = false;
                         getSuggestedPosts();
                     });
             }
@@ -715,7 +750,9 @@ angular.module('adminHomeApp')
             });
 
             $rootScope.$on('reconnect', function () {
-                getPagePosts();
+                if ($scope.currentState == 'home') {
+                    getPagePosts();
+                }
             });
 
             $log.info('PostController booted successfully');
@@ -945,11 +982,184 @@ angular.module('adminHomeApp')
             $rootScope.$on('reconnect', function () {
                 //only update the post variable if the user is not editing the current post
                 if (!$scope.editingMode) {
-                    getFullPost();
+                    if ($scope.currentState == 'post') {
+                        getFullPost();
+                    }
                 }
             });
 
             $log.info('FullPostController booted successfully');
+
+        }
+    ]);
+angular.module('adminHomeApp')
+    .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
+
+            //change to default document title
+            $scope.defaultDocumentTitle();
+
+            $scope.mainSearchResultsPosts = PostService.getCurrentPosts();
+            $scope.mainSearchResultsCount = 0;
+            $scope.currentPage = $stateParams.page;
+
+            $scope.changeCurrentPage = function (page) {
+                if (page != $scope.currentPage) {
+                    //change page here
+                }
+            };
+
+            $scope.suggestedPosts = [];
+
+            //variable that determines whether to show posts/suggested posts or not
+            $scope.showMainSearchResults = false;
+            $scope.showSuggestedPosts = false;
+
+            $scope.showMainSearchResultsOnly = function () {
+                $scope.showHideLoadingBanner(false);
+                $scope.showMainSearchResults = true;
+                $scope.showSuggestedPosts = false;
+            };
+
+            $scope.showSuggestedPostsOnly = function () {
+                $scope.showHideLoadingBanner(false);
+                $scope.showMainSearchResults = false;
+                $scope.showSuggestedPosts = true;
+            };
+
+            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
+            function preparePostSummaryContent() {
+                $scope.mainSearchResultsPosts.forEach(function (post) {
+                    post.postSummary = $scope.makeVideoIframesResponsive(post.postSummary);
+                });
+            }
+
+            //function used to fill in with suggested posts in case no posts are received
+            function getSuggestedPosts() {
+                $scope.showHideLoadingBanner(true);
+                //empty the suggestedPosts
+                $scope.suggestedPosts = [];
+                PostService.getSuggestedPostsFromServer()
+                    .success(function (resp) {
+                        if ((resp.postsArray.length > 0)) {
+                            $scope.showSuggestedPostsOnly();
+                            $scope.suggestedPosts = resp.postsArray;
+                            updateTimeAgo();
+
+                            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
+                            function prepareSuggestedPostsSummaryContent() {
+                                $scope.suggestedPosts.forEach(function (post) {
+                                    post.postSummary = $scope.makeVideoIframesResponsive(post.postSummary);
+                                });
+                            }
+
+                            prepareSuggestedPostsSummaryContent();
+                        } else {
+                            //empty the suggestedPosts
+                            $scope.suggestedPosts = [];
+                            $scope.showSuggestedPosts = false;
+                            $scope.goToUniversalBanner();
+                            $scope.showHideLoadingBanner(false);
+                        }
+
+                    })
+                    .error(function (errResp) {
+                        $scope.goToUniversalBanner();
+                        $scope.showHideLoadingBanner(false);
+                        //empty the suggestedPosts
+                        $scope.suggestedPosts = [];
+                        $scope.showSuggestedPosts = false;
+                        $scope.responseStatusHandler(errResp);
+                    });
+            }
+
+            $scope.mainSearchModel = {
+                queryString: $stateParams.queryString,
+                postSearchUniqueCuid: "",
+                requestedPage: $scope.currentPage
+            };
+
+            function getMainSearchResults() {
+                $scope.showHideLoadingBanner(true);
+
+                PostService.mainSearch($scope.mainSearchModel)
+                    .success(function (resp) {
+                        var theResult = resp.results;
+
+                        PostService.updateMainSearchResults(theResult);
+                        $scope.mainSearchResultsCount = theResult.totalResults;
+                        $scope.changeCurrentPage(theResult.page);
+                        $scope.mainSearchModel.postSearchUniqueCuid = theResult.searchUniqueCuid;
+
+                        //the response is the resultValue
+                        if (theResult.totalResults > 0) {
+                            $scope.mainSearchResultsPosts = theResult.postsArray;
+                            $scope.showMainSearchResultsOnly();
+                            updateTimeAgo();
+                            //parse the posts and prepare them, eg, making iframes responsive
+                            preparePostSummaryContent();
+
+                            var responseMimic1 = {
+                                banner: true,
+                                bannerClass: 'alert alert-dismissible alert-success',
+                                msg: "The search returned " + $scope.mainSearchResultsCount + " results"
+                            };
+                            $scope.responseStatusHandler(responseMimic1);
+                        } else {
+                            //empty the postsArray
+                            $scope.mainSearchResultsPosts = [];
+                            var responseMimic2 = {
+                                banner: true,
+                                bannerClass: 'alert alert-dismissible alert-success',
+                                msg: "The search returned 0 results"
+                            };
+                            $scope.responseStatusHandler(responseMimic2);
+                            $scope.showMainSearchResults = false;
+                            getSuggestedPosts();
+                            $scope.goToUniversalBanner();
+                        }
+                    })
+                    .error(function (errResp) {
+                        $scope.responseStatusHandler(errResp);
+                        //empty the postsArray
+                        $scope.mainSearchResultsPosts = [];
+                        $scope.showMainSearchResults = false;
+                        getSuggestedPosts();
+                    });
+            }
+
+            getMainSearchResults();
+
+            //this functions evaluates to true if object is not empty, useful for ng-show
+            //this function also creates a banner to notify user that there are no posts by mimicing a response and calling the response handler
+            $scope.checkIfPostsSearchResultsIsEmpty = function () {
+                return $scope.mainSearchResultsPosts.length == 0
+            };
+
+            //=============function to update timeago on all posts
+            //updates the timeago on all incoming orders using the timeago filter
+            function updateTimeAgo() {
+                $scope.mainSearchResultsPosts.forEach(function (post) {
+                    post.theTimeAgo = $filter('timeago')(post.createdAt);
+
+                    //post date/time it was ordered e.g. Sun, Mar 17..
+                    post.postDate = moment(post.createdAt).format("ddd, MMM D, H:mm");
+                });
+            }
+
+            $interval(updateTimeAgo, 120000, 0, true);
+
+            //==============end of update time ago
+
+            updateTimeAgo();
+
+            //===============socket listeners===============
+
+            $rootScope.$on('reconnect', function () {
+                getMainSearchResults();
+            });
+
+            $log.info('SearchController booted successfully');
 
         }
     ]);
@@ -1019,6 +1229,8 @@ angular.module('adminHomeApp')
             var posts = [];
             var postsCount = 0;
 
+            var mainSearchResultsPosts = [];
+
             socket.on('newPost', function (data) {
                 //data here has the keys post, postCount
                 $rootScope.$broadcast('newPost', data);
@@ -1070,6 +1282,19 @@ angular.module('adminHomeApp')
                     return $http.post('/api/updatePost', {
                         postUpdate: post
                     });
+                },
+
+                getCurrentMainSearchResults: function () {
+                    return mainSearchResultsPosts;
+                },
+
+                updateMainSearchResults: function (resultValue) {
+                    mainSearchResultsPosts = resultValue;
+                    return mainSearchResultsPosts;
+                },
+
+                mainSearch: function (searchObject) {
+                    return $http.post('/api/mainSearch', searchObject);
                 }
             };
         }]);

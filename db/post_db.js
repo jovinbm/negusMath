@@ -170,7 +170,8 @@ module.exports = {
             authorEmail: theUser.email,
             postHeading: postObject.postHeading,
             postContent: postObject.postContent,
-            postSummary: postObject.postSummary
+            postSummary: postObject.postSummary,
+            postTags: postObject.postTags
         });
         consoleLogger(successLogger(module));
         success(post);
@@ -269,8 +270,8 @@ module.exports = {
     },
 
     //searchForPosts: function (queryString, quantity, page, resultObject, error_neg_1, error_0, success) {
-    searchForPosts: function (queryString, quantity, postSearchUniqueCuid, requestedPage, error_neg_1, error_0, success) {
-        var module = 'searchForPosts';
+    mainSearch: function (queryString, quantity, searchUniqueCuid, requestedPage, error_neg_1, error_0, success) {
+        var module = 'mainSearch';
         receivedLogger(module);
 
         //this function parses the result object from database and spits out an object that contains the uniqueCuids of results,
@@ -284,7 +285,7 @@ module.exports = {
                 postUniqueCuids: [],
                 page: theRequestedPage,
                 totalResults: resultDatabaseObject.resultObject.totalResults,
-                postSearchUniqueCuid: resultDatabaseObject.searchUniqueCuid
+                searchUniqueCuid: resultDatabaseObject.searchUniqueCuid
             };
 
             //check to see if the given page number exceeds the total pages in the object
@@ -307,8 +308,8 @@ module.exports = {
 
         //===================1: If the browser provided a searchUniqueCuid, check to see if the searchUniqueCuid
         //exists, (WHICH MUST COINCIDE WITH THE QUERY STRING is so, retrieve the postSearchObject and parse
-        if (postSearchUniqueCuid) {
-            searchDB.getPostSearch(postSearchUniqueCuid, queryString, error_neg_1, searchObjectNotAvailable, searchObjectAvailable);
+        if (searchUniqueCuid) {
+            searchDB.getPostSearch(searchUniqueCuid, queryString, error_neg_1, searchObjectNotAvailable, searchObjectAvailable);
         } else {
             searchObjectNotAvailable();
         }

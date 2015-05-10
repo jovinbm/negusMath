@@ -5,6 +5,8 @@ angular.module('clientHomeApp')
             var posts = [];
             var postsCount = 0;
 
+            var mainSearchResultsPosts = [];
+
             socket.on('newPost', function (data) {
                 //data here has the keys post, postCount
                 $rootScope.$broadcast('newPost', data);
@@ -44,6 +46,19 @@ angular.module('clientHomeApp')
                     return $http.post('/api/getPost', {
                         postIndex: postIndex
                     });
+                },
+
+                getCurrentMainSearchResults: function () {
+                    return mainSearchResultsPosts;
+                },
+
+                updateMainSearchResults: function (resultValue) {
+                    mainSearchResultsPosts = resultValue;
+                    return mainSearchResultsPosts;
+                },
+
+                mainSearch: function (searchObject) {
+                    return $http.post('/api/mainSearch', searchObject);
                 }
             };
         }]);

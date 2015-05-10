@@ -54,12 +54,17 @@
                                 <div ta-bind
                                      ng-model="post.postContent"></div>
                             </div>
-
+                            m
 
                         </div>
 
                         <div class="card-action clearfix">
-
+                            <div id="postTags"
+                                 class="pull-left">
+                                Tags: <span ng-repeat="tagObject in post.postTags"><a
+                                    class="btn btn-default btn-xs postTags"
+                                    target="_self">{{tagObject.text}}</a> </span>
+                            </div>
                             <div class="pull-right">
                                 <a class="btn-link btn btn-default btn-sm"
                                    ng-click="goToTop(); goIntoPostEditingMode()">Edit</a>
@@ -132,7 +137,27 @@
                                                 <small>Maximum html length required is 2000:</small>
                                                 </span>
 
-                                    <span class="help-block">This will represent this post in the list of all posts. Limited to 2000 characters. Users will be able to click a 'read more' link to see the main content of the post</span>
+                                    <br/>
+                                    <small class="form-help-notice">The post summary represents the post
+                                        in the list
+                                        of all posts. Limited to 2000 characters. Users will be able to
+                                        click a 'read more' link to see the main content of the post
+                                    </small>
+                                </div>
+
+                                <div class="form-group">
+                                    <p><strong>Tags</strong></p>
+
+                                    <tags-input name="editPostTags"
+                                                ng-model="post.postTags"
+                                                placeholder="Add tags"
+                                                min-length="3"
+                                                max-length="30"
+                                                max-tags="5">
+                                        <!--<auto-complete source="loadTags($query)"></auto-complete>-->
+                                    </tags-input>
+                                    <small class="form-help-notice">Enter up to five tags</small>
+
                                 </div>
 
                             </form>

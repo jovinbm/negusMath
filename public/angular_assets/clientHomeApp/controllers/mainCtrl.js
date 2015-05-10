@@ -321,16 +321,18 @@ angular.module('clientHomeApp')
 
 
             //search functionality
-            $scope.googleSearchModel = {
-                searchQuery: ""
+            $scope.mainSearchModel = {
+                queryString: "",
+                postSearchUniqueCuid: "",
+                requestedPage: 1
             };
 
-            $scope.performGoogleSiteSearch = function () {
-                if ($scope.googleSearchModel.searchQuery.length > 0) {
+            $scope.performMainSearch = function () {
+                if ($scope.mainSearchModel.queryString.length > 0) {
                     if ($location.port()) {
-                        $window.location.href = 'http://' + $location.host() + ':' + $location.port() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
+                        $window.location.href = "http://" + $location.host() + ":" + $location.port() + "/#!/search/" + $scope.mainSearchModel.queryString + "/1";
                     } else {
-                        $window.location.href = 'http://' + $location.host() + '/search/?q=' + $scope.googleSearchModel.searchQuery;
+                        $window.location.href = "http://" + $location.host() + "/#!/search/" + $scope.mainSearchModel.queryString + "/1";
                     }
                 }
             };

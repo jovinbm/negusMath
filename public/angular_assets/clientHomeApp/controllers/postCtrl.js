@@ -11,18 +11,18 @@ angular.module('clientHomeApp')
             $scope.suggestedPosts = [];
 
             //variable that determines whether to show posts/suggested posts or not
-            $scope.showPosts = false;
+            $scope.mainSearchResultsPosts = false;
             $scope.showSuggestedPosts = false;
 
             $scope.showThePostsOnly = function () {
                 $scope.showHideLoadingBanner(false);
-                $scope.showPosts = true;
+                $scope.mainSearchResultsPosts = true;
                 $scope.showSuggestedPosts = false;
             };
 
             $scope.showSuggestedPostsOnly = function () {
                 $scope.showHideLoadingBanner(false);
-                $scope.showPosts = false;
+                $scope.mainSearchResultsPosts = false;
                 $scope.showSuggestedPosts = true;
             };
 
@@ -89,7 +89,7 @@ angular.module('clientHomeApp')
                                 msg: "No posts available for this page"
                             };
                             $scope.responseStatusHandler(responseMimic);
-                            $scope.showPosts = false;
+                            $scope.mainSearchResultsPosts = false;
                             getSuggestedPosts();
                             $scope.goToUniversalBanner();
                         } else {
@@ -107,7 +107,7 @@ angular.module('clientHomeApp')
                         $scope.responseStatusHandler(errResp);
                         //empty the postsArray
                         $scope.posts = [];
-                        $scope.showPosts = false;
+                        $scope.mainSearchResultsPosts = false;
                         getSuggestedPosts();
                     });
             }
@@ -152,7 +152,9 @@ angular.module('clientHomeApp')
             });
 
             $rootScope.$on('reconnect', function () {
-                getPagePosts();
+                if ($scope.currentState == 'home') {
+                    getPagePosts();
+                }
             });
 
             $log.info('PostController booted successfully');
@@ -308,7 +310,8 @@ angular.module('clientHomeApp')
 
             $rootScope.$on('reconnect', function () {
                 //only update the post variable if the user is not editing the current post
-                if (!$scope.editingMode) {
+                //the $scope.currentState is defined in main controller
+                if (!$scope.editingMode && $scope.currentState == 'post') {
                     getFullPost();
                 }
             });

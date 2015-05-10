@@ -14,7 +14,9 @@ angular.module('adminHomeApp', [
     'angularUtils.directives.dirDisqus',
     'ngTagsInput'
 ])
-    .run(function ($templateCache, $http) {
+    .run(function ($templateCache, $http, $rootScope, $state, $stateParams) {
+        $rootScope.$state = $state;
+        $rootScope.$stateParams = $stateParams;
         //views
         $http.get('views/admin/partials/views/post_stream.html', {cache: $templateCache});
         $http.get('views/admin/partials/views/full_post.html', {cache: $templateCache});
@@ -34,7 +36,7 @@ angular.module('adminHomeApp', [
                 templateUrl: 'views/admin/partials/views/full_post.html'
             })
             .state('search', {
-                url: '/search/?q',
+                url: '/search/:queryString/:page',
                 templateUrl: 'views/search/search_results.html'
             })
             .state("otherwise", {url: '/home/1'});

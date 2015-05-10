@@ -1,21 +1,129 @@
-<div class="panel panel-default">
+<div ng-controller="SearchController">
 
-    <div id="google_search_results">
+    <div id="loading-splash-card">
         <div class="panel-body">
-            <script>
-                (function () {
-                    var cx = '015143383863257171180:q1wmf565j34';
-                    var gcse = document.createElement('script');
-                    gcse.type = 'text/javascript';
-                    gcse.async = true;
-                    gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') +
-                            '//cse.google.com/cse.js?cx=' + cx;
-                    var s = document.getElementsByTagName('script')[0];
-                    s.parentNode.insertBefore(gcse, s);
-                })();
-            </script>
-            <gcse:searchresults-only></gcse:searchresults-only>
+            <ul class="list-unstyled animated fadeIn">
+                <li class="list-unstyled clearfix">
+
+                    <div class="card"
+                         id="loading-card">
+
+                        <div class="card-content text-center" id="loading-card-content">
+
+                            <h3 class="loading-text text-outputs">LOADING...</h3>
+
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-warning progress-bar-striped" role="progressbar"
+                                     ng-attr-aria-valuenow="{{isLoadingPercentage}}"
+                                     aria-valuemin="0" aria-valuemax="100"
+                                     ng-attr-style="{{'width: ' + isLoadingPercentage + '%;'}}">
+                                    <span class="sr-only">60% Complete</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
         </div>
+    </div>
+
+    <div ng-show="showMainSearchResults">
+        <div class="panel-heading ng-cloak visible-lg visible-md"><i class="fa fa-leanpub"></i> SEARCH RESULTS <span
+                class="pull-right visible-lg">{{currentTime}}</span>
+        </div>
+
+        <ul class="list-unstyled animated fadeIn">
+            <li class="list-unstyled post clearfix"
+                ng-repeat="post in mainSearchResultsPosts">
+                <div class="card">
+
+                    <div class="card-content">
+
+                        <h2 class="ng-cloak text-outputs postHeading"><a ng-href="/#!/post/{{post.postIndex}}"
+                                                                         ng-click="goToTop()">{{post.postHeading}}</a>
+                        </h2>
+
+                        <h3 class="text-muted postBy">
+                            <small class="ng-cloak"><a class="btn-link">{{post.authorName}}</a>
+                                on
+                                {{post.postDate}}
+                            </small>
+                            <br/>
+                            <small class="text-muted ng-cloak">
+                                {{post.theTimeAgo}}
+                            </small>
+                        </h3>
+
+                        <div class="postContent">
+                            <div ta-bind
+                                 ng-model="post.postSummary"></div>
+                        </div>
+
+
+                    </div>
+                    <div class="card-action clearfix">
+
+                        <div class="pull-right">
+                            <a ng-href="/#!/post/{{post.postIndex}}"
+                               ng-click="goToTop()"
+                               class="btn btn-default btn-sm">Read More</a>
+                        </div>
+
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <!--showing suggested posts-->
+    <div ng-show="showSuggestedPosts">
+        <div class="panel-heading ng-cloak"><i class="fa fa-leanpub"></i> SUGGESTED POSTS
+            <span class="pull-right">
+            <a ng-href="/#!/home/1"><i class="fa fa-arrow-left"></i> Home</a>
+            </span>
+        </div>
+
+        <ul class="list-unstyled animated fadeIn">
+            <li class="list-unstyled post clearfix"
+                ng-repeat="post in suggestedPosts">
+                <div class="card">
+
+                    <div class="card-content">
+
+                        <h2 class="ng-cloak text-outputs postHeading"><a ng-href="/#!/post/{{post.postIndex}}"
+                                                                         ng-click="goToTop()">{{post.postHeading}}</a>
+                        </h2>
+
+                        <h3 class="text-muted postBy">
+                            <small class="ng-cloak"><a class="btn-link">{{post.authorName}}</a>
+                                on
+                                {{post.postDate}}
+                            </small>
+                            <br/>
+                            <small class="text-muted ng-cloak">
+                                {{post.theTimeAgo}}
+                            </small>
+                        </h3>
+
+                        <div class="postContent">
+                            <div ta-bind
+                                 ng-model="post.postSummary"></div>
+                        </div>
+
+
+                    </div>
+                    <div class="card-action clearfix">
+
+                        <div class="pull-right">
+                            <a ng-href="/#!/post/{{post.postIndex}}"
+                               ng-click="goToTop()"
+                               class="btn btn-default btn-sm">Read More</a>
+                        </div>
+
+                    </div>
+                </div>
+            </li>
+        </ul>
     </div>
 
 </div>

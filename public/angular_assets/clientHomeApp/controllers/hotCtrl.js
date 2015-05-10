@@ -40,7 +40,7 @@ angular.module('clientHomeApp')
                 getHotThisWeek();
             });
 
-            $log.info('PostController booted successfully');
+            $log.info('HotController booted successfully');
 
         }
     ]);

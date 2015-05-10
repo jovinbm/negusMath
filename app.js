@@ -26,7 +26,7 @@ var moment = require('moment');
 console.log("ENVIRONMENT = " + process.env.NODE_ENV);
 
 //mongoose.set('debug', true);
-mongoose.connect(databaseURL);
+mongoose.connect(databaseURL3);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error: Problem while attempting to connect to database'));
 db.once('open', function () {
@@ -126,7 +126,7 @@ app.post('/api/getPost', postAPI.getPost);
 app.post('/api/newPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.newPost);
 app.post('/api/updatePost', middleware.ensureAuthenticatedAngular, middleware.addUserData, postAPI.updatePost);
 app.post('/api/getHotThisWeek', postAPI.getHotThisWeek);
-app.post('/api/searchForPosts', postAPI.searchForPosts);
+app.post('/api/mainSearch', postAPI.mainSearch);
 
 //error handlers
 function logErrors(err, req, res, next) {

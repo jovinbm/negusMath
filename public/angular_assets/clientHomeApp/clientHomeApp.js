@@ -13,7 +13,9 @@ angular.module('clientHomeApp', [
     'ngSanitize',
     'angularUtils.directives.dirDisqus'
 ])
-    .run(function ($templateCache, $http) {
+    .run(function ($templateCache, $http, $rootScope, $state, $stateParams) {
+        $rootScope.$state = $state;
+        $rootScope.$stateParams = $stateParams;
         //views
         $http.get('views/client/partials/views/post_stream.html', {cache: $templateCache});
         $http.get('views/client/partials/views/full_post.html', {cache: $templateCache});
@@ -33,7 +35,7 @@ angular.module('clientHomeApp', [
                 templateUrl: 'views/client/partials/views/full_post.html'
             })
             .state('search', {
-                url: '/search/?q',
+                url: '/search/:queryString/:page',
                 templateUrl: 'views/search/search_results.html'
             })
             .state("otherwise", {url: '/home/1'});

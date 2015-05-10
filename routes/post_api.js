@@ -105,22 +105,23 @@ module.exports = {
     },
 
 
-    searchForPosts: function (req, res) {
-        var module = 'searchForPosts';
+    mainSearch: function (req, res) {
+        var module = 'mainSearch';
         receivedLogger(module);
+        consoleLogger("*****************************" + JSON.stringify(req.body));
         if (req.body.queryString && req.body.requestedPage) {
             var quantity = 100;
             var requestedPage = req.body.requestedPage;
             var queryString = req.body.queryString;
-            var postSearchUniqueCuid;
+            var searchUniqueCuid;
 
-            if (req.body.postSearchUniqueCuid) {
-                postSearchUniqueCuid = req.body.postSearchUniqueCuid;
+            if (req.body.searchUniqueCuid) {
+                searchUniqueCuid = req.body.searchUniqueCuid;
             } else {
-                postSearchUniqueCuid = null;
+                searchUniqueCuid = null;
             }
 
-            post_handler.searchForPosts(req, res, queryString, quantity, postSearchUniqueCuid, requestedPage);
+            post_handler.mainSearch(req, res, queryString, quantity, searchUniqueCuid, requestedPage);
         } else {
             consoleLogger(errorLogger(module, 'Some request fields missing'));
             res.status(500).send({

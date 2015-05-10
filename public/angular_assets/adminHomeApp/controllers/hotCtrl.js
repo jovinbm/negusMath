@@ -40,7 +40,7 @@ angular.module('adminHomeApp')
                 getHotThisWeek();
             });
 
-            $log.info('PostController booted successfully');
+            $log.info('HotController booted successfully');
 
         }
     ]);
