@@ -313,13 +313,16 @@ module.exports = {
             ++errors;
             error('Missing content field');
         }
+
+        var postContent = cheerio(theNewPost.postSummary).text();
+
         //check that at least at least one character is non-whitespace
-        if (!(noWhiteSpaceRegex.test(theNewPost.postContent)) && errors == 0) {
+        if (!(noWhiteSpaceRegex.test(postContent)) && errors == 0) {
             ++errors;
             error('The post content does not seem to be right. Please check and try again');
         }
 
-        if (theNewPost.postContent.length == 0 && errors == 0) {
+        if (postContent.length == 0 && errors == 0) {
             ++errors;
             error('The post content cannot be empty');
         }
@@ -329,13 +332,14 @@ module.exports = {
             ++errors;
             error('Missing summary field');
         }
+
+        var postSummary = cheerio(theNewPost.postSummary).text();
+
         //check that at least at least one character is non-whitespace
         if (!(noWhiteSpaceRegex.test(theNewPost.postSummary)) && errors == 0) {
             ++errors;
             error('The post summary does not seem to be right. Please check and try again');
         }
-
-        var postSummary = cheerio(theNewPost.postSummary).text();
 
         if (postSummary.length == 0 && errors == 0) {
             ++errors;

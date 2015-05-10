@@ -27,6 +27,55 @@ function getTheUser(req) {
     return req.customData.theUser;
 }
 
+//function that changes the angular tags in the format {'text': tag} into just an array of strings
+//takes in a single post or multiple posts
+function preparePostTagsToDatabase(post, updateOneOnly, postsArray, updateMany, success) {
+    if (updateOneOnly) {
+        var temp = [];
+        post.postTags.forEach(function (angularTag) {
+            temp.push(angularTag['text']);
+        });
+        post.postTags = temp;
+        success(post);
+    } else if (updateMany) {
+        postsArray.forEach(function (post) {
+            var temp = [];
+            post.postTags.forEach(function (angularTag) {
+                temp.push(angularTag['text']);
+            });
+            post.postTags = temp;
+        });
+        success(postsArray);
+    }
+}
+
+
+//function that changes the string tags in a post into the {'text': tag} object format
+//for angular tags
+function preparePostTagsToClient(post, updateOneOnly, postsArray, updateMany, success) {
+    if (updateOneOnly) {
+        var temp = [];
+        post.postTags.forEach(function (tag) {
+            temp.push({
+                'text': tag
+            });
+        });
+        post.postTags = temp;
+        success(post);
+    } else if (updateMany) {
+        postsArray.forEach(function (post) {
+            var temp = [];
+            post.postTags.forEach(function (tag) {
+                temp.push({
+                    'text': tag
+                });
+            });
+            post.postTags = temp;
+        });
+        success(postsArray);
+    }
+}
+
 
 module.exports = {
 
@@ -46,23 +95,28 @@ module.exports = {
                 } else if (postsArray == null || postsArray == undefined || postsArray.length == 0) {
                     consoleLogger(successLogger(module, 'No posts found'));
                     postsArray = [];
+                    preparePostTagsToClient(null, null, postsArray, true, doneTags);
+                } else {
+                    preparePostTagsToClient(null, null, postsArray, true, doneTags);
                 }
-                if (errors == 0) {
-                    var postsCount = 0;
-                    Post.count({}, function (err, count) {
-                        if (err) {
-                            consoleLogger(errorLogger(module, 'Failed to count posts', err));
-                            error_neg_1(-1, err);
-                        } else if (count == null || count == undefined) {
-                            postsCount = 0;
-                            consoleLogger(successLogger(module));
-                            success(postsArray, postsCount);
-                        } else {
-                            postsCount = count;
-                            consoleLogger(successLogger(module));
-                            success(postsArray, postsCount);
-                        }
-                    });
+                function doneTags(postsArray) {
+                    if (errors == 0) {
+                        var postsCount = 0;
+                        Post.count({}, function (err, count) {
+                            if (err) {
+                                consoleLogger(errorLogger(module, 'Failed to count posts', err));
+                                error_neg_1(-1, err);
+                            } else if (count == null || count == undefined) {
+                                postsCount = 0;
+                                consoleLogger(successLogger(module));
+                                success(postsArray, postsCount);
+                            } else {
+                                postsCount = count;
+                                consoleLogger(successLogger(module));
+                                success(postsArray, postsCount);
+                            }
+                        });
+                    }
                 }
             });
     },
@@ -82,10 +136,12 @@ module.exports = {
                 } else if (postsArray == null || postsArray == undefined || postsArray.length == 0) {
                     consoleLogger(successLogger(module, 'No posts found'));
                     postsArray = [];
-                    success(postsArray);
+                    //will call success with the postsArray
+                    preparePostTagsToClient(null, null, postsArray, true, success);
                 } else {
                     consoleLogger(successLogger(module));
-                    success(postsArray);
+                    //will call success with the postsArray
+                    preparePostTagsToClient(null, null, postsArray, true, success);
                 }
             });
     },
@@ -110,7 +166,8 @@ module.exports = {
                         error_0(0);
                     } else {
                         consoleLogger(successLogger(module));
-                        success(thePost);
+                        //will call success with the post
+                        preparePostTagsToClient(thePost, true, null, null, success);
                     }
                 })
         }
@@ -128,10 +185,12 @@ module.exports = {
                     error_neg_1(-1, err);
                 } else if (postsArray.length == 0) {
                     consoleLogger(successLogger(module, "SuggestedPosts is empty"));
-                    success([]);
+                    //will call success with the empty postsArray
+                    preparePostTagsToClient(null, null, [], true, success);
                 } else {
                     consoleLogger(successLogger(module));
-                    success(postsArray);
+                    //will call success with the postsArray
+                    preparePostTagsToClient(null, null, postsArray, true, success);
                 }
             });
     },
@@ -149,10 +208,12 @@ module.exports = {
                     error_neg_1(-1, err);
                 } else if (hotThisWeekArray.length == 0) {
                     consoleLogger(successLogger(module, "HotThisWeek is empty"));
-                    success([]);
+                    //will call success with the empty postsArray
+                    preparePostTagsToClient(null, null, [], true, success);
                 } else {
                     consoleLogger(successLogger(module));
-                    success(hotThisWeekArray);
+                    //will call success with the hotThisWeekArray
+                    preparePostTagsToClient(null, null, hotThisWeekArray, true, success);
                 }
             });
     },
@@ -161,20 +222,27 @@ module.exports = {
         var module = 'makeNewPost';
         receivedLogger(module);
         var theUser = getTheUser(req);
-        var post = new Post({
-            postUniqueCuid: cuid(),
-            //postIndex: taken care by auto-increment
-            authorUniqueCuid: theUser.uniqueCuid,
-            authorName: theUser.firstName + " " + theUser.lastName,
-            authorUsername: theUser.username,
-            authorEmail: theUser.email,
-            postHeading: postObject.postHeading,
-            postContent: postObject.postContent,
-            postSummary: postObject.postSummary,
-            postTags: postObject.postTags
-        });
-        consoleLogger(successLogger(module));
-        success(post);
+        //will call success with the post with serialized tags
+        preparePostTagsToDatabase(postObject, true, null, null, doneTags);
+
+        function doneTags(newPostObject) {
+            postObject = newPostObject;
+
+            var post = new Post({
+                postUniqueCuid: cuid(),
+                //postIndex: taken care by auto-increment
+                authorUniqueCuid: theUser.uniqueCuid,
+                authorName: theUser.firstName + " " + theUser.lastName,
+                authorUsername: theUser.username,
+                authorEmail: theUser.email,
+                postHeading: postObject.postHeading,
+                postContent: postObject.postContent,
+                postSummary: postObject.postSummary,
+                postTags: postObject.postTags
+            });
+            consoleLogger(successLogger(module));
+            success(post);
+        }
     },
 
     saveNewPost: function (post, error_neg_1, error_0, success) {
@@ -196,19 +264,27 @@ module.exports = {
         var module = 'makePostUpdate';
         receivedLogger(module);
         var theUser = getTheUser(req);
-        var post = {
-            postIndex: postObject.postIndex,
-            postUniqueCuid: postObject.postUniqueCuid,
-            authorUniqueCuid: theUser.uniqueCuid,
-            authorName: theUser.firstName + " " + theUser.lastName,
-            authorUsername: theUser.username,
-            authorEmail: theUser.email,
-            postHeading: postObject.postHeading,
-            postContent: postObject.postContent,
-            postSummary: postObject.postSummary
-        };
-        consoleLogger(successLogger(module));
-        success(post);
+        //will call success with the post with serialized tags
+        preparePostTagsToDatabase(postObject, true, null, null, doneTags);
+
+        function doneTags(newPostObject) {
+            postObject = newPostObject;
+
+            var post = {
+                postIndex: postObject.postIndex,
+                postUniqueCuid: postObject.postUniqueCuid,
+                authorUniqueCuid: theUser.uniqueCuid,
+                authorName: theUser.firstName + " " + theUser.lastName,
+                authorUsername: theUser.username,
+                authorEmail: theUser.email,
+                postHeading: postObject.postHeading,
+                postContent: postObject.postContent,
+                postSummary: postObject.postSummary,
+                postTags: postObject.postTags
+            };
+            consoleLogger(successLogger(module));
+            success(post);
+        }
     },
 
 
@@ -234,6 +310,7 @@ module.exports = {
                     thePost.postHeading = postToUpdate.postHeading;
                     thePost.postContent = postToUpdate.postContent;
                     thePost.postSummary = postToUpdate.postSummary;
+                    thePost.postTags = postToUpdate.postTags;
 
                     thePost.save(function (err, savedPost) {
                         if (err) {

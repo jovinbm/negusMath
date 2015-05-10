@@ -317,12 +317,45 @@ angular.module('adminHomeApp')
                 $scope.editingMode = false;
             };
 
+            $scope.editPostHeadingLessMin = false;
+            $scope.editPostContentIsEmpty = true;
             $scope.editPostSummaryIsEmpty = true;
             $scope.editPostSummaryHasExceededMaximum = false;
 
+            $scope.checkIfEditPostHeadingLessMin = function () {
+                if ($scope.post.postHeading) {
+                    var postHeadingText = $scope.post.postHeading;
+                    if (postHeadingText.length < 10) {
+                        $scope.editPostHeadingLessMin = true;
+                    }
+                    else {
+                        $scope.editPostHeadingLessMin = false;
+                    }
+                    return $scope.editPostHeadingLessMin
+                } else {
+                    return true;
+                }
+            };
+
+            $scope.checkIfEditPostContentIsEmpty = function () {
+                if ($scope.post.postContent) {
+                    var postContentText = $("<div>" + $scope.post.postContent + "</div>").text();
+                    if (postContentText.length == 0) {
+                        $scope.editPostContentIsEmpty = true;
+                    }
+                    else {
+                        $scope.editPostContentIsEmpty = false;
+                    }
+                    return $scope.editPostContentIsEmpty
+                } else {
+                    return true;
+                }
+            };
+
             $scope.checkIfEditPostSummaryIsEmpty = function () {
                 if ($scope.post.postSummary) {
-                    if ($scope.post.postSummary.length == 0) {
+                    var editPostSummaryText = $("<div>" + $scope.post.postSummary + "</div>").text();
+                    if (editPostSummaryText.length == 0) {
                         $scope.editPostSummaryIsEmpty = true;
                     }
                     else {
@@ -332,12 +365,12 @@ angular.module('adminHomeApp')
                 } else {
                     return true;
                 }
-
             };
 
             $scope.checkEditPostSummaryMaxLength = function (maxLength) {
                 if ($scope.post.postSummary) {
-                    if ($scope.post.postSummary.length > maxLength) {
+                    var editPostSummaryText = $("<div>" + $scope.post.postSummary + "</div>").text();
+                    if (editPostSummaryText.length > maxLength) {
                         $scope.editPostSummaryHasExceededMaximum = true;
                     } else {
                         $scope.editPostSummaryHasExceededMaximum = false;
@@ -348,12 +381,72 @@ angular.module('adminHomeApp')
                 }
             };
 
-            $scope.submitPostUpdate = function () {
-                if ($scope.post.postContent.length == 0) {
-                    $scope.showToast('warning', 'Please add some content to the post first');
-                } else if ($scope.post.postSummary.length > 2000) {
-                    $scope.showToast('warning', 'The post summary cannot exceed 2000 characters');
+            //returns true if tags pass validation
+            $scope.checkEditPostTags = function () {
+                var errorPostTags = 0;
+                var numberOfTags = 0;
+
+                $scope.post.postTags.forEach(function (tag) {
+                    numberOfTags++;
+                    if (errorPostTags == 0) {
+                        if (tag.text.length < 3 && errorPostTags == 0) {
+                            errorPostTags++;
+                            $scope.showToast('warning', 'Minimum allowed length for each tag is 3 characters');
+                        }
+
+                        if (tag.text.length > 30 && errorPostTags == 0) {
+                            errorPostTags++;
+                            $scope.showToast('warning', 'Maximum allowed length for each tag is 30 characters');
+                        }
+                    }
+                });
+
+                if (numberOfTags > 5 && errorPostTags == 0) {
+                    errorPostTags++;
+                    $scope.showToast('warning', 'Only a maximum of 5 tags are allowed per post');
+                }
+
+                if (errorPostTags == 0) {
+                    return true;
                 } else {
+                    return false;
+                }
+            };
+
+            $scope.submitPostUpdate = function () {
+                var errors = 0;
+
+                //validate post heading
+                if ($scope.checkIfEditPostHeadingLessMin() && errors == 0) {
+                    errors++;
+                    $scope.showToast('warning', 'The minimum required length of the heading is 10 characters');
+                }
+
+                //validatePostContent
+                if ($scope.checkIfEditPostContentIsEmpty() && errors == 0) {
+                    errors++;
+                    $scope.showToast('warning', 'Please add some text to the post first');
+                }
+
+                //validate postSummary
+                if ($scope.checkIfEditPostSummaryIsEmpty() && errors == 0) {
+                    errors++;
+                    $scope.showToast('warning', 'The post summary cannot be empty');
+                }
+
+                if ($scope.checkEditPostSummaryMaxLength() && errors == 0) {
+                    errors++;
+                    $scope.showToast('warning', 'The post summary cannot exceed 2000 characters');
+                }
+
+                //validate tags
+                //note that the edit post tags returns true if validation succeeded
+                //it also shows toasts depending on whats missing
+                if (!$scope.checkEditPostTags() && errors == 0) {
+                    errors++;
+                }
+
+                if (errors == 0) {
                     PostService.submitPostUpdate($scope.post)
                         .success(function (resp) {
                             $scope.goIntoFullPostViewMode();

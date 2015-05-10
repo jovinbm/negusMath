@@ -173,6 +173,15 @@ angular.module('clientHomeApp')
                 $scope.showDisqus = false;
             }
 
+            //listens for state changes, used to activate active states
+            $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+                //clear all banners
+                $scope.clearBanners();
+
+                //clear all toasts
+                $scope.clearToasts();
+            });
+
             //listens for state changes
             $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
                 $scope.currentState = toState.name;
@@ -270,11 +279,6 @@ angular.module('clientHomeApp')
                 $scope.showRegistrationBanner = false;
                 $scope.showNewPostBanner = false;
             };
-
-            //clear banners when the state changes
-            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
-                $scope.clearBanners();
-            });
 
             $scope.universalDisableTrue = function () {
                 $scope.universalDisable = true;
@@ -387,6 +391,11 @@ angular.module('clientHomeApp')
             //===============end of isLoading functions===============
 
             //===============toastr show functions===============
+
+            $scope.clearToasts = function () {
+                toastr.clear();
+            };
+
             $scope.showToast = function (toastType, text) {
                 switch (toastType) {
                     case "success":

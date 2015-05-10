@@ -346,8 +346,33 @@ angular.module('adminHomeApp')
                 postTags: []
             };
 
+            //these variables hold the state of the forms
+            $scope.postHeadingIsLessMin = true;
+            $scope.postContentIsEmpty = true;
             $scope.postSummaryIsEmpty = true;
             $scope.postSummaryHasExceededMaximum = false;
+
+            $scope.checkIfPostHeadingLessMin = function () {
+                var postHeadingText = $scope.newPostModel.postHeading;
+                if (postHeadingText.length < 10) {
+                    $scope.postHeadingIsLessMin = true;
+                }
+                else {
+                    $scope.postHeadingIsLessMin = false;
+                }
+                return $scope.postHeadingIsLessMin
+            };
+
+            $scope.checkIfPostContentIsEmpty = function () {
+                var postContentText = $("<div>" + $scope.newPostModel.postContent + "</div>").text();
+                if (postContentText.length == 0) {
+                    $scope.postContentIsEmpty = true;
+                }
+                else {
+                    $scope.postContentIsEmpty = false;
+                }
+                return $scope.postContentIsEmpty
+            };
 
             $scope.checkIfPostSummaryIsEmpty = function () {
                 var postSummaryText = $("<div>" + $scope.newPostModel.postSummary + "</div>").text();
@@ -370,39 +395,70 @@ angular.module('adminHomeApp')
                 return $scope.postSummaryHasExceededMaximum
             };
 
-            $scope.submitNewPost = function () {
-                var errors = 0;
+            //returns true if tags pass validation
+            $scope.checkEditPostTags = function () {
+                var errorPostTags = 0;
                 var numberOfTags = 0;
 
-                //validate the tags
                 $scope.newPostModel.postTags.forEach(function (tag) {
                     numberOfTags++;
-                    if (errors == 0) {
-                        if (tag.text.length < 3 && errors == 0) {
-                            errors++;
-                            $scope.showToast('warning', 'Minimum allowed length for each tag is 3 characters');
+                    if (errorPostTags == 0) {
+                        if (tag.text.length < 3 && errorPostTags == 0) {
+                            errorPostTags++;
+                            $scope.showToast('warning', 'Minimum required length for each tag is 3 characters');
                         }
 
-                        if (tag.text.length > 30 && errors == 0) {
-                            errors++;
+                        if (tag.text.length > 30 && errorPostTags == 0) {
+                            errorPostTags++;
                             $scope.showToast('warning', 'Maximum allowed length for each tag is 30 characters');
                         }
                     }
                 });
 
-                if (numberOfTags > 5 && errors == 0) {
-                    errors++;
+                if (numberOfTags > 5 && errorPostTags == 0) {
+                    errorPostTags++;
                     $scope.showToast('warning', 'Only a maximum of 5 tags are allowed per post');
                 }
 
-                if ($scope.newPostModel.postContent.length == 0 && errors == 0) {
+                if (errorPostTags == 0) {
+                    return true;
+                } else {
+                    return false;
+                }
+            };
+
+            $scope.submitNewPost = function () {
+                var errors = 0;
+                var numberOfTags = 0;
+
+                //validate post heading
+                if ($scope.checkIfPostHeadingLessMin() && errors == 0) {
                     errors++;
-                    $scope.showToast('warning', 'Please add some content to the post first');
+                    $scope.showToast('warning', 'The minimum required length of the heading is 10 characters');
                 }
 
-                if ($("<div>" + $scope.newPostModel.postSummary + "</div>").text().length > 2000 && errors == 0) {
+                //validate post content
+                if ($scope.checkIfPostContentIsEmpty() && errors == 0) {
+                    errors++;
+                    $scope.showToast('warning', 'Please add some text to the post first');
+                }
+
+                //validate post summary
+                if ($scope.checkIfPostSummaryIsEmpty() && errors == 0) {
+                    errors++;
+                    $scope.showToast('warning', 'The post summary cannot be empty');
+                }
+
+                if ($scope.checkPostSummaryMaxLength() && errors == 0) {
                     errors++;
                     $scope.showToast('warning', 'The post summary cannot exceed 2000 characters');
+                }
+
+                //validate tags
+                //note that the edit post tags returns true if validation succeeded
+                //it also shows toasts depending on whats missing
+                if (!$scope.checkEditPostTags() && errors == 0) {
+                    errors++;
                 }
 
                 if (errors == 0) {

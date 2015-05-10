@@ -61,9 +61,9 @@
                         <div class="card-action clearfix">
                             <div id="postTags"
                                  class="pull-left">
-                                Tags: <span ng-repeat="tagObject in post.postTags"><a
-                                    class="btn btn-default btn-xs postTags"
-                                    target="_self">{{tagObject.text}}</a> </span>
+                                <span ng-repeat="tagObject in post.postTags">
+                                    <a class="btn btn-default btn-xs postTags"
+                                       target="_self">{{tagObject.text}}</a> </span>
                             </div>
                             <div class="pull-right">
                                 <a class="btn-link btn btn-default btn-sm"
