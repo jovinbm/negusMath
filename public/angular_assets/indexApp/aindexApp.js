@@ -7,7 +7,8 @@ angular.module('indexApp', [
     'ui.router',
     'duScroll',
     'ngFx',
-    'ngAnimate'
+    'ngAnimate',
+    'ui.utils'
 ])
     .run(function ($templateCache, $http) {
         //views

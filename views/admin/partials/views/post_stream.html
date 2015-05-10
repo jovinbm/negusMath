@@ -29,7 +29,8 @@
 
     <div ng-show="mainSearchResultsPosts">
         <div class="panel-heading ng-cloak"><i class="fa fa-leanpub"></i> LATEST POSTS <span
-                class="pull-right hidden-xs hidden-sm">{{currentTime}}</span>
+                class="pull-right hidden-xs hidden-sm"
+                ng-bind-html="currentTime"></span>
         </div>
 
         <ul class="list-unstyled animated fadeIn">
@@ -40,17 +41,18 @@
                     <div class="card-content">
 
                         <h2 class="ng-cloak text-outputs postHeading"><a ng-href="/#!/post/{{post.postIndex}}"
-                                                                         ng-click="goToTop()">{{post.postHeading}}</a>
+                                                                         ng-click="goToTop()"
+                                                                         ng-bind-html="post.postHeading"></a>
                         </h2>
 
                         <h3 class="text-muted postBy">
-                            <small class="ng-cloak"><a class="btn-link">{{post.authorName}}</a>
-                                on
-                                {{post.postDate}}
+                            <small class="ng-cloak">
+                                <a class="btn-link"
+                                   ng-bind-html="post.authorName"></a> on <span ng-bind-html="post.postDate"></span>
                             </small>
                             <br/>
-                            <small class="text-muted ng-cloak">
-                                {{post.theTimeAgo}}
+                            <small class="text-muted ng-cloak"
+                                   ng-bind-html="post.theTimeAgo">
                             </small>
                         </h3>
 
@@ -81,7 +83,7 @@
                         <h2 class="text-outputs postHeading">Relativistic dynamics - Solution to Sample Question </h2>
 
                         <h3 class="text-muted postBy">
-                            <small><a class="btn-link">Salash Tolan</a> on {{currentTime}}
+                            <small><a class="btn-link">Salash Tolan</a> on <span ng-bind-html="currentTime"></span>
                             </small>
                         </h3>
 
@@ -114,17 +116,19 @@
                     <div class="card-content">
 
                         <h2 class="ng-cloak text-outputs postHeading"><a ng-href="/#!/post/{{post.postIndex}}"
-                                                                         ng-click="goToTop()">{{post.postHeading}}</a>
+                                                                         ng-click="goToTop()"
+                                                                         ng-bind-html="post.postHeading"></a>
                         </h2>
 
                         <h3 class="text-muted postBy">
-                            <small class="ng-cloak"><a class="btn-link">{{post.authorName}}</a>
-                                on
-                                {{post.postDate}}
+                            <small class="ng-cloak">
+                                <a class="btn-link"
+                                   ng-bind-html="post.authorName"></a> on
+                                <span ng-bind-html="post.postDate">
                             </small>
                             <br/>
-                            <small class="text-muted ng-cloak">
-                                {{post.theTimeAgo}}
+                            <small class="text-muted ng-cloak"
+                                   ng-bind-html="post.theTimeAgo">
                             </small>
                         </h3>
 
@@ -155,7 +159,7 @@
                         <h2 class="text-outputs postHeading">Relativistic dynamics - Solution to Sample Question </h2>
 
                         <h3 class="text-muted postBy">
-                            <small><a class="btn-link">Salash Tolan</a> on {{currentTime}}
+                            <small><a class="btn-link">Salash Tolan</a> on <span ng-bind-html="currentTime">
                             </small>
                         </h3>
 

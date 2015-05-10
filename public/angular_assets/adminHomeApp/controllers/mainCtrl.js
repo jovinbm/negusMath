@@ -16,6 +16,98 @@ angular.module('adminHomeApp')
             //variable to show or hide disqus if window.host contains negusmath
             $scope.showDisqus = $location.host().search("negusmath") !== -1;
 
+            //this function returns the highlightText to the query string on the location url
+            $scope.refillHighLightText = function () {
+                if ($rootScope.$state.current.name == 'search' && $rootScope.$stateParams.queryString) {
+                    $scope.highlightText = $rootScope.$stateParams.queryString ? $rootScope.$stateParams.queryString : $scope.highlightText;
+                }
+            };
+
+            $scope.refillHighLightText();
+
+            $scope.highlightThisText = function (textToHighlight) {
+                var theElement = $("<div>" + textToHighlight + "</div>");
+                $(theElement).highlight($scope.highlightText);
+                return theElement.html();
+            };
+
+            $scope.removeHighLightText = function (textString) {
+                $scope.highlightText = '';
+                var theElement = $("<div>" + textString + "</div>");
+                $(theElement).removeHighlight();
+                return theElement.html();
+            };
+
+            $scope.highLightPost = function (postObject) {
+                if ($scope.highLightReference()) {
+                    if (postObject.authorName) {
+                        postObject.authorName = $scope.highlightThisText(postObject.authorName);
+                    }
+                    if (postObject.postHeading) {
+                        postObject.postHeading = $scope.highlightThisText(postObject.postHeading);
+                    }
+                    if (postObject.postContent) {
+                        postObject.postContent = $scope.highlightThisText(postObject.postContent);
+                    }
+                    if (postObject.postSummary) {
+                        postObject.postSummary = $scope.highlightThisText(postObject.postSummary);
+                    }
+                    if (postObject.postTags) {
+                        postObject.postTags.forEach(function (tag) {
+                            tag.text = $scope.highlightThisText(tag.text);
+                        })
+                    }
+                }
+            };
+
+            $scope.removePostHighlights = function (postObject) {
+                if (postObject.authorName) {
+                    postObject.authorName = $scope.removeHighLightText(postObject.authorName);
+                }
+                if (postObject.postHeading) {
+                    postObject.postHeading = $scope.removeHighLightText(postObject.postHeading);
+                }
+                if (postObject.postContent) {
+                    postObject.postContent = $scope.removeHighLightText(postObject.postContent);
+                }
+                if (postObject.postSummary) {
+                    postObject.postSummary = $scope.removeHighLightText(postObject.postSummary);
+                }
+                if (postObject.postTags) {
+                    postObject.postTags.forEach(function (tag) {
+                        tag.text = $scope.removeHighLightText(tag.text);
+                    })
+                }
+            };
+
+            //stateChangeCounter counts the stateChanges from the previous search,
+            //when the user goes further, you will need to disable search highlight
+            //also, you can use a timer
+            $scope.stateChangeCounter = 0;
+            $scope.highLightReference = function () {
+                var queryString = $rootScope.$stateParams.queryString ? $rootScope.$stateParams.queryString : $scope.highlightText;
+                if (queryString) {
+                    //only highlight when the query string is more than 3 characters
+                    if (queryString.length > 3) {
+                        if ($rootScope.$state.current.name == 'search') {
+                            $scope.stateChangeCounter = 0;
+                            $scope.highlightText = $rootScope.$stateParams.queryString;
+                            return true;
+                        } else if ($scope.stateChangeCounter > 0) {
+                            $scope.stateChangeCounter++;
+                            return false;
+                        } else {
+                            $scope.stateChangeCounter++;
+                            return true;
+                        }
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            };
+
             //listens for state changes, used to activate active states
             $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
                 //clear all banners
@@ -316,6 +408,17 @@ angular.module('adminHomeApp')
                 postSearchUniqueCuid: "",
                 requestedPage: 1
             };
+
+            //put the query string in the search box
+            $scope.fillSearchBox = function () {
+                if ($rootScope.$state.current.name == 'search' && $rootScope.$stateParams.queryString) {
+                    $scope.mainSearchModel.queryString = $rootScope.$stateParams.queryString ? $rootScope.$stateParams.queryString : $scope.highlightText;
+                } else {
+                    $scope.mainSearchModel.queryString = '';
+                }
+            };
+
+            $scope.fillSearchBox();
 
             $scope.performMainSearch = function () {
                 if ($scope.mainSearchModel.queryString.length > 0) {

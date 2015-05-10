@@ -3,7 +3,7 @@ angular.module('adminHomeApp')
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
 
             //change to default document title
-            $scope.defaultDocumentTitle();
+            $scope.changeDocumentTitle($stateParams.queryString + " - NegusMath Search");
 
             $scope.mainSearchResultsPosts = PostService.getCurrentPosts();
             $scope.mainSearchResultsCount = 0;
@@ -104,6 +104,9 @@ angular.module('adminHomeApp')
                             updateTimeAgo();
                             //parse the posts and prepare them, eg, making iframes responsive
                             preparePostSummaryContent();
+                            $scope.mainSearchResultsPosts.forEach(function (post) {
+                                $scope.highLightPost(post);
+                            });
 
                             var responseMimic1 = {
                                 banner: true,
@@ -162,7 +165,9 @@ angular.module('adminHomeApp')
             //===============socket listeners===============
 
             $rootScope.$on('reconnect', function () {
-                getMainSearchResults();
+                if ($scope.currentState == 'search') {
+                    getMainSearchResults();
+                }
             });
 
             $log.info('SearchController booted successfully');

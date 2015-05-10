@@ -246,6 +246,9 @@ angular.module('adminHomeApp')
 
                             preparePostContent();
 
+                            //highlight the post if needed
+                            $scope.highLightPost($scope.post);
+
                             //check first that this is a production env --> showDisqus before bootstrapping disqus
                             if ($scope.showDisqus) {
                                 $scope.postIsLoaded = true;

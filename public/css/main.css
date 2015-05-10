@@ -5,6 +5,15 @@
     display: none !important;
 }
 
+/*angular ui highlight*/
+.ui-match {
+    background: yellow;
+}
+
+.highlight {
+    background-color: yellow
+}
+
 body {
     font-family: "Roboto Slab", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #222;

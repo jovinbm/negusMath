@@ -11,7 +11,8 @@ angular.module('clientHomeApp', [
     'ngAnimate',
     'textAngular',
     'ngSanitize',
-    'angularUtils.directives.dirDisqus'
+    'angularUtils.directives.dirDisqus',
+    'ui.utils'
 ])
     .run(function ($templateCache, $http, $rootScope, $state, $stateParams) {
         $rootScope.$state = $state;

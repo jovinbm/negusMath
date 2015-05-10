@@ -31,7 +31,8 @@
     <!--the full post-->
     <div ng-show="showPost">
         <div class="panel-heading ng-cloak"><a href ng-click="back()"><i class="fa fa-arrow-left"></i> BACK</a>
-            <span class="pull-right hidden-sm hidden-xs">{{post.postDate}}</span>
+            <span class="pull-right hidden-sm hidden-xs"
+                  ng-bind-html="post.postDate"></span>
         </div>
 
         <div class="panel-body">
@@ -42,11 +43,18 @@
 
                         <div class="card-content">
 
-                            <h1 class="ng-cloak text-outputs postHeading">{{post.postHeading}}</h1>
+                            <h1 class="ng-cloak text-outputs postHeading"
+                                ng-bind-html="post.postHeading"></h1>
 
                             <h3 class="text-muted postBy">
-                                <small class="ng-cloak"><a class="btn-link">{{post.authorName}}, </a>
-                                    {{post.theTimeAgo}}
+                                <small class="ng-cloak">
+                                    <a class="btn-link"
+                                       ng-bind-html="post.authorName"></a> on
+                                    <span ng-bind-html="post.postDate"></span>
+                                </small>
+                                <br/>
+                                <small class="text-muted ng-cloak"
+                                       ng-bind-html="post.theTimeAgo">
                                 </small>
                             </h3>
 
@@ -54,8 +62,6 @@
                                 <div ta-bind
                                      ng-model="post.postContent"></div>
                             </div>
-                            m
-
                         </div>
 
                         <div class="card-action clearfix">
@@ -63,7 +69,8 @@
                                  class="pull-left">
                                 <span ng-repeat="tagObject in post.postTags">
                                     <a class="btn btn-default btn-xs postTags"
-                                       target="_self">{{tagObject.text}}</a> </span>
+                                       target="_self"
+                                       ng-bind-html="tagObject.text"></a></span>
                             </div>
                             <div class="pull-right">
                                 <a class="btn-link btn btn-default btn-sm"
@@ -208,17 +215,19 @@
                     <div class="card-content">
 
                         <h2 class="ng-cloak text-outputs postHeading"><a ng-href="/#!/post/{{post.postIndex}}"
-                                                                         ng-click="goToTop()">{{post.postHeading}}</a>
+                                                                         ng-click="goToTop()"
+                                                                         ng-bind-html="post.postHeading"></a>
                         </h2>
 
                         <h3 class="text-muted postBy">
-                            <small class="ng-cloak"><a class="btn-link">{{post.authorName}}</a>
-                                on
-                                {{post.postDate}}
+                            <small class="ng-cloak">
+                                <a class="btn-link"
+                                   ng-bind-html="post.authorName"></a> on
+                                <span ng-bind-html="post.postDate">
                             </small>
                             <br/>
-                            <small class="text-muted ng-cloak">
-                                {{post.theTimeAgo}}
+                            <small class="text-muted ng-cloak"
+                                   ng-bind-html="post.theTimeAgo">
                             </small>
                         </h3>
 
@@ -249,7 +258,7 @@
                         <h2 class="text-outputs postHeading">Relativistic dynamics - Solution to Sample Question </h2>
 
                         <h3 class="text-muted postBy">
-                            <small><a class="btn-link">Salash Tolan</a> on {{currentTime}}
+                            <small><a class="btn-link">Salash Tolan</a> on <span ng-bind-html="currentTime">
                             </small>
                         </h3>
 

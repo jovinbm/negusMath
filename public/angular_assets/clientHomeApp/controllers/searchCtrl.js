@@ -2,8 +2,14 @@ angular.module('clientHomeApp')
     .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
 
+            $scope.mainSearchModel = {
+                queryString: $stateParams.queryString,
+                postSearchUniqueCuid: "",
+                requestedPage: $scope.currentPage
+            };
+
             //change to default document title
-            $scope.defaultDocumentTitle();
+            $scope.changeDocumentTitle($stateParams.queryString + " - NegusMath Search");
 
             $scope.mainSearchResultsPosts = PostService.getCurrentPosts();
             $scope.mainSearchResultsCount = 0;
@@ -79,12 +85,6 @@ angular.module('clientHomeApp')
                     });
             }
 
-            $scope.mainSearchModel = {
-                queryString: $stateParams.queryString,
-                postSearchUniqueCuid: "",
-                requestedPage: $scope.currentPage
-            };
-
             function getMainSearchResults() {
                 $scope.showHideLoadingBanner(true);
 
@@ -104,6 +104,9 @@ angular.module('clientHomeApp')
                             updateTimeAgo();
                             //parse the posts and prepare them, eg, making iframes responsive
                             preparePostSummaryContent();
+                            $scope.mainSearchResultsPosts.forEach(function (post) {
+                                $scope.highLightPost(post);
+                            });
 
                             var responseMimic1 = {
                                 banner: true,

@@ -12,7 +12,8 @@ angular.module('adminHomeApp', [
     'textAngular',
     'ngSanitize',
     'angularUtils.directives.dirDisqus',
-    'ngTagsInput'
+    'ngTagsInput',
+    'ui.utils'
 ])
     .run(function ($templateCache, $http, $rootScope, $state, $stateParams) {
         $rootScope.$state = $state;
