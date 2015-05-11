@@ -289,7 +289,7 @@ angular.module('clientHomeApp')
 
             //back functionality
             var history = [];
-            $rootScope.$on('$routeChangeSuccess', function () {
+            $rootScope.$on('$stateChangeSuccess', function () {
                 history.push($location.$$path);
             });
             $rootScope.back = function () {
