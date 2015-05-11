@@ -25,7 +25,11 @@ angular.module('adminHomeApp', [
     })
 
     .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
-        $urlRouterProvider.otherwise("/home/1");
+        $urlRouterProvider
+            .when("/home", '/home/1')
+            .when("/home", '/home/1')
+            .when("/search", '/home/1')
+            .otherwise("/home/1");
 
         $stateProvider
             .state('home', {
@@ -37,7 +41,7 @@ angular.module('adminHomeApp', [
                 templateUrl: 'views/admin/partials/views/full_post.html'
             })
             .state('search', {
-                url: '/search/:queryString/:page',
+                url: '/search/:queryString/:pageNumber',
                 templateUrl: 'views/search/search_results.html'
             })
             .state("otherwise", {url: '/home/1'});
@@ -108,8 +112,8 @@ angular.module('adminHomeApp')
 
 
 angular.module('adminHomeApp')
-    .controller('HotController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams', 'HotService',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams, HotService) {
+    .controller('HotController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', 'HotService',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, HotService) {
 
             $scope.hotThisWeek = HotService.getHotThisWeek();
 
@@ -154,8 +158,8 @@ angular.module('adminHomeApp')
         }
     ]);
 angular.module('adminHomeApp')
-    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'logoutService', 'PostService', '$document', '$state', '$stateParams', 'cfpLoadingBar',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, logoutService, PostService, $document, $state, $stateParams, cfpLoadingBar) {
+    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'logoutService', 'PostService', '$document', 'cfpLoadingBar',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, logoutService, PostService, $document, cfpLoadingBar) {
 
             //manipulating document title
             $scope.defaultDocumentTitle = function () {
@@ -766,8 +770,8 @@ angular.module('adminHomeApp')
         }
     ]);
 angular.module('adminHomeApp')
-    .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
+    .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
 
             //change to default document title
             $scope.defaultDocumentTitle();
@@ -840,9 +844,9 @@ angular.module('adminHomeApp')
 
             function getPagePosts() {
                 $scope.showHideLoadingBanner(true);
-                PostService.getPostsFromServer($stateParams.pageNumber)
+                PostService.getPostsFromServer($rootScope.$stateParams.pageNumber)
                     .success(function (resp) {
-                        //this function  creates a banner to notify user that there are no posts by mimicing a response and calling the response handler
+                        //this function  creates a banner to notify user that there are no posts by mimicking a response and calling the response handler
                         //used if the user is accessing a page that is beyond the number of posts
                         if (resp.postsArray.length == 0) {
 
@@ -907,7 +911,7 @@ angular.module('adminHomeApp')
 
             $rootScope.$on('newPost', function (event, data) {
                 //newPost goes to page 1, so update only if the page is 1
-                if ($stateParams.pageNumber == 1) {
+                if ($rootScope.$stateParams.pageNumber == 1) {
                     $scope.posts.unshift(data.post);
                     updateTimeAgo();
                     preparePostSummaryContent();
@@ -992,7 +996,7 @@ angular.module('adminHomeApp')
 
             function getFullPost() {
                 $scope.showHideLoadingBanner(true);
-                PostService.getPostFromServer($scope.postIndex)
+                PostService.getPostFromServer($rootScope.$stateParams.postIndex)
                     .success(function (resp) {
                         $scope.post = resp.thePost;
                         $scope.responseStatusHandler(resp);
@@ -1078,6 +1082,9 @@ angular.module('adminHomeApp')
             $scope.postBackup = $scope.post;
 
             $scope.goIntoPostEditingMode = function () {
+                //remove all the text highlights if available
+                $scope.removePostHighlights($scope.post);
+
                 //make copy of post, useful when the user clicks cancel
                 $scope.postBackup = $scope.post;
                 $scope.editingMode = true;
@@ -1257,19 +1264,24 @@ angular.module('adminHomeApp')
         }
     ]);
 angular.module('adminHomeApp')
-    .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
+    .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
+
+            $scope.mainSearchModel = {
+                queryString: $rootScope.$stateParams.queryString || '',
+                postSearchUniqueCuid: "",
+                requestedPage: $rootScope.$stateParams.pageNumber || 1
+            };
 
             //change to default document title
-            $scope.changeDocumentTitle($stateParams.queryString + " - NegusMath Search");
+            $scope.changeDocumentTitle($rootScope.$stateParams.queryString + " - NegusMath Search");
 
             $scope.mainSearchResultsPosts = PostService.getCurrentPosts();
             $scope.mainSearchResultsCount = 0;
-            $scope.currentPage = $stateParams.page;
 
             $scope.changeCurrentPage = function (page) {
-                if (page != $scope.currentPage) {
-                    //change page here
+                if (page != $rootScope.$stateParams.pageNumber) {
+                    //change page here****************************************
                 }
             };
 
@@ -1337,14 +1349,14 @@ angular.module('adminHomeApp')
                     });
             }
 
-            $scope.mainSearchModel = {
-                queryString: $stateParams.queryString,
-                postSearchUniqueCuid: "",
-                requestedPage: $scope.currentPage
-            };
-
             function getMainSearchResults() {
                 $scope.showHideLoadingBanner(true);
+
+                $scope.mainSearchModel = {
+                    queryString: $rootScope.$stateParams.queryString || '',
+                    postSearchUniqueCuid: "",
+                    requestedPage: $rootScope.$stateParams.pageNumber || 1
+                };
 
                 PostService.mainSearch($scope.mainSearchModel)
                     .success(function (resp) {

@@ -1,17 +1,22 @@
 angular.module('adminHomeApp')
-    .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
+    .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
+
+            $scope.mainSearchModel = {
+                queryString: $rootScope.$stateParams.queryString || '',
+                postSearchUniqueCuid: "",
+                requestedPage: $rootScope.$stateParams.pageNumber || 1
+            };
 
             //change to default document title
-            $scope.changeDocumentTitle($stateParams.queryString + " - NegusMath Search");
+            $scope.changeDocumentTitle($rootScope.$stateParams.queryString + " - NegusMath Search");
 
             $scope.mainSearchResultsPosts = PostService.getCurrentPosts();
             $scope.mainSearchResultsCount = 0;
-            $scope.currentPage = $stateParams.page;
 
             $scope.changeCurrentPage = function (page) {
-                if (page != $scope.currentPage) {
-                    //change page here
+                if (page != $rootScope.$stateParams.pageNumber) {
+                    //change page here****************************************
                 }
             };
 
@@ -79,14 +84,14 @@ angular.module('adminHomeApp')
                     });
             }
 
-            $scope.mainSearchModel = {
-                queryString: $stateParams.queryString,
-                postSearchUniqueCuid: "",
-                requestedPage: $scope.currentPage
-            };
-
             function getMainSearchResults() {
                 $scope.showHideLoadingBanner(true);
+
+                $scope.mainSearchModel = {
+                    queryString: $rootScope.$stateParams.queryString || '',
+                    postSearchUniqueCuid: "",
+                    requestedPage: $rootScope.$stateParams.pageNumber || 1
+                };
 
                 PostService.mainSearch($scope.mainSearchModel)
                     .success(function (resp) {

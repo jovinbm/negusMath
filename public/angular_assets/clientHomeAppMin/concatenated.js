@@ -24,7 +24,11 @@ angular.module('clientHomeApp', [
     })
 
     .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
-        $urlRouterProvider.otherwise("/home/1");
+        $urlRouterProvider
+            .when("/home", '/home/1')
+            .when("/home", '/home/1')
+            .when("/search", '/home/1')
+            .otherwise("/home/1");
 
         $stateProvider
             .state('home', {
@@ -36,7 +40,7 @@ angular.module('clientHomeApp', [
                 templateUrl: 'views/client/partials/views/full_post.html'
             })
             .state('search', {
-                url: '/search/:queryString/:page',
+                url: '/search/:queryString/:pageNumber',
                 templateUrl: 'views/search/search_results.html'
             })
             .state("otherwise", {url: '/home/1'});
@@ -107,8 +111,8 @@ angular.module('clientHomeApp')
 
 
 angular.module('clientHomeApp')
-    .controller('HotController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams', 'HotService',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams, HotService) {
+    .controller('HotController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', 'HotService',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, HotService) {
 
             $scope.hotThisWeek = HotService.getHotThisWeek();
 
@@ -153,8 +157,8 @@ angular.module('clientHomeApp')
         }
     ]);
 angular.module('clientHomeApp')
-    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$document', '$state', '$stateParams', 'logoutService', 'cfpLoadingBar',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $document, $state, $stateParams, logoutService, cfpLoadingBar) {
+    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$document', 'logoutService', 'cfpLoadingBar',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $document, logoutService, cfpLoadingBar) {
 
             //manipulating document title
             $scope.defaultDocumentTitle = function () {
@@ -630,8 +634,8 @@ angular.module('clientHomeApp')
         }
     ]);
 angular.module('clientHomeApp')
-    .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
+    .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
 
             //change to default document title
             $scope.defaultDocumentTitle();
@@ -705,9 +709,9 @@ angular.module('clientHomeApp')
 
             function getPagePosts() {
                 $scope.showHideLoadingBanner(true);
-                PostService.getPostsFromServer($stateParams.pageNumber)
+                PostService.getPostsFromServer($rootScope.$stateParams.pageNumber)
                     .success(function (resp) {
-                        //this function  creates a banner to notify user that there are no posts by mimicing a response and calling the response handler
+                        //this function  creates a banner to notify user that there are no posts by mimicking a response and calling the response handler
                         //used if the user is accessing a page that is beyond the number of posts
                         if (resp.postsArray.length == 0) {
 
@@ -772,7 +776,7 @@ angular.module('clientHomeApp')
 
             $rootScope.$on('newPost', function (event, data) {
                 //newPost goes to page 1, so update only if the page is 1
-                if ($stateParams.pageNumber == 1) {
+                if ($rootScope.$stateParams.pageNumber == 1) {
                     $scope.posts.unshift(data.post);
                     updateTimeAgo();
                     preparePostSummaryContent();
@@ -955,25 +959,24 @@ angular.module('clientHomeApp')
         }
     ]);
 angular.module('clientHomeApp')
-    .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
+    .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
 
             $scope.mainSearchModel = {
-                queryString: $stateParams.queryString,
+                queryString: $rootScope.$stateParams.queryString || '',
                 postSearchUniqueCuid: "",
-                requestedPage: $scope.currentPage
+                requestedPage: $rootScope.$stateParams.pageNumber || 1
             };
 
             //change to default document title
-            $scope.changeDocumentTitle($stateParams.queryString + " - NegusMath Search");
+            $scope.changeDocumentTitle($rootScope.$stateParams.queryString + " - NegusMath Search");
 
             $scope.mainSearchResultsPosts = PostService.getCurrentPosts();
             $scope.mainSearchResultsCount = 0;
-            $scope.currentPage = $stateParams.page;
 
             $scope.changeCurrentPage = function (page) {
-                if (page != $scope.currentPage) {
-                    //change page here
+                if (page != $rootScope.$stateParams.pageNumber) {
+                    //change page here******************************
                 }
             };
 
@@ -1043,6 +1046,12 @@ angular.module('clientHomeApp')
 
             function getMainSearchResults() {
                 $scope.showHideLoadingBanner(true);
+
+                $scope.mainSearchModel = {
+                    queryString: $rootScope.$stateParams.queryString || '',
+                    postSearchUniqueCuid: "",
+                    requestedPage: $rootScope.$stateParams.pageNumber || 1
+                };
 
                 PostService.mainSearch($scope.mainSearchModel)
                     .success(function (resp) {

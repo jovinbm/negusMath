@@ -1,6 +1,6 @@
 angular.module('clientHomeApp')
-    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$document', '$state', '$stateParams', 'logoutService', 'cfpLoadingBar',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $document, $state, $stateParams, logoutService, cfpLoadingBar) {
+    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$document', 'logoutService', 'cfpLoadingBar',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $document, logoutService, cfpLoadingBar) {
 
             //manipulating document title
             $scope.defaultDocumentTitle = function () {

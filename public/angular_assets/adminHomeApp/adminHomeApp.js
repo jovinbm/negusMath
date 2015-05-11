@@ -25,7 +25,11 @@ angular.module('adminHomeApp', [
     })
 
     .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
-        $urlRouterProvider.otherwise("/home/1");
+        $urlRouterProvider
+            .when("/home", '/home/1')
+            .when("/home", '/home/1')
+            .when("/search", '/home/1')
+            .otherwise("/home/1");
 
         $stateProvider
             .state('home', {
@@ -37,7 +41,7 @@ angular.module('adminHomeApp', [
                 templateUrl: 'views/admin/partials/views/full_post.html'
             })
             .state('search', {
-                url: '/search/:queryString/:page',
+                url: '/search/:queryString/:pageNumber',
                 templateUrl: 'views/search/search_results.html'
             })
             .state("otherwise", {url: '/home/1'});
