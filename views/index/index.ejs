@@ -103,8 +103,7 @@
 
                     <a href="#"
                        target="_self"
-                       class="dropdown-toggle" data-toggle="dropdown"
-                       ng-bind="userData.firstName"><b class="caret"></b>
+                       class="dropdown-toggle" data-toggle="dropdown">{{userData.firstName}}<b class="caret"></b>
                     </a>
 
                     <ul class="dropdown-menu">
@@ -193,13 +192,17 @@
             <div class="row">
                 <div class="container">
 
-                    <div ng-class="bannerClass"
-                         ng-if="showBanner">
-                        <button type="button" class="close" data-dismiss="alert">×</button>
-                        <strong ng-bind-html="bannerMessage"></strong>
-                    </div>
-
                     <div class="col-lg-12">
+
+                        <div class="row">
+                            <div class="col-lg-12 allBannerOuterDivs">
+                                <div ng-class="bannerClass"
+                                     ng-if="showBanner">
+                                    <button type="button" class="close" data-dismiss="alert">×</button>
+                                    <strong ng-bind="bannerMessage"></strong>
+                                </div>
+                            </div>
+                        </div>
 
                         <!--data-dv attributes for bootstrap validator plugin-->
                         <div class="row">
@@ -322,30 +325,32 @@
 
                     <div class="col-lg-12">
 
-                        <div class="container">
-
-                            <div ng-class="registrationBannerClass"
-                                 ng-if="showRegistrationBanner">
-                                <button type="button" class="close" data-dismiss="alert">×</button>
-                                <strong ng-bind-html="registrationBannerMessage"></strong>
+                        <div class="row">
+                            <div class="col-lg-12 allBannerOuterDivs">
+                                <div ng-class="registrationBannerClass"
+                                     ng-if="showRegistrationBanner">
+                                    <button type="button" class="close" data-dismiss="alert">×</button>
+                                    <strong ng-bind="registrationBannerMessage"></strong>
+                                </div>
                             </div>
+                        </div>
 
-                            <div class="row">
-                                <form name="registrationForm"
-                                      id="registrationForm">
+                        <div class="row">
+                            <form name="registrationForm"
+                                  id="registrationForm">
 
-                                    <!--Email field-->
-                                    <div class="form-group">
-                                        <label for="email">Email</label>
-                                        <input type="email"
-                                               class="form-control"
-                                               id="email"
-                                               placeholder="username@domain.com"
-                                               ng-model="registrationDetails.email"
-                                               ng-pattern="/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i"
-                                               required
-                                               ng-disabled="isLoading || universalDisable"
-                                               name="email">
+                                <!--Email field-->
+                                <div class="form-group">
+                                    <label for="email">Email</label>
+                                    <input type="email"
+                                           class="form-control"
+                                           id="email"
+                                           placeholder="username@domain.com"
+                                           ng-model="registrationDetails.email"
+                                           ng-pattern="/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i"
+                                           required
+                                           ng-disabled="isLoading || universalDisable"
+                                           name="email">
             <span class="form-error-notice"
                   ng-show="registrationForm.email.$error.required"
                   ng-if='registrationForm.message.$dirty'>
@@ -356,22 +361,22 @@
                   ng-if='registrationForm.email.$dirty'>
                 <small>This is not a valid email</small>
             </span>
-                                    </div>
+                                </div>
 
 
-                                    <!--FirstName field-->
-                                    <div class="form-group">
-                                        <label for="firstName">First name</label>
-                                        <input type="text"
-                                               class="form-control"
-                                               id="firstName"
-                                               placeholder="Jane"
-                                               ng-model="registrationDetails.firstName"
-                                               ng-minlength="2"
-                                               ng-maxlength="30"
-                                               required
-                                               ng-disabled="isLoading || universalDisable"
-                                               name="firstName">
+                                <!--FirstName field-->
+                                <div class="form-group">
+                                    <label for="firstName">First name</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="firstName"
+                                           placeholder="Jane"
+                                           ng-model="registrationDetails.firstName"
+                                           ng-minlength="2"
+                                           ng-maxlength="30"
+                                           required
+                                           ng-disabled="isLoading || universalDisable"
+                                           name="firstName">
             <span class="form-error-notice"
                   ng-show="registrationForm.firstName.$error.required"
                   ng-if='registrationForm.firstname.$dirty'>
@@ -387,21 +392,21 @@
                   ng-if='registrationForm.firstname.$dirty'>
                 <small>Maximum length required is 30:</small>
             </span>
-                                    </div>
+                                </div>
 
-                                    <!--LastName field-->
-                                    <div class="form-group">
-                                        <label for="LastName">Last name</label>
-                                        <input type="text"
-                                               class="form-control"
-                                               id="LastName"
-                                               placeholder="Doe"
-                                               ng-model="registrationDetails.lastName"
-                                               ng-minlength="2"
-                                               ng-maxlength="30"
-                                               required
-                                               ng-disabled="isLoading || universalDisable"
-                                               name="lastName">
+                                <!--LastName field-->
+                                <div class="form-group">
+                                    <label for="LastName">Last name</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="LastName"
+                                           placeholder="Doe"
+                                           ng-model="registrationDetails.lastName"
+                                           ng-minlength="2"
+                                           ng-maxlength="30"
+                                           required
+                                           ng-disabled="isLoading || universalDisable"
+                                           name="lastName">
             <span class="form-error-notice"
                   ng-show="registrationForm.lastName.$error.required"
                   ng-if='registrationForm.lastName.$dirty'>
@@ -417,22 +422,22 @@
                   ng-if='registrationForm.lastName.$dirty'>
                 <small>Maximum length required is 30:</small>
             </span>
-                                    </div>
+                                </div>
 
-                                    <!--Username field-->
-                                    <div class="form-group">
-                                        <label for="username">Public username</label>
-                                        <input type="text"
-                                               class="form-control"
-                                               id="username"
-                                               placeholder="JaneDoe"
-                                               ng-model="registrationDetails.username"
-                                               ng-minlength="4"
-                                               ng-maxlength="10"
-                                               ng-pattern="/^[a-zA-Z0-9_]*$/"
-                                               required
-                                               ng-disabled="isLoading || universalDisable"
-                                               name="username">
+                                <!--Username field-->
+                                <div class="form-group">
+                                    <label for="username">Public username</label>
+                                    <input type="text"
+                                           class="form-control"
+                                           id="username"
+                                           placeholder="JaneDoe"
+                                           ng-model="registrationDetails.username"
+                                           ng-minlength="4"
+                                           ng-maxlength="10"
+                                           ng-pattern="/^[a-zA-Z0-9_]*$/"
+                                           required
+                                           ng-disabled="isLoading || universalDisable"
+                                           name="username">
             <span class="form-error-notice"
                   ng-show="registrationForm.username.$error.required"
                   ng-if='registrationForm.username.$dirty'>
@@ -453,22 +458,22 @@
                   ng-if='registrationForm.username.$dirty'>
                 <small>Only letters, numbers and underscores allowed:</small>
             </span>
-                                    </div>
+                                </div>
 
-                                    <!--password field-->
-                                    <div class="form-group">
-                                        <label for="clientUpdatePassword1">New Password</label>
-                                        <input type="password"
-                                               name="password1"
-                                               class="form-control"
-                                               id="clientUpdatePassword1"
-                                               placeholder=""
-                                               ng-model="registrationDetails.password1"
-                                               ng-minlength="4"
-                                               ng-maxlength="20"
-                                               ng-pattern="/^[a-zA-Z0-9_]*$/"
-                                               required
-                                               ng-disabled="isLoading || universalDisable">
+                                <!--password field-->
+                                <div class="form-group">
+                                    <label for="clientUpdatePassword1">New Password</label>
+                                    <input type="password"
+                                           name="password1"
+                                           class="form-control"
+                                           id="clientUpdatePassword1"
+                                           placeholder=""
+                                           ng-model="registrationDetails.password1"
+                                           ng-minlength="4"
+                                           ng-maxlength="20"
+                                           ng-pattern="/^[a-zA-Z0-9_]*$/"
+                                           required
+                                           ng-disabled="isLoading || universalDisable">
                     <span class="form-error-notice"
                           ng-show="registrationForm.password1.$error.required"
                           ng-if='registrationForm.password1.$dirty'>
@@ -494,22 +499,22 @@
                           ng-if="registrationForm.password1.$dirty && registrationForm.password2.$dirty">
                         <small>Passwords do not match:</small>
                     </span>
-                                    </div>
+                                </div>
 
-                                    <!--confirm password-->
-                                    <div class="form-group">
-                                        <label for="clientUpdatePassword2">Confirm Password</label>
-                                        <input type="password"
-                                               name="password2"
-                                               class="form-control"
-                                               id="clientUpdatePassword2"
-                                               placeholder=""
-                                               ng-model="registrationDetails.password2"
-                                               ng-minlength="4"
-                                               ng-maxlength="20"
-                                               ng-pattern="/^[a-zA-Z0-9_]*$/"
-                                               required
-                                               ng-disabled="isLoading || universalDisable">
+                                <!--confirm password-->
+                                <div class="form-group">
+                                    <label for="clientUpdatePassword2">Confirm Password</label>
+                                    <input type="password"
+                                           name="password2"
+                                           class="form-control"
+                                           id="clientUpdatePassword2"
+                                           placeholder=""
+                                           ng-model="registrationDetails.password2"
+                                           ng-minlength="4"
+                                           ng-maxlength="20"
+                                           ng-pattern="/^[a-zA-Z0-9_]*$/"
+                                           required
+                                           ng-disabled="isLoading || universalDisable">
                     <span class="form-error-notice"
                           ng-show="registrationForm.password2.$error.required"
                           ng-if='registrationForm.password2.$dirty'>
@@ -535,21 +540,21 @@
                           ng-if="registrationForm.password1.$dirty && registrationForm.password2.$dirty">
                         <small>Passwords do not match:</small>
                     </span>
-                                    </div>
+                                </div>
 
-                                    <!--invitation code-->
-                                    <div class="form-group">
-                                        <label for="code">Invitation code</label>
-                                        <input type="password"
-                                               class="form-control"
-                                               id="code"
-                                               ng-model="registrationDetails.invitationCode"
-                                               ng-minlength="4"
-                                               ng-maxlength="10"
-                                               ng-pattern="/^[a-zA-Z0-9_]*$/"
-                                               required
-                                               ng-disabled="isLoading || universalDisable"
-                                               name="invitationCode">
+                                <!--invitation code-->
+                                <div class="form-group">
+                                    <label for="code">Invitation code</label>
+                                    <input type="password"
+                                           class="form-control"
+                                           id="code"
+                                           ng-model="registrationDetails.invitationCode"
+                                           ng-minlength="4"
+                                           ng-maxlength="10"
+                                           ng-pattern="/^[a-zA-Z0-9_]*$/"
+                                           required
+                                           ng-disabled="isLoading || universalDisable"
+                                           name="invitationCode">
             <span class="form-error-notice"
                   ng-show="registrationForm.invitationCode.$error.required"
                   ng-if='registrationForm.invitationCode.$dirty'>
@@ -570,32 +575,31 @@
                   ng-if='registrationForm.invitationCode.$dirty'>
                 <small>Only letters, numbers and underscores allowed:</small>
             </span>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <button class="btn btn-default btn-lg btn-block"
-                                                ng-disabled="registrationForm.$invalid || isLoading || universalDisable"
-                                                ng-click="createAccount()">CREATE MY ACCOUNT
-                                        </button>
-                                    </div>
-
-                                </form>
-                            </div>
-
-
-                            <div class="row text-center">
-                                <div class="padding-top-20 padding-bottom-15">
-                                    Have an account?
                                 </div>
 
-                                <a class="btn btn-xl"
-                                   href="#login"
-                                   du-smooth-scroll du-scrollspy
-                                   ng-click="changeUserLoginState('signIn')">SIGN IN
-                                </a>
+                                <div class="form-group">
+                                    <button class="btn btn-default btn-lg btn-block"
+                                            ng-disabled="registrationForm.$invalid || isLoading || universalDisable"
+                                            ng-click="createAccount()">CREATE MY ACCOUNT
+                                    </button>
+                                </div>
+
+                            </form>
+                        </div>
+
+
+                        <div class="row text-center">
+                            <div class="padding-top-20 padding-bottom-15">
+                                Have an account?
                             </div>
 
+                            <a class="btn btn-xl"
+                               href="#login"
+                               du-smooth-scroll du-scrollspy
+                               ng-click="changeUserLoginState('signIn')">SIGN IN
+                            </a>
                         </div>
+
                     </div>
                 </div>
             </div>
