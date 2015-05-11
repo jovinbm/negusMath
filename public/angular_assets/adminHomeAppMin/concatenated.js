@@ -737,6 +737,7 @@ angular.module('adminHomeApp')
                             $scope.newPostModel.postHeading = "";
                             $scope.newPostModel.postContent = "";
                             $scope.newPostModel.postSummary = "";
+                            $scope.newPostModel.postTags = [];
                         })
                         .error(function (errResponse) {
                             $scope.responseStatusHandler(errResponse);
