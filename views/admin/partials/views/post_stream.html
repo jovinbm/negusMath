@@ -27,8 +27,9 @@
         </div>
     </div>
 
-    <div ng-show="mainSearchResultsPosts">
-        <div class="panel-heading ng-cloak"><i class="fa fa-leanpub"></i> LATEST POSTS <span
+    <div ng-show="mainSearchResultsPosts"
+         class="ng-cloak">
+        <div class="panel-heading"><i class="fa fa-leanpub"></i> LATEST POSTS <span
                 class="pull-right hidden-xs hidden-sm"
                 ng-bind-html="currentTime"></span>
         </div>
@@ -40,18 +41,18 @@
 
                     <div class="card-content">
 
-                        <h2 class="ng-cloak text-outputs postHeading"><a ng-href="/#!/post/{{post.postIndex}}"
-                                                                         ng-click="goToTop()"
-                                                                         ng-bind-html="post.postHeading"></a>
+                        <h2 class="text-outputs postHeading"><a ng-href="/#!/post/{{post.postIndex}}"
+                                                                ng-click="goToTop()"
+                                                                ng-bind-html="post.postHeading"></a>
                         </h2>
 
                         <h3 class="text-muted postBy">
-                            <small class="ng-cloak">
+                            <small>
                                 <a class="btn-link"
                                    ng-bind-html="post.authorName"></a> on <span ng-bind-html="post.postDate"></span>
                             </small>
                             <br/>
-                            <small class="text-muted ng-cloak"
+                            <small class="text-muted"
                                    ng-bind-html="post.theTimeAgo">
                             </small>
                         </h3>
@@ -78,8 +79,9 @@
     </div>
 
     <!--showing suggested posts-->
-    <div ng-show="showSuggestedPosts">
-        <div class="panel-heading ng-cloak"><i class="fa fa-leanpub"></i> SUGGESTED POSTS
+    <div ng-show="showSuggestedPosts"
+         class="ng-cloak">
+        <div class="panel-heading"><i class="fa fa-leanpub"></i> SUGGESTED POSTS
             <span class="pull-right">
             <a ng-href="/#!/home/1"><i class="fa fa-arrow-left"></i> Home</a>
             </span>
@@ -92,19 +94,19 @@
 
                     <div class="card-content">
 
-                        <h2 class="ng-cloak text-outputs postHeading"><a ng-href="/#!/post/{{post.postIndex}}"
-                                                                         ng-click="goToTop()"
-                                                                         ng-bind-html="post.postHeading"></a>
+                        <h2 class="text-outputs postHeading"><a ng-href="/#!/post/{{post.postIndex}}"
+                                                                ng-click="goToTop()"
+                                                                ng-bind-html="post.postHeading"></a>
                         </h2>
 
                         <h3 class="text-muted postBy">
-                            <small class="ng-cloak">
+                            <small>
                                 <a class="btn-link"
                                    ng-bind-html="post.authorName"></a> on
-                                <span ng-bind-html="post.postDate">
+                                <span ng-bind-html="post.postDate"></span>
                             </small>
                             <br/>
-                            <small class="text-muted ng-cloak"
+                            <small class="text-muted"
                                    ng-bind-html="post.theTimeAgo">
                             </small>
                         </h3>

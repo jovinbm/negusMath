@@ -17,6 +17,13 @@ angular.module('adminHomeApp')
                 $rootScope.$broadcast('finishedLoading');
             };
 
+            //set index landing page url
+            if ($location.port()) {
+                $scope.indexPageUrl = "http://" + $location.host() + ":" + $location.port() + "/index";
+            } else {
+                $scope.indexPageUrl = "http://" + $location.host() + "/index"
+            }
+
             //variable to show or hide disqus if window.host contains negusmath
             $scope.showDisqus = $location.host().search("negusmath") !== -1;
 

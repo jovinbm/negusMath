@@ -129,11 +129,11 @@
 </nav>
 <!--end of nav-->
 
-<div class="ng-cloak">
+<div>
 
     <div id="top"></div>
 
-    <div class="container"
+    <div class="container ng-cloak"
          id="universalBanner">
         <div ng-class="bannerClass"
              ng-if="showBanner">
@@ -157,11 +157,11 @@
         </div>
     </div>
 
-    <section id="postsSection">
+    <section id="postsSection" class="ng-cloak">
         <div class="container">
             <div class="row">
 
-                <div class="col-lg-8 ng-cloak" id="postStream">
+                <div class="col-lg-8" id="postStream">
 
                     <div ui-view></div>
 
@@ -183,7 +183,7 @@
                 <div class="col-lg-4 col-lg-offset-0 hideMobileLoading hidden-xs hidden-sm"
                      id="sideBarColumn">
 
-                    <div class="panel panel-default ng-cloak">
+                    <div class="panel panel-default">
 
                         <div class="panel-heading"><i class="fa fa-youtube-play"></i> THIS WEEK'S VIDEOS
                         </div>
@@ -196,7 +196,8 @@
                                         <div class="card-content">
                                             <div class="embed-responsive embed-responsive-16by9">
                                                 <iframe class="embed-responsive-item"
-                                                        src="https://www.youtube.com/embed/adKP2CzKaFM" frameborder="0"
+                                                        src="https://www.youtube.com/embed/PIVd4imGkjI"
+                                                        frameborder="0"
                                                         allowfullscreen></iframe>
                                             </div>
                                         </div>
@@ -209,7 +210,8 @@
                                         <div class="card-content">
                                             <div class="embed-responsive embed-responsive-16by9">
                                                 <iframe class="embed-responsive-item"
-                                                        src="https://www.youtube.com/embed/adKP2CzKaFM" frameborder="0"
+                                                        src="https://www.youtube.com/embed/adKP2CzKaFM"
+                                                        frameborder="0"
                                                         allowfullscreen></iframe>
                                             </div>
                                         </div>
@@ -219,7 +221,7 @@
                         </div>
                     </div>
 
-                    <div class="panel panel-default ng-cloak"
+                    <div class="panel panel-default"
                          ng-controller="HotController"
                          ng-if="hotThisWeek.length != 0">
 
@@ -231,19 +233,19 @@
                             <ul class="list-group hotThisWeek">
                                 <li class="list-group-item post"
                                     ng-repeat="hotPost in hotThisWeek">
-                                    <p class="ng-cloak text-outputs">
+                                    <p class="text-outputs">
                                         <a ng-href="/#!/post/{{hotPost.postIndex}}"
                                            ng-click="goToTop()"
                                            ng-bind-html="hotPost.postHeading">
                                         </a> <br/>
                                     <h6 class="text-muted">
-                                        <small class="ng-cloak">
+                                        <small>
                                             <a class="btn-link"
                                                ng-bind-html="hotPost.authorName"></a> on
                                             <span ng-bind-html="hotPost.postDate"></span>
                                         </small>
                                         <br/>
-                                        <small class="text-muted ng-cloak"
+                                        <small class="text-muted"
                                                ng-bind-html="hotPost.theTimeAgo">
                                         </small>
                                     </h6>
@@ -261,7 +263,7 @@
 
 
     <section id="contact"
-             class="hideMobileLoading hidden-xs hidden-sm">
+             class="hideMobileLoading hidden-xs hidden-sm ng-cloak">
         <div class="container">
             <div class="row">
                 <div class="col-lg-12 text-center">
@@ -362,7 +364,7 @@
         </div>
     </section>
 
-    <footer class="hideMobileLoading hidden-xs hidden-sm">
+    <footer class="hideMobileLoading hidden-xs hidden-sm ng-cloak">
         <div class="container">
             <div class="row">
                 <div class="col-md-12 clearfix text-center">

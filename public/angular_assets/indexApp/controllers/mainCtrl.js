@@ -2,6 +2,13 @@ angular.module('indexApp')
     .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'logoutService',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, logoutService) {
 
+            //set /index url
+            if ($location.port()) {
+                $scope.indexPageUrl = "http://" + $location.host() + ":" + $location.port() + "/index";
+            } else {
+                $scope.indexPageUrl = "http://" + $location.host() + "/index";
+            }
+
 
             //===============request error handler===============
 
@@ -126,6 +133,8 @@ angular.module('indexApp')
             });
 
             //===============end of toastr show functions===============
+
+            $scope.clientIsRegistered = true;
 
             //initial requests
             function initialRequests() {
