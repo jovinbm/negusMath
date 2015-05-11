@@ -310,6 +310,19 @@
 
                     <div ui-view></div>
 
+                    <div ng-show="showPaging"
+                         class="text-center">
+                        <pagination total-items="pagingTotalCount"
+                                    items-per-page="itemsPerPage"
+                                    ng-model="currentPage"
+                                    ng-change="goToPage()"
+                                    max-size="pagingMaxSize"
+                                    class="pagination-sm"
+                                    boundary-links="true"
+                                    rotate="false"
+                                    num-pages="numPages"></pagination>
+                    </div>
+
                 </div>
 
                 <div class="col-lg-4 col-lg-offset-0 hideMobileLearning hidden-xs hidden-sm"
@@ -536,7 +549,7 @@
 
 <!--angular ui-->
 <script type="text/javascript"
-        src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.12.0/ui-bootstrap-tpls.min.js"></script>
+        src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.13.0/ui-bootstrap-tpls.min.js"></script>
 
 <!--angular-ui-router-->
 <script type="text/javascript"

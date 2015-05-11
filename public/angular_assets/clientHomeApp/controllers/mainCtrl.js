@@ -13,6 +13,10 @@ angular.module('clientHomeApp')
                 }
             };
 
+            $scope.finishedLoading = function () {
+                $rootScope.$broadcast('finishedLoading');
+            };
+
             //variable to show or hide disqus if window.host contains negusmath
             $scope.showDisqus = $location.host().search("negusmath") !== -1;
 
@@ -452,6 +456,38 @@ angular.module('clientHomeApp')
                     }
                 }
             };
+
+            //==================================================paging controllers for posts
+            $scope.showPaging = false;
+            $scope.showThePager = function () {
+                $scope.showPaging = true;
+            };
+            $scope.hideThePager = function () {
+                $scope.showPaging = false;
+            };
+            $scope.pagingMaxSize = 5;
+            $scope.numPages = 5;
+            $scope.itemsPerPage = 10;
+            $scope.pagingTotalCount = 1;
+            $scope.changePagingTotalCount = function (newTotalCount) {
+                $scope.pagingTotalCount = newTotalCount;
+            };
+
+            $scope.currentPage = $rootScope.$stateParams.pageNumber;
+            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+                //refresh the currentPage if the user is going to a new state
+                if (fromState.name != toState.name) {
+                    $scope.currentPage = $rootScope.$stateParams.pageNumber;
+                    $scope.pagingTotalCount = 1
+                }
+            });
+
+            $scope.goToPage = function () {
+                //go to the current state's new page
+                $rootScope.$state.go($rootScope.$state.current.name, {pageNumber: $scope.currentPage});
+                $scope.goToTop();
+            };
+            //=======================================================end of post paging controllers
 
             //===============logout functions===============
             $scope.logoutClient = function () {

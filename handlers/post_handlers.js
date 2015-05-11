@@ -46,7 +46,7 @@ module.exports = {
                     consoleLogger(successLogger(module));
                     ioJs.emitToAll('newPost', {
                         "post": savedPost,
-                        "postCount": savedPost.postIndex
+                        "postsCount": savedPost.postIndex
                     });
                     res.status(200).send({
                         code: 200,

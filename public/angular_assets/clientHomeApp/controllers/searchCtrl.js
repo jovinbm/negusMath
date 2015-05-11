@@ -2,6 +2,9 @@ angular.module('clientHomeApp')
     .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
 
+            //show paging
+            $scope.showThePager();
+
             $scope.mainSearchModel = {
                 queryString: $rootScope.$stateParams.queryString || '',
                 postSearchUniqueCuid: "",
@@ -65,6 +68,7 @@ angular.module('clientHomeApp')
                             }
 
                             prepareSuggestedPostsSummaryContent();
+                            $scope.finishedLoading();
                         } else {
                             //empty the suggestedPosts
                             $scope.suggestedPosts = [];
@@ -99,6 +103,9 @@ angular.module('clientHomeApp')
 
                         PostService.updateMainSearchResults(theResult);
                         $scope.mainSearchResultsCount = theResult.totalResults;
+                        //change paging total count
+                        $scope.changePagingTotalCount($scope.mainSearchResultsCount);
+
                         $scope.changeCurrentPage(theResult.page);
                         $scope.mainSearchModel.postSearchUniqueCuid = theResult.searchUniqueCuid;
 
@@ -119,6 +126,7 @@ angular.module('clientHomeApp')
                                 msg: "The search returned " + $scope.mainSearchResultsCount + " results"
                             };
                             $scope.responseStatusHandler(responseMimic1);
+                            $scope.finishedLoading();
                         } else {
                             //empty the postsArray
                             $scope.mainSearchResultsPosts = [];
@@ -131,6 +139,7 @@ angular.module('clientHomeApp')
                             $scope.showMainSearchResults = false;
                             getSuggestedPosts();
                             $scope.goToUniversalBanner();
+                            $scope.finishedLoading();
                         }
                     })
                     .error(function (errResp) {

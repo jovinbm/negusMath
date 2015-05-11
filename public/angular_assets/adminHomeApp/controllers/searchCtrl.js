@@ -2,6 +2,8 @@ angular.module('adminHomeApp')
     .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
 
+            $scope.showThePager();
+
             $scope.mainSearchModel = {
                 queryString: $rootScope.$stateParams.queryString || '',
                 postSearchUniqueCuid: "",
@@ -99,6 +101,7 @@ angular.module('adminHomeApp')
 
                         PostService.updateMainSearchResults(theResult);
                         $scope.mainSearchResultsCount = theResult.totalResults;
+                        $scope.changePagingTotalCount($scope.mainSearchResultsCount);
                         $scope.changeCurrentPage(theResult.page);
                         $scope.mainSearchModel.postSearchUniqueCuid = theResult.searchUniqueCuid;
 

@@ -2,6 +2,9 @@ angular.module('adminHomeApp')
     .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
 
+            //show paging
+            $scope.showThePager();
+
             //change to default document title
             $scope.defaultDocumentTitle();
 
@@ -59,6 +62,7 @@ angular.module('adminHomeApp')
                             $scope.showSuggestedPosts = false;
                             $scope.goToUniversalBanner();
                             $scope.showHideLoadingBanner(false);
+                            $scope.finishedLoading();
                         }
 
                     })
@@ -95,11 +99,13 @@ angular.module('adminHomeApp')
                             $scope.posts = PostService.updatePosts(resp.postsArray);
                             $scope.showThePostsOnly();
                             updateTimeAgo();
-                            if (resp.postCount) {
+                            if (resp.postsCount) {
                                 $scope.postsCount = resp.postsCount;
+                                $scope.changePagingTotalCount($scope.postsCount);
                             }
                             //parse the posts and prepare them, eg, making iframes responsive
                             preparePostSummaryContent();
+                            $scope.finishedLoading();
                         }
                     })
                     .error(function (errResp) {
@@ -145,8 +151,9 @@ angular.module('adminHomeApp')
                     updateTimeAgo();
                     preparePostSummaryContent();
                 }
-                if (data.postCount) {
-                    $scope.postCount = data.postCount;
+                if (data.postsCount) {
+                    $scope.postsCount = data.postsCount;
+                    $scope.changePagingTotalCount($scope.postsCount);
                 }
             });
 
@@ -163,6 +170,9 @@ angular.module('adminHomeApp')
 
     .controller('FullPostController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
+            //hide paging
+            $scope.hideThePager();
+
             $scope.postIndex = $stateParams.postIndex;
             $scope.post = {};
             $scope.suggestedPosts = [];
@@ -205,6 +215,7 @@ angular.module('adminHomeApp')
                             }
 
                             prepareSuggestedPostsSummaryContent();
+                            $scope.finishedLoading();
                         } else {
                             //empty the suggestedPosts
                             $scope.suggestedPosts = [];
@@ -253,6 +264,8 @@ angular.module('adminHomeApp')
                             if ($scope.showDisqus) {
                                 $scope.postIsLoaded = true;
                             }
+
+                            $scope.finishedLoading();
 
                         } else {
                             //empty the post

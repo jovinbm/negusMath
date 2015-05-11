@@ -172,6 +172,10 @@ angular.module('adminHomeApp')
                 }
             };
 
+            $scope.finishedLoading = function () {
+                $rootScope.$broadcast('finishedLoading');
+            };
+
             //variable to show or hide disqus if window.host contains negusmath
             $scope.showDisqus = $location.host().search("negusmath") !== -1;
 
@@ -561,7 +565,7 @@ angular.module('adminHomeApp')
                 console.log("JOIN SUCCESS");
             });
 
-            //search functionality
+            //===================================search functionality
             $scope.mainSearchModel = {
                 queryString: "",
                 postSearchUniqueCuid: "",
@@ -588,7 +592,39 @@ angular.module('adminHomeApp')
                     }
                 }
             };
-            //end of search functionality
+            //==================================================end of search functionality
+
+            //==================================================paging controllers for posts
+            $scope.showPaging = false;
+            $scope.showThePager = function () {
+                $scope.showPaging = true;
+            };
+            $scope.hideThePager = function () {
+                $scope.showPaging = false;
+            };
+            $scope.pagingMaxSize = 5;
+            $scope.numPages = 5;
+            $scope.itemsPerPage = 10;
+            $scope.pagingTotalCount = 1;
+            $scope.changePagingTotalCount = function (newTotalCount) {
+                $scope.pagingTotalCount = newTotalCount;
+            };
+
+            $scope.currentPage = $rootScope.$stateParams.pageNumber;
+            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+                //refresh the currentPage if the user is going to a new state
+                if (fromState.name != toState.name) {
+                    $scope.currentPage = $rootScope.$stateParams.pageNumber;
+                    $scope.pagingTotalCount = 1
+                }
+            });
+
+            $scope.goToPage = function () {
+                //go to the current state's new page
+                $rootScope.$state.go($rootScope.$state.current.name, {pageNumber: $scope.currentPage});
+                $scope.goToTop();
+            };
+            //=======================================================end of post paging controllers
 
             //===============new post controllers===========
 
@@ -774,6 +810,9 @@ angular.module('adminHomeApp')
     .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
 
+            //show paging
+            $scope.showThePager();
+
             //change to default document title
             $scope.defaultDocumentTitle();
 
@@ -831,6 +870,7 @@ angular.module('adminHomeApp')
                             $scope.showSuggestedPosts = false;
                             $scope.goToUniversalBanner();
                             $scope.showHideLoadingBanner(false);
+                            $scope.finishedLoading();
                         }
 
                     })
@@ -867,11 +907,13 @@ angular.module('adminHomeApp')
                             $scope.posts = PostService.updatePosts(resp.postsArray);
                             $scope.showThePostsOnly();
                             updateTimeAgo();
-                            if (resp.postCount) {
+                            if (resp.postsCount) {
                                 $scope.postsCount = resp.postsCount;
+                                $scope.changePagingTotalCount($scope.postsCount);
                             }
                             //parse the posts and prepare them, eg, making iframes responsive
                             preparePostSummaryContent();
+                            $scope.finishedLoading();
                         }
                     })
                     .error(function (errResp) {
@@ -917,8 +959,9 @@ angular.module('adminHomeApp')
                     updateTimeAgo();
                     preparePostSummaryContent();
                 }
-                if (data.postCount) {
-                    $scope.postCount = data.postCount;
+                if (data.postsCount) {
+                    $scope.postsCount = data.postsCount;
+                    $scope.changePagingTotalCount($scope.postsCount);
                 }
             });
 
@@ -935,6 +978,9 @@ angular.module('adminHomeApp')
 
     .controller('FullPostController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
+            //hide paging
+            $scope.hideThePager();
+
             $scope.postIndex = $stateParams.postIndex;
             $scope.post = {};
             $scope.suggestedPosts = [];
@@ -977,6 +1023,7 @@ angular.module('adminHomeApp')
                             }
 
                             prepareSuggestedPostsSummaryContent();
+                            $scope.finishedLoading();
                         } else {
                             //empty the suggestedPosts
                             $scope.suggestedPosts = [];
@@ -1025,6 +1072,8 @@ angular.module('adminHomeApp')
                             if ($scope.showDisqus) {
                                 $scope.postIsLoaded = true;
                             }
+
+                            $scope.finishedLoading();
 
                         } else {
                             //empty the post
@@ -1268,6 +1317,8 @@ angular.module('adminHomeApp')
     .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
 
+            $scope.showThePager();
+
             $scope.mainSearchModel = {
                 queryString: $rootScope.$stateParams.queryString || '',
                 postSearchUniqueCuid: "",
@@ -1365,6 +1416,7 @@ angular.module('adminHomeApp')
 
                         PostService.updateMainSearchResults(theResult);
                         $scope.mainSearchResultsCount = theResult.totalResults;
+                        $scope.changePagingTotalCount($scope.mainSearchResultsCount);
                         $scope.changeCurrentPage(theResult.page);
                         $scope.mainSearchModel.postSearchUniqueCuid = theResult.searchUniqueCuid;
 
