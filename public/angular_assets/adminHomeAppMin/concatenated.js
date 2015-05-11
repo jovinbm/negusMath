@@ -888,6 +888,9 @@ angular.module('adminHomeApp')
                         $scope.showSuggestedPosts = false;
                         $scope.responseStatusHandler(errResp);
                     });
+
+                //whatever happens, hide the pager
+                $scope.hideThePager();
             }
 
             function getPagePosts() {
@@ -920,6 +923,7 @@ angular.module('adminHomeApp')
                             }
                             //parse the posts and prepare them, eg, making iframes responsive
                             preparePostSummaryContent();
+                            $scope.showThePager();
                             $scope.finishedLoading();
                         }
                     })
@@ -1047,6 +1051,9 @@ angular.module('adminHomeApp')
                         $scope.showSuggestedPosts = false;
                         $scope.responseStatusHandler(errResp);
                     });
+
+                //whatever happens, hide the pager
+                $scope.hideThePager();
             }
 
             function getFullPost() {
@@ -1080,6 +1087,7 @@ angular.module('adminHomeApp')
                                 $scope.postIsLoaded = true;
                             }
 
+                            $scope.hideThePager();
                             $scope.finishedLoading();
 
                         } else {
@@ -1141,6 +1149,7 @@ angular.module('adminHomeApp')
             $scope.goIntoPostEditingMode = function () {
                 //remove all the text highlights if available
                 $scope.removePostHighlights($scope.post);
+                $scope.hideThePager();
 
                 //make copy of post, useful when the user clicks cancel
                 $scope.postBackup = $scope.post;
@@ -1149,6 +1158,7 @@ angular.module('adminHomeApp')
 
             $scope.goIntoFullPostViewMode = function () {
                 $scope.editingMode = false;
+                $scope.hideThePager();
             };
 
             $scope.editPostHeadingLessMin = false;
@@ -1406,6 +1416,9 @@ angular.module('adminHomeApp')
                         $scope.showSuggestedPosts = false;
                         $scope.responseStatusHandler(errResp);
                     });
+
+                //whatever happens, hide the pager
+                $scope.hideThePager();
             }
 
             function getMainSearchResults() {
@@ -1444,6 +1457,7 @@ angular.module('adminHomeApp')
                                 msg: "The search returned " + $scope.mainSearchResultsCount + " results"
                             };
                             $scope.responseStatusHandler(responseMimic1);
+                            $scope.showThePager();
                         } else {
                             //empty the postsArray
                             $scope.mainSearchResultsPosts = [];

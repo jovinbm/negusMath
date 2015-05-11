@@ -111,197 +111,6 @@ angular.module('clientHomeApp')
 
 
 angular.module('clientHomeApp')
-
-    .factory('globals', ['$q', '$window', '$rootScope', 'socketService',
-        function ($q, $window, $rootScope, socketService) {
-            var userData = {};
-            return {
-
-                userData: function (data) {
-                    if (data) {
-                        userData = data;
-                        return userData;
-                    } else {
-                        return userData;
-                    }
-                }
-            };
-        }]);
-angular.module('clientHomeApp')
-    .factory('HotService', ['$log', '$http', '$window', '$rootScope', 'socket', 'socketService', 'globals',
-        function ($log, $http, $window, $rootScope, socket, socketService, globals) {
-
-            var hotThisWeek = [];
-
-            socket.on('hotThisWeekPosts', function (data) {
-                //data here has the keys post, postCount
-                $rootScope.$broadcast('hotThisWeekPosts', data);
-            });
-
-            return {
-
-                getHotThisWeek: function () {
-                    return hotThisWeek;
-                },
-
-                getHotThisWeekFromServer: function () {
-                    return $http.post('/api/getHotThisWeek', {})
-                },
-
-                updateHotThisWeek: function (hotThisWeekArray) {
-                    hotThisWeek = hotThisWeekArray;
-                    return hotThisWeekArray;
-                }
-            };
-        }]);
-angular.module('clientHomeApp')
-    .factory('mainService', ['$log', '$window', '$rootScope', 'socket', 'socketService', 'globals',
-        function ($log, $window, $rootScope, socket, socketService, globals) {
-
-            socket.on('reconnect', function () {
-                $log.info("'reconnect sequence' triggered");
-                $rootScope.$broadcast('reconnect');
-            });
-
-            return {
-                done: function () {
-                    return 1;
-                }
-            };
-        }]);
-angular.module('clientHomeApp')
-    .factory('PostService', ['$log', '$http', '$window', '$rootScope', 'socket', 'socketService', 'globals',
-        function ($log, $http, $window, $rootScope, socket, socketService, globals, $stateParams) {
-
-            var posts = [];
-            var postsCount = 0;
-
-            var mainSearchResultsPosts = [];
-
-            socket.on('newPost', function (data) {
-                //data here has the keys post, postCount
-                $rootScope.$broadcast('newPost', data);
-            });
-
-            socket.on('postUpdate', function (data) {
-                //data here has the keys post, postCount
-                $rootScope.$broadcast('postUpdate', data);
-            });
-
-            return {
-
-                getCurrentPosts: function () {
-                    return posts;
-                },
-
-                getCurrentPostsCount: function () {
-                    return postsCount;
-                },
-
-                getPostsFromServer: function (pageNumber) {
-                    return $http.post('/api/getPosts', {
-                        page: pageNumber
-                    })
-                },
-
-                getSuggestedPostsFromServer: function () {
-                    return $http.post('/api/getSuggestedPosts', {})
-                },
-
-                updatePosts: function (postsArray) {
-                    posts = postsArray;
-                    return postsArray;
-                },
-
-                getPostFromServer: function (postIndex) {
-                    return $http.post('/api/getPost', {
-                        postIndex: postIndex
-                    });
-                },
-
-                getCurrentMainSearchResults: function () {
-                    return mainSearchResultsPosts;
-                },
-
-                updateMainSearchResults: function (resultValue) {
-                    mainSearchResultsPosts = resultValue;
-                    return mainSearchResultsPosts;
-                },
-
-                mainSearch: function (searchObject) {
-                    return $http.post('/api/mainSearch', searchObject);
-                }
-            };
-        }]);
-angular.module('clientHomeApp')
-
-    .factory('socket', ['$log', '$location', '$rootScope',
-        function ($log, $location, $rootScope) {
-            var url;
-            if ($location.port()) {
-                url = $location.host() + ":" + $location.port();
-            } else {
-                url = $location.host();
-            }
-            var socket = io.connect(url);
-            //return socket;
-            return {
-                on: function (eventName, callback) {
-                    socket.on(eventName, function () {
-                        var args = arguments;
-                        $rootScope.$apply(function () {
-                            callback.apply(socket, args);
-                        });
-                    });
-                },
-
-                emit: function (eventName, data, callback) {
-                    socket.emit(eventName, data, function () {
-                        var args = arguments;
-                        $rootScope.$apply(function () {
-                            if (callback) {
-                                callback.apply(socket, args);
-                            }
-                        });
-                    });
-                },
-
-                removeAllListeners: function (eventName, callback) {
-                    socket.removeAllListeners(eventName, function () {
-                        var args = arguments;
-                        $rootScope.$apply(function () {
-                            callback.apply(socket, args);
-                        });
-                    });
-                }
-            };
-        }])
-
-
-    .factory('socketService', ['$log', '$http', '$rootScope',
-        function ($log, $http, $rootScope) {
-            return {
-                getUserData: function () {
-                    return $http.get('/api/getUserData');
-                },
-
-                sendContactUs: function (contactUsModel) {
-                    return $http.post('/contactUs', contactUsModel);
-                }
-            }
-        }
-    ])
-
-    .factory('logoutService', ['$http',
-        function ($http) {
-            return {
-
-                logoutClient: function () {
-                    return $http.post('/api/logoutClient');
-                }
-            }
-        }]);
-angular.module('clientHomeApp')
     .controller('HotController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', 'HotService',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, HotService) {
 
@@ -943,6 +752,9 @@ angular.module('clientHomeApp')
                         $scope.showSuggestedPosts = false;
                         $scope.responseStatusHandler(errResp);
                     });
+
+                //whatever happens, hide the pager
+                $scope.hideThePager();
             }
 
             function getPagePosts() {
@@ -975,6 +787,7 @@ angular.module('clientHomeApp')
                             }
                             //parse the posts and prepare them, eg, making iframes responsive
                             preparePostSummaryContent();
+                            $scope.showThePager();
                             $scope.finishedLoading();
                         }
                     })
@@ -1104,6 +917,9 @@ angular.module('clientHomeApp')
                         $scope.showSuggestedPosts = false;
                         $scope.responseStatusHandler(errResp);
                     });
+
+                //whatever happens, hide the pager
+                $scope.hideThePager();
             }
 
             function getFullPost() {
@@ -1137,6 +953,7 @@ angular.module('clientHomeApp')
                                 $scope.postIsLoaded = true;
                             }
 
+                            $scope.hideThePager();
                             $scope.finishedLoading();
 
                         } else {
@@ -1294,6 +1111,9 @@ angular.module('clientHomeApp')
                         $scope.showSuggestedPosts = false;
                         $scope.responseStatusHandler(errResp);
                     });
+
+                //whatever happens, hide the pager
+                $scope.hideThePager();
             }
 
             function getMainSearchResults() {
@@ -1334,6 +1154,7 @@ angular.module('clientHomeApp')
                                 msg: "The search returned " + $scope.mainSearchResultsCount + " results"
                             };
                             $scope.responseStatusHandler(responseMimic1);
+                            $scope.showThePager();
                             $scope.finishedLoading();
                         } else {
                             //empty the postsArray
@@ -1396,3 +1217,194 @@ angular.module('clientHomeApp')
 
         }
     ]);
+angular.module('clientHomeApp')
+
+    .factory('globals', ['$q', '$window', '$rootScope', 'socketService',
+        function ($q, $window, $rootScope, socketService) {
+            var userData = {};
+            return {
+
+                userData: function (data) {
+                    if (data) {
+                        userData = data;
+                        return userData;
+                    } else {
+                        return userData;
+                    }
+                }
+            };
+        }]);
+angular.module('clientHomeApp')
+    .factory('HotService', ['$log', '$http', '$window', '$rootScope', 'socket', 'socketService', 'globals',
+        function ($log, $http, $window, $rootScope, socket, socketService, globals) {
+
+            var hotThisWeek = [];
+
+            socket.on('hotThisWeekPosts', function (data) {
+                //data here has the keys post, postCount
+                $rootScope.$broadcast('hotThisWeekPosts', data);
+            });
+
+            return {
+
+                getHotThisWeek: function () {
+                    return hotThisWeek;
+                },
+
+                getHotThisWeekFromServer: function () {
+                    return $http.post('/api/getHotThisWeek', {})
+                },
+
+                updateHotThisWeek: function (hotThisWeekArray) {
+                    hotThisWeek = hotThisWeekArray;
+                    return hotThisWeekArray;
+                }
+            };
+        }]);
+angular.module('clientHomeApp')
+    .factory('mainService', ['$log', '$window', '$rootScope', 'socket', 'socketService', 'globals',
+        function ($log, $window, $rootScope, socket, socketService, globals) {
+
+            socket.on('reconnect', function () {
+                $log.info("'reconnect sequence' triggered");
+                $rootScope.$broadcast('reconnect');
+            });
+
+            return {
+                done: function () {
+                    return 1;
+                }
+            };
+        }]);
+angular.module('clientHomeApp')
+    .factory('PostService', ['$log', '$http', '$window', '$rootScope', 'socket', 'socketService', 'globals',
+        function ($log, $http, $window, $rootScope, socket, socketService, globals, $stateParams) {
+
+            var posts = [];
+            var postsCount = 0;
+
+            var mainSearchResultsPosts = [];
+
+            socket.on('newPost', function (data) {
+                //data here has the keys post, postCount
+                $rootScope.$broadcast('newPost', data);
+            });
+
+            socket.on('postUpdate', function (data) {
+                //data here has the keys post, postCount
+                $rootScope.$broadcast('postUpdate', data);
+            });
+
+            return {
+
+                getCurrentPosts: function () {
+                    return posts;
+                },
+
+                getCurrentPostsCount: function () {
+                    return postsCount;
+                },
+
+                getPostsFromServer: function (pageNumber) {
+                    return $http.post('/api/getPosts', {
+                        page: pageNumber
+                    })
+                },
+
+                getSuggestedPostsFromServer: function () {
+                    return $http.post('/api/getSuggestedPosts', {})
+                },
+
+                updatePosts: function (postsArray) {
+                    posts = postsArray;
+                    return postsArray;
+                },
+
+                getPostFromServer: function (postIndex) {
+                    return $http.post('/api/getPost', {
+                        postIndex: postIndex
+                    });
+                },
+
+                getCurrentMainSearchResults: function () {
+                    return mainSearchResultsPosts;
+                },
+
+                updateMainSearchResults: function (resultValue) {
+                    mainSearchResultsPosts = resultValue;
+                    return mainSearchResultsPosts;
+                },
+
+                mainSearch: function (searchObject) {
+                    return $http.post('/api/mainSearch', searchObject);
+                }
+            };
+        }]);
+angular.module('clientHomeApp')
+
+    .factory('socket', ['$log', '$location', '$rootScope',
+        function ($log, $location, $rootScope) {
+            var url;
+            if ($location.port()) {
+                url = $location.host() + ":" + $location.port();
+            } else {
+                url = $location.host();
+            }
+            var socket = io.connect(url);
+            //return socket;
+            return {
+                on: function (eventName, callback) {
+                    socket.on(eventName, function () {
+                        var args = arguments;
+                        $rootScope.$apply(function () {
+                            callback.apply(socket, args);
+                        });
+                    });
+                },
+
+                emit: function (eventName, data, callback) {
+                    socket.emit(eventName, data, function () {
+                        var args = arguments;
+                        $rootScope.$apply(function () {
+                            if (callback) {
+                                callback.apply(socket, args);
+                            }
+                        });
+                    });
+                },
+
+                removeAllListeners: function (eventName, callback) {
+                    socket.removeAllListeners(eventName, function () {
+                        var args = arguments;
+                        $rootScope.$apply(function () {
+                            callback.apply(socket, args);
+                        });
+                    });
+                }
+            };
+        }])
+
+
+    .factory('socketService', ['$log', '$http', '$rootScope',
+        function ($log, $http, $rootScope) {
+            return {
+                getUserData: function () {
+                    return $http.get('/api/getUserData');
+                },
+
+                sendContactUs: function (contactUsModel) {
+                    return $http.post('/contactUs', contactUsModel);
+                }
+            }
+        }
+    ])
+
+    .factory('logoutService', ['$http',
+        function ($http) {
+            return {
+
+                logoutClient: function () {
+                    return $http.post('/api/logoutClient');
+                }
+            }
+        }]);

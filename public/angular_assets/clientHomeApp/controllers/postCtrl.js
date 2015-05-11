@@ -74,6 +74,9 @@ angular.module('clientHomeApp')
                         $scope.showSuggestedPosts = false;
                         $scope.responseStatusHandler(errResp);
                     });
+
+                //whatever happens, hide the pager
+                $scope.hideThePager();
             }
 
             function getPagePosts() {
@@ -106,6 +109,7 @@ angular.module('clientHomeApp')
                             }
                             //parse the posts and prepare them, eg, making iframes responsive
                             preparePostSummaryContent();
+                            $scope.showThePager();
                             $scope.finishedLoading();
                         }
                     })
@@ -235,6 +239,9 @@ angular.module('clientHomeApp')
                         $scope.showSuggestedPosts = false;
                         $scope.responseStatusHandler(errResp);
                     });
+
+                //whatever happens, hide the pager
+                $scope.hideThePager();
             }
 
             function getFullPost() {
@@ -268,6 +275,7 @@ angular.module('clientHomeApp')
                                 $scope.postIsLoaded = true;
                             }
 
+                            $scope.hideThePager();
                             $scope.finishedLoading();
 
                         } else {

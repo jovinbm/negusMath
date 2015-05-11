@@ -86,6 +86,9 @@ angular.module('clientHomeApp')
                         $scope.showSuggestedPosts = false;
                         $scope.responseStatusHandler(errResp);
                     });
+
+                //whatever happens, hide the pager
+                $scope.hideThePager();
             }
 
             function getMainSearchResults() {
@@ -126,6 +129,7 @@ angular.module('clientHomeApp')
                                 msg: "The search returned " + $scope.mainSearchResultsCount + " results"
                             };
                             $scope.responseStatusHandler(responseMimic1);
+                            $scope.showThePager();
                             $scope.finishedLoading();
                         } else {
                             //empty the postsArray
