@@ -1,39 +1,12 @@
 <div class="panel panel-default"
      ng-controller="FullPostController">
 
-    <div id="loading-splash-card">
-        <div class="panel-body">
-            <ul class="list-unstyled animated fadeIn">
-                <li class="list-unstyled clearfix">
-
-                    <div class="card"
-                         id="loading-card">
-
-                        <div class="card-content text-center" id="loading-card-content">
-
-                            <h3 class="loading-text text-outputs">LOADING...</h3>
-
-                            <div class="progress">
-                                <div class="progress-bar progress-bar-warning progress-bar-striped" role="progressbar"
-                                     ng-attr-aria-valuenow="{{isLoadingPercentage}}"
-                                     aria-valuemin="0" aria-valuemax="100"
-                                     ng-attr-style="{{'width: ' + isLoadingPercentage + '%;'}}">
-                                    <span class="sr-only">60% Complete</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </div>
-
     <!--the full post-->
-    <div ng-show="showPost"
+    <div ng-if="showPost"
          class="ng-cloak">
         <div class="panel-heading"><a href ng-click="back()"><i class="fa fa-arrow-left"></i> BACK</a>
             <span class="pull-right hidden-sm hidden-xs"
-                  ng-bind-html="post.postDate"></span>
+                  ng-bind-html="post.createdAt | AddPostDate"></span>
         </div>
 
         <div class="panel-body">
@@ -45,34 +18,25 @@
                         <div class="card-content">
 
                             <h1 class="text-outputs postHeading"
-                                ng-bind-html="post.postHeading"></h1>
+                                ng-bind-html="post.postHeading | highlightText"></h1>
 
                             <h3 class="text-muted postBy">
                                 <small>
                                     <a class="btn-link"
-                                       ng-bind-html="post.authorName"></a> on
-                                    <span ng-bind-html="post.postDate"></span>
+                                       ng-bind-html="post.authorName | highlightText"></a> on
+                                    <span ng-bind-html="post.createdAt | AddPostDate"></span>
                                 </small>
                                 <br/>
                                 <small class="text-muted"
-                                       ng-bind-html="post.theTimeAgo">
+                                       ng-bind-html="post.createdAt | AddTimeAgo">
                                 </small>
                             </h3>
 
-                            <div class="postContent">
-                                <div ta-bind
-                                     ng-model="post.postContent"></div>
-                            </div>
+                            <div post-content></div>
                         </div>
 
                         <div class="card-action clearfix">
-                            <div id="postTags"
-                                 class="pull-left">
-                                <span ng-repeat="tagObject in post.postTags">
-                                    <a class="btn btn-default btn-xs postTags"
-                                       target="_self"
-                                       ng-bind-html="tagObject.text"></a></span>
-                            </div>
+                            <div post-tags></div>
                             <div class="pull-right">
                                 <a class="btn-link btn btn-default btn-sm"
                                    ng-click="goToTop(); goIntoPostEditingMode()">Edit</a>
@@ -201,7 +165,7 @@
     </div>
 
     <!--showing suggested posts-->
-    <div ng-show="showSuggestedPosts"
+    <div ng-if="showSuggestedPosts"
          class="ng-cloak">
         <div class="panel-heading"><i class="fa fa-leanpub"></i> SUGGESTED POSTS
             <span class="pull-right">
@@ -225,11 +189,11 @@
                             <small>
                                 <a class="btn-link"
                                    ng-bind-html="post.authorName"></a> on
-                                <span ng-bind-html="post.postDate"></span>
+                                <span ng-bind-html="post.createdAt | AddPostDate"></span>
                             </small>
                             <br/>
                             <small class="text-muted"
-                                   ng-bind-html="post.theTimeAgo">
+                                   ng-bind-html="post.createdAt | AddTimeAgo">
                             </small>
                         </h3>
 

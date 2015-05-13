@@ -1,12 +1,9 @@
 angular.module('adminHomeApp')
-    .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
+    .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', 'fN',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, fN) {
 
-            //show paging
             $scope.showThePager();
-
-            //change to default document title
-            $scope.defaultDocumentTitle();
+            globals.defaultDocumentTitle();
 
             $scope.posts = PostService.getCurrentPosts();
             $scope.postsCount = PostService.getCurrentPostsCount();
@@ -29,13 +26,6 @@ angular.module('adminHomeApp')
                 $scope.showSuggestedPosts = true;
             };
 
-            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
-            function preparePostSummaryContent() {
-                $scope.posts.forEach(function (post) {
-                    post.postSummary = $scope.makeVideoIframesResponsive(post.postSummary);
-                });
-            }
-
             //function used to fill in with suggested posts in case no posts are received
             function getSuggestedPosts() {
                 $scope.showHideLoadingBanner(true);
@@ -46,32 +36,22 @@ angular.module('adminHomeApp')
                         if ((resp.postsArray.length > 0)) {
                             $scope.showSuggestedPostsOnly();
                             $scope.suggestedPosts = resp.postsArray;
-                            updateTimeAgo();
-
-                            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
-                            function prepareSuggestedPostsSummaryContent() {
-                                $scope.suggestedPosts.forEach(function (post) {
-                                    post.postSummary = $scope.makeVideoIframesResponsive(post.postSummary);
-                                });
-                            }
-
-                            prepareSuggestedPostsSummaryContent();
+                            $scope.suggestedPosts = $filter('makeVideoIframesResponsive')(null, $scope.suggestedPosts);
                         } else {
                             //empty the suggestedPosts
                             $scope.suggestedPosts = [];
                             $scope.showSuggestedPosts = false;
-                            $scope.goToUniversalBanner();
+                            $scope.goToTop();
                             $scope.showHideLoadingBanner(false);
-                            $scope.finishedLoading();
                         }
 
                     })
                     .error(function (errResp) {
-                        $scope.goToUniversalBanner();
+                        $scope.goToTop();
                         //empty the suggestedPosts
                         $scope.suggestedPosts = [];
                         $scope.showSuggestedPosts = false;
-                        $scope.responseStatusHandler(errResp);
+                        $rootScope.responseStatusHandler(errResp);
                     });
 
                 //whatever happens, hide the pager
@@ -94,26 +74,26 @@ angular.module('adminHomeApp')
                                 bannerClass: 'alert alert-dismissible alert-success',
                                 msg: "No more posts to show"
                             };
-                            $scope.responseStatusHandler(responseMimic);
+                            $rootScope.responseStatusHandler(responseMimic);
                             $scope.mainSearchResultsPosts = false;
                             getSuggestedPosts();
-                            $scope.goToUniversalBanner();
+                            $scope.goToTop();
                         } else {
                             $scope.posts = PostService.updatePosts(resp.postsArray);
+                            $scope.posts = $filter('makeVideoIframesResponsive')(null, $scope.posts);
+
                             $scope.showThePostsOnly();
-                            updateTimeAgo();
+
+
                             if (resp.postsCount) {
                                 $scope.postsCount = resp.postsCount;
                                 $scope.changePagingTotalCount($scope.postsCount);
                             }
-                            //parse the posts and prepare them, eg, making iframes responsive
-                            preparePostSummaryContent();
                             $scope.showThePager();
-                            $scope.finishedLoading();
                         }
                     })
                     .error(function (errResp) {
-                        $scope.responseStatusHandler(errResp);
+                        $rootScope.responseStatusHandler(errResp);
                         //empty the postsArray
                         $scope.posts = [];
                         $scope.mainSearchResultsPosts = false;
@@ -123,37 +103,13 @@ angular.module('adminHomeApp')
 
             getPagePosts();
 
-            //this functions evaluates to true if object is not empty, useful for ng-show
-            //this function also creates a banner to notify user that there are no posts by mimicing a response and calling the response handler
-            $scope.checkIfPostsIsEmpty = function () {
-                return $scope.posts.length == 0
-            };
-
-            //=============function to update timeago on all posts
-            //updates the timeago on all incoming orders using the timeago filter
-            function updateTimeAgo() {
-                $scope.posts.forEach(function (post) {
-                    post.theTimeAgo = $filter('timeago')(post.createdAt);
-
-                    //post date/time it was ordered e.g. Sun, Mar 17..
-                    post.postDate = moment(post.createdAt).format("ddd, MMM D, H:mm");
-                });
-            }
-
-            $interval(updateTimeAgo, 120000, 0, true);
-
-            //==============end of update time ago
-
-            updateTimeAgo();
-
             //===============socket listeners===============
 
             $rootScope.$on('newPost', function (event, data) {
                 //newPost goes to page 1, so update only if the page is 1
                 if ($rootScope.$stateParams.pageNumber == 1) {
+                    data.post = $filter('makeVideoIframesResponsive')(data.post, null);
                     $scope.posts.unshift(data.post);
-                    updateTimeAgo();
-                    preparePostSummaryContent();
                 }
                 if (data.postsCount) {
                     $scope.postsCount = data.postsCount;
@@ -162,18 +118,15 @@ angular.module('adminHomeApp')
             });
 
             $rootScope.$on('reconnect', function () {
-                if ($scope.currentState == 'home') {
+                if ($rootScope.$state.current.name == 'home') {
                     getPagePosts();
                 }
             });
-
-            $log.info('PostController booted successfully');
-
         }
     ])
 
-    .controller('FullPostController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
+    .controller('FullPostController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams', 'fN',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams, fN) {
             //hide paging
             $scope.hideThePager();
 
@@ -209,32 +162,22 @@ angular.module('adminHomeApp')
                         if ((resp.postsArray.length > 0)) {
                             $scope.showSuggestedPostsOnly();
                             $scope.suggestedPosts = resp.postsArray;
-                            updateTimeAgo();
-
-                            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
-                            function prepareSuggestedPostsSummaryContent() {
-                                $scope.suggestedPosts.forEach(function (post) {
-                                    post.postSummary = $scope.makeVideoIframesResponsive(post.postSummary);
-                                });
-                            }
-
-                            prepareSuggestedPostsSummaryContent();
-                            $scope.finishedLoading();
+                            $scope.suggestedPosts = $filter('makeVideoIframesResponsive')(null, $scope.suggestedPosts);
                         } else {
                             //empty the suggestedPosts
                             $scope.suggestedPosts = [];
                             $scope.showSuggestedPosts = false;
-                            $scope.goToUniversalBanner();
+                            $scope.goToTop();
                             $scope.showHideLoadingBanner(false);
                         }
 
                     })
                     .error(function (errResp) {
-                        $scope.goToUniversalBanner();
+                        $scope.goToTop();
                         //empty the suggestedPosts
                         $scope.suggestedPosts = [];
                         $scope.showSuggestedPosts = false;
-                        $scope.responseStatusHandler(errResp);
+                        $rootScope.responseStatusHandler(errResp);
                     });
 
                 //whatever happens, hide the pager
@@ -246,26 +189,13 @@ angular.module('adminHomeApp')
                 PostService.getPostFromServer($rootScope.$stateParams.postIndex)
                     .success(function (resp) {
                         $scope.post = resp.thePost;
-                        $scope.responseStatusHandler(resp);
-                        //check that there is a post first before starting disqus and other attributes
-                        if ($scope.calcObjectLength($scope.post) != 0) {
-
-                            //change the document title
-                            $scope.changeDocumentTitle($scope.post.postHeading);
-
+                        $rootScope.responseStatusHandler(resp);
+                        if (fN.calcObjectLength($scope.post) != 0) {
+                            $scope.post = $filter('makeVideoIframesResponsive')($scope.post, null);
+                            $scope.post = $filter('AddPostUrl')($scope.post, null);
+                            globals.changeDocumentTitle($scope.post.postHeading);
+                            //check that there is a post first before starting disqus and other attributes
                             $scope.showThePostOnly();
-                            updateTimeAgo();
-                            addPostUrl();
-
-                            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
-                            function preparePostContent() {
-                                $scope.post.postContent = $scope.makeVideoIframesResponsive($scope.post.postContent);
-                            }
-
-                            preparePostContent();
-
-                            //highlight the post if needed
-                            $scope.highLightPost($scope.post);
 
                             //check first that this is a production env --> showDisqus before bootstrapping disqus
                             if ($scope.showDisqus) {
@@ -273,19 +203,18 @@ angular.module('adminHomeApp')
                             }
 
                             $scope.hideThePager();
-                            $scope.finishedLoading();
 
                         } else {
                             //empty the post
                             $scope.post = {};
                             $scope.showPost = false;
                             getSuggestedPosts();
-                            $scope.goToUniversalBanner();
+                            $scope.goToTop();
                         }
 
                     })
                     .error(function (errResponse) {
-                        $scope.responseStatusHandler(errResponse);
+                        $rootScope.responseStatusHandler(errResponse);
                         //empty the post
                         $scope.post = {};
                         $scope.showPost = false;
@@ -294,34 +223,6 @@ angular.module('adminHomeApp')
             }
 
             getFullPost();
-
-            //=============function to update timeago on this post
-            function updateTimeAgo() {
-                if ($scope.post) {
-                    $scope.post.theTimeAgo = $filter('timeago')($scope.post.createdAt);
-
-                    //post date/time it was ordered e.g. Sun, Mar 17..
-                    $scope.post.postDate = moment($scope.post.createdAt).format("ddd, MMM D, H:mm");
-                }
-
-                if ($scope.suggestedPosts) {
-                    $scope.suggestedPosts.forEach(function (post) {
-                        post.theTimeAgo = $filter('timeago')(post.createdAt);
-
-                        //post date/time it was ordered e.g. Sun, Mar 17..
-                        post.postDate = moment(post.createdAt).format("ddd, MMM D, H:mm");
-                    });
-                }
-            }
-
-            $interval(updateTimeAgo, 120000, 0, true);
-
-            function addPostUrl() {
-                $scope.post.postUrl = 'http://www.negusmath.com/#!/post/' + $scope.post.postIndex;
-                //$scope.post.postUrl = 'http://' + $location.host() + '/#!/post/' + $scope.post.postIndex;
-            }
-
-            //==============end of update time ago
 
             //=============editing post====================
 
@@ -332,8 +233,6 @@ angular.module('adminHomeApp')
             $scope.postBackup = $scope.post;
 
             $scope.goIntoPostEditingMode = function () {
-                //remove all the text highlights if available
-                $scope.removePostHighlights($scope.post);
                 $scope.hideThePager();
 
                 //make copy of post, useful when the user clicks cancel
@@ -420,19 +319,19 @@ angular.module('adminHomeApp')
                     if (errorPostTags == 0) {
                         if (tag.text.length < 3 && errorPostTags == 0) {
                             errorPostTags++;
-                            $scope.showToast('warning', 'Minimum allowed length for each tag is 3 characters');
+                            $rootScope.showToast('warning', 'Minimum allowed length for each tag is 3 characters');
                         }
 
                         if (tag.text.length > 30 && errorPostTags == 0) {
                             errorPostTags++;
-                            $scope.showToast('warning', 'Maximum allowed length for each tag is 30 characters');
+                            $rootScope.showToast('warning', 'Maximum allowed length for each tag is 30 characters');
                         }
                     }
                 });
 
                 if (numberOfTags > 5 && errorPostTags == 0) {
                     errorPostTags++;
-                    $scope.showToast('warning', 'Only a maximum of 5 tags are allowed per post');
+                    $rootScope.showToast('warning', 'Only a maximum of 5 tags are allowed per post');
                 }
 
                 if (errorPostTags == 0) {
@@ -448,24 +347,24 @@ angular.module('adminHomeApp')
                 //validate post heading
                 if ($scope.checkIfEditPostHeadingLessMin() && errors == 0) {
                     errors++;
-                    $scope.showToast('warning', 'The minimum required length of the heading is 10 characters');
+                    $rootScope.showToast('warning', 'The minimum required length of the heading is 10 characters');
                 }
 
                 //validatePostContent
                 if ($scope.checkIfEditPostContentIsEmpty() && errors == 0) {
                     errors++;
-                    $scope.showToast('warning', 'Please add some text to the post first');
+                    $rootScope.showToast('warning', 'Please add some text to the post first');
                 }
 
                 //validate postSummary
                 if ($scope.checkIfEditPostSummaryIsEmpty() && errors == 0) {
                     errors++;
-                    $scope.showToast('warning', 'The post summary cannot be empty');
+                    $rootScope.showToast('warning', 'The post summary cannot be empty');
                 }
 
                 if ($scope.checkEditPostSummaryMaxLength() && errors == 0) {
                     errors++;
-                    $scope.showToast('warning', 'The post summary cannot exceed 2000 characters');
+                    $rootScope.showToast('warning', 'The post summary cannot exceed 2000 characters');
                 }
 
                 //validate tags
@@ -479,10 +378,10 @@ angular.module('adminHomeApp')
                     PostService.submitPostUpdate($scope.post)
                         .success(function (resp) {
                             $scope.goIntoFullPostViewMode();
-                            $scope.responseStatusHandler(resp);
+                            $rootScope.responseStatusHandler(resp);
                         })
                         .error(function (errResponse) {
-                            $scope.responseStatusHandler(errResponse);
+                            $rootScope.responseStatusHandler(errResponse);
                         })
                 }
             };
@@ -490,7 +389,7 @@ angular.module('adminHomeApp')
             $scope.cancelPostUpdate = function () {
                 $scope.post = $scope.postBackup;
                 $scope.goIntoFullPostViewMode();
-                $scope.showToast('success', 'Update cancelled');
+                $rootScope.showToast('success', 'Update cancelled');
             };
 
             //end of editing post functions================
@@ -498,20 +397,19 @@ angular.module('adminHomeApp')
             //===============socket listeners===============
 
             $rootScope.$on('postUpdate', function (event, data) {
-                $scope.post = data.post;
-                updateTimeAgo();
+                if ($rootScope.$stateParams.postIndex == data.post.postIndex) {
+                    data.post = $filter('makeVideoIframesResponsive')(data.post, null);
+                    $scope.post = data.post;
+                }
             });
 
             $rootScope.$on('reconnect', function () {
                 //only update the post variable if the user is not editing the current post
                 if (!$scope.editingMode) {
-                    if ($scope.currentState == 'post') {
+                    if ($rootScope.$state.current.name == 'post') {
                         getFullPost();
                     }
                 }
             });
-
-            $log.info('FullPostController booted successfully');
-
         }
     ]);

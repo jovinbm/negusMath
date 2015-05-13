@@ -49,7 +49,799 @@ angular.module('clientHomeApp', [
             .html5Mode(false)
             .hashPrefix('!');
     }]);
+angular.module('clientHomeApp')
+    .directive('universalBanner', ['$rootScope', function ($rootScope) {
+        return {
+            templateUrl: 'views/client/partials/smalls/universal_banner.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.universalBanner = {
+                    show: false,
+                    bannerClass: "",
+                    msg: ""
+                };
 
+                $rootScope.$on('universalBanner', function (event, banner) {
+                    $scope.universalBanner = banner;
+                });
+
+                $rootScope.$on('clearBanners', function () {
+                    $scope.universalBanner = {
+                        show: false,
+                        bannerClass: "",
+                        msg: ""
+                    };
+                })
+            }
+        }
+    }])
+    .directive('toastrDirective', ['$rootScope', function ($rootScope) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $rootScope.showToast = function (toastType, text) {
+                    switch (toastType) {
+                        case "success":
+                            toastr.clear();
+                            toastr.success(text);
+                            break;
+                        case "warning":
+                            toastr.clear();
+                            toastr.warning(text, 'Warning', {
+                                closeButton: true,
+                                tapToDismiss: true
+                            });
+                            break;
+                        case "error":
+                            toastr.clear();
+                            toastr.error(text, 'Error', {
+                                closeButton: true,
+                                tapToDismiss: true,
+                                timeOut: false
+                            });
+                            break;
+                        default:
+                            //clears current list of toasts
+                            toastr.clear();
+                    }
+                };
+
+                $rootScope.clearToasts = function () {
+                    toastr.clear();
+                };
+            }
+        }
+    }])
+    .directive('loadingBanner', ['$rootScope', function ($rootScope) {
+        var controller = ['$scope', '$rootScope', 'cfpLoadingBar', function ($scope, $rootScope, cfpLoadingBar) {
+
+            $rootScope.isLoading = false;
+            $rootScope.isLoadingPercentage = 0;
+            $rootScope.changeIsLoadingPercentage = function (num) {
+                $rootScope.isLoadingPercentage = num;
+            };
+
+            //hides or shows the loading splash screen
+            $rootScope.showHideLoadingBanner = function (bool) {
+                if (bool) {
+                    $('#loading-splash-card').removeClass('hidden');
+                    $('.hideMobileLoading').addClass('hidden-xs hidden-sm');
+                } else {
+                    $('#loading-splash-card').addClass('hidden');
+                    $('.hideMobileLoading').removeClass('hidden-xs hidden-sm');
+                }
+            };
+
+            $rootScope.$on('cfpLoadingBar:loading', function (event, resp) {
+                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.$on('cfpLoadingBar:loaded', function (event, resp) {
+                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.$on('cfpLoadingBar:completed', function (event, resp) {
+                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.isLoadingTrue = function () {
+                $rootScope.isLoading = true;
+            };
+            $rootScope.isLoadingFalse = function () {
+                $rootScope.isLoading = false;
+            };
+
+            $rootScope.$on('isLoadingTrue', function () {
+                $rootScope.isLoading = true;
+            });
+
+            $rootScope.$on('isLoadingFalse', function () {
+                $rootScope.isLoading = false;
+            });
+        }];
+
+        return {
+            templateUrl: 'views/client/partials/smalls/loading_banner.html',
+            restrict: 'AE',
+            controller: controller
+        }
+    }]);
+angular.module('clientHomeApp')
+    .directive('titleDirective', ['globals', function (globals) {
+        return {
+            template: '<title ng-bind="defaultTitle">' + '</title>',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.defaultTitle = globals.getDocumentTitle();
+                $scope.$watch(globals.getDocumentTitle, function () {
+                    $scope.defaultTitle = globals.getDocumentTitle();
+                });
+            }
+        }
+    }])
+    .directive('universalSearchBox', ['$window', '$location', '$rootScope', 'globals', function ($window, $location, $rootScope, globals) {
+        return {
+            templateUrl: 'views/client/partials/smalls/universal_search_box.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.mainSearchModel = {
+                    queryString: "",
+                    postSearchUniqueCuid: "",
+                    requestedPage: 1
+                };
+
+                $scope.fillSearchBox = function () {
+                    //check latest state
+                    if ($rootScope.$state.current.name == 'search') {
+                        $scope.mainSearchModel.queryString = $rootScope.$stateParams.queryString ? $rootScope.$stateParams.queryString : "";
+                    } else if ($rootScope.stateHistory.length > 0) {
+                        if ($rootScope.stateHistory[$rootScope.stateHistory.length - 1].hasOwnProperty('search')) {
+                            //checking the previous state
+                            $scope.mainSearchModel.queryString = $rootScope.stateHistory[$rootScope.stateHistory.length - 1]['search'].queryString
+                        } else {
+                            $scope.mainSearchModel.queryString = "";
+                        }
+                    } else {
+                        $scope.mainSearchModel.queryString = "";
+                    }
+                };
+
+                $scope.fillSearchBox();
+
+                $scope.performMainSearch = function () {
+                    if ($scope.mainSearchModel.queryString.length > 0) {
+                        if ($location.port()) {
+                            $window.location.href = "http://" + $location.host() + ":" + $location.port() + "/#!/search/" + $scope.mainSearchModel.queryString + "/1";
+                        } else {
+                            $window.location.href = "http://" + $location.host() + "/#!/search/" + $scope.mainSearchModel.queryString + "/1";
+                        }
+                    }
+                };
+            }
+        }
+    }])
+    .directive('topNav', ['$window', '$location', '$rootScope', 'logoutService', function ($window, $location, $rootScope, logoutService) {
+        return {
+
+            templateUrl: 'views/client/partials/views/top_nav.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+
+                $scope.goToLandingPage = function () {
+                    $window.location.href = 'index';
+                };
+
+                $scope.logoutClient = function () {
+                    logoutService.logoutClient()
+                        .success(function (resp) {
+                            $rootScope.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.responseStatusHandler(errResponse);
+                        });
+                };
+            }
+        }
+    }])
+    .directive('pagerDirective', ['$window', '$location', '$rootScope', 'globals', function ($window, $location, $rootScope, globals) {
+        return {
+
+            templateUrl: 'views/client/partials/smalls/pager.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.showPaging = false;
+                $rootScope.showThePager = function () {
+                    $scope.showPaging = true;
+                };
+                $rootScope.hideThePager = function () {
+                    $scope.showPaging = false;
+                };
+                $scope.pagingMaxSize = 5;
+                $scope.numPages = 5;
+                $scope.itemsPerPage = 10;
+                $scope.pagingTotalCount = 1;
+                $rootScope.changePagingTotalCount = function (newTotalCount) {
+                    $scope.pagingTotalCount = newTotalCount;
+                };
+
+                $scope.currentPage = $rootScope.$stateParams.pageNumber;
+                $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+                    //refresh the currentPage if the user is going to a new state
+                    if (fromState.name != toState.name) {
+                        $scope.currentPage = $rootScope.$stateParams.pageNumber;
+                        $scope.pagingTotalCount = 1
+                    }
+                });
+
+                $scope.goToPage = function () {
+                    //go to the current state's new page
+                    $rootScope.$state.go($rootScope.$state.current.name, {pageNumber: $scope.currentPage});
+                    $scope.goToTop();
+                };
+            }
+        }
+    }]);
+angular.module('clientHomeApp')
+    .directive('postContent', ['$filter', '$rootScope', 'globals', 'PostService', function ($filter, $rootScope, globals, PostService) {
+        return {
+            templateUrl: 'views/client/partials/smalls/post_content.html',
+            scope: true,
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.postContent = $filter('highlightText')($scope.post.postContent);
+            }
+        }
+    }])
+    .directive('postSummary', ['$filter', '$rootScope', 'globals', 'PostService', function ($filter, $rootScope, globals, PostService) {
+        return {
+            templateUrl: 'views/client/partials/smalls/post_summary.html',
+            scope: true,
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.postSummary = $filter('highlightText')($scope.post.postSummary);
+            }
+        }
+    }])
+    .directive('postTags', ['$filter', '$rootScope', 'globals', 'PostService', function ($filter, $rootScope, globals, PostService) {
+        return {
+            templateUrl: 'views/client/partials/smalls/post_tags.html',
+            scope: true,
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.postTags = $scope.post.postTags;
+                $scope.postTags.forEach(function (tag) {
+                    tag.text = $filter('highlightText')(tag.text);
+                })
+            }
+        }
+    }]);
+angular.module('clientHomeApp')
+    .controller('HotController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', 'HotService', 'fN',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, HotService, fN) {
+
+            $scope.hotThisWeek = HotService.getHotThisWeek();
+
+            function getHotThisWeek() {
+                HotService.getHotThisWeekFromServer()
+                    .success(function (resp) {
+                        $scope.hotThisWeek = HotService.updateHotThisWeek(resp.hotThisWeek);
+                    })
+                    .error(function (errResp) {
+                        $scope.responseStatusHandler(errResp);
+                    });
+            }
+
+            getHotThisWeek();
+
+            //===============socket listeners===============
+
+            $rootScope.$on('reconnect', function () {
+                getHotThisWeek();
+            });
+        }
+    ]);
+angular.module('clientHomeApp')
+    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', 'logoutService', '$document', 'fN',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, logoutService, $document, fN) {
+
+            $scope.indexPageUrl = globals.allData.indexPageUrl;
+
+            //back navigation functionality
+            var history = [];
+            $rootScope.stateHistory = [];
+            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+                history.push($location.$$path);
+                //push the previous state also
+                var temp = {};
+                temp[fromState.name] = fromParams;
+                $rootScope.stateHistory.push(temp);
+            });
+            $rootScope.back = function () {
+                var prevUrl = history.length > 1 ? history.splice(-2)[0] : "/";
+                $location.path(prevUrl);
+            };
+
+            $scope.showHideLoadingBanner = function (bool) {
+                if ($rootScope.showHideLoadingBanner) {
+                    $rootScope.showHideLoadingBanner(bool);
+                }
+            };
+
+            $scope.showThePager = function (bool) {
+                if ($rootScope.showThePager) {
+                    $rootScope.showThePager(bool);
+                }
+            };
+
+            $scope.changePagingTotalCount = function (newTotalCount) {
+                if ($rootScope.changePagingTotalCount) {
+                    console.log(newTotalCount);
+                    $rootScope.changePagingTotalCount(newTotalCount);
+                }
+            };
+
+            $scope.showDisqus = $location.host().search("negusmath") !== -1;
+
+            $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+                $rootScope.clearBanners();
+                $rootScope.clearToasts();
+            });
+
+            //register error handler error handler
+            $rootScope.responseStatusHandler = function (resp) {
+                $filter('responseFilter')(resp);
+            };
+
+            $rootScope.clearBanners = function () {
+                $rootScope.$broadcast('clearBanners');
+            };
+
+            //scrolling functions
+            var duration = 0; //milliseconds
+            var offset = 40; //pixels; adjust for floating menu, context etc
+            //Scroll to #some-id with 30 px "padding"
+            //Note: Use this in a directive, not with document.getElementById
+
+            //scrolling to top
+            $scope.goToTop = function () {
+                var someElement = angular.element(document.getElementById('top'));
+                $document.scrollToElement(someElement, 80, duration);
+            };
+
+            //=====================time functions=======================
+            $scope.currentTime = "";
+
+            //set current Date
+            $scope.currentTime = moment().format("ddd, MMM D, H:mm");
+            var updateCurrentTime = function () {
+                $scope.currentTime = moment().format("ddd, MMM D, H:mm");
+            };
+            $interval(updateCurrentTime, 20000, 0, true);
+
+            //======================end time functions===================
+
+            //initial requests
+            function initialRequests() {
+                socketService.getUserData()
+                    .success(function (resp) {
+                        $scope.userData = globals.userData(resp.userData);
+                        $scope.clientIsRegistered = $scope.userData.isRegistered == 'yes';
+
+                        if ($scope.userData.isRegistered == 'yes') {
+                            //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
+                            socket.emit('joinRoom', {
+                                room: resp.userData.uniqueCuid
+                            });
+                        }
+
+                        $scope.responseStatusHandler(resp);
+                    })
+                    .error(function (errResponse) {
+                        $scope.responseStatusHandler(errResponse);
+                    });
+            }
+
+            socket.on('joined', function () {
+                console.log("JOIN SUCCESS");
+            });
+
+            initialRequests();
+
+            //===============socket listeners===============
+
+            $rootScope.$on('reconnect', function () {
+            });
+        }
+    ]);
+angular.module('clientHomeApp')
+    .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', 'fN',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, fN) {
+
+            $scope.showThePager();
+            globals.defaultDocumentTitle();
+
+            $scope.posts = PostService.getCurrentPosts();
+            $scope.postsCount = PostService.getCurrentPostsCount();
+
+            $scope.suggestedPosts = [];
+
+            //variable that determines whether to show posts/suggested posts or not
+            $scope.mainSearchResultsPosts = false;
+            $scope.showSuggestedPosts = false;
+
+            $scope.showThePostsOnly = function () {
+                $scope.showHideLoadingBanner(false);
+                $scope.mainSearchResultsPosts = true;
+                $scope.showSuggestedPosts = false;
+            };
+
+            $scope.showSuggestedPostsOnly = function () {
+                $scope.showHideLoadingBanner(false);
+                $scope.mainSearchResultsPosts = false;
+                $scope.showSuggestedPosts = true;
+            };
+
+            //function used to fill in with suggested posts in case no posts are received
+            function getSuggestedPosts() {
+                $scope.showHideLoadingBanner(true);
+                //empty the suggestedPosts
+                $scope.suggestedPosts = [];
+                PostService.getSuggestedPostsFromServer()
+                    .success(function (resp) {
+                        if ((resp.postsArray.length > 0)) {
+                            $scope.showSuggestedPostsOnly();
+                            $scope.suggestedPosts = resp.postsArray;
+                            $scope.suggestedPosts = $filter('makeVideoIframesResponsive')(null, $scope.suggestedPosts);
+                        } else {
+                            //empty the suggestedPosts
+                            $scope.suggestedPosts = [];
+                            $scope.showSuggestedPosts = false;
+                            $scope.goToTop();
+                            $scope.showHideLoadingBanner(false);
+                        }
+
+                    })
+                    .error(function (errResp) {
+                        $scope.goToTop();
+                        //empty the suggestedPosts
+                        $scope.suggestedPosts = [];
+                        $scope.showSuggestedPosts = false;
+                        $rootScope.responseStatusHandler(errResp);
+                    });
+
+                //whatever happens, hide the pager
+                $scope.hideThePager();
+            }
+
+            function getPagePosts() {
+                $scope.showHideLoadingBanner(true);
+                PostService.getPostsFromServer($rootScope.$stateParams.pageNumber)
+                    .success(function (resp) {
+                        //this function  creates a banner to notify user that there are no posts by mimicking a response and calling the response handler
+                        //used if the user is accessing a page that is beyond the number of posts
+                        if (resp.postsArray.length == 0) {
+
+                            //empty the postsArray
+                            $scope.posts = [];
+
+                            var responseMimic = {
+                                banner: true,
+                                bannerClass: 'alert alert-dismissible alert-success',
+                                msg: "No more posts to show"
+                            };
+                            $rootScope.responseStatusHandler(responseMimic);
+                            $scope.mainSearchResultsPosts = false;
+                            getSuggestedPosts();
+                            $scope.goToTop();
+                        } else {
+                            $scope.posts = PostService.updatePosts(resp.postsArray);
+                            $scope.posts = $filter('makeVideoIframesResponsive')(null, $scope.posts);
+
+                            $scope.showThePostsOnly();
+
+
+                            if (resp.postsCount) {
+                                $scope.postsCount = resp.postsCount;
+                                $scope.changePagingTotalCount($scope.postsCount);
+                            }
+                            $scope.showThePager();
+                        }
+                    })
+                    .error(function (errResp) {
+                        $rootScope.responseStatusHandler(errResp);
+                        //empty the postsArray
+                        $scope.posts = [];
+                        $scope.mainSearchResultsPosts = false;
+                        getSuggestedPosts();
+                    });
+            }
+
+            getPagePosts();
+
+            //===============socket listeners===============
+
+            $rootScope.$on('newPost', function (event, data) {
+                //newPost goes to page 1, so update only if the page is 1
+                if ($rootScope.$stateParams.pageNumber == 1) {
+                    data.post = $filter('makeVideoIframesResponsive')(data.post, null);
+                    $scope.posts.unshift(data.post);
+                }
+                if (data.postsCount) {
+                    $scope.postsCount = data.postsCount;
+                    $scope.changePagingTotalCount($scope.postsCount);
+                }
+            });
+
+            $rootScope.$on('reconnect', function () {
+                if ($rootScope.$state.current.name == 'home') {
+                    getPagePosts();
+                }
+            });
+        }
+    ])
+
+    .controller('FullPostController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams', 'fN',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams, fN) {
+            //hide paging
+            $scope.hideThePager();
+
+            $scope.postIndex = $stateParams.postIndex;
+            $scope.post = {};
+            $scope.suggestedPosts = [];
+
+            //variable that determines whether to show posts/suggested posts or not
+            $scope.showPost = false;
+            $scope.showSuggestedPosts = false;
+
+            $scope.showThePostOnly = function () {
+                $scope.showHideLoadingBanner(false);
+                $scope.showPost = true;
+                $scope.showSuggestedPosts = false;
+            };
+
+            $scope.showSuggestedPostsOnly = function () {
+                $scope.showHideLoadingBanner(false);
+                $scope.showPost = false;
+                $scope.showSuggestedPosts = true;
+            };
+
+            $scope.postIsLoaded = false;
+
+            //function used to fill in with suggested posts in case no posts are received
+            function getSuggestedPosts() {
+                $scope.showHideLoadingBanner(true);
+                //empty the suggestedPosts
+                $scope.suggestedPosts = [];
+                PostService.getSuggestedPostsFromServer()
+                    .success(function (resp) {
+                        if ((resp.postsArray.length > 0)) {
+                            $scope.showSuggestedPostsOnly();
+                            $scope.suggestedPosts = resp.postsArray;
+                            $scope.suggestedPosts = $filter('makeVideoIframesResponsive')(null, $scope.suggestedPosts);
+                        } else {
+                            //empty the suggestedPosts
+                            $scope.suggestedPosts = [];
+                            $scope.showSuggestedPosts = false;
+                            $scope.goToTop();
+                            $scope.showHideLoadingBanner(false);
+                        }
+
+                    })
+                    .error(function (errResp) {
+                        $scope.goToTop();
+                        //empty the suggestedPosts
+                        $scope.suggestedPosts = [];
+                        $scope.showSuggestedPosts = false;
+                        $rootScope.responseStatusHandler(errResp);
+                    });
+
+                //whatever happens, hide the pager
+                $scope.hideThePager();
+            }
+
+            function getFullPost() {
+                $scope.showHideLoadingBanner(true);
+                PostService.getPostFromServer($rootScope.$stateParams.postIndex)
+                    .success(function (resp) {
+                        $scope.post = resp.thePost;
+                        $rootScope.responseStatusHandler(resp);
+                        if (fN.calcObjectLength($scope.post) != 0) {
+                            $scope.post = $filter('makeVideoIframesResponsive')($scope.post, null);
+                            $scope.post = $filter('AddPostUrl')($scope.post, null);
+                            globals.changeDocumentTitle($scope.post.postHeading);
+                            //check that there is a post first before starting disqus and other attributes
+                            $scope.showThePostOnly();
+
+                            //check first that this is a production env --> showDisqus before bootstrapping disqus
+                            if ($scope.showDisqus) {
+                                $scope.postIsLoaded = true;
+                            }
+
+                            $scope.hideThePager();
+
+                        } else {
+                            //empty the post
+                            $scope.post = {};
+                            $scope.showPost = false;
+                            getSuggestedPosts();
+                            $scope.goToTop();
+                        }
+
+                    })
+                    .error(function (errResponse) {
+                        $rootScope.responseStatusHandler(errResponse);
+                        //empty the post
+                        $scope.post = {};
+                        $scope.showPost = false;
+                        getSuggestedPosts();
+                    });
+            }
+
+            getFullPost();
+
+            //===============socket listeners===============
+
+            $rootScope.$on('postUpdate', function (event, data) {
+                if ($rootScope.$stateParams.postIndex == data.post.postIndex) {
+                    data.post = $filter('makeVideoIframesResponsive')(data.post, null);
+                    $scope.post = data.post;
+                }
+            });
+
+            $rootScope.$on('reconnect', function () {
+                if ($rootScope.$state.current.name == 'post') {
+                    getFullPost();
+                }
+            });
+        }
+    ]);
+angular.module('clientHomeApp')
+    .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', 'fN',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, fN) {
+
+            $scope.showThePager();
+
+            $scope.mainSearchModel = {
+                queryString: $rootScope.$stateParams.queryString || '',
+                postSearchUniqueCuid: "",
+                requestedPage: $rootScope.$stateParams.pageNumber || 1
+            };
+
+            //change to default document title
+            globals.changeDocumentTitle($rootScope.$stateParams.queryString + " - NegusMath Search");
+
+            $scope.mainSearchResultsPosts = PostService.getCurrentPosts();
+            $scope.mainSearchResultsCount = 0;
+
+            $scope.changeCurrentPage = function (page) {
+                if (page != $rootScope.$stateParams.pageNumber) {
+                    //change page here****************************************
+                }
+            };
+
+            $scope.suggestedPosts = [];
+
+            //variable that determines whether to show posts/suggested posts or not
+            $scope.showMainSearchResults = false;
+            $scope.showSuggestedPosts = false;
+
+            $scope.showMainSearchResultsOnly = function () {
+                $scope.showHideLoadingBanner(false);
+                $scope.showMainSearchResults = true;
+                $scope.showSuggestedPosts = false;
+            };
+
+            $scope.showSuggestedPostsOnly = function () {
+                $scope.showHideLoadingBanner(false);
+                $scope.showMainSearchResults = false;
+                $scope.showSuggestedPosts = true;
+            };
+
+            //function used to fill in with suggested posts in case no posts are received
+            function getSuggestedPosts() {
+                $scope.showHideLoadingBanner(true);
+                //empty the suggestedPosts
+                $scope.suggestedPosts = [];
+                PostService.getSuggestedPostsFromServer()
+                    .success(function (resp) {
+                        if ((resp.postsArray.length > 0)) {
+                            $scope.showSuggestedPostsOnly();
+                            $scope.suggestedPosts = resp.postsArray;
+                            $scope.suggestedPosts = $scope.suggestedPosts = $filter('makeVideoIframesResponsive')(null, $scope.suggestedPosts);
+                        } else {
+                            //empty the suggestedPosts
+                            $scope.suggestedPosts = [];
+                            $scope.showSuggestedPosts = false;
+                            $scope.goToTop();
+                            $scope.showHideLoadingBanner(false);
+                        }
+
+                    })
+                    .error(function (errResp) {
+                        $scope.goToTop();
+                        $scope.showHideLoadingBanner(false);
+                        //empty the suggestedPosts
+                        $scope.suggestedPosts = [];
+                        $scope.showSuggestedPosts = false;
+                        $rootScope.responseStatusHandler(errResp);
+                    });
+
+                //whatever happens, hide the pager
+                $scope.hideThePager();
+            }
+
+            function getMainSearchResults() {
+                $scope.showHideLoadingBanner(true);
+
+                $scope.mainSearchModel = {
+                    queryString: $rootScope.$stateParams.queryString || '',
+                    postSearchUniqueCuid: "",
+                    requestedPage: $rootScope.$stateParams.pageNumber || 1
+                };
+
+                PostService.mainSearch($scope.mainSearchModel)
+                    .success(function (resp) {
+                        var theResult = resp.results;
+
+                        PostService.updateMainSearchResults(theResult);
+                        $scope.mainSearchResultsCount = theResult.totalResults;
+                        $scope.changePagingTotalCount($scope.mainSearchResultsCount);
+                        $scope.changeCurrentPage(theResult.page);
+                        $scope.mainSearchModel.postSearchUniqueCuid = theResult.searchUniqueCuid;
+
+                        //the response is the resultValue
+                        if (theResult.totalResults > 0) {
+                            $scope.mainSearchResultsPosts = theResult.postsArray;
+                            $scope.mainSearchResultsPosts = $filter('makeVideoIframesResponsive')(null, $scope.mainSearchResultsPosts);
+                            $scope.showMainSearchResultsOnly();
+
+                            var responseMimic1 = {
+                                banner: true,
+                                bannerClass: 'alert alert-dismissible alert-success',
+                                msg: "The search returned " + $scope.mainSearchResultsCount + " results"
+                            };
+                            $rootScope.responseStatusHandler(responseMimic1);
+                            $scope.showThePager();
+                        } else {
+                            //empty the postsArray
+                            $scope.mainSearchResultsPosts = [];
+                            var responseMimic2 = {
+                                banner: true,
+                                bannerClass: 'alert alert-dismissible alert-success',
+                                msg: "The search returned 0 results"
+                            };
+                            $rootScope.responseStatusHandler(responseMimic2);
+                            $scope.showMainSearchResults = false;
+                            getSuggestedPosts();
+                            $scope.goToTop();
+                        }
+                    })
+                    .error(function (errResp) {
+                        $rootScope.responseStatusHandler(errResp);
+                        //empty the postsArray
+                        $scope.mainSearchResultsPosts = [];
+                        $scope.showMainSearchResults = false;
+                        getSuggestedPosts();
+                    });
+            }
+
+            getMainSearchResults();
+
+            //this functions evaluates to true if object is not empty, useful for ng-show
+            //this function also creates a banner to notify user that there are no posts by mimicing a response and calling the response handler
+            $scope.checkIfPostsSearchResultsIsEmpty = function () {
+                return $scope.mainSearchResultsPosts.length == 0
+            };
+
+            //===============socket listeners===============
+
+            $rootScope.$on('reconnect', function () {
+                if ($rootScope.$state.current.name == 'search') {
+                    getMainSearchResults();
+                }
+            });
+        }
+    ]);
 angular.module('clientHomeApp')
     .filter("timeago", function () {
         //time: the time
@@ -106,1122 +898,244 @@ angular.module('clientHomeApp')
             }
             return (time <= local) ? span + ' ago' : 'in ' + span;
         }
-    });
-
-
-
-angular.module('clientHomeApp')
-    .controller('HotController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', 'HotService',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, HotService) {
-
-            $scope.hotThisWeek = HotService.getHotThisWeek();
-
-            function getHotThisWeek() {
-                HotService.getHotThisWeekFromServer()
-                    .success(function (resp) {
-                        $scope.hotThisWeek = HotService.updateHotThisWeek(resp.hotThisWeek);
-                        updateTimeAgo();
-                    })
-                    .error(function (errResp) {
-                        $scope.responseStatusHandler(errResp);
-                    });
-            }
-
-            getHotThisWeek();
-
-            //=============function to update timeago on all posts
-            //updates the timeago on all incoming orders using the timeago filter
-            function updateTimeAgo() {
-                $scope.hotThisWeek.forEach(function (hot) {
-                    hot.theTimeAgo = $filter('timeago')(hot.createdAt);
-
-                    //post date/time it was ordered e.g. Sun, Mar 17..
-                    hot.postDate = moment(hot.createdAt).format("ddd, MMM D, H:mm");
-                });
-            }
-
-            $interval(updateTimeAgo, 120000, 0, true);
-
-            //==============end of update time ago
-
-            updateTimeAgo();
-
-            //===============socket listeners===============
-
-            $rootScope.$on('reconnect', function () {
-                getHotThisWeek();
-            });
-
-            $log.info('HotController booted successfully');
-
+    })
+    .filter("AddTimeAgo", ['$filter', function ($filter) {
+        //takes in a post or an array of posts, and adds a timeAgo key in them
+        return function (createdAt) {
+            return $filter('timeago')(createdAt);
         }
-    ]);
-angular.module('clientHomeApp')
-    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$document', 'logoutService', 'cfpLoadingBar',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $document, logoutService, cfpLoadingBar) {
-
-            //manipulating document title
-            $scope.defaultDocumentTitle = function () {
-                document.title = "Negus Math - College Level Advanced Mathematics for Kenya Students";
-            };
-
-            $scope.changeDocumentTitle = function (newTitle) {
-                if (newTitle) {
-                    document.title = newTitle;
+    }])
+    .filter("AddPostDate", ['$filter', function () {
+        //takes in a post or an array of posts, and adds a timeAgo key in them
+        return function (createdAt) {
+            return moment(createdAt).format("ddd, MMM D, H:mm");
+        }
+    }])
+    .filter("AddPostUrl", ['$filter', function () {
+        //takes in a post or an array of posts, and adds a timeAgo key in them
+        return function (post, posts) {
+            function addUrl(post) {
+                if (post.postIndex) {
+                    post.postUrl = 'http://www.negusmath.com/#!/post/' + post.postIndex;
                 }
-            };
-
-            $scope.finishedLoading = function () {
-                $rootScope.$broadcast('finishedLoading');
-            };
-
-            //set index landing page url
-            if ($location.port()) {
-                $scope.indexPageUrl = "http://" + $location.host() + ":" + $location.port() + "/index";
-            } else {
-                $scope.indexPageUrl = "http://" + $location.host() + "/index"
+                return post;
             }
 
-            //variable to show or hide disqus if window.host contains negusmath
-            $scope.showDisqus = $location.host().search("negusmath") !== -1;
+            if (post) {
+                return addUrl(post);
+            } else if (posts) {
+                posts.forEach(function (post) {
+                    post = addUrl(post);
+                });
+                return posts;
+            }
+        }
+    }])
+    .filter("makeVideoIframesResponsive", ['$filter', function () {
+        //making embedded videos responsive
+        return function (post, posts) {
+            var theElement;
+            var imgElement;
+            var imgWrappedInDiv;
 
-            //this function returns the highlightText to the query string on the location url
-            $scope.refillHighLightText = function () {
-                if ($rootScope.$state.current.name == 'search' && $rootScope.$stateParams.queryString) {
-                    $scope.highlightText = $rootScope.$stateParams.queryString ? $rootScope.$stateParams.queryString : $scope.highlightText;
-                }
-            };
+            function makeResp(post) {
+                if (post.postSummary) {
+                    //convert the element to string
+                    theElement = $("<div>" + post.postSummary + "</div>");
 
-            $scope.refillHighLightText();
+                    //find the video iframe elements
+                    imgElement = $('img.ta-insert-video', theElement);
 
-            $scope.highlightThisText = function (textToHighlight) {
-                var theElement = $("<div>" + textToHighlight + "</div>");
-                $(theElement).highlight($scope.highlightText);
-                return theElement.html();
-            };
+                    //only perform operation if there are iframes available
+                    if (imgElement.length > 0) {
 
-            $scope.removeHighLightText = function (textString) {
-                $scope.highlightText = '';
-                var theElement = $("<div>" + textString + "</div>");
-                $(theElement).removeHighlight();
-                return theElement.html();
-            };
+                        //add class and wrap in div
+                        imgWrappedInDiv = imgElement
+                            .addClass('embed-responsive-item')
+                            .wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
 
-            $scope.highLightPost = function (postObject) {
-                if ($scope.highLightReference()) {
-                    if (postObject.authorName) {
-                        postObject.authorName = $scope.highlightThisText(postObject.authorName);
+                        //replace in original
+                        theElement.find('img').replaceWith(imgWrappedInDiv);
                     }
-                    if (postObject.postHeading) {
-                        postObject.postHeading = $scope.highlightThisText(postObject.postHeading);
-                    }
-                    if (postObject.postContent) {
-                        postObject.postContent = $scope.highlightThisText(postObject.postContent);
-                    }
-                    if (postObject.postSummary) {
-                        postObject.postSummary = $scope.highlightThisText(postObject.postSummary);
-                    }
-                    if (postObject.postTags) {
-                        postObject.postTags.forEach(function (tag) {
-                            tag.text = $scope.highlightThisText(tag.text);
-                        })
-                    }
-                }
-            };
+                    post.postSummary = theElement.html();
 
-            $scope.removePostHighlights = function (postObject) {
-                if (postObject.authorName) {
-                    postObject.authorName = $scope.removeHighLightText(postObject.authorName);
                 }
-                if (postObject.postHeading) {
-                    postObject.postHeading = $scope.removeHighLightText(postObject.postHeading);
-                }
-                if (postObject.postContent) {
-                    postObject.postContent = $scope.removeHighLightText(postObject.postContent);
-                }
-                if (postObject.postSummary) {
-                    postObject.postSummary = $scope.removeHighLightText(postObject.postSummary);
-                }
-                if (postObject.postTags) {
-                    postObject.postTags.forEach(function (tag) {
-                        tag.text = $scope.removeHighLightText(tag.text);
-                    })
-                }
-            };
+                if (post.postContent) {
+                    //convert the element to string
+                    theElement = $("<div>" + post.postContent + "</div>");
 
-            //stateChangeCounter counts the stateChanges from the previous search,
-            //when the user goes further, you will need to disable search highlight
-            //also, you can use a timer
-            $scope.stateChangeCounter = 0;
-            $scope.highLightReference = function () {
-                var queryString = $rootScope.$stateParams.queryString ? $rootScope.$stateParams.queryString : $scope.highlightText;
-                if (queryString) {
-                    //only highlight when the query string is more than 3 characters
-                    if (queryString.length > 3) {
-                        if ($rootScope.$state.current.name == 'search') {
-                            $scope.stateChangeCounter = 0;
-                            $scope.highlightText = $rootScope.$stateParams.queryString;
-                            return true;
-                        } else if ($scope.stateChangeCounter > 0) {
-                            $scope.stateChangeCounter++;
-                            return false;
-                        } else {
-                            $scope.stateChangeCounter++;
-                            return true;
+                    //find the video iframe elements
+                    imgElement = $('img.ta-insert-video', theElement);
+
+                    //only perform operation if there are iframes available
+                    if (imgElement.length > 0) {
+
+                        //add class and wrap in div
+                        imgWrappedInDiv = imgElement
+                            .addClass('embed-responsive-item')
+                            .wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
+
+                        //replace in original
+                        theElement.find('img').replaceWith(imgWrappedInDiv);
+                    }
+                    post.postContent = theElement.html();
+                }
+                return post;
+            }
+
+            if (post) {
+                return makeResp(post)
+            } else if (posts) {
+                posts.forEach(function (post) {
+                    post = makeResp(post);
+                });
+                return posts;
+            }
+        }
+    }])
+    .filter("highlightText", ['$filter', '$rootScope', function ($filter, $rootScope) {
+        //making embedded videos responsive
+        return function (theElementString) {
+
+            //text is highlighted only if the present or previous state was search
+            //this fn checks if the present or previous state was search, and returns an object with status false if not
+            //if true, the returned object carries the queryString with it
+            function checkSearchState() {
+                //check latest state
+                if ($rootScope.$state.current.name == 'search') {
+                    return {
+                        status: true,
+                        queryString: $rootScope.$stateParams.queryString || ""
+                    }
+                } else if ($rootScope.stateHistory.length > 0) {
+                    if ($rootScope.stateHistory[$rootScope.stateHistory.length - 1].hasOwnProperty('search')) {
+                        //checking the previous state
+                        return {
+                            status: true,
+                            queryString: $rootScope.stateHistory[$rootScope.stateHistory.length - 1]['search'].queryString
                         }
                     } else {
-                        return false;
+                        return {
+                            status: false
+                        }
                     }
                 } else {
-                    return false;
-                }
-            };
-
-            //listens for state changes, used to activate active states
-            $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-                //clear all banners
-                $scope.clearBanners();
-
-                //clear all toasts
-                $scope.clearToasts();
-            });
-
-            //listens for state changes
-            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
-                $scope.currentState = toState.name;
-            });
-
-            //listens for a finished loading event changes
-            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
-                $scope.currentState = toState.name;
-                $scope.refillHighLightText();
-                $scope.fillSearchBox();
-            });
-
-            //back functionality
-            var history = [];
-            $rootScope.$on('$stateChangeSuccess', function () {
-                history.push($location.$$path);
-            });
-            $rootScope.back = function () {
-                var prevUrl = history.length > 1 ? history.splice(-2)[0] : "/";
-                $location.path(prevUrl);
-            };
-
-            //length of an object
-
-            $scope.calcObjectLength = function (obj) {
-                var len = 0;
-                for (var prop in obj) {
-                    if (obj.hasOwnProperty(prop)) {
-                        len++;
+                    return {
+                        status: false
                     }
                 }
-                return len
-            };
+            }
 
-            //end of object lengths
-
-            //scrolling functions
-            var duration = 0; //milliseconds
-            var offset = 40; //pixels; adjust for floating menu, context etc
-            //Scroll to #some-id with 30 px "padding"
-            //Note: Use this in a directive, not with document.getElementById
-
-            //scrolling to top
-            $scope.goToTop = function () {
-                var someElement = angular.element(document.getElementById('top'));
-                $document.scrollToElement(someElement, 80, duration);
-            };
-
-            //scrolling to universal banner
-            $scope.goToUniversalBanner = function () {
-                var someElement = angular.element(document.getElementById('universalBanner'));
-                $document.scrollToElement(someElement, 80, duration);
-            };
-
-            //making videos responsive
-            $scope.makeVideoIframesResponsive = function (theElementString) {
-                //convert the element to string
-                var theElement = $("<div>" + theElementString + "</div>");
-
-                //find the video iframe elements
-                var imgElement = $('img.ta-insert-video', theElement);
-
-                //only perform operation if there are iframes available
-                if (imgElement.length > 0) {
-
-                    //add class and wrap in div
-                    var imgWrappedInDiv = imgElement
-                        .addClass('embed-responsive-item')
-                        .wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
-
-                    //replace in original
-                    theElement.find('img').replaceWith(imgWrappedInDiv);
+            function highLightThisText(textToHighlight) {
+                var finalString = textToHighlight;
+                var highlightDetails = checkSearchState();
+                if (highlightDetails.status === true) {
+                    //highlight
+                    var theElement = $("<div>" + textToHighlight + "</div>");
+                    $(theElement).highlight(highlightDetails.queryString);
+                    finalString = theElement.html();
+                } else {
+                    //remove highlight
+                    var theElement2 = $("<div>" + textToHighlight + "</div>");
+                    $(theElement2).removeHighlight();
+                    finalString = theElement2.html();
                 }
+                return finalString;
+            }
 
-                return theElement.html();
+            return highLightThisText(theElementString);
 
-            };
+        }
+    }])
+    .filter("responseFilter", ['$q', '$filter', '$log', '$interval', '$window', '$location', '$rootScope', 'globals', function ($q, $filter, $log, $interval, $window, $location, $rootScope, globals) {
+        //making embedded videos responsive
+        return function (resp) {
 
-            //===============request error handler===============
+            function makeBanner(show, bannerClass, msg) {
+                return {
+                    show: show ? true : false,
+                    bannerClass: bannerClass,
+                    msg: msg
+                }
+            }
 
-            //universalDisable variable is used to disable everything crucial in case an error
-            //occurs.This is sometimes needed if a reload did not work
-            $scope.universalDisable = false;
-
-            //universal banner
-            $scope.showBanner = false;
-            $scope.bannerClass = "";
-            $scope.bannerMessage = "";
-
-            //registration banner
-            $scope.showRegistrationBanner = false;
-            $scope.registrationBannerClass = "";
-            $scope.registrationBannerMessage = "";
-
-            //new post banner
-            $scope.showNewPostBanner = false;
-            $scope.newPostBannerClass = "";
-            $scope.newPostBannerMessage = "";
-
-            $scope.clearBanners = function () {
-                $scope.showBanner = false;
-                $scope.showRegistrationBanner = false;
-                $scope.showNewPostBanner = false;
-            };
-
-            $scope.universalDisableTrue = function () {
-                $scope.universalDisable = true;
-            };
-            $scope.universalDisableFalse = function () {
-                $scope.universalDisable = false;
-            };
-
-            $scope.responseStatusHandler = function (resp) {
-                if (resp) {
+            if (resp) {
+                if (resp.redirect) {
                     if (resp.redirect) {
-                        if (resp.redirect) {
-                            $window.location.href = resp.redirectPage;
-                        }
+                        $window.location.href = resp.redirectPage;
                     }
-                    if (resp.disable) {
-                        if (resp.disable) {
-                            $scope.universalDisableTrue();
-                        }
-                    }
-                    if (resp.notify) {
-                        if (resp.type && resp.msg) {
-                            $scope.showToast(resp.type, resp.msg);
-                        }
-                    }
-                    if (resp.banner) {
-                        if (resp.bannerClass && resp.msg) {
-                            $scope.showBanner = true;
-                            $scope.bannerClass = resp.bannerClass;
-                            $scope.bannerMessage = resp.msg;
-                        }
-                    }
-                    if (resp.newPostBanner) {
-                        if (resp.bannerClass && resp.msg) {
-                            $scope.showNewPostBanner = true;
-                            $scope.newPostBannerClass = resp.bannerClass;
-                            $scope.newPostBannerMessage = resp.msg;
-                        }
-                    }
-                    if (resp.registrationBanner) {
-                        if (resp.bannerClass && resp.msg) {
-                            $scope.showRegistrationBanner = true;
-                            $scope.registrationBannerClass = resp.bannerClass;
-                            $scope.registrationBannerMessage = resp.msg;
-                        }
-                    }
-                    if (resp.reason) {
-                        $log.warn(resp.reason);
-                    }
-                } else {
-                    //do nothing
                 }
-            };
-
-            $rootScope.$on('responseStatusHandler', function (event, resp) {
-                $scope.responseStatusHandler(resp);
-            });
-
-
-            //===============end of request error handler===============
-
-
-            //===============isLoading functions to disable elements while content is loading or processing===============
-            $scope.isLoading = false;
-            $scope.isLoadingPercentage = 0;
-            $scope.changeIsLoadingPercentage = function (num) {
-                $scope.isLoadingPercentage = num;
-            };
-
-            //hides or shows the loading splash screen
-            $scope.showHideLoadingBanner = function (bool) {
-                $scope.showHideLoadingBanner = function (bool) {
-                    if (bool) {
-                        $('#loading-splash-card').removeClass('hidden');
-                        $('.hideMobileLoading').addClass('hidden-xs hidden-sm');
-                    } else {
-                        $('#loading-splash-card').addClass('hidden');
-                        $('.hideMobileLoading').removeClass('hidden-xs hidden-sm');
+                if (resp.notify) {
+                    if (resp.type && resp.msg) {
+                        $rootScope.showToast(resp.type, resp.msg);
                     }
-                };
-            };
-
-            $rootScope.$on('cfpLoadingBar:loading', function (event, resp) {
-                $scope.isLoadingPercentage = cfpLoadingBar.status() * 100
-            });
-
-            $rootScope.$on('cfpLoadingBar:loaded', function (event, resp) {
-                $scope.isLoadingPercentage = cfpLoadingBar.status() * 100
-            });
-
-            $rootScope.$on('cfpLoadingBar:completed', function (event, resp) {
-                $scope.isLoadingPercentage = cfpLoadingBar.status() * 100
-            });
-
-            $scope.isLoadingTrue = function () {
-                $scope.isLoading = true;
-            };
-            $scope.isLoadingFalse = function () {
-                $scope.isLoading = false;
-            };
-
-            $rootScope.$on('isLoadingTrue', function () {
-                $scope.isLoading = true;
-            });
-
-            $rootScope.$on('isLoadingFalse', function () {
-                $scope.isLoading = false;
-            });
-
-            //===============end of isLoading functions===============
-
-            //===============toastr show functions===============
-
-            $scope.clearToasts = function () {
-                toastr.clear();
-            };
-
-            $scope.showToast = function (toastType, text) {
-                switch (toastType) {
-                    case "success":
-                        toastr.clear();
-                        toastr.success(text);
-                        break;
-                    case "warning":
-                        toastr.clear();
-                        toastr.warning(text, 'Warning', {
-                            closeButton: true,
-                            tapToDismiss: true
-                        });
-                        break;
-                    case "error":
-                        toastr.clear();
-                        toastr.error(text, 'Error', {
-                            closeButton: true,
-                            tapToDismiss: true,
-                            timeOut: false
-                        });
-                        break;
-                    default:
-                        //clears current list of toasts
-                        toastr.clear();
                 }
-            };
-
-            $rootScope.$on('showToast', function (event, data) {
-                var toastType = data.toastType;
-                var text = data.text;
-
-                $scope.showToast(toastType, text);
-            });
-
-            //===============end of toastr show functions===============
-
-            //************time functions****************
-            $scope.currentTime = "";
-
-            //set current Date
-            $scope.currentTime = moment().format("ddd, MMM D, H:mm");
-            var updateCurrentTime = function () {
-                $scope.currentTime = moment().format("ddd, MMM D, H:mm");
-            };
-            $interval(updateCurrentTime, 20000, 0, true);
-
-            //***************end time functions***********************
-
-            //initial requests
-            function initialRequests() {
-                socketService.getUserData()
-                    .success(function (resp) {
-                        $scope.userData = globals.userData(resp.userData);
-                        if ($scope.userData.isRegistered == 'yes') {
-                            $scope.clientIsRegistered = true;
-                        } else {
-                            $scope.clientIsRegistered = false;
-                        }
-
-                        if ($scope.userData.isRegistered == 'yes') {
-                            //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
-                            socket.emit('joinRoom', {
-                                room: resp.userData.uniqueCuid
-                            });
-                        }
-
-                        $scope.responseStatusHandler(resp);
-                    })
-                    .error(function (errResponse) {
-                        $scope.responseStatusHandler(errResponse);
-                    });
+                if (resp.banner) {
+                    if (resp.bannerClass && resp.msg) {
+                        $rootScope.$broadcast('universalBanner', makeBanner(true, resp.bannerClass, resp.msg));
+                    }
+                }
+                if (resp.newPostBanner) {
+                    if (resp.bannerClass && resp.msg) {
+                        $rootScope.$broadcast('newPostBanner', makeBanner(true, resp.bannerClass, resp.msg));
+                    }
+                }
+                if (resp.registrationBanner) {
+                    if (resp.bannerClass && resp.msg) {
+                        $rootScope.$broadcast('registrationBanner', makeBanner(true, resp.bannerClass, resp.msg));
+                    }
+                }
+                if (resp.reason) {
+                    $log.warn(resp.reason);
+                }
+            } else {
+                //do nothing
             }
 
-            socket.on('joined', function () {
-                console.log("JOIN SUCCESS");
-            });
-
-            initialRequests();
-
-
-            //function to go to landing page
-            $scope.goToLandingPage = function () {
-                $window.location.href = 'index';
-            };
-
-
-            //search functionality
-            $scope.mainSearchModel = {
-                queryString: "",
-                postSearchUniqueCuid: "",
-                requestedPage: 1
-            };
-
-            //put the query string in the search box
-            $scope.fillSearchBox = function () {
-                if ($rootScope.$state.current.name == 'search' && $rootScope.$stateParams.queryString) {
-                    $scope.mainSearchModel.queryString = $rootScope.$stateParams.queryString ? $rootScope.$stateParams.queryString : $scope.highlightText;
-                } else {
-                    $scope.mainSearchModel.queryString = '';
-                }
-            };
-
-            $scope.fillSearchBox();
-
-
-            $scope.performMainSearch = function () {
-                if ($scope.mainSearchModel.queryString.length > 0) {
-                    if ($location.port()) {
-                        $window.location.href = "http://" + $location.host() + ":" + $location.port() + "/#!/search/" + $scope.mainSearchModel.queryString + "/1";
-                    } else {
-                        $window.location.href = "http://" + $location.host() + "/#!/search/" + $scope.mainSearchModel.queryString + "/1";
-                    }
-                }
-            };
-
-            //==================================================paging controllers for posts
-            $scope.showPaging = false;
-            $scope.showThePager = function () {
-                $scope.showPaging = true;
-            };
-            $scope.hideThePager = function () {
-                $scope.showPaging = false;
-            };
-            $scope.pagingMaxSize = 5;
-            $scope.numPages = 5;
-            $scope.itemsPerPage = 10;
-            $scope.pagingTotalCount = 1;
-            $scope.changePagingTotalCount = function (newTotalCount) {
-                $scope.pagingTotalCount = newTotalCount;
-            };
-
-            $scope.currentPage = $rootScope.$stateParams.pageNumber;
-            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
-                //refresh the currentPage if the user is going to a new state
-                if (fromState.name != toState.name) {
-                    $scope.currentPage = $rootScope.$stateParams.pageNumber;
-                    $scope.pagingTotalCount = 1
-                }
-            });
-
-            $scope.goToPage = function () {
-                //go to the current state's new page
-                $rootScope.$state.go($rootScope.$state.current.name, {pageNumber: $scope.currentPage});
-                $scope.goToTop();
-            };
-            //=======================================================end of post paging controllers
-
-            //===============logout functions===============
-            $scope.logoutClient = function () {
-                logoutService.logoutClient()
-                    .success(function (resp) {
-                        $scope.responseStatusHandler(resp);
-                    })
-                    .error(function (errResponse) {
-                        $scope.responseStatusHandler(errResponse);
-                    });
-            };
-
-            //=============end of logout===================
-
-            //===============socket listeners===============
-
-            $rootScope.$on('reconnect', function () {
-            });
-
-            $log.info('MainController booted successfully');
-
+            return true;
         }
-    ]);
-angular.module('clientHomeApp')
-    .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
+    }]);
 
-            //show paging
-            $scope.showThePager();
 
-            //change to default document title
-            $scope.defaultDocumentTitle();
 
-            $scope.posts = PostService.getCurrentPosts();
-            $scope.postsCount = PostService.getCurrentPostsCount();
-
-            $scope.suggestedPosts = [];
-
-            //variable that determines whether to show posts/suggested posts or not
-            $scope.mainSearchResultsPosts = false;
-            $scope.showSuggestedPosts = false;
-
-            $scope.showThePostsOnly = function () {
-                $scope.showHideLoadingBanner(false);
-                $scope.mainSearchResultsPosts = true;
-                $scope.showSuggestedPosts = false;
-            };
-
-            $scope.showSuggestedPostsOnly = function () {
-                $scope.showHideLoadingBanner(false);
-                $scope.mainSearchResultsPosts = false;
-                $scope.showSuggestedPosts = true;
-            };
-
-            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
-            function preparePostSummaryContent() {
-                $scope.posts.forEach(function (post) {
-                    post.postSummary = $scope.makeVideoIframesResponsive(post.postSummary);
-                });
-            }
-
-            //function used to fill in with suggested posts in case no posts are received
-            function getSuggestedPosts() {
-                $scope.showHideLoadingBanner(true);
-                //empty the suggestedPosts
-                $scope.suggestedPosts = [];
-                PostService.getSuggestedPostsFromServer()
-                    .success(function (resp) {
-                        if ((resp.postsArray.length > 0)) {
-                            $scope.showSuggestedPostsOnly();
-                            $scope.suggestedPosts = resp.postsArray;
-                            updateTimeAgo();
-
-                            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
-                            function prepareSuggestedPostsSummaryContent() {
-                                $scope.suggestedPosts.forEach(function (post) {
-                                    post.postSummary = $scope.makeVideoIframesResponsive(post.postSummary);
-                                });
-                            }
-
-                            prepareSuggestedPostsSummaryContent();
-                            $scope.finishedLoading();
-                        } else {
-                            //empty the suggestedPosts
-                            $scope.suggestedPosts = [];
-                            $scope.showSuggestedPosts = false;
-                            $scope.goToUniversalBanner();
-                            $scope.showHideLoadingBanner(false);
-                        }
-
-                    })
-                    .error(function (errResp) {
-                        $scope.goToUniversalBanner();
-                        $scope.showHideLoadingBanner(false);
-                        //empty the suggestedPosts
-                        $scope.suggestedPosts = [];
-                        $scope.showSuggestedPosts = false;
-                        $scope.responseStatusHandler(errResp);
-                    });
-
-                //whatever happens, hide the pager
-                $scope.hideThePager();
-            }
-
-            function getPagePosts() {
-                $scope.showHideLoadingBanner(true);
-                PostService.getPostsFromServer($rootScope.$stateParams.pageNumber)
-                    .success(function (resp) {
-                        //this function  creates a banner to notify user that there are no posts by mimicking a response and calling the response handler
-                        //used if the user is accessing a page that is beyond the number of posts
-                        if (resp.postsArray.length == 0) {
-
-                            //empty the postsArray
-                            $scope.posts = [];
-
-                            var responseMimic = {
-                                banner: true,
-                                bannerClass: 'alert alert-dismissible alert-success',
-                                msg: "No posts available for this page"
-                            };
-                            $scope.responseStatusHandler(responseMimic);
-                            $scope.mainSearchResultsPosts = false;
-                            getSuggestedPosts();
-                            $scope.goToUniversalBanner();
-                        } else {
-                            $scope.posts = PostService.updatePosts(resp.postsArray);
-                            $scope.showThePostsOnly();
-                            updateTimeAgo();
-                            if (resp.postsCount) {
-                                $scope.postsCount = resp.postsCount;
-                                $scope.changePagingTotalCount($scope.postsCount);
-                            }
-                            //parse the posts and prepare them, eg, making iframes responsive
-                            preparePostSummaryContent();
-                            $scope.showThePager();
-                            $scope.finishedLoading();
-                        }
-                    })
-                    .error(function (errResp) {
-                        $scope.responseStatusHandler(errResp);
-                        //empty the postsArray
-                        $scope.posts = [];
-                        $scope.mainSearchResultsPosts = false;
-                        getSuggestedPosts();
-                    });
-            }
-
-            getPagePosts();
-
-            //this functions evaluates to true if object is not empty, useful for ng-show
-            //this function also creates a banner to notify user that there are no posts by mimicing a response and calling the response handler
-            $scope.checkIfPostsIsEmpty = function () {
-                return $scope.posts.length == 0
-            };
-
-            //=============function to update timeago on all posts
-            //updates the timeago on all incoming orders using the timeago filter
-            function updateTimeAgo() {
-                $scope.posts.forEach(function (post) {
-                    post.theTimeAgo = $filter('timeago')(post.createdAt);
-
-                    //post date/time it was ordered e.g. Sun, Mar 17..
-                    post.postDate = moment(post.createdAt).format("ddd, MMM D, H:mm");
-                });
-            }
-
-            $interval(updateTimeAgo, 120000, 0, true);
-
-            //==============end of update time ago
-
-            updateTimeAgo();
-
-            //===============socket listeners===============
-
-            $rootScope.$on('newPost', function (event, data) {
-                //newPost goes to page 1, so update only if the page is 1
-                if ($rootScope.$stateParams.pageNumber == 1) {
-                    $scope.posts.unshift(data.post);
-                    updateTimeAgo();
-                    preparePostSummaryContent();
-                }
-                if (data.postsCount) {
-                    $scope.postsCount = data.postsCount;
-                    $scope.changePagingTotalCount($scope.postsCount);
-                }
-            });
-
-            $rootScope.$on('reconnect', function () {
-                if ($scope.currentState == 'home') {
-                    getPagePosts();
-                }
-            });
-
-            $log.info('PostController booted successfully');
-
-        }
-    ])
-
-    .controller('FullPostController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams) {
-
-            //hide paging
-            $scope.hideThePager();
-
-            $scope.postIndex = $stateParams.postIndex;
-            $scope.post = {};
-            $scope.suggestedPosts = [];
-
-            //variable that determines whether to show posts/suggested posts or not
-            $scope.showPost = false;
-            $scope.showSuggestedPosts = false;
-
-            $scope.showThePostOnly = function () {
-                $scope.showHideLoadingBanner(false);
-                $scope.showPost = true;
-                $scope.showSuggestedPosts = false;
-            };
-
-            $scope.showSuggestedPostsOnly = function () {
-                $scope.showHideLoadingBanner(false);
-                $scope.showPost = false;
-                $scope.showSuggestedPosts = true;
-            };
-
-            $scope.postIsLoaded = false;
-
-            //function used to fill in with suggested posts in case no posts are received
-            function getSuggestedPosts() {
-                $scope.showHideLoadingBanner(true);
-                //empty the suggestedPosts
-                $scope.suggestedPosts = [];
-                PostService.getSuggestedPostsFromServer()
-                    .success(function (resp) {
-                        if ((resp.postsArray.length > 0)) {
-                            $scope.showSuggestedPostsOnly();
-                            $scope.suggestedPosts = resp.postsArray;
-                            updateTimeAgo();
-
-                            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
-                            function prepareSuggestedPostsSummaryContent() {
-                                $scope.suggestedPosts.forEach(function (post) {
-                                    post.postSummary = $scope.makeVideoIframesResponsive(post.postSummary);
-                                });
-                            }
-
-                            prepareSuggestedPostsSummaryContent();
-                            $scope.finishedLoading();
-                        } else {
-                            //empty the suggestedPosts
-                            $scope.suggestedPosts = [];
-                            $scope.showSuggestedPosts = false;
-                            $scope.goToUniversalBanner();
-                            $scope.showHideLoadingBanner(false);
-                        }
-
-                    })
-                    .error(function (errResp) {
-                        $scope.goToUniversalBanner();
-                        $scope.showHideLoadingBanner(false);
-                        //empty the suggestedPosts
-                        $scope.suggestedPosts = [];
-                        $scope.showSuggestedPosts = false;
-                        $scope.responseStatusHandler(errResp);
-                    });
-
-                //whatever happens, hide the pager
-                $scope.hideThePager();
-            }
-
-            function getFullPost() {
-                $scope.showHideLoadingBanner(true);
-                PostService.getPostFromServer($scope.postIndex)
-                    .success(function (resp) {
-                        $scope.post = resp.thePost;
-                        $scope.responseStatusHandler(resp);
-                        //check that there is a post first before starting disqus and other attributes
-                        if ($scope.calcObjectLength($scope.post) != 0) {
-
-                            //change the document title
-                            $scope.changeDocumentTitle($scope.post.postHeading);
-
-                            $scope.showThePostOnly();
-                            updateTimeAgo();
-                            addPostUrl();
-
-                            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
-                            function preparePostContent() {
-                                $scope.post.postContent = $scope.makeVideoIframesResponsive($scope.post.postContent);
-                            }
-
-                            preparePostContent();
-
-                            //highlight the post if needed
-                            $scope.highLightPost($scope.post);
-
-                            //check first that this is a production env --> showDisqus before bootstrapping disqus
-                            if ($scope.showDisqus) {
-                                $scope.postIsLoaded = true;
-                            }
-
-                            $scope.hideThePager();
-                            $scope.finishedLoading();
-
-                        } else {
-                            //empty the post
-                            $scope.post = {};
-                            $scope.showPost = false;
-                            getSuggestedPosts();
-                            $scope.goToUniversalBanner();
-                        }
-
-                    })
-                    .error(function (errResponse) {
-                        $scope.responseStatusHandler(errResponse);
-                        //empty the post
-                        $scope.post = {};
-                        $scope.showPost = false;
-                        getSuggestedPosts();
-                    });
-            }
-
-            getFullPost();
-
-            //=============function to update timeago on this post
-            function updateTimeAgo() {
-                if ($scope.post) {
-                    $scope.post.theTimeAgo = $filter('timeago')($scope.post.createdAt);
-
-                    //post date/time it was ordered e.g. Sun, Mar 17..
-                    $scope.post.postDate = moment($scope.post.createdAt).format("ddd, MMM D, H:mm");
-                }
-
-                if ($scope.suggestedPosts) {
-                    $scope.suggestedPosts.forEach(function (post) {
-                        post.theTimeAgo = $filter('timeago')(post.createdAt);
-
-                        //post date/time it was ordered e.g. Sun, Mar 17..
-                        post.postDate = moment(post.createdAt).format("ddd, MMM D, H:mm");
-                    });
-                }
-            }
-
-            $interval(updateTimeAgo, 120000, 0, true);
-
-            function addPostUrl() {
-                //$scope.post.postUrl = 'http://' + $location.host() + '/#!/post/' + $scope.post.postIndex;
-                $scope.post.postUrl = 'http://www.negusmath.com/#!/post/' + $scope.post.postIndex;
-            }
-
-            //==============end of update time ago
-
-            //===============socket listeners===============
-
-            $rootScope.$on('postUpdate', function (event, data) {
-                $scope.post = data.post;
-                updateTimeAgo();
-            });
-
-            $rootScope.$on('reconnect', function () {
-                //only update the post variable if the user is not editing the current post
-                //the $scope.currentState is defined in main controller
-                if (!$scope.editingMode && $scope.currentState == 'post') {
-                    getFullPost();
-                }
-            });
-
-            $log.info('FullPostController booted successfully');
-
-        }
-    ]);
-angular.module('clientHomeApp')
-    .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
-
-            //show paging
-            $scope.showThePager();
-
-            $scope.mainSearchModel = {
-                queryString: $rootScope.$stateParams.queryString || '',
-                postSearchUniqueCuid: "",
-                requestedPage: $rootScope.$stateParams.pageNumber || 1
-            };
-
-            //change to default document title
-            $scope.changeDocumentTitle($rootScope.$stateParams.queryString + " - NegusMath Search");
-
-            $scope.mainSearchResultsPosts = PostService.getCurrentPosts();
-            $scope.mainSearchResultsCount = 0;
-
-            $scope.changeCurrentPage = function (page) {
-                if (page != $rootScope.$stateParams.pageNumber) {
-                    //change page here******************************
-                }
-            };
-
-            $scope.suggestedPosts = [];
-
-            //variable that determines whether to show posts/suggested posts or not
-            $scope.showMainSearchResults = false;
-            $scope.showSuggestedPosts = false;
-
-            $scope.showMainSearchResultsOnly = function () {
-                $scope.showHideLoadingBanner(false);
-                $scope.showMainSearchResults = true;
-                $scope.showSuggestedPosts = false;
-            };
-
-            $scope.showSuggestedPostsOnly = function () {
-                $scope.showHideLoadingBanner(false);
-                $scope.showMainSearchResults = false;
-                $scope.showSuggestedPosts = true;
-            };
-
-            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
-            function preparePostSummaryContent() {
-                $scope.mainSearchResultsPosts.forEach(function (post) {
-                    post.postSummary = $scope.makeVideoIframesResponsive(post.postSummary);
-                });
-            }
-
-            //function used to fill in with suggested posts in case no posts are received
-            function getSuggestedPosts() {
-                $scope.showHideLoadingBanner(true);
-                //empty the suggestedPosts
-                $scope.suggestedPosts = [];
-                PostService.getSuggestedPostsFromServer()
-                    .success(function (resp) {
-                        if ((resp.postsArray.length > 0)) {
-                            $scope.showSuggestedPostsOnly();
-                            $scope.suggestedPosts = resp.postsArray;
-                            updateTimeAgo();
-
-                            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
-                            function prepareSuggestedPostsSummaryContent() {
-                                $scope.suggestedPosts.forEach(function (post) {
-                                    post.postSummary = $scope.makeVideoIframesResponsive(post.postSummary);
-                                });
-                            }
-
-                            prepareSuggestedPostsSummaryContent();
-                            $scope.finishedLoading();
-                        } else {
-                            //empty the suggestedPosts
-                            $scope.suggestedPosts = [];
-                            $scope.showSuggestedPosts = false;
-                            $scope.goToUniversalBanner();
-                            $scope.showHideLoadingBanner(false);
-                        }
-
-                    })
-                    .error(function (errResp) {
-                        $scope.goToUniversalBanner();
-                        $scope.showHideLoadingBanner(false);
-                        //empty the suggestedPosts
-                        $scope.suggestedPosts = [];
-                        $scope.showSuggestedPosts = false;
-                        $scope.responseStatusHandler(errResp);
-                    });
-
-                //whatever happens, hide the pager
-                $scope.hideThePager();
-            }
-
-            function getMainSearchResults() {
-                $scope.showHideLoadingBanner(true);
-
-                $scope.mainSearchModel = {
-                    queryString: $rootScope.$stateParams.queryString || '',
-                    postSearchUniqueCuid: "",
-                    requestedPage: $rootScope.$stateParams.pageNumber || 1
-                };
-
-                PostService.mainSearch($scope.mainSearchModel)
-                    .success(function (resp) {
-                        var theResult = resp.results;
-
-                        PostService.updateMainSearchResults(theResult);
-                        $scope.mainSearchResultsCount = theResult.totalResults;
-                        //change paging total count
-                        $scope.changePagingTotalCount($scope.mainSearchResultsCount);
-
-                        $scope.changeCurrentPage(theResult.page);
-                        $scope.mainSearchModel.postSearchUniqueCuid = theResult.searchUniqueCuid;
-
-                        //the response is the resultValue
-                        if (theResult.totalResults > 0) {
-                            $scope.mainSearchResultsPosts = theResult.postsArray;
-                            $scope.showMainSearchResultsOnly();
-                            updateTimeAgo();
-                            //parse the posts and prepare them, eg, making iframes responsive
-                            preparePostSummaryContent();
-                            $scope.mainSearchResultsPosts.forEach(function (post) {
-                                $scope.highLightPost(post);
-                            });
-
-                            var responseMimic1 = {
-                                banner: true,
-                                bannerClass: 'alert alert-dismissible alert-success',
-                                msg: "The search returned " + $scope.mainSearchResultsCount + " results"
-                            };
-                            $scope.responseStatusHandler(responseMimic1);
-                            $scope.showThePager();
-                            $scope.finishedLoading();
-                        } else {
-                            //empty the postsArray
-                            $scope.mainSearchResultsPosts = [];
-                            var responseMimic2 = {
-                                banner: true,
-                                bannerClass: 'alert alert-dismissible alert-success',
-                                msg: "The search returned 0 results"
-                            };
-                            $scope.responseStatusHandler(responseMimic2);
-                            $scope.showMainSearchResults = false;
-                            getSuggestedPosts();
-                            $scope.goToUniversalBanner();
-                            $scope.finishedLoading();
-                        }
-                    })
-                    .error(function (errResp) {
-                        $scope.responseStatusHandler(errResp);
-                        //empty the postsArray
-                        $scope.mainSearchResultsPosts = [];
-                        $scope.showMainSearchResults = false;
-                        getSuggestedPosts();
-                    });
-            }
-
-            getMainSearchResults();
-
-            //this functions evaluates to true if object is not empty, useful for ng-show
-            //this function also creates a banner to notify user that there are no posts by mimicing a response and calling the response handler
-            $scope.checkIfPostsSearchResultsIsEmpty = function () {
-                return $scope.mainSearchResultsPosts.length == 0
-            };
-
-            //=============function to update timeago on all posts
-            //updates the timeago on all incoming orders using the timeago filter
-            function updateTimeAgo() {
-                $scope.mainSearchResultsPosts.forEach(function (post) {
-                    post.theTimeAgo = $filter('timeago')(post.createdAt);
-
-                    //post date/time it was ordered e.g. Sun, Mar 17..
-                    post.postDate = moment(post.createdAt).format("ddd, MMM D, H:mm");
-                });
-            }
-
-            $interval(updateTimeAgo, 120000, 0, true);
-
-            //==============end of update time ago
-
-            updateTimeAgo();
-
-            //===============socket listeners===============
-
-            $rootScope.$on('reconnect', function () {
-                if ($scope.currentState == 'search') {
-                    getMainSearchResults();
-                }
-            });
-
-            $log.info('SearchController booted successfully');
-
-        }
-    ]);
 angular.module('clientHomeApp')
 
-    .factory('globals', ['$q', '$window', '$rootScope', 'socketService',
-        function ($q, $window, $rootScope, socketService) {
+    .factory('fN', ['$q', '$location', '$window', '$rootScope', 'socketService',
+        function ($q, $location, $window, $rootScope, socketService) {
+            return {
+                calcObjectLength: function (obj) {
+                    var len = 0;
+                    for (var prop in obj) {
+                        if (obj.hasOwnProperty(prop)) {
+                            len++;
+                        }
+                    }
+                    return len
+                }
+            };
+        }]);
+angular.module('clientHomeApp')
+
+    .factory('globals', ['$q', '$location', '$window', '$rootScope', 'socketService',
+        function ($q, $location, $window, $rootScope, socketService) {
             var userData = {};
+            var allData = {
+                documentTitle: "Negus Math - College Level Advanced Mathematics for Kenya Students",
+                indexPageUrl: $location.port() ? "http://" + $location.host() + ":" + $location.port() + "/index" : $scope.indexPageUrl = "http://" + $location.host() + "/index"
+            };
+
+            var universalBanner = {
+                show: false,
+                bannerClass: "",
+                msg: ""
+            };
+
+            var registrationBanner = {
+                show: false,
+                bannerClass: "",
+                msg: ""
+            };
+
             return {
 
                 userData: function (data) {
@@ -1231,6 +1145,23 @@ angular.module('clientHomeApp')
                     } else {
                         return userData;
                     }
+                },
+
+                allData: allData,
+
+                getDocumentTitle: function () {
+                    return allData.documentTitle
+                },
+
+                defaultDocumentTitle: function () {
+                    allData.documentTitle = "Negus Math - College Level Advanced Mathematics for Kenya Students";
+                },
+
+                changeDocumentTitle: function (newDocumentTitle) {
+                    if (newDocumentTitle) {
+                        allData.documentTitle = newDocumentTitle;
+                    }
+                    return allData.documentTitle
                 }
             };
         }]);

@@ -1,8 +1,7 @@
 angular.module('clientHomeApp')
-    .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
+    .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', 'fN',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, fN) {
 
-            //show paging
             $scope.showThePager();
 
             $scope.mainSearchModel = {
@@ -12,14 +11,14 @@ angular.module('clientHomeApp')
             };
 
             //change to default document title
-            $scope.changeDocumentTitle($rootScope.$stateParams.queryString + " - NegusMath Search");
+            globals.changeDocumentTitle($rootScope.$stateParams.queryString + " - NegusMath Search");
 
             $scope.mainSearchResultsPosts = PostService.getCurrentPosts();
             $scope.mainSearchResultsCount = 0;
 
             $scope.changeCurrentPage = function (page) {
                 if (page != $rootScope.$stateParams.pageNumber) {
-                    //change page here******************************
+                    //change page here****************************************
                 }
             };
 
@@ -41,13 +40,6 @@ angular.module('clientHomeApp')
                 $scope.showSuggestedPosts = true;
             };
 
-            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
-            function preparePostSummaryContent() {
-                $scope.mainSearchResultsPosts.forEach(function (post) {
-                    post.postSummary = $scope.makeVideoIframesResponsive(post.postSummary);
-                });
-            }
-
             //function used to fill in with suggested posts in case no posts are received
             function getSuggestedPosts() {
                 $scope.showHideLoadingBanner(true);
@@ -58,33 +50,23 @@ angular.module('clientHomeApp')
                         if ((resp.postsArray.length > 0)) {
                             $scope.showSuggestedPostsOnly();
                             $scope.suggestedPosts = resp.postsArray;
-                            updateTimeAgo();
-
-                            //function that parses and prepares the post content e.g. making iframes in html string to be responsive
-                            function prepareSuggestedPostsSummaryContent() {
-                                $scope.suggestedPosts.forEach(function (post) {
-                                    post.postSummary = $scope.makeVideoIframesResponsive(post.postSummary);
-                                });
-                            }
-
-                            prepareSuggestedPostsSummaryContent();
-                            $scope.finishedLoading();
+                            $scope.suggestedPosts = $scope.suggestedPosts = $filter('makeVideoIframesResponsive')(null, $scope.suggestedPosts);
                         } else {
                             //empty the suggestedPosts
                             $scope.suggestedPosts = [];
                             $scope.showSuggestedPosts = false;
-                            $scope.goToUniversalBanner();
+                            $scope.goToTop();
                             $scope.showHideLoadingBanner(false);
                         }
 
                     })
                     .error(function (errResp) {
-                        $scope.goToUniversalBanner();
+                        $scope.goToTop();
                         $scope.showHideLoadingBanner(false);
                         //empty the suggestedPosts
                         $scope.suggestedPosts = [];
                         $scope.showSuggestedPosts = false;
-                        $scope.responseStatusHandler(errResp);
+                        $rootScope.responseStatusHandler(errResp);
                     });
 
                 //whatever happens, hide the pager
@@ -106,31 +88,23 @@ angular.module('clientHomeApp')
 
                         PostService.updateMainSearchResults(theResult);
                         $scope.mainSearchResultsCount = theResult.totalResults;
-                        //change paging total count
                         $scope.changePagingTotalCount($scope.mainSearchResultsCount);
-
                         $scope.changeCurrentPage(theResult.page);
                         $scope.mainSearchModel.postSearchUniqueCuid = theResult.searchUniqueCuid;
 
                         //the response is the resultValue
                         if (theResult.totalResults > 0) {
                             $scope.mainSearchResultsPosts = theResult.postsArray;
+                            $scope.mainSearchResultsPosts = $filter('makeVideoIframesResponsive')(null, $scope.mainSearchResultsPosts);
                             $scope.showMainSearchResultsOnly();
-                            updateTimeAgo();
-                            //parse the posts and prepare them, eg, making iframes responsive
-                            preparePostSummaryContent();
-                            $scope.mainSearchResultsPosts.forEach(function (post) {
-                                $scope.highLightPost(post);
-                            });
 
                             var responseMimic1 = {
                                 banner: true,
                                 bannerClass: 'alert alert-dismissible alert-success',
                                 msg: "The search returned " + $scope.mainSearchResultsCount + " results"
                             };
-                            $scope.responseStatusHandler(responseMimic1);
+                            $rootScope.responseStatusHandler(responseMimic1);
                             $scope.showThePager();
-                            $scope.finishedLoading();
                         } else {
                             //empty the postsArray
                             $scope.mainSearchResultsPosts = [];
@@ -139,15 +113,14 @@ angular.module('clientHomeApp')
                                 bannerClass: 'alert alert-dismissible alert-success',
                                 msg: "The search returned 0 results"
                             };
-                            $scope.responseStatusHandler(responseMimic2);
+                            $rootScope.responseStatusHandler(responseMimic2);
                             $scope.showMainSearchResults = false;
                             getSuggestedPosts();
-                            $scope.goToUniversalBanner();
-                            $scope.finishedLoading();
+                            $scope.goToTop();
                         }
                     })
                     .error(function (errResp) {
-                        $scope.responseStatusHandler(errResp);
+                        $rootScope.responseStatusHandler(errResp);
                         //empty the postsArray
                         $scope.mainSearchResultsPosts = [];
                         $scope.showMainSearchResults = false;
@@ -163,32 +136,12 @@ angular.module('clientHomeApp')
                 return $scope.mainSearchResultsPosts.length == 0
             };
 
-            //=============function to update timeago on all posts
-            //updates the timeago on all incoming orders using the timeago filter
-            function updateTimeAgo() {
-                $scope.mainSearchResultsPosts.forEach(function (post) {
-                    post.theTimeAgo = $filter('timeago')(post.createdAt);
-
-                    //post date/time it was ordered e.g. Sun, Mar 17..
-                    post.postDate = moment(post.createdAt).format("ddd, MMM D, H:mm");
-                });
-            }
-
-            $interval(updateTimeAgo, 120000, 0, true);
-
-            //==============end of update time ago
-
-            updateTimeAgo();
-
             //===============socket listeners===============
 
             $rootScope.$on('reconnect', function () {
-                if ($scope.currentState == 'search') {
+                if ($rootScope.$state.current.name == 'search') {
                     getMainSearchResults();
                 }
             });
-
-            $log.info('SearchController booted successfully');
-
         }
     ]);

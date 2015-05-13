@@ -17,7 +17,348 @@ angular.module('indexApp', [
         //partials->navs
         //partials->modals
     });
+angular.module('indexApp')
+    .directive('universalBanner', ['$rootScope', function ($rootScope) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/universal_banner.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.universalBanner = {
+                    show: false,
+                    bannerClass: "",
+                    msg: ""
+                };
 
+                $rootScope.$on('universalBanner', function (event, banner) {
+                    $scope.universalBanner = banner;
+                });
+
+                $rootScope.$on('clearBanners', function () {
+                    $scope.universalBanner = {
+                        show: false,
+                        bannerClass: "",
+                        msg: ""
+                    };
+                })
+            }
+        }
+    }])
+    .directive('toastrDirective', ['$rootScope', function ($rootScope) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $rootScope.showToast = function (toastType, text) {
+                    switch (toastType) {
+                        case "success":
+                            toastr.clear();
+                            toastr.success(text);
+                            break;
+                        case "warning":
+                            toastr.clear();
+                            toastr.warning(text, 'Warning', {
+                                closeButton: true,
+                                tapToDismiss: true
+                            });
+                            break;
+                        case "error":
+                            toastr.clear();
+                            toastr.error(text, 'Error', {
+                                closeButton: true,
+                                tapToDismiss: true,
+                                timeOut: false
+                            });
+                            break;
+                        default:
+                            //clears current list of toasts
+                            toastr.clear();
+                    }
+                };
+
+                $rootScope.clearToasts = function () {
+                    toastr.clear();
+                };
+            }
+        }
+    }])
+    .directive('loadingBanner', ['$rootScope', function ($rootScope) {
+        var controller = ['$scope', '$rootScope', 'cfpLoadingBar', function ($scope, $rootScope, cfpLoadingBar) {
+
+            $rootScope.isLoading = false;
+            $rootScope.isLoadingPercentage = 0;
+            $rootScope.changeIsLoadingPercentage = function (num) {
+                $rootScope.isLoadingPercentage = num;
+            };
+
+            //hides or shows the loading splash screen
+            $rootScope.showHideLoadingBanner = function (bool) {
+                if (bool) {
+                    $('#loading-splash-card').removeClass('hidden');
+                    $('.hideMobileLoading').addClass('hidden-xs hidden-sm');
+                } else {
+                    $('#loading-splash-card').addClass('hidden');
+                    $('.hideMobileLoading').removeClass('hidden-xs hidden-sm');
+                }
+            };
+
+            $rootScope.$on('cfpLoadingBar:loading', function (event, resp) {
+                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.$on('cfpLoadingBar:loaded', function (event, resp) {
+                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.$on('cfpLoadingBar:completed', function (event, resp) {
+                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.isLoadingTrue = function () {
+                $rootScope.isLoading = true;
+            };
+            $rootScope.isLoadingFalse = function () {
+                $rootScope.isLoading = false;
+            };
+
+            $rootScope.$on('isLoadingTrue', function () {
+                $rootScope.isLoading = true;
+            });
+
+            $rootScope.$on('isLoadingFalse', function () {
+                $rootScope.isLoading = false;
+            });
+        }];
+
+        return {
+            templateUrl: 'views/admin/partials/smalls/loading_banner.html',
+            restrict: 'AE',
+            controller: controller
+        }
+    }]);
+angular.module('indexApp')
+    .directive('universalSearchBox', ['$window', '$location', '$rootScope', 'globals', function ($window, $location, $rootScope, globals) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/universal_search_box.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.mainSearchModel = {
+                    queryString: "",
+                    postSearchUniqueCuid: "",
+                    requestedPage: 1
+                };
+
+                $scope.fillSearchBox = function () {
+                    //check latest state
+                    if ($rootScope.$state.current.name == 'search') {
+                        $scope.mainSearchModel.queryString = $rootScope.$stateParams.queryString ? $rootScope.$stateParams.queryString : "";
+                    } else if ($rootScope.stateHistory.length > 0) {
+                        if ($rootScope.stateHistory[$rootScope.stateHistory.length - 1].hasOwnProperty('search')) {
+                            //checking the previous state
+                            $scope.mainSearchModel.queryString = $rootScope.stateHistory[$rootScope.stateHistory.length - 1]['search'].queryString
+                        } else {
+                            $scope.mainSearchModel.queryString = "";
+                        }
+                    } else {
+                        $scope.mainSearchModel.queryString = "";
+                    }
+                };
+
+                $scope.fillSearchBox();
+
+                $scope.performMainSearch = function () {
+                    if ($scope.mainSearchModel.queryString.length > 0) {
+                        if ($location.port()) {
+                            $window.location.href = "http://" + $location.host() + ":" + $location.port() + "/#!/search/" + $scope.mainSearchModel.queryString + "/1";
+                        } else {
+                            $window.location.href = "http://" + $location.host() + "/#!/search/" + $scope.mainSearchModel.queryString + "/1";
+                        }
+                    }
+                };
+            }
+        }
+    }])
+    .directive('topNav', ['$rootScope', 'logoutService', function ($rootScope, logoutService) {
+        return {
+
+            templateUrl: 'views/index/views/top_nav.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.logoutClient = function () {
+                    logoutService.logoutClient()
+                        .success(function (resp) {
+                            $rootScope.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.responseStatusHandler(errResponse);
+                        });
+                };
+            }
+        }
+    }])
+    .directive('accountOuter', ['$rootScope', function ($rootScope, logoutService) {
+        return {
+            templateUrl: 'views/index/views/account_outer.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                //variable to hold state between local login and creating a new account
+                //values =  signIn, register
+                $scope.userLoginState = 'signIn';
+                $scope.changeUserLoginState = function (newState) {
+                    $scope.userLoginState = newState;
+                };
+            }
+        }
+    }])
+    .directive('signIn', ['$rootScope', 'socketService', function ($rootScope, socketService) {
+        return {
+            templateUrl: 'views/index/views/sign_in.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.loginFormModel = {
+                    username: "",
+                    password: ""
+                };
+
+                $scope.submitLocalLoginForm = function () {
+                    socketService.localUserLogin($scope.loginFormModel)
+                        .success(function (resp) {
+                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
+                            $rootScope.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $scope.loginFormModel.password = "";
+                            $rootScope.responseStatusHandler(errResponse);
+                        });
+                };
+            }
+        }
+    }])
+    .directive('createAccount', ['$rootScope', 'socketService', function ($rootScope, socketService) {
+        return {
+            templateUrl: 'views/index/views/create_account.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.registrationDetails = {
+                    email: "",
+                    firstName: "",
+                    lastName: "",
+                    username: "",
+                    password1: "",
+                    password2: "",
+                    invitationCode: ""
+                };
+
+                $scope.createAccount = function () {
+                    socketService.createAccount($scope.registrationDetails)
+                        .success(function (resp) {
+                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
+                            $rootScope.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+
+                            $scope.registrationDetails.password1 = "";
+                            $scope.registrationDetails.password2 = "";
+                            $scope.registrationDetails.invitationCode = "";
+                            $rootScope.responseStatusHandler(errResponse);
+                        });
+                };
+            }
+        }
+    }])
+    .directive('contactUs', ['$rootScope', 'socketService', function ($rootScope, socketService) {
+        return {
+            templateUrl: 'views/index/views/create_account.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.contactUsModel = {
+                    name: "",
+                    email: "",
+                    message: ""
+                };
+
+                function validateContactUs(name, email, message) {
+                    var errors = 0;
+
+                    if (!name || name.length == 0) {
+                        ++errors;
+                        $rootScope.showToast('warning', "Please enter your name");
+                        return -1
+                    } else if (!email || email.length == 0) {
+                        ++errors;
+                        $rootScope.showToast('warning', "Please enter a valid email");
+                        return -1
+                    } else if (!message || message.length == 0) {
+                        ++errors;
+                        $rootScope.showToast('warning', "Message field is empty");
+                        return -1;
+                    } else if (errors == 0) {
+                        return 1;
+                    }
+                }
+
+                $scope.sendContactUs = function () {
+                    var formStatus = validateContactUs($scope.contactUsModel.name, $scope.contactUsModel.email, $scope.contactUsModel.message);
+                    if (formStatus == 1) {
+                        socketService.sendContactUs($scope.contactUsModel)
+                            .success(function (resp) {
+                                $scope.contactUsModel.name = "";
+                                $scope.contactUsModel.email = "";
+                                $scope.contactUsModel.message = "";
+                                $rootScope.responseStatusHandler(resp);
+                            })
+                            .error(function (errResp) {
+                                $rootScope.responseStatusHandler(errResp);
+                            });
+                    }
+                };
+            }
+        }
+    }]);
+angular.module('indexApp')
+    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals) {
+
+            $scope.indexPageUrl = globals.allData.indexPageUrl;
+
+            //register error handler error handler
+            $rootScope.responseStatusHandler = function (resp) {
+                $filter('responseFilter')(resp);
+            };
+
+            $scope.clientIsRegistered = true;
+
+            //initial requests
+            function initialRequests() {
+                socketService.getUserData()
+                    .success(function (resp) {
+                        $scope.userData = globals.userData(resp.userData);
+                        $scope.clientIsRegistered = $scope.userData.isRegistered == 'yes';
+
+                        if ($scope.userData.isRegistered == 'yes') {
+                            //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
+                            socket.emit('joinRoom', {
+                                room: resp.userData.uniqueCuid
+                            });
+                        }
+                        $rootScope.responseStatusHandler(resp);
+                    })
+                    .error(function (errResponse) {
+                        $rootScope.responseStatusHandler(errResponse);
+                    });
+            }
+
+            socket.on('joined', function () {
+                console.log("JOIN SUCCESS");
+            });
+
+            initialRequests();
+
+
+            //===============socket listeners===============
+
+            $rootScope.$on('reconnectSuccess', function () {
+            });
+        }
+    ]);
 angular.module('indexApp')
     .filter("timeago", function () {
         //time: the time
@@ -74,318 +415,249 @@ angular.module('indexApp')
             }
             return (time <= local) ? span + ' ago' : 'in ' + span;
         }
-    });
-
-
-
-angular.module('indexApp')
-    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'logoutService',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, logoutService) {
-
-            //set /index url
-            if ($location.port()) {
-                $scope.indexPageUrl = "http://" + $location.host() + ":" + $location.port() + "/index";
-            } else {
-                $scope.indexPageUrl = "http://" + $location.host() + "/index";
+    })
+    .filter("AddTimeAgo", ['$filter', function ($filter) {
+        //takes in a post or an array of posts, and adds a timeAgo key in them
+        return function (createdAt) {
+            return $filter('timeago')(createdAt);
+        }
+    }])
+    .filter("AddPostDate", ['$filter', function () {
+        //takes in a post or an array of posts, and adds a timeAgo key in them
+        return function (createdAt) {
+            return moment(createdAt).format("ddd, MMM D, H:mm");
+        }
+    }])
+    .filter("AddPostUrl", ['$filter', function () {
+        //takes in a post or an array of posts, and adds a timeAgo key in them
+        return function (post, posts) {
+            function addUrl(post) {
+                if (post.postIndex) {
+                    post.postUrl = 'http://www.negusmath.com/#!/post/' + post.postIndex;
+                }
+                return post;
             }
 
+            if (post) {
+                return addUrl(post);
+            } else if (posts) {
+                posts.forEach(function (post) {
+                    post = addUrl(post);
+                });
+                return posts;
+            }
+        }
+    }])
+    .filter("makeVideoIframesResponsive", ['$filter', function () {
+        //making embedded videos responsive
+        return function (post, posts) {
+            var theElement;
+            var imgElement;
+            var imgWrappedInDiv;
 
-            //===============request error handler===============
+            function makeResp(post) {
+                if (post.postSummary) {
+                    //convert the element to string
+                    theElement = $("<div>" + post.postSummary + "</div>");
 
-            //universalDisable variable is used to disable everything crucial in case an error
-            //occurs.This is sometimes needed if a reload did not work
-            $scope.universalDisable = false;
-            $scope.showBanner = false;
-            $scope.bannerClass = "";
-            $scope.bannerMessage = "";
+                    //find the video iframe elements
+                    imgElement = $('img.ta-insert-video', theElement);
 
-            $scope.showRegistrationBanner = false;
-            $scope.registrationBannerClass = "";
-            $scope.registrationBannerMessage = "";
+                    //only perform operation if there are iframes available
+                    if (imgElement.length > 0) {
 
-            $scope.universalDisableTrue = function () {
-                $scope.universalDisable = true;
-            };
-            $scope.universalDisableFalse = function () {
-                $scope.universalDisable = false;
-            };
+                        //add class and wrap in div
+                        imgWrappedInDiv = imgElement
+                            .addClass('embed-responsive-item')
+                            .wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
 
-            $scope.responseStatusHandler = function (resp) {
-                if (resp) {
-                    if (resp.redirect) {
-                        if (resp.redirect) {
-                            $window.location.href = resp.redirectPage;
-                        }
+                        //replace in original
+                        theElement.find('img').replaceWith(imgWrappedInDiv);
                     }
-                    if (resp.disable) {
-                        if (resp.disable) {
-                            $scope.universalDisableTrue();
-                        }
+                    post.postSummary = theElement.html();
+
+                }
+                if (post.postContent) {
+                    //convert the element to string
+                    theElement = $("<div>" + post.postContent + "</div>");
+
+                    //find the video iframe elements
+                    imgElement = $('img.ta-insert-video', theElement);
+
+                    //only perform operation if there are iframes available
+                    if (imgElement.length > 0) {
+
+                        //add class and wrap in div
+                        imgWrappedInDiv = imgElement
+                            .addClass('embed-responsive-item')
+                            .wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
+
+                        //replace in original
+                        theElement.find('img').replaceWith(imgWrappedInDiv);
                     }
-                    if (resp.notify) {
-                        if (resp.type && resp.msg) {
-                            $scope.showToast(resp.type, resp.msg);
-                        }
+                    post.postContent = theElement.html();
+                }
+                return post;
+            }
+
+            if (post) {
+                return makeResp(post)
+            } else if (posts) {
+                posts.forEach(function (post) {
+                    post = makeResp(post);
+                });
+                return posts;
+            }
+        }
+    }])
+    .filter("highlightText", ['$filter', '$rootScope', function ($filter, $rootScope) {
+        //making embedded videos responsive
+        return function (theElementString) {
+
+            //text is highlighted only if the present or previous state was search
+            //this fn checks if the present or previous state was search, and returns an object with status false if not
+            //if true, the returned object carries the queryString with it
+            function checkSearchState() {
+                //check latest state
+                if ($rootScope.$state.current.name == 'search') {
+                    return {
+                        status: true,
+                        queryString: $rootScope.$stateParams.queryString || ""
                     }
-                    if (resp.banner) {
-                        if (resp.bannerClass && resp.msg) {
-                            $scope.showBanner = true;
-                            $scope.bannerClass = resp.bannerClass;
-                            $scope.bannerMessage = resp.msg;
+                } else if ($rootScope.stateHistory.length > 0) {
+                    if ($rootScope.stateHistory[$rootScope.stateHistory.length - 1].hasOwnProperty('search')) {
+                        //checking the previous state
+                        return {
+                            status: true,
+                            queryString: $rootScope.stateHistory[$rootScope.stateHistory.length - 1]['search'].queryString
                         }
-                    }
-                    if (resp.registrationBanner) {
-                        if (resp.bannerClass && resp.msg) {
-                            $scope.showRegistrationBanner = true;
-                            $scope.registrationBannerClass = resp.bannerClass;
-                            $scope.registrationBannerMessage = resp.msg;
+                    } else {
+                        return {
+                            status: false
                         }
-                    }
-                    if (resp.reason) {
-                        $log.warn(resp.reason);
                     }
                 } else {
-                    //do nothing
-                }
-            };
-
-            $rootScope.$on('responseStatusHandler', function (event, resp) {
-                $scope.responseStatusHandler(resp);
-            });
-
-
-            //===============end of request error handler===============
-
-
-            //===============isLoading functions to disable elements while content is loading or processing===============
-            $scope.isLoading = false;
-
-            $scope.isLoadingTrue = function () {
-                $scope.isLoading = true;
-            };
-            $scope.isLoadingFalse = function () {
-                $scope.isLoading = false;
-            };
-
-            $rootScope.$on('isLoadingTrue', function () {
-                $scope.isLoading = true;
-            });
-
-            $rootScope.$on('isLoadingFalse', function () {
-                $scope.isLoading = false;
-            });
-
-            //===============end of isLoading functions===============
-
-            //===============toastr show functions===============
-            $scope.showToast = function (toastType, text) {
-                switch (toastType) {
-                    case "success":
-                        toastr.clear();
-                        toastr.success(text);
-                        break;
-                    case "warning":
-                        toastr.clear();
-                        toastr.warning(text, 'Warning', {
-                            closeButton: true,
-                            tapToDismiss: true
-                        });
-                        break;
-                    case "error":
-                        toastr.clear();
-                        toastr.error(text, 'Error', {
-                            closeButton: true,
-                            tapToDismiss: true,
-                            timeOut: false
-                        });
-                        break;
-                    default:
-                        //clears current list of toasts
-                        toastr.clear();
-                }
-            };
-
-            $rootScope.$on('showToast', function (event, data) {
-                var toastType = data.toastType;
-                var text = data.text;
-
-                $scope.showToast(toastType, text);
-            });
-
-            //===============end of toastr show functions===============
-
-            $scope.clientIsRegistered = true;
-
-            //initial requests
-            function initialRequests() {
-                $scope.isLoadingTrue();
-                socketService.getUserData()
-                    .success(function (resp) {
-                        $scope.userData = globals.userData(resp.userData);
-                        if ($scope.userData.isRegistered == 'yes') {
-                            $scope.clientIsRegistered = true;
-                        } else {
-                            $scope.clientIsRegistered = false;
-                        }
-
-                        if ($scope.userData.isRandomClient) {
-                            $scope.isRandomClient = true;
-                        } else {
-                            $scope.isRandomClient = false;
-                        }
-
-                        if ($scope.userData.isRegistered == 'yes') {
-                            //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
-                            socket.emit('joinRoom', {
-                                room: resp.userData.uniqueCuid
-                            });
-                        }
-
-                        $scope.responseStatusHandler(resp);
-                        $scope.isLoadingFalse();
-                    })
-                    .error(function (errResponse) {
-                        $scope.responseStatusHandler(errResponse);
-                        $scope.isLoadingFalse();
-                    });
-            }
-
-            socket.on('joined', function () {
-                console.log("JOIN SUCCESS");
-            });
-
-            initialRequests();
-
-
-            //variable to hold state between local login and creating a new account
-            //values =  signIn, register
-            $scope.userLoginState = 'signIn';
-            $scope.changeUserLoginState = function (newState) {
-                $scope.userLoginState = newState;
-            };
-
-            //===============THE LOCAL LOGIN FORM===============
-
-            $scope.loginFormModel = {
-                username: "",
-                password: ""
-            };
-
-            $scope.submitLocalLoginForm = function () {
-                socketService.localUserLogin($scope.loginFormModel)
-                    .success(function (resp) {
-                        //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
-                        $scope.responseStatusHandler(resp);
-                    })
-                    .error(function (errResponse) {
-                        $scope.loginFormModel.password = "";
-                        $scope.responseStatusHandler(errResponse);
-                    });
-            };
-
-            //===============END OF LOCAL LOGIN FORM FUNCTIONS===============
-
-            //===============REGISTRATION FORM===============
-            //===============registration details and functions===============
-            $scope.registrationDetails = {
-                email: "",
-                firstName: "",
-                lastName: "",
-                username: "",
-                password1: "",
-                password2: "",
-                invitationCode: ""
-            };
-
-            $scope.createAccount = function () {
-                socketService.createAccount($scope.registrationDetails)
-                    .success(function (resp) {
-                        //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
-                        $scope.responseStatusHandler(resp);
-                    })
-                    .error(function (errResponse) {
-
-                        $scope.registrationDetails.password1 = "";
-                        $scope.registrationDetails.password2 = "";
-                        $scope.registrationDetails.invitationCode = "";
-                        $scope.responseStatusHandler(errResponse);
-                    });
-            };
-            //===============END OF REGISTRATION FORM===============
-
-            //===============contact us form===============
-            $scope.contactUsModel = {
-                name: "",
-                email: "",
-                message: ""
-            };
-
-            function validateContactUs(name, email, message) {
-                var errors = 0;
-
-                if (!name || name.length == 0) {
-                    ++errors;
-                    $scope.showToast('warning', "Please enter your name");
-                    return -1
-                } else if (!email || email.length == 0) {
-                    ++errors;
-                    $scope.showToast('warning', "Please enter a valid email");
-                    return -1
-                } else if (!message || message.length == 0) {
-                    ++errors;
-                    $scope.showToast('warning', "Message field is empty");
-                    return -1;
-                } else if (errors == 0) {
-                    return 1;
+                    return {
+                        status: false
+                    }
                 }
             }
 
-            $scope.sendContactUs = function () {
-                var formStatus = validateContactUs($scope.contactUsModel.name, $scope.contactUsModel.email, $scope.contactUsModel.message);
-                if (formStatus == 1) {
-                    socketService.sendContactUs($scope.contactUsModel)
-                        .success(function (resp) {
-                            $scope.contactUsModel.name = "";
-                            $scope.contactUsModel.email = "";
-                            $scope.contactUsModel.message = "";
-                            $scope.responseStatusHandler(resp);
-                        })
-                        .error(function (errResp) {
-                            $scope.responseStatusHandler(errResp);
-                        });
+            function highLightThisText(textToHighlight) {
+                var finalString = textToHighlight;
+                var highlightDetails = checkSearchState();
+                if (highlightDetails.status === true) {
+                    //highlight
+                    var theElement = $("<div>" + textToHighlight + "</div>");
+                    $(theElement).highlight(highlightDetails.queryString);
+                    finalString = theElement.html();
+                } else {
+                    //remove highlight
+                    var theElement2 = $("<div>" + textToHighlight + "</div>");
+                    $(theElement2).removeHighlight();
+                    finalString = theElement2.html();
                 }
-            };
+                return finalString;
+            }
 
-            //===============end of contactUs===============
-
-            //===============logout functions===============
-            $scope.logoutClient = function () {
-                logoutService.logoutClient()
-                    .success(function (resp) {
-                        $scope.responseStatusHandler(resp);
-                    })
-                    .error(function (errResponse) {
-                        $scope.responseStatusHandler(errResponse);
-                    });
-            };
-
-            //=============end of logout===================
-
-
-            //===============socket listeners===============
-
-            $rootScope.$on('reconnectSuccess', function () {
-            });
-
-            $log.info('MainController booted successfully');
+            return highLightThisText(theElementString);
 
         }
-    ]);
+    }])
+    .filter("responseFilter", ['$q', '$filter', '$log', '$interval', '$window', '$location', '$rootScope', 'globals', function ($q, $filter, $log, $interval, $window, $location, $rootScope, globals) {
+        //making embedded videos responsive
+        return function (resp) {
+
+            function makeBanner(show, bannerClass, msg) {
+                return {
+                    show: show ? true : false,
+                    bannerClass: bannerClass,
+                    msg: msg
+                }
+            }
+
+            $rootScope.universalDisable = false;
+
+            if (resp) {
+                if (resp.redirect) {
+                    if (resp.redirect) {
+                        $window.location.href = resp.redirectPage;
+                    }
+                }
+                if (resp.disable) {
+                    $rootScope.universalDisable = true;
+                }
+                if (resp.notify) {
+                    if (resp.type && resp.msg) {
+                        $rootScope.showToast(resp.type, resp.msg);
+                    }
+                }
+                if (resp.banner) {
+                    if (resp.bannerClass && resp.msg) {
+                        $rootScope.$broadcast('universalBanner', makeBanner(true, resp.bannerClass, resp.msg));
+                    }
+                }
+                if (resp.newPostBanner) {
+                    if (resp.bannerClass && resp.msg) {
+                        $rootScope.$broadcast('newPostBanner', makeBanner(true, resp.bannerClass, resp.msg));
+                    }
+                }
+                if (resp.registrationBanner) {
+                    if (resp.bannerClass && resp.msg) {
+                        $rootScope.$broadcast('registrationBanner', makeBanner(true, resp.bannerClass, resp.msg));
+                    }
+                }
+                if (resp.reason) {
+                    $log.warn(resp.reason);
+                }
+            } else {
+                //do nothing
+            }
+
+            return true;
+        }
+    }]);
+
+
+
 angular.module('indexApp')
 
-    .factory('globals', ['$window', '$rootScope', 'socketService',
-        function ($window, $rootScope, socketService) {
+    .factory('fN', ['$q', '$location', '$window', '$rootScope', 'socketService',
+        function ($q, $location, $window, $rootScope, socketService) {
+            return {
+                calcObjectLength: function (obj) {
+                    var len = 0;
+                    for (var prop in obj) {
+                        if (obj.hasOwnProperty(prop)) {
+                            len++;
+                        }
+                    }
+                    return len
+                }
+            };
+        }]);
+angular.module('indexApp')
+
+    .factory('globals', ['$q', '$location', '$window', '$rootScope', 'socketService',
+        function ($q, $location, $window, $rootScope, socketService) {
             var userData = {};
+            var allData = {
+                documentTitle: "Negus Math - College Level Advanced Mathematics for Kenya Students",
+                indexPageUrl: $location.port() ? "http://" + $location.host() + ":" + $location.port() + "/index" : $scope.indexPageUrl = "http://" + $location.host() + "/index"
+            };
+
+            var universalBanner = {
+                show: false,
+                bannerClass: "",
+                msg: ""
+            };
+
+            var registrationBanner = {
+                show: false,
+                bannerClass: "",
+                msg: ""
+            };
+
             return {
 
                 userData: function (data) {
@@ -395,6 +667,23 @@ angular.module('indexApp')
                     } else {
                         return userData;
                     }
+                },
+
+                allData: allData,
+
+                getDocumentTitle: function () {
+                    return allData.documentTitle
+                },
+
+                defaultDocumentTitle: function () {
+                    allData.documentTitle = "Negus Math - College Level Advanced Mathematics for Kenya Students";
+                },
+
+                changeDocumentTitle: function (newDocumentTitle) {
+                    if (newDocumentTitle) {
+                        allData.documentTitle = newDocumentTitle;
+                    }
+                    return allData.documentTitle
                 }
             };
         }]);

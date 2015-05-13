@@ -1,6 +1,5 @@
 angular.module('adminHomeApp', [
     'ui.bootstrap',
-    'angular-loading-bar',
     'cfp.loadingBar',
     'angulartics',
     'angulartics.google.analytics',
@@ -27,7 +26,7 @@ angular.module('adminHomeApp', [
     .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
         $urlRouterProvider
             .when("/home", '/home/1')
-            .when("/home", '/home/1')
+            .when("/home/", '/home/1')
             .when("/search", '/home/1')
             .otherwise("/home/1");
 
