@@ -441,8 +441,8 @@ angular.module('indexApp')
             if (post) {
                 return addUrl(post);
             } else if (posts) {
-                posts.forEach(function (post) {
-                    post = addUrl(post);
+                posts.forEach(function (post, index) {
+                    posts[index] = addUrl(post);
                 });
                 return posts;
             }
@@ -503,8 +503,8 @@ angular.module('indexApp')
             if (post) {
                 return makeResp(post)
             } else if (posts) {
-                posts.forEach(function (post) {
-                    post = makeResp(post);
+                posts.forEach(function (post, index) {
+                    posts[index] = makeResp(post);
                 });
                 return posts;
             }

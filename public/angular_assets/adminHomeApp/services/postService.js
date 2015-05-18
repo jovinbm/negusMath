@@ -2,6 +2,7 @@ angular.module('adminHomeApp')
     .factory('PostService', ['$log', '$http', '$window', '$rootScope', 'socket', 'socketService', 'globals',
         function ($log, $http, $window, $rootScope, socket, socketService, globals, $stateParams) {
 
+            var post = {};
             var posts = [];
             var postsCount = 0;
 
@@ -37,6 +38,10 @@ angular.module('adminHomeApp')
                     return $http.post('/api/getSuggestedPosts', {})
                 },
 
+                getCurrentPost: function () {
+                    return post;
+                },
+
                 updatePosts: function (postsArray) {
                     posts = postsArray;
                     return postsArray;
@@ -46,6 +51,11 @@ angular.module('adminHomeApp')
                     return $http.post('/api/getPost', {
                         postIndex: postIndex
                     });
+                },
+
+                updatePost: function (newPost) {
+                    post = newPost;
+                    return post;
                 },
 
                 submitNewPost: function (newPost) {

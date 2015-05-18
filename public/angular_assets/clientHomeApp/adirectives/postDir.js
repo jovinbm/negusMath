@@ -26,8 +26,8 @@ angular.module('clientHomeApp')
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.postTags = $scope.post.postTags;
-                $scope.postTags.forEach(function (tag) {
-                    tag.text = $filter('highlightText')(tag.text);
+                $scope.postTags.forEach(function (tag, index) {
+                    $scope.postTags[index].text = $filter('highlightText')(tag.text);
                 })
             }
         }

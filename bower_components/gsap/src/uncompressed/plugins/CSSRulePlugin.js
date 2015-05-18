@@ -1,19 +1,20 @@
 /*!
- * VERSION: beta 0.6.1
- * DATE: 2014-01-20
+ * VERSION: beta 0.6.3
+ * DATE: 2014-12-31
  * UPDATES AND DOCS AT: http://www.greensock.com
  *
- * @license Copyright (c) 2008-2014, GreenSock. All rights reserved.
- * This work is subject to the terms at http://www.greensock.com/terms_of_use.html or for
+ * @license Copyright (c) 2008-2015, GreenSock. All rights reserved.
+ * This work is subject to the terms at http://greensock.com/standard-license or for
  * Club GreenSock members, the software agreement that was issued with your membership.
  * 
  * @author: Jack Doyle, jack@greensock.com
  */
-(window._gsQueue || (window._gsQueue = [])).push( function() {
+var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(global) !== "undefined") ? global : this || window; //helps ensure compatibility with AMD/RequireJS and CommonJS/Node
+(_gsScope._gsQueue || (_gsScope._gsQueue = [])).push( function() {
 
 	"use strict";
 
-	window._gsDefine("plugins.CSSRulePlugin", ["plugins.TweenPlugin","TweenLite","plugins.CSSPlugin"], function(TweenPlugin, TweenLite, CSSPlugin) {
+	_gsScope._gsDefine("plugins.CSSRulePlugin", ["plugins.TweenPlugin","TweenLite","plugins.CSSPlugin"], function(TweenPlugin, TweenLite, CSSPlugin) {
 
 		/** @constructor **/
 		var CSSRulePlugin = function() {
@@ -26,7 +27,7 @@
 
 		p._propName = "cssRule";
 		p.constructor = CSSRulePlugin;
-		CSSRulePlugin.version = "0.6.1";
+		CSSRulePlugin.version = "0.6.3";
 		CSSRulePlugin.API = 2;
 
 		/**
@@ -51,11 +52,14 @@
 				//Firefox may throw insecure operation errors when css is loaded from other domains, so try/catch.
 				try {
 					curSS = ss[i][ruleProp];
+					if (!curSS) {
+						continue;
+					}
+					j = curSS.length;
 				} catch (e) {
 					console.log(e);
 					continue;
 				}
-				j = curSS.length;
 				while (--j > -1) {
 					cs = curSS[j];
 					if (cs.selectorText && ("," + cs.selectorText.split("::").join(":").toLowerCase() + ",").indexOf(selector) !== -1) { //note: IE adds an extra ":" to pseudo selectors, so .myClass:after becomes .myClass::after, so we need to strip the extra one out.
@@ -98,4 +102,4 @@
 		
 	}, true);
 	
-}); if (window._gsDefine) { window._gsQueue.pop()(); }
+}); if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); }

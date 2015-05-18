@@ -25,15 +25,20 @@ angular.module('clientHomeApp')
                 }
             };
 
-            $scope.showThePager = function (bool) {
+            $scope.showThePager = function () {
                 if ($rootScope.showThePager) {
-                    $rootScope.showThePager(bool);
+                    $rootScope.showThePager();
+                }
+            };
+
+            $scope.hideThePager = function () {
+                if ($rootScope.hideThePager) {
+                    $rootScope.hideThePager();
                 }
             };
 
             $scope.changePagingTotalCount = function (newTotalCount) {
                 if ($rootScope.changePagingTotalCount) {
-                    console.log(newTotalCount);
                     $rootScope.changePagingTotalCount(newTotalCount);
                 }
             };

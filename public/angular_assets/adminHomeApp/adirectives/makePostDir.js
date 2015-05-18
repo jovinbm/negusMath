@@ -44,7 +44,7 @@ angular.module('adminHomeApp')
                         }
                     }
                     if (errors == 0) {
-                        if (!$filter("validatePostTags")($scope.newPostModel.postTags, notify) && errors == 0) {
+                        if (!$filter("validatePostTags")($scope.newPostModel.postTags, notify)) {
                             errors++;
                         }
                     }

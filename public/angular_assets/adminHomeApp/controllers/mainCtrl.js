@@ -25,9 +25,15 @@ angular.module('adminHomeApp')
                 }
             };
 
-            $scope.showThePager = function (bool) {
+            $scope.showThePager = function () {
                 if ($rootScope.showThePager) {
-                    $rootScope.showThePager(bool);
+                    $rootScope.showThePager();
+                }
+            };
+
+            $scope.hideThePager = function () {
+                if ($rootScope.hideThePager) {
+                    $rootScope.hideThePager();
                 }
             };
 
@@ -42,6 +48,9 @@ angular.module('adminHomeApp')
             $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
                 $rootScope.clearBanners();
                 $rootScope.clearToasts();
+
+                //variable to keep track of when the user is editing the post
+                $rootScope.isEditingPost = false;
             });
 
             //register error handler error handler

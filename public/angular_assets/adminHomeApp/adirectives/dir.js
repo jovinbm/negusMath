@@ -77,8 +77,12 @@ angular.module('adminHomeApp')
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.showPaging = false;
-                $rootScope.showThePager = function () {
-                    $scope.showPaging = true;
+                $rootScope.showThePager = function (bool) {
+                    if (bool) {
+                        $scope.showPaging = true;
+                    } else {
+                        $scope.showPaging = true;
+                    }
                 };
                 $rootScope.hideThePager = function () {
                     $scope.showPaging = false;

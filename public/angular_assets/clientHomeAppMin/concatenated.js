@@ -309,8 +309,8 @@ angular.module('clientHomeApp')
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.postTags = $scope.post.postTags;
-                $scope.postTags.forEach(function (tag) {
-                    tag.text = $filter('highlightText')(tag.text);
+                $scope.postTags.forEach(function (tag, index) {
+                    $scope.postTags[index].text = $filter('highlightText')(tag.text);
                 })
             }
         }
@@ -367,15 +367,20 @@ angular.module('clientHomeApp')
                 }
             };
 
-            $scope.showThePager = function (bool) {
+            $scope.showThePager = function () {
                 if ($rootScope.showThePager) {
-                    $rootScope.showThePager(bool);
+                    $rootScope.showThePager();
+                }
+            };
+
+            $scope.hideThePager = function () {
+                if ($rootScope.hideThePager) {
+                    $rootScope.hideThePager();
                 }
             };
 
             $scope.changePagingTotalCount = function (newTotalCount) {
                 if ($rootScope.changePagingTotalCount) {
-                    console.log(newTotalCount);
                     $rootScope.changePagingTotalCount(newTotalCount);
                 }
             };
@@ -481,6 +486,18 @@ angular.module('clientHomeApp')
                 $scope.showSuggestedPosts = true;
             };
 
+            $scope.prepareOnePost = function (post) {
+                return $filter('makeVideoIframesResponsive')($filter('AddPostUrl')(post, null), null);
+            };
+
+            $scope.prepareManyPosts = function (postsArray) {
+                var posts = [];
+                postsArray.forEach(function (post) {
+                    posts.push($filter('makeVideoIframesResponsive')($filter('AddPostUrl')(post, null), null));
+                });
+                return posts;
+            };
+
             //function used to fill in with suggested posts in case no posts are received
             function getSuggestedPosts() {
                 $scope.showHideLoadingBanner(true);
@@ -491,7 +508,7 @@ angular.module('clientHomeApp')
                         if ((resp.postsArray.length > 0)) {
                             $scope.showSuggestedPostsOnly();
                             $scope.suggestedPosts = resp.postsArray;
-                            $scope.suggestedPosts = $filter('makeVideoIframesResponsive')(null, $scope.suggestedPosts);
+                            $scope.suggestedPosts = $scope.prepareManyPosts($scope.suggestedPosts);
                         } else {
                             //empty the suggestedPosts
                             $scope.suggestedPosts = [];
@@ -535,7 +552,7 @@ angular.module('clientHomeApp')
                             $scope.goToTop();
                         } else {
                             $scope.posts = PostService.updatePosts(resp.postsArray);
-                            $scope.posts = $filter('makeVideoIframesResponsive')(null, $scope.posts);
+                            $scope.posts = $scope.prepareManyPosts($scope.posts);
 
                             $scope.showThePostsOnly();
 
@@ -563,7 +580,7 @@ angular.module('clientHomeApp')
             $rootScope.$on('newPost', function (event, data) {
                 //newPost goes to page 1, so update only if the page is 1
                 if ($rootScope.$stateParams.pageNumber == 1) {
-                    data.post = $filter('makeVideoIframesResponsive')(data.post, null);
+                    data.post = $scope.prepareOnePost(data.post);
                     $scope.posts.unshift(data.post);
                 }
                 if (data.postsCount) {
@@ -607,6 +624,18 @@ angular.module('clientHomeApp')
 
             $scope.postIsLoaded = false;
 
+            $scope.prepareOnePost = function (post) {
+                return $filter('makeVideoIframesResponsive')($filter('AddPostUrl')(post, null), null);
+            };
+
+            $scope.prepareManyPosts = function (postsArray) {
+                var posts = [];
+                postsArray.forEach(function (post) {
+                    posts.push($filter('makeVideoIframesResponsive')($filter('AddPostUrl')(post, null), null));
+                });
+                return posts;
+            };
+
             //function used to fill in with suggested posts in case no posts are received
             function getSuggestedPosts() {
                 $scope.showHideLoadingBanner(true);
@@ -617,7 +646,7 @@ angular.module('clientHomeApp')
                         if ((resp.postsArray.length > 0)) {
                             $scope.showSuggestedPostsOnly();
                             $scope.suggestedPosts = resp.postsArray;
-                            $scope.suggestedPosts = $filter('makeVideoIframesResponsive')(null, $scope.suggestedPosts);
+                            $scope.suggestedPosts = $scope.prepareManyPosts($scope.suggestedPosts);
                         } else {
                             //empty the suggestedPosts
                             $scope.suggestedPosts = [];
@@ -646,8 +675,7 @@ angular.module('clientHomeApp')
                         $scope.post = resp.thePost;
                         $rootScope.responseStatusHandler(resp);
                         if (fN.calcObjectLength($scope.post) != 0) {
-                            $scope.post = $filter('makeVideoIframesResponsive')($scope.post, null);
-                            $scope.post = $filter('AddPostUrl')($scope.post, null);
+                            $scope.post = $scope.prepareOnePost($scope.post);
                             globals.changeDocumentTitle($scope.post.postHeading);
                             //check that there is a post first before starting disqus and other attributes
                             $scope.showThePostOnly();
@@ -683,7 +711,7 @@ angular.module('clientHomeApp')
 
             $rootScope.$on('postUpdate', function (event, data) {
                 if ($rootScope.$stateParams.postIndex == data.post.postIndex) {
-                    data.post = $filter('makeVideoIframesResponsive')(data.post, null);
+                    data.post = $scope.prepareOnePost(data.post);
                     $scope.post = data.post;
                 }
             });
@@ -924,8 +952,8 @@ angular.module('clientHomeApp')
             if (post) {
                 return addUrl(post);
             } else if (posts) {
-                posts.forEach(function (post) {
-                    post = addUrl(post);
+                posts.forEach(function (post, index) {
+                    posts[index] = addUrl(post);
                 });
                 return posts;
             }
@@ -986,8 +1014,8 @@ angular.module('clientHomeApp')
             if (post) {
                 return makeResp(post)
             } else if (posts) {
-                posts.forEach(function (post) {
-                    post = makeResp(post);
+                posts.forEach(function (post, index) {
+                    posts[index] = makeResp(post);
                 });
                 return posts;
             }
