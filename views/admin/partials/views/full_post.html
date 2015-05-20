@@ -2,135 +2,46 @@
      ng-controller="FullPostController">
 
     <!--the full post-->
-    <div ng-if="showPost"
+    <div ng-if="showEditPost"
          class="ng-cloak">
         <div class="panel-heading"><a href ng-click="back()"><i class="fa fa-arrow-left"></i> BACK</a>
             <span class="pull-right hidden-sm hidden-xs"
-                  ng-bind-html="post.createdAt | AddPostDate"></span>
+                  ng-bind-html="post.postDate"></span>
         </div>
 
         <div class="panel-body">
             <ul class="list-unstyled animated fadeIn">
-                <li class="list-unstyled clearfix"
-                    ng-if="!$root.isEditingPost">
+                <li class="list-unstyled clearfix">
                     <div class="card">
 
                         <div class="card-content">
 
                             <h1 class="text-outputs postHeading"
-                                ng-bind-html="post.postHeading | highlightText"></h1>
+                                ng-bind-html="post.postHeading"></h1>
 
                             <h3 class="text-muted postBy">
                                 <small>
                                     <a class="btn-link"
-                                       ng-bind-html="post.authorName | highlightText"></a> on
-                                    <span ng-bind-html="post.createdAt | AddPostDate"></span>
+                                       ng-bind-html="post.authorName"></a> on
+                                    <span ng-bind-html="post.postDate"></span>
                                 </small>
                                 <br/>
                                 <small class="text-muted"
-                                       ng-bind-html="post.createdAt | AddTimeAgo">
+                                       ng-bind-html="post.timeAgo">
                                 </small>
                             </h3>
 
-                            <div post-content></div>
+                            <div post-content model="post.postContent"></div>
                         </div>
 
                         <div class="card-action clearfix">
-                            <div post-tags></div>
+                            <div post-tags model="post.postTags"></div>
+
                             <div class="pull-right">
                                 <a class="btn-link btn btn-default btn-sm"
-                                   ng-click="goToTop(); $root.goIntoPostEditingMode()">Edit</a>
+                                   ng-href="/#!/editPost/{{post.postIndex}}"
+                                   ng-click="goToTop()">Edit</a>
                                 <a class="btn-link btn btn-default btn-sm">Delete</a>
-                            </div>
-
-                        </div>
-                    </div>
-                </li>
-
-                <li ng-show="$root.isEditingPost">
-                    <div class="card">
-                        <div class="card-content">
-                            <form name="editPostForm">
-                                <div class="padding-bottom-15">
-
-                                    <!--Heading field-->
-                                    <div class="form-group">
-                                        <label for="editPostHeading"><strong>Heading</strong></label>
-                                        <input type="text"
-                                               class="form-control"
-                                               id="editPostHeading"
-                                               placeholder="Enter heading"
-                                               ng-model="post.postHeading"
-                                               ng-minlength="10"
-                                               required
-                                               ng-disabled="universalDisable"
-                                               name="editPostHeading">
-
-                            <span class="form-error-notice"
-                                  ng-show="editPostForm.editPostHeading.$error.required"
-                                  ng-if='editPostForm.editPostHeading.$dirty'>
-                                <small>This is a required field:</small>
-                            </span>
-                            <span class="form-error-notice"
-                                  ng-show="editPostForm.editPostHeading.$error.minlength"
-                                  ng-if='editPostForm.editPostHeading.$dirty'>
-                                <small>Minimum length required is 10:</small>
-                            </span>
-                                    </div>
-
-                                </div>
-
-                                <div class="form-group">
-                                    <p><strong>Content</strong></p>
-
-                                    <text-angular
-                                            name="editPostMainContent"
-                                            ng-model="post.postContent"></text-angular>
-                                    <div content-messages model="post"></div>
-                                </div>
-
-                                <div class="form-group">
-                                    <p><strong>Post Summary</strong></p>
-
-                                    <text-angular
-                                            name="editPostSummary"
-                                            ng-model="post.postSummary">
-                                    </text-angular>
-                                    <div summary-messages model="post"></div>
-                                    <small class="form-help-notice">The post summary represents the post
-                                        in the list
-                                        of all posts. Limited to 2000 characters. Users will be able to
-                                        click a 'read more' link to see the main content of the post
-                                    </small>
-                                </div>
-
-                                <div class="form-group">
-                                    <p><strong>Tags</strong></p>
-
-                                    <tags-input name="editPostTags"
-                                                ng-model="post.postTags"
-                                                placeholder="Add tags"
-                                                min-length="3"
-                                                max-length="30"
-                                                max-tags="5">
-                                        <!--<auto-complete source="loadTags($query)"></auto-complete>-->
-                                    </tags-input>
-                                    <div tag-messages model="post"></div>
-                                    <small class="form-help-notice">Enter up to five tags</small>
-
-                                </div>
-
-                            </form>
-
-                        </div>
-
-                        <div class="card-action clearfix">
-
-                            <div class="pull-right">
-                                <a class="btn btn-default btn-sm"
-                                   href ng-click="cancelPostUpdate(); goToTop();">Cancel</a>
-                                <a class="btn btn-default btn-sm"
-                                   href ng-click="submitPostUpdate(); goToTop();">Save</a>
                             </div>
 
                         </div>
@@ -150,59 +61,4 @@
             </ul>
         </div>
     </div>
-
-    <!--showing suggested posts-->
-    <div ng-if="showSuggestedPosts"
-         class="ng-cloak">
-        <div class="panel-heading"><i class="fa fa-leanpub"></i> SUGGESTED POSTS
-            <span class="pull-right">
-            <a ng-href="/#!/home/1"><i class="fa fa-arrow-left"></i> Home</a>
-            </span>
-        </div>
-
-        <ul class="list-unstyled animated fadeIn">
-            <li class="list-unstyled post clearfix"
-                ng-repeat="post in suggestedPosts">
-                <div class="card">
-
-                    <div class="card-content">
-
-                        <h2 class="text-outputs postHeading"><a ng-href="/#!/post/{{post.postIndex}}"
-                                                                ng-click="goToTop()"
-                                                                ng-bind-html="post.postHeading"></a>
-                        </h2>
-
-                        <h3 class="text-muted postBy">
-                            <small>
-                                <a class="btn-link"
-                                   ng-bind-html="post.authorName"></a> on
-                                <span ng-bind-html="post.createdAt | AddPostDate"></span>
-                            </small>
-                            <br/>
-                            <small class="text-muted"
-                                   ng-bind-html="post.createdAt | AddTimeAgo">
-                            </small>
-                        </h3>
-
-                        <div class="postContent">
-                            <div ta-bind
-                                 ng-model="post.postSummary"></div>
-                        </div>
-
-
-                    </div>
-                    <div class="card-action clearfix">
-
-                        <div class="pull-right">
-                            <a ng-href="/#!/post/{{post.postIndex}}"
-                               ng-click="goToTop()"
-                               class="btn btn-default btn-sm">Read More</a>
-                        </div>
-
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </div>
-
 </div>

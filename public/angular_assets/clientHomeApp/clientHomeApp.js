@@ -26,8 +26,11 @@ angular.module('clientHomeApp', [
     .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
         $urlRouterProvider
             .when("/home", '/home/1')
-            .when("/home", '/home/1')
+            .when("/home/", '/home/1')
+            .when("/post", '/home/1')
+            .when("/post/", '/home/1')
             .when("/search", '/home/1')
+            .when("/search/", '/home/1')
             .otherwise("/home/1");
 
         $stateProvider

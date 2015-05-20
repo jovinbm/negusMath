@@ -1,6 +1,6 @@
 angular.module('adminHomeApp')
-    .factory('HotService', ['$log', '$http', '$window', '$rootScope', 'socket', 'socketService', 'globals',
-        function ($log, $http, $window, $rootScope, socket, socketService, globals) {
+    .factory('HotService', ['$filter', '$log', '$http', '$window', '$rootScope', 'socket',
+        function ($filter, $log, $http, $window, $rootScope, socket) {
 
             var hotThisWeek = [];
 
@@ -20,7 +20,11 @@ angular.module('adminHomeApp')
                 },
 
                 updateHotThisWeek: function (hotThisWeekArray) {
-                    hotThisWeek = hotThisWeekArray;
+                    if (hotThisWeekArray == []) {
+                        hotThisWeek = [];
+                    } else {
+                        hotThisWeek = $filter('preparePosts')(null, hotThisWeekArray);
+                    }
                     return hotThisWeekArray;
                 }
             };

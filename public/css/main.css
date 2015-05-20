@@ -28,6 +28,10 @@ img {
     max-width: 100%;
 }
 
+.no-margin-bottom {
+    margin-bottom: 0;
+}
+
 .navbar {
     font-size: 15px
 }

@@ -1,4 +1,4 @@
-angular.module('adminHomeApp')
+angular.module('clientHomeApp')
     .directive('titleDirective', ['globals', function (globals) {
         return {
             template: '<title ng-bind="defaultTitle">' + '</title>',
@@ -13,7 +13,7 @@ angular.module('adminHomeApp')
     }])
     .directive('universalSearchBox', ['$window', '$location', '$rootScope', 'globals', function ($window, $location, $rootScope, globals) {
         return {
-            templateUrl: 'views/admin/partials/smalls/universal_search_box.html',
+            templateUrl: 'views/client/partials/smalls/universal_search_box.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.mainSearchModel = {
@@ -55,7 +55,7 @@ angular.module('adminHomeApp')
     .directive('topNav', ['$rootScope', 'logoutService', function ($rootScope, logoutService) {
         return {
 
-            templateUrl: 'views/admin/partials/views/top_nav.html',
+            templateUrl: 'views/client/partials/views/top_nav.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.logoutClient = function () {
@@ -70,10 +70,61 @@ angular.module('adminHomeApp')
             }
         }
     }])
+    .directive('suggestedPosts', ['$rootScope', 'PostService', function ($rootScope, PostService) {
+        return {
+            templateUrl: 'views/client/partials/smalls/suggested_posts.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.suggestedPosts = PostService.getSuggestedPosts();
+
+                $scope.showSuggestedPosts = false;
+                $rootScope.showHideSuggestedPosts = function (bool) {
+                    if (bool) {
+                        $scope.showSuggestedPosts = true;
+                        //get new suggested posts
+                        getSuggestedPosts();
+                    } else {
+                        $scope.showSuggestedPosts = false;
+                    }
+                };
+
+                function getSuggestedPosts() {
+                    $scope.showLoadingBanner();
+                    PostService.getSuggestedPostsFromServer()
+                        .success(function (resp) {
+                            if ((resp.postsArray.length > 0)) {
+                                $scope.suggestedPosts = PostService.updateSuggestedPosts(resp.postsArray);
+                                $scope.hideLoadingBanner();
+                            } else {
+                                //empty the suggestedPosts
+                                $scope.suggestedPosts = [];
+                                $scope.showSuggestedPosts = false;
+                                $scope.goToTop();
+                                $scope.hideLoadingBanner();
+                            }
+
+                        })
+                        .error(function (errResp) {
+                            $scope.goToTop();
+                            //empty the suggestedPosts
+                            $scope.suggestedPosts = PostService.updateSuggestedPosts([]);
+                            $scope.showSuggestedPosts = false;
+                            $rootScope.responseStatusHandler(errResp);
+                            $scope.hideLoadingBanner();
+                        });
+
+                    //whatever happens, hide the pager
+                    $scope.hideThePager();
+                }
+
+                getSuggestedPosts();
+            }
+        }
+    }])
     .directive('pagerDirective', ['$window', '$location', '$rootScope', 'globals', function ($window, $location, $rootScope, globals) {
         return {
 
-            templateUrl: 'views/admin/partials/smalls/pager.html',
+            templateUrl: 'views/client/partials/smalls/pager.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.showPaging = false;

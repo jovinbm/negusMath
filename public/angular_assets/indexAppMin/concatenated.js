@@ -416,13 +416,13 @@ angular.module('indexApp')
             return (time <= local) ? span + ' ago' : 'in ' + span;
         }
     })
-    .filter("AddTimeAgo", ['$filter', function ($filter) {
+    .filter("getTimeAgo", ['$filter', function ($filter) {
         //takes in a post or an array of posts, and adds a timeAgo key in them
         return function (createdAt) {
             return $filter('timeago')(createdAt);
         }
     }])
-    .filter("AddPostDate", ['$filter', function () {
+    .filter("getPostDate", ['$filter', function () {
         //takes in a post or an array of posts, and adds a timeAgo key in them
         return function (createdAt) {
             return moment(createdAt).format("ddd, MMM D, H:mm");
@@ -456,9 +456,9 @@ angular.module('indexApp')
             var imgWrappedInDiv;
 
             function makeResp(post) {
-                if (post.postSummary) {
+                if (post.postHeading) {
                     //convert the element to string
-                    theElement = $("<div>" + post.postSummary + "</div>");
+                    theElement = $("<div>" + post.postHeading + "</div>");
 
                     //find the video iframe elements
                     imgElement = $('img.ta-insert-video', theElement);
@@ -474,7 +474,7 @@ angular.module('indexApp')
                         //replace in original
                         theElement.find('img').replaceWith(imgWrappedInDiv);
                     }
-                    post.postSummary = theElement.html();
+                    post.postHeading = theElement.html();
 
                 }
                 if (post.postContent) {

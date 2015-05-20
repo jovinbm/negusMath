@@ -1,11 +1,13 @@
 angular.module('clientHomeApp')
-    .factory('PostService', ['$log', '$http', '$window', '$rootScope', 'socket', 'socketService', 'globals',
-        function ($log, $http, $window, $rootScope, socket, socketService, globals, $stateParams) {
+    .factory('PostService', ['$filter', '$http', '$window', '$rootScope', '$interval', 'socket',
+        function ($filter, $http, $window, $rootScope, $interval, socket) {
 
+            var post = {};
+            var editPostModel = {};
             var posts = [];
             var postsCount = 0;
-
             var mainSearchResultsPosts = [];
+            var suggestedPosts = [];
 
             socket.on('newPost', function (data) {
                 //data here has the keys post, postCount
@@ -33,13 +35,32 @@ angular.module('clientHomeApp')
                     })
                 },
 
-                getSuggestedPostsFromServer: function () {
-                    return $http.post('/api/getSuggestedPosts', {})
+                updatePosts: function (postsArray) {
+                    if (postsArray == []) {
+                        posts = [];
+                    } else {
+                        posts = $filter('preparePosts')(null, postsArray);
+                    }
+                    return posts;
                 },
 
-                updatePosts: function (postsArray) {
-                    posts = postsArray;
-                    return postsArray;
+                addNewToPosts: function (newPost) {
+                    function makePost(theNewPost) {
+                        if (newPost == {}) {
+                            theNewPost = {}
+                        } else {
+                            theNewPost = $filter('preparePosts')(theNewPost, null);
+                        }
+                        return theNewPost;
+                    }
+
+                    var tempPost = makePost(newPost);
+                    posts.unshift(tempPost);
+                    return posts;
+                },
+
+                getCurrentPost: function () {
+                    return post;
                 },
 
                 getPostFromServer: function (postIndex) {
@@ -48,8 +69,21 @@ angular.module('clientHomeApp')
                     });
                 },
 
+                updatePost: function (newPost) {
+                    if (newPost == {}) {
+                        post = {}
+                    } else {
+                        post = $filter('preparePosts')(newPost, null);
+                    }
+                    return post;
+                },
+
                 getCurrentMainSearchResults: function () {
                     return mainSearchResultsPosts;
+                },
+
+                mainSearch: function (searchObject) {
+                    return $http.post('/api/mainSearch', searchObject);
                 },
 
                 updateMainSearchResults: function (resultValue) {
@@ -57,8 +91,33 @@ angular.module('clientHomeApp')
                     return mainSearchResultsPosts;
                 },
 
-                mainSearch: function (searchObject) {
-                    return $http.post('/api/mainSearch', searchObject);
+                getSuggestedPosts: function () {
+                    return suggestedPosts;
+                },
+
+                getSuggestedPostsFromServer: function () {
+                    return $http.post('/api/getSuggestedPosts', {})
+                },
+
+                updateSuggestedPosts: function (suggestedPostsArray) {
+                    if (suggestedPostsArray == []) {
+                        suggestedPosts = [];
+                    } else {
+                        suggestedPosts = $filter('preparePosts')(null, suggestedPostsArray);
+                    }
+                    return suggestedPosts;
+                },
+
+                submitNewPost: function (newPost) {
+                    return $http.post('/api/newPost', {
+                        newPost: newPost
+                    });
+                },
+
+                submitPostUpdate: function (post) {
+                    return $http.post('/api/updatePost', {
+                        postUpdate: post
+                    });
                 }
             };
         }]);

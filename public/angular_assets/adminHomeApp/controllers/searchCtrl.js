@@ -13,7 +13,7 @@ angular.module('adminHomeApp')
             //change to default document title
             globals.changeDocumentTitle($rootScope.$stateParams.queryString + " - NegusMath Search");
 
-            $scope.mainSearchResultsPosts = PostService.getCurrentPosts();
+            $scope.mainSearchResultsPosts = PostService.getCurrentMainSearchResults();
             $scope.mainSearchResultsCount = 0;
 
             $scope.changeCurrentPage = function (page) {
@@ -29,20 +29,20 @@ angular.module('adminHomeApp')
             $scope.showSuggestedPosts = false;
 
             $scope.showMainSearchResultsOnly = function () {
-                $scope.showHideLoadingBanner(false);
+                $scope.hideLoadingBanner();
                 $scope.showMainSearchResults = true;
                 $scope.showSuggestedPosts = false;
             };
 
             $scope.showSuggestedPostsOnly = function () {
-                $scope.showHideLoadingBanner(false);
+                $scope.hideLoadingBanner();
                 $scope.showMainSearchResults = false;
                 $scope.showSuggestedPosts = true;
             };
 
             //function used to fill in with suggested posts in case no posts are received
             function getSuggestedPosts() {
-                $scope.showHideLoadingBanner(true);
+                $scope.showLoadingBanner();
                 //empty the suggestedPosts
                 $scope.suggestedPosts = [];
                 PostService.getSuggestedPostsFromServer()
@@ -56,13 +56,13 @@ angular.module('adminHomeApp')
                             $scope.suggestedPosts = [];
                             $scope.showSuggestedPosts = false;
                             $scope.goToTop();
-                            $scope.showHideLoadingBanner(false);
+                            $scope.hideLoadingBanner();
                         }
 
                     })
                     .error(function (errResp) {
                         $scope.goToTop();
-                        $scope.showHideLoadingBanner(false);
+                        $scope.hideLoadingBanner();
                         //empty the suggestedPosts
                         $scope.suggestedPosts = [];
                         $scope.showSuggestedPosts = false;
@@ -74,7 +74,7 @@ angular.module('adminHomeApp')
             }
 
             function getMainSearchResults() {
-                $scope.showHideLoadingBanner(true);
+                $scope.showLoadingBanner();
 
                 $scope.mainSearchModel = {
                     queryString: $rootScope.$stateParams.queryString || '',

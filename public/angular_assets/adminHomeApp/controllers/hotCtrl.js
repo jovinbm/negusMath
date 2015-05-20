@@ -10,6 +10,7 @@ angular.module('adminHomeApp')
                         $scope.hotThisWeek = HotService.updateHotThisWeek(resp.hotThisWeek);
                     })
                     .error(function (errResp) {
+                        $scope.hotThisWeek = HotService.updateHotThisWeek([]);
                         $rootScope.responseStatusHandler(errResp);
                     });
             }

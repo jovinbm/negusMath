@@ -2,41 +2,40 @@
      ng-controller="FullPostController">
 
     <!--the full post-->
-    <div ng-if="showPost"
+    <div ng-if="showEditPost"
          class="ng-cloak">
         <div class="panel-heading"><a href ng-click="back()"><i class="fa fa-arrow-left"></i> BACK</a>
             <span class="pull-right hidden-sm hidden-xs"
-                  ng-bind-html="post.createdAt | AddPostDate"></span>
+                  ng-bind-html="post.postDate"></span>
         </div>
 
         <div class="panel-body">
             <ul class="list-unstyled animated fadeIn">
-                <li class="list-unstyled clearfix"
-                    ng-show="!editingMode">
+                <li class="list-unstyled clearfix">
                     <div class="card">
 
                         <div class="card-content">
 
                             <h1 class="text-outputs postHeading"
-                                ng-bind-html="post.postHeading | highlightText"></h1>
+                                ng-bind-html="post.postHeading"></h1>
 
                             <h3 class="text-muted postBy">
                                 <small>
                                     <a class="btn-link"
-                                       ng-bind-html="post.authorName | highlightText"></a> on
-                                    <span ng-bind-html="post.createdAt | AddPostDate"></span>
+                                       ng-bind-html="post.authorName"></a> on
+                                    <span ng-bind-html="post.postDate"></span>
                                 </small>
                                 <br/>
                                 <small class="text-muted"
-                                       ng-bind-html="post.createdAt | AddTimeAgo">
+                                       ng-bind-html="post.timeAgo">
                                 </small>
                             </h3>
 
-                            <div post-content></div>
+                            <div post-content model="post.postContent"></div>
                         </div>
 
                         <div class="card-action clearfix">
-                            <div post-tags></div>
+                            <div post-tags model="post.postTags"></div>
                         </div>
                     </div>
                 </li>
@@ -54,59 +53,4 @@
             </ul>
         </div>
     </div>
-
-    <!--showing suggested posts-->
-    <div ng-if="showSuggestedPosts"
-         class="ng-cloak">
-        <div class="panel-heading"><i class="fa fa-leanpub"></i> SUGGESTED POSTS
-            <span class="pull-right">
-            <a ng-href="/#!/home/1"><i class="fa fa-arrow-left"></i> Home</a>
-            </span>
-        </div>
-
-        <ul class="list-unstyled animated fadeIn">
-            <li class="list-unstyled post clearfix"
-                ng-repeat="post in suggestedPosts">
-                <div class="card">
-
-                    <div class="card-content">
-
-                        <h2 class="text-outputs postHeading"><a ng-href="/#!/post/{{post.postIndex}}"
-                                                                ng-click="goToTop()"
-                                                                ng-bind-html="post.postHeading"></a>
-                        </h2>
-
-                        <h3 class="text-muted postBy">
-                            <small>
-                                <a class="btn-link"
-                                   ng-bind-html="post.authorName"></a> on
-                                <span ng-bind-html="post.createdAt | AddPostDate"></span>
-                            </small>
-                            <br/>
-                            <small class="text-muted"
-                                   ng-bind-html="post.createdAt | AddTimeAgo">
-                            </small>
-                        </h3>
-
-                        <div class="postContent">
-                            <div ta-bind
-                                 ng-model="post.postSummary"></div>
-                        </div>
-
-
-                    </div>
-                    <div class="card-action clearfix">
-
-                        <div class="pull-right">
-                            <a ng-href="/#!/post/{{post.postIndex}}"
-                               ng-click="goToTop()"
-                               class="btn btn-default btn-sm">Read More</a>
-                        </div>
-
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </div>
-
 </div>

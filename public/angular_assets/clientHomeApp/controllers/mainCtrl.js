@@ -2,62 +2,11 @@ angular.module('clientHomeApp')
     .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', 'logoutService', '$document', 'fN',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, logoutService, $document, fN) {
 
+            //index page url
             $scope.indexPageUrl = globals.allData.indexPageUrl;
 
-            //back navigation functionality
-            var history = [];
-            $rootScope.stateHistory = [];
-            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
-                history.push($location.$$path);
-                //push the previous state also
-                var temp = {};
-                temp[fromState.name] = fromParams;
-                $rootScope.stateHistory.push(temp);
-            });
-            $rootScope.back = function () {
-                var prevUrl = history.length > 1 ? history.splice(-2)[0] : "/";
-                $location.path(prevUrl);
-            };
-
-            $scope.showHideLoadingBanner = function (bool) {
-                if ($rootScope.showHideLoadingBanner) {
-                    $rootScope.showHideLoadingBanner(bool);
-                }
-            };
-
-            $scope.showThePager = function () {
-                if ($rootScope.showThePager) {
-                    $rootScope.showThePager();
-                }
-            };
-
-            $scope.hideThePager = function () {
-                if ($rootScope.hideThePager) {
-                    $rootScope.hideThePager();
-                }
-            };
-
-            $scope.changePagingTotalCount = function (newTotalCount) {
-                if ($rootScope.changePagingTotalCount) {
-                    $rootScope.changePagingTotalCount(newTotalCount);
-                }
-            };
-
+            //disqus
             $scope.showDisqus = $location.host().search("negusmath") !== -1;
-
-            $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-                $rootScope.clearBanners();
-                $rootScope.clearToasts();
-            });
-
-            //register error handler error handler
-            $rootScope.responseStatusHandler = function (resp) {
-                $filter('responseFilter')(resp);
-            };
-
-            $rootScope.clearBanners = function () {
-                $rootScope.$broadcast('clearBanners');
-            };
 
             //scrolling functions
             var duration = 0; //milliseconds
@@ -109,6 +58,85 @@ angular.module('clientHomeApp')
             });
 
             initialRequests();
+
+            //$scope functions to be used in other controllers and directives
+            //back navigation functionality
+            var history = [];
+            $rootScope.stateHistory = [];
+            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+                history.push($location.$$path);
+                //push the previous state also
+                var temp = {};
+                temp[fromState.name] = fromParams;
+                $rootScope.stateHistory.push(temp);
+            });
+            $rootScope.back = function () {
+                var prevUrl = history.length > 1 ? history.splice(-2)[0] : "/";
+                $location.path(prevUrl);
+            };
+
+            $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+                $rootScope.clearBanners();
+                $rootScope.clearToasts();
+
+                //variable to keep track of when the user is editing the post
+                $rootScope.isEditingPost = false;
+            });
+
+            //register error handler error handler
+            $rootScope.responseStatusHandler = function (resp) {
+                $filter('responseFilter')(resp);
+            };
+
+            $rootScope.clearBanners = function () {
+                $rootScope.$broadcast('clearBanners');
+            };
+
+            //loading banner
+            $scope.showLoadingBanner = function () {
+                if ($rootScope.showHideLoadingBanner) {
+                    $rootScope.showHideLoadingBanner(true);
+                }
+            };
+
+            $scope.hideLoadingBanner = function () {
+                if ($rootScope.showHideLoadingBanner) {
+                    $rootScope.showHideLoadingBanner(false);
+                }
+            };
+
+            //pager
+            $scope.showThePager = function () {
+                if ($rootScope.showThePager) {
+                    $rootScope.showThePager();
+                }
+            };
+
+            $scope.hideThePager = function () {
+                if ($rootScope.hideThePager) {
+                    $rootScope.hideThePager();
+                }
+            };
+
+            //suggestedPosts
+            $scope.showSuggested = function () {
+                if ($rootScope.showHideSuggestedPosts) {
+                    $rootScope.showHideSuggestedPosts(true);
+                }
+            };
+
+            $scope.hideSuggested = function () {
+                if ($rootScope.showHideSuggestedPosts) {
+                    $rootScope.showHideSuggestedPosts(false);
+                }
+            };
+
+            //total posts count
+            $scope.changePagingTotalCount = function (newTotalCount) {
+                if ($rootScope.changePagingTotalCount) {
+                    $rootScope.changePagingTotalCount(newTotalCount);
+                }
+            };
 
             //===============socket listeners===============
 

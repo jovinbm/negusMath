@@ -1,12 +1,13 @@
 angular.module('adminHomeApp')
-    .factory('PostService', ['$log', '$http', '$window', '$rootScope', 'socket', 'socketService', 'globals',
-        function ($log, $http, $window, $rootScope, socket, socketService, globals, $stateParams) {
+    .factory('PostService', ['$filter', '$http', '$window', '$rootScope', '$interval', 'socket',
+        function ($filter, $http, $window, $rootScope, $interval, socket) {
 
             var post = {};
+            var editPostModel = {};
             var posts = [];
             var postsCount = 0;
-
             var mainSearchResultsPosts = [];
+            var suggestedPosts = [];
 
             socket.on('newPost', function (data) {
                 //data here has the keys post, postCount
@@ -34,17 +35,32 @@ angular.module('adminHomeApp')
                     })
                 },
 
-                getSuggestedPostsFromServer: function () {
-                    return $http.post('/api/getSuggestedPosts', {})
+                updatePosts: function (postsArray) {
+                    if (postsArray == []) {
+                        posts = [];
+                    } else {
+                        posts = $filter('preparePosts')(null, postsArray);
+                    }
+                    return posts;
+                },
+
+                addNewToPosts: function (newPost) {
+                    function makePost(theNewPost) {
+                        if (newPost == {}) {
+                            theNewPost = {}
+                        } else {
+                            theNewPost = $filter('preparePosts')(theNewPost, null);
+                        }
+                        return theNewPost;
+                    }
+
+                    var tempPost = makePost(newPost);
+                    posts.unshift(tempPost);
+                    return posts;
                 },
 
                 getCurrentPost: function () {
                     return post;
-                },
-
-                updatePosts: function (postsArray) {
-                    posts = postsArray;
-                    return postsArray;
                 },
 
                 getPostFromServer: function (postIndex) {
@@ -54,8 +70,65 @@ angular.module('adminHomeApp')
                 },
 
                 updatePost: function (newPost) {
-                    post = newPost;
+                    if (newPost == {}) {
+                        post = {}
+                    } else {
+                        post = $filter('preparePosts')(newPost, null);
+                    }
                     return post;
+                },
+
+                getCurrentEditPostModel: function () {
+                    if (editPostModel == {}) {
+                        return {}
+                    } else {
+                        return editPostModel;
+                    }
+                },
+
+                getCurrentEditPostModelFromServer: function (postIndex) {
+                    return $http.post('/api/getPost', {
+                        postIndex: postIndex
+                    });
+                },
+
+                updateCurrentEditPostModel: function (newPost) {
+                    if (newPost == {}) {
+                        editPostModel = {}
+                    } else {
+                        editPostModel = newPost;
+                    }
+                    return editPostModel;
+                },
+
+                getCurrentMainSearchResults: function () {
+                    return mainSearchResultsPosts;
+                },
+
+                mainSearch: function (searchObject) {
+                    return $http.post('/api/mainSearch', searchObject);
+                },
+
+                updateMainSearchResults: function (resultValue) {
+                    mainSearchResultsPosts = resultValue;
+                    return mainSearchResultsPosts;
+                },
+
+                getSuggestedPosts: function () {
+                    return suggestedPosts;
+                },
+
+                getSuggestedPostsFromServer: function () {
+                    return $http.post('/api/getSuggestedPosts', {})
+                },
+
+                updateSuggestedPosts: function (suggestedPostsArray) {
+                    if (suggestedPostsArray == []) {
+                        suggestedPosts = [];
+                    } else {
+                        suggestedPosts = $filter('preparePosts')(null, suggestedPostsArray);
+                    }
+                    return suggestedPosts;
                 },
 
                 submitNewPost: function (newPost) {
@@ -68,19 +141,6 @@ angular.module('adminHomeApp')
                     return $http.post('/api/updatePost', {
                         postUpdate: post
                     });
-                },
-
-                getCurrentMainSearchResults: function () {
-                    return mainSearchResultsPosts;
-                },
-
-                updateMainSearchResults: function (resultValue) {
-                    mainSearchResultsPosts = resultValue;
-                    return mainSearchResultsPosts;
-                },
-
-                mainSearch: function (searchObject) {
-                    return $http.post('/api/mainSearch', searchObject);
                 }
             };
         }]);

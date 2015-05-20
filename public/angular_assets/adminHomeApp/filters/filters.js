@@ -55,13 +55,13 @@ angular.module('adminHomeApp')
             return (time <= local) ? span + ' ago' : 'in ' + span;
         }
     })
-    .filter("AddTimeAgo", ['$filter', function ($filter) {
+    .filter("getTimeAgo", ['$filter', function ($filter) {
         //takes in a post or an array of posts, and adds a timeAgo key in them
         return function (createdAt) {
             return $filter('timeago')(createdAt);
         }
     }])
-    .filter("AddPostDate", ['$filter', function () {
+    .filter("getPostDate", ['$filter', function () {
         //takes in a post or an array of posts, and adds a timeAgo key in them
         return function (createdAt) {
             return moment(createdAt).format("ddd, MMM D, H:mm");
@@ -85,6 +85,11 @@ angular.module('adminHomeApp')
                 });
                 return posts;
             }
+        }
+    }])
+    .filter("getPostUrl", ['$filter', function () {
+        return function (postIndex) {
+            return 'http://www.negusmath.com/#!/post/' + postIndex;
         }
     }])
     .filter("makeVideoIframesResponsive", ['$filter', function () {
@@ -149,13 +154,51 @@ angular.module('adminHomeApp')
             }
         }
     }])
+    .filter("getVideoResponsiveVersion", ['$filter', function () {
+        //making embedded videos responsive
+        return function (textString) {
+            var theElement;
+            var imgElement;
+            var imgWrappedInDiv;
+
+            function makeResp(textString) {
+                //convert the element to string
+                theElement = $("<div>" + textString + "</div>");
+
+                //find the video iframe elements
+                imgElement = $('img.ta-insert-video', theElement);
+
+                //only perform operation if there are iframes available
+                if (imgElement.length > 0) {
+
+                    //add class and wrap in div
+                    imgWrappedInDiv = imgElement
+                        .addClass('embed-responsive-item')
+                        .wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
+
+                    //replace in original
+                    theElement.find('img').replaceWith(imgWrappedInDiv);
+                }
+                return theElement.html();
+            }
+
+            if (textString) {
+                return makeResp(textString)
+            } else {
+                return textString;
+            }
+        }
+    }])
     .filter("highlightText", ['$filter', '$rootScope', function ($filter, $rootScope) {
         //making embedded videos responsive
-        return function (theElementString) {
-
+        //the highlight variable should be a boolean to make the function
+        //know if to highlight or not
+        //if false then the function will remove highlight
+        return function (theElementString, highlight) {
             //text is highlighted only if the present or previous state was search
             //this fn checks if the present or previous state was search, and returns an object with status false if not
             //if true, the returned object carries the queryString with it
+
             function checkSearchState() {
                 //check latest state
                 if ($rootScope.$state.current.name == 'search') {
@@ -183,19 +226,27 @@ angular.module('adminHomeApp')
             }
 
             function highLightThisText(textToHighlight) {
-                var finalString = textToHighlight;
-                var highlightDetails = checkSearchState();
-                if (highlightDetails.status === true) {
-                    //highlight
-                    var theElement = $("<div>" + textToHighlight + "</div>");
-                    $(theElement).highlight(highlightDetails.queryString);
-                    finalString = theElement.html();
+                if (highlight) {
+                    var finalString = textToHighlight;
+                    var highlightDetails = checkSearchState();
+                    if (highlightDetails.status === true) {
+                        //highlight
+                        var theElement = $("<div>" + textToHighlight + "</div>");
+                        $(theElement).highlight(highlightDetails.queryString);
+                        finalString = theElement.html();
+                    } else {
+                        //remove highlight
+                        var theElement2 = $("<div>" + textToHighlight + "</div>");
+                        $(theElement2).removeHighlight();
+                        finalString = theElement2.html();
+                    }
                 } else {
                     //remove highlight
-                    var theElement2 = $("<div>" + textToHighlight + "</div>");
-                    $(theElement2).removeHighlight();
-                    finalString = theElement2.html();
+                    var theElement3 = $("<div>" + textToHighlight + "</div>");
+                    $(theElement3).removeHighlight();
+                    finalString = theElement3.html();
                 }
+
                 return finalString;
             }
 
@@ -203,10 +254,77 @@ angular.module('adminHomeApp')
 
         }
     }])
+    .filter("preparePosts", ['$filter', function ($filter) {
+        //making embedded videos responsive
+        return function (post, posts) {
+            function highlightPostTags(postTags) {
+                postTags.forEach(function (tag, index) {
+                    postTags[index].text = $filter('highlightText')(tag.text, true);
+                });
+
+                return postTags;
+            }
+
+            function prepare(post) {
+                post.timeAgo = $filter('getTimeAgo')(post.createdAt);
+                post.postDate = $filter('getPostDate')(post.createdAt);
+                post.postUrl = $filter('getPostUrl')(post.postIndex);
+                post.postHeading = $filter('highlightText')(post.postHeading, true);
+                post.authorName = $filter('highlightText')(post.authorName, true);
+                post.postSummary = $filter('highlightText')($filter('getVideoResponsiveVersion')(post.postSummary), true);
+                post.postContent = $filter('highlightText')($filter('getVideoResponsiveVersion')(post.postContent), true);
+                post.postTags = highlightPostTags(post.postTags);
+
+                return post;
+            }
+
+            if (post) {
+                return prepare(post)
+            } else if (posts) {
+                posts.forEach(function (post, index) {
+                    posts[index] = prepare(post);
+                });
+                return posts;
+            }
+        }
+    }])
+    .filter("removeHighlights", ['$filter', function ($filter) {
+        //making embedded videos responsive
+        return function (post, posts) {
+            function removePostTagsHighlight(postTags) {
+                postTags.forEach(function (tag, index) {
+                    postTags[index].text = $filter('highlightText')(tag.text, false);
+                });
+
+                return postTags;
+            }
+
+            function prepare(post) {
+                post.timeAgo = $filter('getTimeAgo')(post.createdAt);
+                post.postDate = $filter('getPostDate')(post.createdAt);
+                post.postUrl = $filter('getPostUrl')(post.postIndex);
+                post.postHeading = $filter('highlightText')(post.postHeading, false);
+                post.authorName = $filter('highlightText')(post.authorName, false);
+                post.postSummary = $filter('highlightText')(post.postSummary, false);
+                post.postContent = $filter('highlightText')(post.postContent, false);
+                post.postTags = removePostTagsHighlight(post.postTags);
+
+                return post;
+            }
+
+            if (post) {
+                return prepare(post)
+            } else if (posts) {
+                posts.forEach(function (post, index) {
+                    posts[index] = prepare(post);
+                });
+                return posts;
+            }
+        }
+    }])
     .filter("responseFilter", ['$q', '$filter', '$log', '$interval', '$window', '$location', '$rootScope', 'globals', function ($q, $filter, $log, $interval, $window, $location, $rootScope, globals) {
         //making embedded videos responsive
         return function (resp) {
-
             function makeBanner(show, bannerClass, msg) {
                 return {
                     show: show ? true : false,

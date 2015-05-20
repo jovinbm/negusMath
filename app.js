@@ -2,6 +2,7 @@ var envVariables = require('./environment_config.js');
 var databaseURL = envVariables.databaseURL();
 var databaseURL2 = envVariables.databaseURL2();
 var databaseURL3 = "mongodb://localhost:27017/math4";
+var dbUrl = databaseURL;
 
 //THE APP
 var express = require('express');
@@ -26,11 +27,11 @@ var moment = require('moment');
 console.log("ENVIRONMENT = " + process.env.NODE_ENV);
 
 //mongoose.set('debug', true);
-mongoose.connect(databaseURL3);
+mongoose.connect(dbUrl);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error: Problem while attempting to connect to database'));
 db.once('open', function () {
-    console.log("Successfully connected to database");
+    console.log("Successfully connected to database " + dbUrl);
 });
 
 var basic = require('./functions/basic.js');

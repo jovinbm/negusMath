@@ -1,4 +1,3 @@
-var userDB = require('../db/user_db.js');
 var basic = require('../functions/basic.js');
 var consoleLogger = require('../functions/basic.js').consoleLogger;
 var path = require('path');
@@ -45,54 +44,79 @@ module.exports = {
         }
 
         //check the firstName
-        if (firstName.length > 30 && errors == 0) {
-            consoleLogger("YES");
-            error('First name should have at most 30 characters');
-            ++errors;
+        if (errors == 0) {
+            if (firstName.length > 30) {
+                consoleLogger("YES");
+                error('First name should have at most 30 characters');
+                ++errors;
+            }
         }
-        if (firstName.length < 2 && errors == 0) {
-            error('First name should have at least 2 characters');
-            ++errors;
+
+        if (errors == 0) {
+            if (firstName.length < 2) {
+                error('First name should have at least 2 characters');
+                ++errors;
+            }
         }
 
         //check the lastName
-        if (lastName.length > 30 && errors == 0) {
-            ++errors;
-            error('Last name should have at most 30 characters');
+        if (errors == 0) {
+            if (lastName.length > 30) {
+                ++errors;
+                error('Last name should have at most 30 characters');
+            }
         }
-        if (lastName.length < 2 && errors == 0) {
-            ++errors;
-            error('Last name should have at least 2 characters');
+
+        if (errors == 0) {
+            if (lastName.length < 2) {
+                ++errors;
+                error('Last name should have at least 2 characters');
+            }
         }
 
         //check the username
-        if (!(usernameRegex.test(username)) && errors == 0) {
-            ++errors;
-            error('Please enter a valid username. Only letters, numbers and underscores allowed');
+        if (errors == 0) {
+            if (!(usernameRegex.test(username))) {
+                ++errors;
+                error('Please enter a valid username. Only letters, numbers and underscores allowed');
+            }
         }
-        if (username.length > 10 && errors == 0) {
-            ++errors;
-            error('Username should have at most 10 characters');
+
+        if (errors == 0) {
+            if (username.length > 10) {
+                ++errors;
+                error('Username should have at most 10 characters');
+            }
         }
-        if (username.length < 4 && errors == 0) {
-            ++errors;
-            error('Username should have at least 2 characters');
+
+        if (errors == 0) {
+            if (username.length < 4) {
+                ++errors;
+                error('Username should have at least 2 characters');
+            }
         }
 
         //check the email
-        if (!(emailRegex.test(email)) && errors == 0) {
-            ++errors;
-            error('Please enter a valid email');
+        if (errors == 0) {
+            if (!(emailRegex.test(email))) {
+                ++errors;
+                error('Please enter a valid email');
+            }
         }
 
         //check passwords
-        if (!(passwordRegex.test(password1)) && errors == 0) {
-            ++errors;
-            error('Please enter a valid password. Only letters, numbers and underscores allowed');
+        if (errors == 0) {
+            if (!(passwordRegex.test(password1))) {
+                ++errors;
+                error('Please enter a valid password. Only letters, numbers and underscores allowed');
+            }
         }
-        if ((password1 != password2) && errors == 0) {
-            ++errors;
-            error("The passwords you entered don't match");
+
+        if (errors == 0) {
+            if ((password1 != password2)) {
+                ++errors;
+                error("The passwords you entered don't match");
+            }
         }
 
         if (errors == 0) {
@@ -125,17 +149,25 @@ module.exports = {
         }
 
         //check the username
-        if (!(usernameRegex.test(username)) && errors == 0) {
-            ++errors;
-            error('Please enter a valid username. Only letters, numbers and underscores allowed');
+        if (errors == 0) {
+            if (!(usernameRegex.test(username))) {
+                ++errors;
+                error('Please enter a valid username. Only letters, numbers and underscores allowed');
+            }
         }
-        if (username.length > 10 && errors == 0) {
-            ++errors;
-            error('Username should have at most 10 characters');
+
+        if (errors == 0) {
+            if (username.length > 10) {
+                ++errors;
+                error('Username should have at most 10 characters');
+            }
         }
-        if (username.length < 4 && errors == 0) {
-            ++errors;
-            error('Username should have at least 4 characters');
+
+        if (errors == 0) {
+            if (username.length < 4) {
+                ++errors;
+                error('Username should have at least 4 characters');
+            }
         }
 
         if (errors == 0) {
@@ -168,9 +200,11 @@ module.exports = {
         }
 
         //check passwords
-        if (!(passwordRegex.test(password)) && errors == 0) {
-            ++errors;
-            error('Please enter a valid password. Only letters, numbers and underscores allowed');
+        if (errors == 0) {
+            if (!(passwordRegex.test(password))) {
+                ++errors;
+                error('Please enter a valid password. Only letters, numbers and underscores allowed');
+            }
         }
 
         if (errors == 0) {
@@ -203,19 +237,23 @@ module.exports = {
         }
 
         //check the email
-        if (!(emailRegex.test(email)) && errors == 0) {
-            ++errors;
-            error('Please enter a valid email');
+        if (errors == 0) {
+            if (!(emailRegex.test(email))) {
+                ++errors;
+                error('Please enter a valid email');
+            }
         }
 
-        if (message && errors == 0) {
-            if (message.length == 0) {
+        if (errors == 0) {
+            if (message) {
+                if (message.length == 0) {
+                    ++errors;
+                    error('Please enter a message');
+                }
+            } else {
                 ++errors;
                 error('Please enter a message');
             }
-        } else {
-            ++errors;
-            error('Please enter a message');
         }
 
         if (errors == 0) {
@@ -249,23 +287,33 @@ module.exports = {
         }
 
         //check the username
-        if (!(usernameRegex.test(username)) && errors == 0) {
-            ++errors;
-            error('Please enter a valid username. Only letters, numbers and underscores allowed');
+        if (errors == 0) {
+            if (!(usernameRegex.test(username))) {
+                ++errors;
+                error('Please enter a valid username. Only letters, numbers and underscores allowed');
+            }
         }
-        if (username.length > 10 && errors == 0) {
-            ++errors;
-            error('Username should have at most 10 characters');
+
+        if (errors == 0) {
+            if (username.length > 10) {
+                ++errors;
+                error('Username should have at most 10 characters');
+            }
         }
-        if (username.length < 4 && errors == 0) {
-            ++errors;
-            error('Username should have at least 4 characters');
+
+        if (errors == 0) {
+            if (username.length < 4) {
+                ++errors;
+                error('Username should have at least 4 characters');
+            }
         }
 
         //check passwords
-        if (!(passwordRegex.test(password)) && errors == 0) {
-            ++errors;
-            error('Please enter a valid password. Only letters, numbers and underscores allowed');
+        if (errors == 0) {
+            if (!(passwordRegex.test(password))) {
+                ++errors;
+                error('Please enter a valid password. Only letters, numbers and underscores allowed');
+            }
         }
 
         if (errors == 0) {
@@ -293,90 +341,114 @@ module.exports = {
         //check that all fields in the new post are available
 
         //validate heading
-        if ((theNewPost.postHeading == null || theNewPost.postHeading == undefined) && errors == 0) {
-            ++errors;
-            error('Missing heading field');
-        }
-        //check that at least at least one character is non-whitespace
-        if (!(noWhiteSpaceRegex.test(theNewPost.postHeading)) && errors == 0) {
-            ++errors;
-            error('Heading does not seem to be right. Please check and try again');
+        if (errors == 0) {
+            if ((theNewPost.postHeading == null || theNewPost.postHeading == undefined)) {
+                ++errors;
+                error('Missing heading field');
+            }
         }
 
-        if (theNewPost.postHeading.length == 0 && errors == 0) {
-            ++errors;
-            error('The heading cannot be empty');
+        //check that at least at least one character is non-whitespace
+        if (errors == 0) {
+            if (!(noWhiteSpaceRegex.test(theNewPost.postHeading))) {
+                ++errors;
+                error('Heading does not seem to be right. Please check and try again');
+            }
+        }
+
+        if (errors == 0) {
+            if (theNewPost.postHeading.length == 0) {
+                ++errors;
+                error('The heading cannot be empty');
+            }
         }
 
         //validate content
-        if ((theNewPost.postContent == null || theNewPost.postContent == undefined) && errors == 0) {
-            ++errors;
-            error('Missing content field');
+        if (errors == 0) {
+            if ((theNewPost.postContent == null || theNewPost.postContent == undefined)) {
+                ++errors;
+                error('Missing content field');
+            }
         }
 
-        var postContent = cheerio(theNewPost.postSummary).text();
+        var postContent = cheerio(theNewPost.postContent).text();
 
         //check that at least at least one character is non-whitespace
-        if (!(noWhiteSpaceRegex.test(postContent)) && errors == 0) {
-            ++errors;
-            error('The post content does not seem to be right. Please check and try again');
+        if (errors == 0) {
+            if (!(noWhiteSpaceRegex.test(postContent))) {
+                ++errors;
+                error('The post content does not seem to be right. Please check and try again');
+            }
         }
 
-        if (postContent.length == 0 && errors == 0) {
-            ++errors;
-            error('The post content cannot be empty');
+        if (errors == 0) {
+            if (postContent.length == 0) {
+                ++errors;
+                error('The post content cannot be empty');
+            }
         }
 
         //validate summary
-        if ((theNewPost.postSummary == null || theNewPost.postSummary == undefined) && errors == 0) {
-            ++errors;
-            error('Missing summary field');
+        if (errors == 0) {
+            if ((theNewPost.postSummary == null || theNewPost.postSummary == undefined)) {
+                ++errors;
+                error('Missing summary field');
+            }
         }
 
         var postSummary = cheerio(theNewPost.postSummary).text();
 
         //check that at least at least one character is non-whitespace
-        if (!(noWhiteSpaceRegex.test(theNewPost.postSummary)) && errors == 0) {
-            ++errors;
-            error('The post summary does not seem to be right. Please check and try again');
+        if (errors == 0) {
+            if (!(noWhiteSpaceRegex.test(theNewPost.postSummary))) {
+                ++errors;
+                error('The post summary does not seem to be right. Please check and try again');
+            }
         }
 
-        if (postSummary.length == 0 && errors == 0) {
-            ++errors;
-            error('The post content cannot be empty');
+        if (errors == 0) {
+            if (postSummary.length == 0) {
+                ++errors;
+                error('The post summary cannot be empty');
+            }
         }
 
-        if (postSummary.length > 2000 && errors == 0) {
-            ++errors;
-            error('The post summary cannot exceed 2000 characters');
+        if (errors == 0) {
+            if (postSummary.length > 2000) {
+                ++errors;
+                error('The post summary cannot exceed 2000 characters');
+            }
         }
 
         //validate tags
-        if ((theNewPost.postTags == null || theNewPost.postTags == undefined) && errors == 0) {
-            ++errors;
-            error('Missing postTags field');
-        }
         if (errors == 0) {
-            var tags = theNewPost.postTags;
-            var numberOfTags = 0;
-            tags.forEach(function (tag) {
-                numberOfTags++;
-                if (errors == 0) {
-                    if (tag.text.length < 3 && errors == 0) {
-                        errors++;
-                        error('Minimum allowed length for each tag is 3 characters');
-                    }
+            if ((theNewPost.postTags == null || theNewPost.postTags == undefined) && errors == 0) {
+                ++errors;
+                error('Missing postTags field');
+            }
 
-                    if (tag.text.length > 30 && errors == 0) {
-                        errors++;
-                        error('Maximum allowed length for each tag is 30 characters');
+            if (errors == 0) {
+                var tags = theNewPost.postTags;
+                var numberOfTags = 0;
+                tags.forEach(function (tag) {
+                    numberOfTags++;
+                    if (errors == 0) {
+                        if (tag.text.length < 3 && errors == 0) {
+                            errors++;
+                            error('Minimum allowed length for each tag is 3 characters');
+                        }
+
+                        if (tag.text.length > 30 && errors == 0) {
+                            errors++;
+                            error('Maximum allowed length for each tag is 30 characters');
+                        }
                     }
+                });
+
+                if (numberOfTags > 5 && errors == 0) {
+                    errors++;
+                    error('Only a maximum of 10 tags are allowed per post');
                 }
-            });
-
-            if (numberOfTags > 5 && errors == 0) {
-                errors++;
-                error('Only a maximum of 10 tags are allowed per post');
             }
         }
 
@@ -389,7 +461,7 @@ module.exports = {
             consoleLogger(errorLogger(module, errorMessage));
             res.status(500).send({
                 code: 500,
-                newPostBanner: true,
+                banner: true,
                 bannerClass: 'alert alert-dismissible alert-warning',
                 msg: errorMessage
             });
@@ -411,14 +483,18 @@ module.exports = {
 
         //validate query no whitespace
         //check that at least at least one character is non-whitespace
-        if (!(noWhiteSpaceRegex.test(queryString)) && errors == 0) {
-            ++errors;
-            error('The search cannot be empty');
+        if (errors == 0) {
+            if (!(noWhiteSpaceRegex.test(queryString))) {
+                ++errors;
+                error('The search cannot be empty');
+            }
         }
 
-        if (queryString.length == 0 && errors == 0) {
-            ++errors;
-            error('The search cannot be empty');
+        if (errors == 0) {
+            if (queryString.length == 0 && errors == 0) {
+                ++errors;
+                error('The search cannot be empty');
+            }
         }
 
 

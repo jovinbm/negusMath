@@ -24,10 +24,10 @@
                     </a>
                 </li>
                 <li ng-if="!clientIsRegistered">
-                    <a href ng-click="goToLandingPage()">Register</a>
+                    <a ng-href="{{indexPageUrl}}">Register</a>
                 </li>
                 <li ng-if="!clientIsRegistered">
-                    <a href ng-click="goToLandingPage()">Sign In</a>
+                    <a ng-href="{{indexPageUrl}}">Sign In</a>
                 </li>
                 <li class="dropdown"
                     ng-if="clientIsRegistered">

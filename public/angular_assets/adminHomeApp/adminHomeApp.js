@@ -27,7 +27,12 @@ angular.module('adminHomeApp', [
         $urlRouterProvider
             .when("/home", '/home/1')
             .when("/home/", '/home/1')
+            .when("/post", '/home/1')
+            .when("/post/", '/home/1')
+            .when("/editPost", '/home/1')
+            .when("/editPost/", '/home/1')
             .when("/search", '/home/1')
+            .when("/search/", '/home/1')
             .otherwise("/home/1");
 
         $stateProvider
@@ -38,6 +43,10 @@ angular.module('adminHomeApp', [
             .state('post', {
                 url: '/post/:postIndex',
                 templateUrl: 'views/admin/partials/views/full_post.html'
+            })
+            .state('editPost', {
+                url: '/editPost/:postIndex',
+                templateUrl: 'views/admin/partials/views/edit_post.html'
             })
             .state('search', {
                 url: '/search/:queryString/:pageNumber',

@@ -1,72 +1,31 @@
 angular.module('adminHomeApp')
-    .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', 'fN',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, fN) {
+    .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
 
             $scope.showThePager();
             globals.defaultDocumentTitle();
 
             $scope.posts = PostService.getCurrentPosts();
             $scope.postsCount = PostService.getCurrentPostsCount();
-
-            $scope.suggestedPosts = [];
+            $scope.suggestedPosts = PostService.getSuggestedPosts();
 
             //variable that determines whether to show posts/suggested posts or not
             $scope.mainSearchResultsPosts = false;
-            $scope.showSuggestedPosts = false;
 
             $scope.showThePostsOnly = function () {
-                $scope.showHideLoadingBanner(false);
+                $scope.hideLoadingBanner();
                 $scope.mainSearchResultsPosts = true;
-                $scope.showSuggestedPosts = false;
+                $scope.hideSuggested();
             };
 
             $scope.showSuggestedPostsOnly = function () {
-                $scope.showHideLoadingBanner(false);
+                $scope.hideLoadingBanner();
                 $scope.mainSearchResultsPosts = false;
-                $scope.showSuggestedPosts = true;
+                $scope.showSuggested();
             };
-
-            $scope.prepareManyPosts = function (postsArray) {
-                var posts = [];
-                postsArray.forEach(function (post) {
-                    posts.push($filter('makeVideoIframesResponsive')($filter('AddPostUrl')(post, null), null));
-                });
-                return posts;
-            };
-
-            //function used to fill in with suggested posts in case no posts are received
-            function getSuggestedPosts() {
-                $scope.showHideLoadingBanner(true);
-                //empty the suggestedPosts
-                $scope.suggestedPosts = [];
-                PostService.getSuggestedPostsFromServer()
-                    .success(function (resp) {
-                        if ((resp.postsArray.length > 0)) {
-                            $scope.showSuggestedPostsOnly();
-                            $scope.suggestedPosts = $scope.prepareManyPosts(resp.postsArray);
-                        } else {
-                            //empty the suggestedPosts
-                            $scope.suggestedPosts = [];
-                            $scope.showSuggestedPosts = false;
-                            $scope.goToTop();
-                            $scope.showHideLoadingBanner(false);
-                        }
-
-                    })
-                    .error(function (errResp) {
-                        $scope.goToTop();
-                        //empty the suggestedPosts
-                        $scope.suggestedPosts = [];
-                        $scope.showSuggestedPosts = false;
-                        $rootScope.responseStatusHandler(errResp);
-                    });
-
-                //whatever happens, hide the pager
-                $scope.hideThePager();
-            }
 
             function getPagePosts() {
-                $scope.showHideLoadingBanner(true);
+                $scope.showLoadingBanner();
                 PostService.getPostsFromServer($rootScope.$stateParams.pageNumber)
                     .success(function (resp) {
                         //this function  creates a banner to notify user that there are no posts by mimicking a response and calling the response handler
@@ -83,14 +42,11 @@ angular.module('adminHomeApp')
                             };
                             $rootScope.responseStatusHandler(responseMimic);
                             $scope.mainSearchResultsPosts = false;
-                            getSuggestedPosts();
+                            $scope.showSuggestedPostsOnly();
                             $scope.goToTop();
                         } else {
-                            $scope.posts = PostService.updatePosts($scope.prepareManyPosts(resp.postsArray));
-
+                            $scope.posts = PostService.updatePosts(resp.postsArray);
                             $scope.showThePostsOnly();
-
-
                             if (resp.postsCount) {
                                 $scope.postsCount = resp.postsCount;
                                 $scope.changePagingTotalCount($scope.postsCount);
@@ -103,7 +59,7 @@ angular.module('adminHomeApp')
                         //empty the postsArray
                         $scope.posts = PostService.updatePosts([]);
                         $scope.mainSearchResultsPosts = false;
-                        getSuggestedPosts();
+                        $scope.showSuggestedPostsOnly();
                     });
             }
 
@@ -114,9 +70,7 @@ angular.module('adminHomeApp')
             $rootScope.$on('newPost', function (event, data) {
                 //newPost goes to page 1, so update only if the page is 1
                 if ($rootScope.$stateParams.pageNumber == 1) {
-                    data.post = $scope.prepareOnePost(data.post);
-                    $scope.posts.unshift(data.post);
-                    PostService.updatePosts($scope.posts);
+                    $scope.posts = PostService.addNewToPosts(data.post);
                 }
                 if (data.postsCount) {
                     $scope.postsCount = data.postsCount;
@@ -136,85 +90,32 @@ angular.module('adminHomeApp')
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams, fN) {
             //hide paging
             $scope.hideThePager();
-
-            $scope.postIndex = $stateParams.postIndex;
-            $scope.post = {};
-            $scope.postEdit = {};
-            $scope.updatePost = function (newPost) {
-                $scope.post = PostService.updatePost($scope.prepareOnePost(newPost));
-                $scope.postEdit = $scope.post;
-            };
-            $scope.suggestedPosts = [];
+            $scope.post = PostService.getCurrentPost();
 
             //variable that determines whether to show posts/suggested posts or not
-            $scope.showPost = false;
-            $scope.showSuggestedPosts = false;
+            $scope.showEditPost = false;
 
             $scope.showThePostOnly = function () {
-                $scope.showHideLoadingBanner(false);
-                $scope.showPost = true;
-                $scope.showSuggestedPosts = false;
+                $scope.hideLoadingBanner();
+                $scope.showEditPost = true;
+                $scope.hideSuggested();
             };
 
             $scope.showSuggestedPostsOnly = function () {
-                $scope.showHideLoadingBanner(false);
-                $scope.showPost = false;
-                $scope.showSuggestedPosts = true;
-            };
-
-            $scope.prepareOnePost = function (post) {
-                return $filter('makeVideoIframesResponsive')($filter('AddPostUrl')(post, null), null);
-            };
-
-            $scope.prepareManyPosts = function (postsArray) {
-                var posts = [];
-                postsArray.forEach(function (post) {
-                    posts.push($filter('makeVideoIframesResponsive')($filter('AddPostUrl')(post, null), null));
-                });
-                return posts;
+                $scope.hideLoadingBanner();
+                $scope.showEditPost = false;
+                $scope.showSuggested();
             };
 
             $scope.postIsLoaded = false;
 
-            //function used to fill in with suggested posts in case no posts are received
-            function getSuggestedPosts() {
-                $scope.showHideLoadingBanner(true);
-                //empty the suggestedPosts
-                $scope.suggestedPosts = [];
-                PostService.getSuggestedPostsFromServer()
-                    .success(function (resp) {
-                        if ((resp.postsArray.length > 0)) {
-                            $scope.showSuggestedPostsOnly();
-                            $scope.suggestedPosts = $scope.prepareManyPosts(resp.postsArray);
-                        } else {
-                            //empty the suggestedPosts
-                            $scope.suggestedPosts = [];
-                            $scope.showSuggestedPosts = false;
-                            $scope.goToTop();
-                            $scope.showHideLoadingBanner(false);
-                        }
-
-                    })
-                    .error(function (errResp) {
-                        $scope.goToTop();
-                        //empty the suggestedPosts
-                        $scope.suggestedPosts = [];
-                        $scope.showSuggestedPosts = false;
-                        $rootScope.responseStatusHandler(errResp);
-                    });
-
-                //whatever happens, hide the pager
-                $scope.hideThePager();
-            }
-
             function getFullPost() {
-                $scope.showHideLoadingBanner(true);
+                $scope.showLoadingBanner();
                 PostService.getPostFromServer($rootScope.$stateParams.postIndex)
                     .success(function (resp) {
-                        $scope.post = resp.thePost;
                         $rootScope.responseStatusHandler(resp);
-                        if (fN.calcObjectLength($scope.post) != 0) {
-                            $scope.updatePost($scope.post);
+                        if (fN.calcObjectLength(resp.thePost) != 0) {
+                            $scope.post = PostService.updatePost(resp.thePost);
                             globals.changeDocumentTitle($scope.post.postHeading);
                             //check that there is a post first before starting disqus and other attributes
                             $scope.showThePostOnly();
@@ -228,9 +129,9 @@ angular.module('adminHomeApp')
 
                         } else {
                             //empty the post
-                            $scope.updatePost({});
-                            $scope.showPost = false;
-                            getSuggestedPosts();
+                            $scope.post = PostService.updatePost({});
+                            $scope.showEditPost = false;
+                            $scope.showSuggestedPostsOnly();
                             $scope.goToTop();
                         }
 
@@ -238,73 +139,19 @@ angular.module('adminHomeApp')
                     .error(function (errResponse) {
                         $rootScope.responseStatusHandler(errResponse);
                         //empty the post
-                        $scope.updatePost({});
-                        $scope.showPost = false;
-                        getSuggestedPosts();
+                        $scope.post = PostService.updatePost({});
+                        $scope.showEditPost = false;
+                        $scope.showSuggestedPostsOnly();
                     });
             }
 
             getFullPost();
 
-            $rootScope.goIntoPostEditingMode = function () {
-                $scope.hideThePager();
-                $rootScope.isEditingPost = true;
-            };
-
-            $rootScope.goIntoFullPostViewMode = function () {
-                $scope.hideThePager();
-                $rootScope.isEditingPost = false;
-            };
-
-            $scope.validateEditForm = function (notify) {
-                console.log('ysssssssss');
-                var errors = 0;
-                if (!$filter("validatePostHeading")($scope.post.postHeading, notify)) {
-                    errors++;
-                }
-                if (errors == 0) {
-                    if (!$filter("validatePostContent")($scope.post.postContent, notify)) {
-                        errors++;
-                    }
-                }
-                if (errors == 0) {
-                    if (!$filter("validatePostSummary")($scope.post.postSummary, notify)) {
-                        errors++;
-                    }
-                }
-                if (errors == 0) {
-                    if (!$filter("validatePostTags")($scope.post.postTags, notify)) {
-                        errors++;
-                    }
-                }
-                return errors == 0;
-            };
-
-            $scope.submitPostUpdate = function () {
-                if ($scope.validateEditForm(true)) {
-                    PostService.submitPostUpdate($scope.post)
-                        .success(function (resp) {
-                            $rootScope.goIntoFullPostViewMode();
-                            $rootScope.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.responseStatusHandler(errResponse);
-                        })
-                }
-            };
-
-            $scope.cancelPostUpdate = function () {
-                console.log(PostService.getCurrentPost());
-                $rootScope.goIntoFullPostViewMode();
-                $rootScope.showToast('success', 'Update cancelled');
-            };
-
-
             //===============socket listeners===============
 
             $rootScope.$on('postUpdate', function (event, data) {
                 if ($rootScope.$stateParams.postIndex == data.post.postIndex) {
-                    $scope.post = $scope.updatePost(data.post);
+                    $scope.post = PostService.updatePost(data.post);
                 }
             });
 
@@ -316,5 +163,108 @@ angular.module('adminHomeApp')
                     }
                 }
             });
+        }
+    ])
+    .controller('EditPostController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams', 'fN',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams, fN) {
+            //hide paging
+            $scope.hideThePager();
+            $scope.editPostModel = PostService.getCurrentEditPostModel();
+
+            //variable that determines whether to show posts/suggested posts or not
+            $scope.showEditPost = false;
+
+            $scope.showTheEditPostOnly = function () {
+                $scope.hideLoadingBanner();
+                $scope.showEditPost = true;
+                $scope.hideSuggested();
+            };
+
+            $scope.showSuggestedPostsOnly = function () {
+                $scope.hideLoadingBanner();
+                $scope.showEditPost = false;
+                $scope.showSuggested();
+            };
+
+            function getFullEditPostModel() {
+                $scope.showLoadingBanner();
+                PostService.getCurrentEditPostModelFromServer($rootScope.$stateParams.postIndex)
+                    .success(function (resp) {
+                        $rootScope.responseStatusHandler(resp);
+                        if (fN.calcObjectLength(resp.thePost) != 0) {
+                            $scope.editPostModel = PostService.updateCurrentEditPostModel(resp.thePost);
+                            globals.changeDocumentTitle($scope.editPostModel.postHeading);
+                            //check that there is a post first before starting disqus and other attributes
+                            $scope.showTheEditPostOnly();
+                            $scope.hideThePager();
+                        } else {
+                            //empty the post
+                            $scope.editPostModel = PostService.updateCurrentEditPostModel({});
+                            $scope.showEditPost = false;
+                            $scope.showSuggestedPostsOnly();
+                            $scope.goToTop();
+                        }
+
+                    })
+                    .error(function (errResponse) {
+                        $rootScope.responseStatusHandler(errResponse);
+                        //empty the post
+                        $scope.editPostModel = PostService.updateCurrentEditPostModel({});
+                        $scope.showEditPost = false;
+                        $scope.showSuggestedPostsOnly();
+                    });
+            }
+
+            getFullEditPostModel();
+
+            $scope.cancelPostUpdate = function () {
+                $rootScope.showToast('success', 'Update cancelled');
+                if ($location.port()) {
+                    $window.location.href = "http://" + $location.host() + ":" + $location.port() + "/#!/post/" + $scope.editPostModel.postIndex;
+                } else {
+                    $window.location.href = "http://" + $location.host() + "/#!/post/" + $scope.editPostModel.postIndex;
+                }
+            };
+
+            $scope.validateEditForm = function (notify) {
+                var errors = 0;
+                if (!$filter("validatePostHeading")($scope.editPostModel.postHeading, notify)) {
+                    errors++;
+                }
+                if (errors == 0) {
+                    if (!$filter("validatePostContent")($scope.editPostModel.postContent, notify)) {
+                        errors++;
+                    }
+                }
+                if (errors == 0) {
+                    if (!$filter("validatePostSummary")($scope.editPostModel.postSummary, notify)) {
+                        errors++;
+                    }
+                }
+                if (errors == 0) {
+                    if (!$filter("validatePostTags")($scope.editPostModel.postTags, notify)) {
+                        errors++;
+                    }
+                }
+                return errors == 0;
+            };
+
+            $scope.submitPostUpdate = function () {
+                if ($scope.validateEditForm(true)) {
+                    PostService.submitPostUpdate($scope.editPostModel)
+                        .success(function (resp) {
+                            $rootScope.responseStatusHandler(resp);
+                            $rootScope.showToast('success', 'Saved');
+                            if ($location.port()) {
+                                $window.location.href = "http://" + $location.host() + ":" + $location.port() + "/#!/post/" + $scope.editPostModel.postIndex;
+                            } else {
+                                $window.location.href = "http://" + $location.host() + "/#!/post/" + $scope.editPostModel.postIndex;
+                            }
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.responseStatusHandler(errResponse);
+                        })
+                }
+            };
         }
     ]);

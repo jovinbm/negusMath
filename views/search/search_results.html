@@ -21,11 +21,11 @@
                         <h3 class="text-muted postBy">
                             <small><a class="btn-link"
                                       ng-bind-html="post.authorName | highlightText"></a>
-                                on <span ng-bind-html="post.createdAt | AddPostDate"></span>
+                                on <span ng-bind-html="post.createdAt | getPostDate"></span>
                             </small>
                             <br/>
                             <small class="text-muted"
-                                   ng-bind-html="post.createdAt | AddTimeAgo">
+                                   ng-bind-html="post.createdAt | getTimeAgo">
                             </small>
                         </h3>
 
@@ -69,10 +69,10 @@
 
                         <h3 class="text-muted postBy">
                             <small><a class="btn-link" ng-bind-html="post.authorName"></a> on <span
-                                    ng-bind-html="post.created | AddPostDate"></span>
+                                    ng-bind-html="post.created | getPostDate"></span>
                             </small>
                             <br/>
-                            <small class="text-muted" ng-bind-html="post.createdAt | AddTimeAgo"></small>
+                            <small class="text-muted" ng-bind-html="post.createdAt | getTimeAgo"></small>
                         </h3>
 
                         <div class="postContent">
