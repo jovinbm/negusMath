@@ -18,23 +18,48 @@ angular.module('indexApp', [
         //partials->modals
     });
 angular.module('indexApp')
-    .directive('universalBanner', ['$rootScope', function ($rootScope) {
+    .directive('signInBanner', ['$rootScope', function ($rootScope) {
         return {
-            templateUrl: 'views/admin/partials/smalls/universal_banner.html',
+            templateUrl: 'views/index/smalls/sign_in_banner.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
-                $scope.universalBanner = {
+                $scope.signInBanner = {
                     show: false,
                     bannerClass: "",
                     msg: ""
                 };
 
-                $rootScope.$on('universalBanner', function (event, banner) {
-                    $scope.universalBanner = banner;
+                $rootScope.$on('signInBanner', function (event, banner) {
+                    $scope.signInBanner = banner;
                 });
 
                 $rootScope.$on('clearBanners', function () {
-                    $scope.universalBanner = {
+                    $scope.signInBanner = {
+                        show: false,
+                        bannerClass: "",
+                        msg: ""
+                    };
+                })
+            }
+        }
+    }])
+    .directive('registrationBanner', ['$rootScope', function ($rootScope) {
+        return {
+            templateUrl: 'views/index/smalls/registration_banner.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.registrationBanner = {
+                    show: false,
+                    bannerClass: "",
+                    msg: ""
+                };
+
+                $rootScope.$on('registrationBanner', function (event, banner) {
+                    $scope.registrationBanner = banner;
+                });
+
+                $rootScope.$on('clearBanners', function () {
+                    $scope.registrationBanner = {
                         show: false,
                         bannerClass: "",
                         msg: ""
@@ -129,7 +154,7 @@ angular.module('indexApp')
         }];
 
         return {
-            templateUrl: 'views/admin/partials/smalls/loading_banner.html',
+            templateUrl: 'views/client/partials/smalls/loading_banner.html',
             restrict: 'AE',
             controller: controller
         }
@@ -313,52 +338,6 @@ angular.module('indexApp')
             }
         }
     }]);
-angular.module('indexApp')
-    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals) {
-
-            $scope.indexPageUrl = globals.allData.indexPageUrl;
-
-            //register error handler error handler
-            $rootScope.responseStatusHandler = function (resp) {
-                $filter('responseFilter')(resp);
-            };
-
-            $scope.clientIsRegistered = true;
-
-            //initial requests
-            function initialRequests() {
-                socketService.getUserData()
-                    .success(function (resp) {
-                        $scope.userData = globals.userData(resp.userData);
-                        $scope.clientIsRegistered = $scope.userData.isRegistered == 'yes';
-
-                        if ($scope.userData.isRegistered == 'yes') {
-                            //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
-                            socket.emit('joinRoom', {
-                                room: resp.userData.uniqueCuid
-                            });
-                        }
-                        $rootScope.responseStatusHandler(resp);
-                    })
-                    .error(function (errResponse) {
-                        $rootScope.responseStatusHandler(errResponse);
-                    });
-            }
-
-            socket.on('joined', function () {
-                console.log("JOIN SUCCESS");
-            });
-
-            initialRequests();
-
-
-            //===============socket listeners===============
-
-            $rootScope.$on('reconnectSuccess', function () {
-            });
-        }
-    ]);
 angular.module('indexApp')
     .filter("timeago", function () {
         //time: the time
@@ -602,6 +581,11 @@ angular.module('indexApp')
                         $rootScope.$broadcast('newPostBanner', makeBanner(true, resp.bannerClass, resp.msg));
                     }
                 }
+                if (resp.signInBanner) {
+                    if (resp.bannerClass && resp.msg) {
+                        $rootScope.$broadcast('signInBanner', makeBanner(true, resp.bannerClass, resp.msg));
+                    }
+                }
                 if (resp.registrationBanner) {
                     if (resp.bannerClass && resp.msg) {
                         $rootScope.$broadcast('registrationBanner', makeBanner(true, resp.bannerClass, resp.msg));
@@ -620,6 +604,52 @@ angular.module('indexApp')
 
 
 
+angular.module('indexApp')
+    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals) {
+
+            $scope.indexPageUrl = globals.allData.indexPageUrl;
+
+            //register error handler error handler
+            $rootScope.responseStatusHandler = function (resp) {
+                $filter('responseFilter')(resp);
+            };
+
+            $scope.clientIsRegistered = true;
+
+            //initial requests
+            function initialRequests() {
+                socketService.getUserData()
+                    .success(function (resp) {
+                        $scope.userData = globals.userData(resp.userData);
+                        $scope.clientIsRegistered = $scope.userData.isRegistered == 'yes';
+
+                        if ($scope.userData.isRegistered == 'yes') {
+                            //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
+                            socket.emit('joinRoom', {
+                                room: resp.userData.uniqueCuid
+                            });
+                        }
+                        $rootScope.responseStatusHandler(resp);
+                    })
+                    .error(function (errResponse) {
+                        $rootScope.responseStatusHandler(errResponse);
+                    });
+            }
+
+            socket.on('joined', function () {
+                console.log("JOIN SUCCESS");
+            });
+
+            initialRequests();
+
+
+            //===============socket listeners===============
+
+            $rootScope.$on('reconnectSuccess', function () {
+            });
+        }
+    ]);
 angular.module('indexApp')
 
     .factory('fN', ['$q', '$location', '$window', '$rootScope', 'socketService',

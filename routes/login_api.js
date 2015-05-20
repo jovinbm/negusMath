@@ -94,9 +94,9 @@ module.exports = {
             passport.authenticate('local', function (err, user, info) {
 
                 if (err) {
-                    return res.status(500).send({
-                        code: 500,
-                        banner: true,
+                    return res.status(401).send({
+                        code: 401,
+                        signInBanner: true,
                         bannerClass: 'alert alert-dismissible alert-warning',
                         msg: info || err
                     });
@@ -105,7 +105,7 @@ module.exports = {
                 if (!user) {
                     return res.status(401).send({
                         code: 401,
-                        banner: true,
+                        signInBanner: true,
                         bannerClass: 'alert alert-dismissible alert-warning',
                         msg: info || err
                     });
@@ -121,7 +121,7 @@ module.exports = {
                         consoleLogger(errorLogger('req.login', err, err));
                         return res.status(500).send({
                             code: 500,
-                            banner: true,
+                            signInBanner: true,
                             bannerClass: 'alert alert-dismissible alert-warning',
                             msg: "A problem occurred when trying to log you in. Please try again"
                         });
@@ -142,7 +142,7 @@ module.exports = {
                 code: 401,
                 notify: false,
                 type: 'error',
-                banner: true,
+                signInBanner: true,
                 bannerClass: 'alert alert-dismissible alert-warning',
                 msg: 'An error occurred. Some fields missing. Please try again'
             });
@@ -171,7 +171,6 @@ module.exports = {
             var email = req.body.email;
             var firstName = req.body.firstName;
             var lastName = req.body.lastName;
-            var fullName = firstName + " " + lastName;
             var username = req.body.username;
             var password = req.body.password1;
             var uniqueCuid = cuid();

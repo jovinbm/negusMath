@@ -1,21 +1,46 @@
 angular.module('indexApp')
-    .directive('universalBanner', ['$rootScope', function ($rootScope) {
+    .directive('signInBanner', ['$rootScope', function ($rootScope) {
         return {
-            templateUrl: 'views/admin/partials/smalls/universal_banner.html',
+            templateUrl: 'views/index/smalls/sign_in_banner.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
-                $scope.universalBanner = {
+                $scope.signInBanner = {
                     show: false,
                     bannerClass: "",
                     msg: ""
                 };
 
-                $rootScope.$on('universalBanner', function (event, banner) {
-                    $scope.universalBanner = banner;
+                $rootScope.$on('signInBanner', function (event, banner) {
+                    $scope.signInBanner = banner;
                 });
 
                 $rootScope.$on('clearBanners', function () {
-                    $scope.universalBanner = {
+                    $scope.signInBanner = {
+                        show: false,
+                        bannerClass: "",
+                        msg: ""
+                    };
+                })
+            }
+        }
+    }])
+    .directive('registrationBanner', ['$rootScope', function ($rootScope) {
+        return {
+            templateUrl: 'views/index/smalls/registration_banner.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.registrationBanner = {
+                    show: false,
+                    bannerClass: "",
+                    msg: ""
+                };
+
+                $rootScope.$on('registrationBanner', function (event, banner) {
+                    $scope.registrationBanner = banner;
+                });
+
+                $rootScope.$on('clearBanners', function () {
+                    $scope.registrationBanner = {
                         show: false,
                         bannerClass: "",
                         msg: ""
@@ -110,7 +135,7 @@ angular.module('indexApp')
         }];
 
         return {
-            templateUrl: 'views/admin/partials/smalls/loading_banner.html',
+            templateUrl: 'views/client/partials/smalls/loading_banner.html',
             restrict: 'AE',
             controller: controller
         }

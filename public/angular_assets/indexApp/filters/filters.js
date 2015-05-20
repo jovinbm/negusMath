@@ -241,6 +241,11 @@ angular.module('indexApp')
                         $rootScope.$broadcast('newPostBanner', makeBanner(true, resp.bannerClass, resp.msg));
                     }
                 }
+                if (resp.signInBanner) {
+                    if (resp.bannerClass && resp.msg) {
+                        $rootScope.$broadcast('signInBanner', makeBanner(true, resp.bannerClass, resp.msg));
+                    }
+                }
                 if (resp.registrationBanner) {
                     if (resp.bannerClass && resp.msg) {
                         $rootScope.$broadcast('registrationBanner', makeBanner(true, resp.bannerClass, resp.msg));

@@ -1630,47 +1630,14 @@ angular.module('adminHomeApp')
             $scope.showMainSearchResultsOnly = function () {
                 $scope.hideLoadingBanner();
                 $scope.showMainSearchResults = true;
-                $scope.showSuggestedPosts = false;
+                $scope.hideSuggested();
             };
 
             $scope.showSuggestedPostsOnly = function () {
                 $scope.hideLoadingBanner();
                 $scope.showMainSearchResults = false;
-                $scope.showSuggestedPosts = true;
+                $scope.showSuggested();
             };
-
-            //function used to fill in with suggested posts in case no posts are received
-            function getSuggestedPosts() {
-                $scope.showLoadingBanner();
-                //empty the suggestedPosts
-                $scope.suggestedPosts = [];
-                PostService.getSuggestedPostsFromServer()
-                    .success(function (resp) {
-                        if ((resp.postsArray.length > 0)) {
-                            $scope.showSuggestedPostsOnly();
-                            $scope.suggestedPosts = resp.postsArray;
-                            $scope.suggestedPosts = $scope.suggestedPosts = $filter('makeVideoIframesResponsive')(null, $scope.suggestedPosts);
-                        } else {
-                            //empty the suggestedPosts
-                            $scope.suggestedPosts = [];
-                            $scope.showSuggestedPosts = false;
-                            $scope.goToTop();
-                            $scope.hideLoadingBanner();
-                        }
-
-                    })
-                    .error(function (errResp) {
-                        $scope.goToTop();
-                        $scope.hideLoadingBanner();
-                        //empty the suggestedPosts
-                        $scope.suggestedPosts = [];
-                        $scope.showSuggestedPosts = false;
-                        $rootScope.responseStatusHandler(errResp);
-                    });
-
-                //whatever happens, hide the pager
-                $scope.hideThePager();
-            }
 
             function getMainSearchResults() {
                 $scope.showLoadingBanner();
@@ -1683,18 +1650,14 @@ angular.module('adminHomeApp')
 
                 PostService.mainSearch($scope.mainSearchModel)
                     .success(function (resp) {
-                        var theResult = resp.results;
-
-                        PostService.updateMainSearchResults(theResult);
-                        $scope.mainSearchResultsCount = theResult.totalResults;
-                        $scope.changePagingTotalCount($scope.mainSearchResultsCount);
-                        $scope.changeCurrentPage(theResult.page);
-                        $scope.mainSearchModel.postSearchUniqueCuid = theResult.searchUniqueCuid;
-
                         //the response is the resultValue
-                        if (theResult.totalResults > 0) {
-                            $scope.mainSearchResultsPosts = theResult.postsArray;
-                            $scope.mainSearchResultsPosts = $filter('makeVideoIframesResponsive')(null, $scope.mainSearchResultsPosts);
+                        if (resp.results.totalResults > 0) {
+                            var theResult = resp.results;
+                            $scope.mainSearchResultsPosts = PostService.updateMainSearchResults(theResult.postsArray);
+                            $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(theResult.totalResults);
+                            $scope.changePagingTotalCount($scope.mainSearchResultsCount);
+                            $scope.changeCurrentPage(theResult.page);
+                            $scope.mainSearchModel.postSearchUniqueCuid = theResult.searchUniqueCuid;
                             $scope.showMainSearchResultsOnly();
 
                             var responseMimic1 = {
@@ -1706,7 +1669,8 @@ angular.module('adminHomeApp')
                             $scope.showThePager();
                         } else {
                             //empty the postsArray
-                            $scope.mainSearchResultsPosts = [];
+                            $scope.mainSearchResultsPosts = PostService.updateMainSearchResults([]);
+                            $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(0);
                             var responseMimic2 = {
                                 banner: true,
                                 bannerClass: 'alert alert-dismissible alert-success',
@@ -1714,16 +1678,17 @@ angular.module('adminHomeApp')
                             };
                             $rootScope.responseStatusHandler(responseMimic2);
                             $scope.showMainSearchResults = false;
-                            getSuggestedPosts();
+                            $scope.showSuggestedPostsOnly();
                             $scope.goToTop();
                         }
                     })
                     .error(function (errResp) {
                         $rootScope.responseStatusHandler(errResp);
                         //empty the postsArray
-                        $scope.mainSearchResultsPosts = [];
+                        $scope.mainSearchResultsPosts = PostService.updateMainSearchResults([]);
+                        $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(0);
                         $scope.showMainSearchResults = false;
-                        getSuggestedPosts();
+                        $scope.showSuggestedPostsOnly();
                     });
             }
 
@@ -1872,7 +1837,9 @@ angular.module('adminHomeApp')
             var posts = [];
             var postsCount = 0;
             var mainSearchResultsPosts = [];
+            var mainSearchResultsPostsCount = 0;
             var suggestedPosts = [];
+            var suggestedPostsCount = 0;
 
             socket.on('newPost', function (data) {
                 //data here has the keys post, postCount
@@ -1907,6 +1874,11 @@ angular.module('adminHomeApp')
                         posts = $filter('preparePosts')(null, postsArray);
                     }
                     return posts;
+                },
+
+                updatePostsCount: function (newCount) {
+                    postsCount = newCount;
+                    return postsCount;
                 },
 
                 addNewToPosts: function (newPost) {
@@ -1974,9 +1946,18 @@ angular.module('adminHomeApp')
                     return $http.post('/api/mainSearch', searchObject);
                 },
 
-                updateMainSearchResults: function (resultValue) {
-                    mainSearchResultsPosts = resultValue;
+                updateMainSearchResults: function (resultsArray) {
+                    if (resultsArray == []) {
+                        mainSearchResultsPosts = [];
+                    } else {
+                        mainSearchResultsPosts = $filter('preparePosts')(null, resultsArray);
+                    }
                     return mainSearchResultsPosts;
+                },
+
+                updateMainSearchResultsCount: function (newCount) {
+                    mainSearchResultsPostsCount = newCount;
+                    return mainSearchResultsPostsCount;
                 },
 
                 getSuggestedPosts: function () {

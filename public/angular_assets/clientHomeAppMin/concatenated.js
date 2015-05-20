@@ -707,7 +707,7 @@ angular.module('clientHomeApp')
             });
         }
     ]);
-angular.module('clientHomeApp')
+angular.module('adminHomeApp')
     .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', 'fN',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, fN) {
 
@@ -740,47 +740,14 @@ angular.module('clientHomeApp')
             $scope.showMainSearchResultsOnly = function () {
                 $scope.hideLoadingBanner();
                 $scope.showMainSearchResults = true;
-                $scope.showSuggestedPosts = false;
+                $scope.hideSuggested();
             };
 
             $scope.showSuggestedPostsOnly = function () {
                 $scope.hideLoadingBanner();
                 $scope.showMainSearchResults = false;
-                $scope.showSuggestedPosts = true;
+                $scope.showSuggested();
             };
-
-            //function used to fill in with suggested posts in case no posts are received
-            function getSuggestedPosts() {
-                $scope.showLoadingBanner();
-                //empty the suggestedPosts
-                $scope.suggestedPosts = [];
-                PostService.getSuggestedPostsFromServer()
-                    .success(function (resp) {
-                        if ((resp.postsArray.length > 0)) {
-                            $scope.showSuggestedPostsOnly();
-                            $scope.suggestedPosts = resp.postsArray;
-                            $scope.suggestedPosts = $scope.suggestedPosts = $filter('makeVideoIframesResponsive')(null, $scope.suggestedPosts);
-                        } else {
-                            //empty the suggestedPosts
-                            $scope.suggestedPosts = [];
-                            $scope.showSuggestedPosts = false;
-                            $scope.goToTop();
-                            $scope.hideLoadingBanner();
-                        }
-
-                    })
-                    .error(function (errResp) {
-                        $scope.goToTop();
-                        $scope.hideLoadingBanner();
-                        //empty the suggestedPosts
-                        $scope.suggestedPosts = [];
-                        $scope.showSuggestedPosts = false;
-                        $rootScope.responseStatusHandler(errResp);
-                    });
-
-                //whatever happens, hide the pager
-                $scope.hideThePager();
-            }
 
             function getMainSearchResults() {
                 $scope.showLoadingBanner();
@@ -793,18 +760,14 @@ angular.module('clientHomeApp')
 
                 PostService.mainSearch($scope.mainSearchModel)
                     .success(function (resp) {
-                        var theResult = resp.results;
-
-                        PostService.updateMainSearchResults(theResult);
-                        $scope.mainSearchResultsCount = theResult.totalResults;
-                        $scope.changePagingTotalCount($scope.mainSearchResultsCount);
-                        $scope.changeCurrentPage(theResult.page);
-                        $scope.mainSearchModel.postSearchUniqueCuid = theResult.searchUniqueCuid;
-
                         //the response is the resultValue
-                        if (theResult.totalResults > 0) {
-                            $scope.mainSearchResultsPosts = theResult.postsArray;
-                            $scope.mainSearchResultsPosts = $filter('makeVideoIframesResponsive')(null, $scope.mainSearchResultsPosts);
+                        if (resp.results.totalResults > 0) {
+                            var theResult = resp.results;
+                            $scope.mainSearchResultsPosts = PostService.updateMainSearchResults(theResult.postsArray);
+                            $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(theResult.totalResults);
+                            $scope.changePagingTotalCount($scope.mainSearchResultsCount);
+                            $scope.changeCurrentPage(theResult.page);
+                            $scope.mainSearchModel.postSearchUniqueCuid = theResult.searchUniqueCuid;
                             $scope.showMainSearchResultsOnly();
 
                             var responseMimic1 = {
@@ -816,7 +779,8 @@ angular.module('clientHomeApp')
                             $scope.showThePager();
                         } else {
                             //empty the postsArray
-                            $scope.mainSearchResultsPosts = [];
+                            $scope.mainSearchResultsPosts = PostService.updateMainSearchResults([]);
+                            $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(0);
                             var responseMimic2 = {
                                 banner: true,
                                 bannerClass: 'alert alert-dismissible alert-success',
@@ -824,16 +788,17 @@ angular.module('clientHomeApp')
                             };
                             $rootScope.responseStatusHandler(responseMimic2);
                             $scope.showMainSearchResults = false;
-                            getSuggestedPosts();
+                            $scope.showSuggestedPostsOnly();
                             $scope.goToTop();
                         }
                     })
                     .error(function (errResp) {
                         $rootScope.responseStatusHandler(errResp);
                         //empty the postsArray
-                        $scope.mainSearchResultsPosts = [];
+                        $scope.mainSearchResultsPosts = PostService.updateMainSearchResults([]);
+                        $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(0);
                         $scope.showMainSearchResults = false;
-                        getSuggestedPosts();
+                        $scope.showSuggestedPostsOnly();
                     });
             }
 
@@ -854,310 +819,6 @@ angular.module('clientHomeApp')
             });
         }
     ]);
-angular.module('clientHomeApp')
-
-    .factory('fN', ['$q', '$location', '$window', '$rootScope', 'socketService',
-        function ($q, $location, $window, $rootScope, socketService) {
-            return {
-                calcObjectLength: function (obj) {
-                    var len = 0;
-                    for (var prop in obj) {
-                        if (obj.hasOwnProperty(prop)) {
-                            len++;
-                        }
-                    }
-                    return len
-                }
-            };
-        }]);
-angular.module('clientHomeApp')
-
-    .factory('globals', ['$q', '$location', '$window', '$rootScope', 'socketService',
-        function ($q, $location, $window, $rootScope, socketService) {
-            var userData = {};
-            var allData = {
-                documentTitle: "Negus Math - College Level Advanced Mathematics for Kenya Students",
-                indexPageUrl: $location.port() ? "http://" + $location.host() + ":" + $location.port() + "/index" : $scope.indexPageUrl = "http://" + $location.host() + "/index"
-            };
-
-            var universalBanner = {
-                show: false,
-                bannerClass: "",
-                msg: ""
-            };
-
-            var registrationBanner = {
-                show: false,
-                bannerClass: "",
-                msg: ""
-            };
-
-            return {
-
-                userData: function (data) {
-                    if (data) {
-                        userData = data;
-                        return userData;
-                    } else {
-                        return userData;
-                    }
-                },
-
-                allData: allData,
-
-                getDocumentTitle: function () {
-                    return allData.documentTitle
-                },
-
-                defaultDocumentTitle: function () {
-                    allData.documentTitle = "Negus Math - College Level Advanced Mathematics for Kenya Students";
-                },
-
-                changeDocumentTitle: function (newDocumentTitle) {
-                    if (newDocumentTitle) {
-                        allData.documentTitle = newDocumentTitle;
-                    }
-                    return allData.documentTitle
-                }
-            };
-        }]);
-angular.module('clientHomeApp')
-    .factory('HotService', ['$filter', '$log', '$http', '$window', '$rootScope', 'socket',
-        function ($filter, $log, $http, $window, $rootScope, socket) {
-
-            var hotThisWeek = [];
-
-            socket.on('hotThisWeekPosts', function (data) {
-                //data here has the keys post, postCount
-                $rootScope.$broadcast('hotThisWeekPosts', data);
-            });
-
-            return {
-
-                getHotThisWeek: function () {
-                    return hotThisWeek;
-                },
-
-                getHotThisWeekFromServer: function () {
-                    return $http.post('/api/getHotThisWeek', {})
-                },
-
-                updateHotThisWeek: function (hotThisWeekArray) {
-                    if (hotThisWeekArray == []) {
-                        hotThisWeek = [];
-                    } else {
-                        hotThisWeek = $filter('preparePosts')(null, hotThisWeekArray);
-                    }
-                    return hotThisWeekArray;
-                }
-            };
-        }]);
-angular.module('clientHomeApp')
-    .factory('mainService', ['$log', '$window', '$rootScope', 'socket', 'socketService', 'globals',
-        function ($log, $window, $rootScope, socket, socketService, globals) {
-
-            socket.on('reconnect', function () {
-                $log.info("'reconnect sequence' triggered");
-                $rootScope.$broadcast('reconnect');
-            });
-
-            return {
-                done: function () {
-                    return 1;
-                }
-            };
-        }]);
-angular.module('clientHomeApp')
-    .factory('PostService', ['$filter', '$http', '$window', '$rootScope', '$interval', 'socket',
-        function ($filter, $http, $window, $rootScope, $interval, socket) {
-
-            var post = {};
-            var editPostModel = {};
-            var posts = [];
-            var postsCount = 0;
-            var mainSearchResultsPosts = [];
-            var suggestedPosts = [];
-
-            socket.on('newPost', function (data) {
-                //data here has the keys post, postCount
-                $rootScope.$broadcast('newPost', data);
-            });
-
-            socket.on('postUpdate', function (data) {
-                //data here has the keys post, postCount
-                $rootScope.$broadcast('postUpdate', data);
-            });
-
-            return {
-
-                getCurrentPosts: function () {
-                    return posts;
-                },
-
-                getCurrentPostsCount: function () {
-                    return postsCount;
-                },
-
-                getPostsFromServer: function (pageNumber) {
-                    return $http.post('/api/getPosts', {
-                        page: pageNumber
-                    })
-                },
-
-                updatePosts: function (postsArray) {
-                    if (postsArray == []) {
-                        posts = [];
-                    } else {
-                        posts = $filter('preparePosts')(null, postsArray);
-                    }
-                    return posts;
-                },
-
-                addNewToPosts: function (newPost) {
-                    function makePost(theNewPost) {
-                        if (newPost == {}) {
-                            theNewPost = {}
-                        } else {
-                            theNewPost = $filter('preparePosts')(theNewPost, null);
-                        }
-                        return theNewPost;
-                    }
-
-                    var tempPost = makePost(newPost);
-                    posts.unshift(tempPost);
-                    return posts;
-                },
-
-                getCurrentPost: function () {
-                    return post;
-                },
-
-                getPostFromServer: function (postIndex) {
-                    return $http.post('/api/getPost', {
-                        postIndex: postIndex
-                    });
-                },
-
-                updatePost: function (newPost) {
-                    if (newPost == {}) {
-                        post = {}
-                    } else {
-                        post = $filter('preparePosts')(newPost, null);
-                    }
-                    return post;
-                },
-
-                getCurrentMainSearchResults: function () {
-                    return mainSearchResultsPosts;
-                },
-
-                mainSearch: function (searchObject) {
-                    return $http.post('/api/mainSearch', searchObject);
-                },
-
-                updateMainSearchResults: function (resultValue) {
-                    mainSearchResultsPosts = resultValue;
-                    return mainSearchResultsPosts;
-                },
-
-                getSuggestedPosts: function () {
-                    return suggestedPosts;
-                },
-
-                getSuggestedPostsFromServer: function () {
-                    return $http.post('/api/getSuggestedPosts', {})
-                },
-
-                updateSuggestedPosts: function (suggestedPostsArray) {
-                    if (suggestedPostsArray == []) {
-                        suggestedPosts = [];
-                    } else {
-                        suggestedPosts = $filter('preparePosts')(null, suggestedPostsArray);
-                    }
-                    return suggestedPosts;
-                },
-
-                submitNewPost: function (newPost) {
-                    return $http.post('/api/newPost', {
-                        newPost: newPost
-                    });
-                },
-
-                submitPostUpdate: function (post) {
-                    return $http.post('/api/updatePost', {
-                        postUpdate: post
-                    });
-                }
-            };
-        }]);
-angular.module('clientHomeApp')
-
-    .factory('socket', ['$log', '$location', '$rootScope',
-        function ($log, $location, $rootScope) {
-            var url;
-            if ($location.port()) {
-                url = $location.host() + ":" + $location.port();
-            } else {
-                url = $location.host();
-            }
-            var socket = io.connect(url);
-            //return socket;
-            return {
-                on: function (eventName, callback) {
-                    socket.on(eventName, function () {
-                        var args = arguments;
-                        $rootScope.$apply(function () {
-                            callback.apply(socket, args);
-                        });
-                    });
-                },
-
-                emit: function (eventName, data, callback) {
-                    socket.emit(eventName, data, function () {
-                        var args = arguments;
-                        $rootScope.$apply(function () {
-                            if (callback) {
-                                callback.apply(socket, args);
-                            }
-                        });
-                    });
-                },
-
-                removeAllListeners: function (eventName, callback) {
-                    socket.removeAllListeners(eventName, function () {
-                        var args = arguments;
-                        $rootScope.$apply(function () {
-                            callback.apply(socket, args);
-                        });
-                    });
-                }
-            };
-        }])
-
-
-    .factory('socketService', ['$log', '$http', '$rootScope',
-        function ($log, $http, $rootScope) {
-            return {
-                getUserData: function () {
-                    return $http.get('/api/getUserData');
-                },
-
-                sendContactUs: function (contactUsModel) {
-                    return $http.post('/contactUs', contactUsModel);
-                }
-            }
-        }
-    ])
-
-    .factory('logoutService', ['$http',
-        function ($http) {
-            return {
-
-                logoutClient: function () {
-                    return $http.post('/api/logoutClient');
-                }
-            }
-        }]);
 angular.module('clientHomeApp')
     .filter("timeago", function () {
         //time: the time
@@ -1531,3 +1192,308 @@ angular.module('clientHomeApp')
     }]);
 
 
+
+angular.module('clientHomeApp')
+
+    .factory('fN', ['$q', '$location', '$window', '$rootScope', 'socketService',
+        function ($q, $location, $window, $rootScope, socketService) {
+            return {
+                calcObjectLength: function (obj) {
+                    var len = 0;
+                    for (var prop in obj) {
+                        if (obj.hasOwnProperty(prop)) {
+                            len++;
+                        }
+                    }
+                    return len
+                }
+            };
+        }]);
+angular.module('clientHomeApp')
+
+    .factory('globals', ['$q', '$location', '$window', '$rootScope', 'socketService',
+        function ($q, $location, $window, $rootScope, socketService) {
+            var userData = {};
+            var allData = {
+                documentTitle: "Negus Math - College Level Advanced Mathematics for Kenya Students",
+                indexPageUrl: $location.port() ? "http://" + $location.host() + ":" + $location.port() + "/index" : $scope.indexPageUrl = "http://" + $location.host() + "/index"
+            };
+
+            var universalBanner = {
+                show: false,
+                bannerClass: "",
+                msg: ""
+            };
+
+            var registrationBanner = {
+                show: false,
+                bannerClass: "",
+                msg: ""
+            };
+
+            return {
+
+                userData: function (data) {
+                    if (data) {
+                        userData = data;
+                        return userData;
+                    } else {
+                        return userData;
+                    }
+                },
+
+                allData: allData,
+
+                getDocumentTitle: function () {
+                    return allData.documentTitle
+                },
+
+                defaultDocumentTitle: function () {
+                    allData.documentTitle = "Negus Math - College Level Advanced Mathematics for Kenya Students";
+                },
+
+                changeDocumentTitle: function (newDocumentTitle) {
+                    if (newDocumentTitle) {
+                        allData.documentTitle = newDocumentTitle;
+                    }
+                    return allData.documentTitle
+                }
+            };
+        }]);
+angular.module('clientHomeApp')
+    .factory('HotService', ['$filter', '$log', '$http', '$window', '$rootScope', 'socket',
+        function ($filter, $log, $http, $window, $rootScope, socket) {
+
+            var hotThisWeek = [];
+
+            socket.on('hotThisWeekPosts', function (data) {
+                //data here has the keys post, postCount
+                $rootScope.$broadcast('hotThisWeekPosts', data);
+            });
+
+            return {
+
+                getHotThisWeek: function () {
+                    return hotThisWeek;
+                },
+
+                getHotThisWeekFromServer: function () {
+                    return $http.post('/api/getHotThisWeek', {})
+                },
+
+                updateHotThisWeek: function (hotThisWeekArray) {
+                    if (hotThisWeekArray == []) {
+                        hotThisWeek = [];
+                    } else {
+                        hotThisWeek = $filter('preparePosts')(null, hotThisWeekArray);
+                    }
+                    return hotThisWeekArray;
+                }
+            };
+        }]);
+angular.module('clientHomeApp')
+    .factory('mainService', ['$log', '$window', '$rootScope', 'socket', 'socketService', 'globals',
+        function ($log, $window, $rootScope, socket, socketService, globals) {
+
+            socket.on('reconnect', function () {
+                $log.info("'reconnect sequence' triggered");
+                $rootScope.$broadcast('reconnect');
+            });
+
+            return {
+                done: function () {
+                    return 1;
+                }
+            };
+        }]);
+angular.module('clientHomeApp')
+    .factory('PostService', ['$filter', '$http', '$window', '$rootScope', '$interval', 'socket',
+        function ($filter, $http, $window, $rootScope, $interval, socket) {
+
+            var post = {};
+            var editPostModel = {};
+            var posts = [];
+            var postsCount = 0;
+            var mainSearchResultsPosts = [];
+            var suggestedPosts = [];
+
+            socket.on('newPost', function (data) {
+                //data here has the keys post, postCount
+                $rootScope.$broadcast('newPost', data);
+            });
+
+            socket.on('postUpdate', function (data) {
+                //data here has the keys post, postCount
+                $rootScope.$broadcast('postUpdate', data);
+            });
+
+            return {
+
+                getCurrentPosts: function () {
+                    return posts;
+                },
+
+                getCurrentPostsCount: function () {
+                    return postsCount;
+                },
+
+                getPostsFromServer: function (pageNumber) {
+                    return $http.post('/api/getPosts', {
+                        page: pageNumber
+                    })
+                },
+
+                updatePosts: function (postsArray) {
+                    if (postsArray == []) {
+                        posts = [];
+                    } else {
+                        posts = $filter('preparePosts')(null, postsArray);
+                    }
+                    return posts;
+                },
+
+                addNewToPosts: function (newPost) {
+                    function makePost(theNewPost) {
+                        if (newPost == {}) {
+                            theNewPost = {}
+                        } else {
+                            theNewPost = $filter('preparePosts')(theNewPost, null);
+                        }
+                        return theNewPost;
+                    }
+
+                    var tempPost = makePost(newPost);
+                    posts.unshift(tempPost);
+                    return posts;
+                },
+
+                getCurrentPost: function () {
+                    return post;
+                },
+
+                getPostFromServer: function (postIndex) {
+                    return $http.post('/api/getPost', {
+                        postIndex: postIndex
+                    });
+                },
+
+                updatePost: function (newPost) {
+                    if (newPost == {}) {
+                        post = {}
+                    } else {
+                        post = $filter('preparePosts')(newPost, null);
+                    }
+                    return post;
+                },
+
+                getCurrentMainSearchResults: function () {
+                    return mainSearchResultsPosts;
+                },
+
+                mainSearch: function (searchObject) {
+                    return $http.post('/api/mainSearch', searchObject);
+                },
+
+                updateMainSearchResults: function (resultValue) {
+                    mainSearchResultsPosts = resultValue;
+                    return mainSearchResultsPosts;
+                },
+
+                getSuggestedPosts: function () {
+                    return suggestedPosts;
+                },
+
+                getSuggestedPostsFromServer: function () {
+                    return $http.post('/api/getSuggestedPosts', {})
+                },
+
+                updateSuggestedPosts: function (suggestedPostsArray) {
+                    if (suggestedPostsArray == []) {
+                        suggestedPosts = [];
+                    } else {
+                        suggestedPosts = $filter('preparePosts')(null, suggestedPostsArray);
+                    }
+                    return suggestedPosts;
+                },
+
+                submitNewPost: function (newPost) {
+                    return $http.post('/api/newPost', {
+                        newPost: newPost
+                    });
+                },
+
+                submitPostUpdate: function (post) {
+                    return $http.post('/api/updatePost', {
+                        postUpdate: post
+                    });
+                }
+            };
+        }]);
+angular.module('clientHomeApp')
+
+    .factory('socket', ['$log', '$location', '$rootScope',
+        function ($log, $location, $rootScope) {
+            var url;
+            if ($location.port()) {
+                url = $location.host() + ":" + $location.port();
+            } else {
+                url = $location.host();
+            }
+            var socket = io.connect(url);
+            //return socket;
+            return {
+                on: function (eventName, callback) {
+                    socket.on(eventName, function () {
+                        var args = arguments;
+                        $rootScope.$apply(function () {
+                            callback.apply(socket, args);
+                        });
+                    });
+                },
+
+                emit: function (eventName, data, callback) {
+                    socket.emit(eventName, data, function () {
+                        var args = arguments;
+                        $rootScope.$apply(function () {
+                            if (callback) {
+                                callback.apply(socket, args);
+                            }
+                        });
+                    });
+                },
+
+                removeAllListeners: function (eventName, callback) {
+                    socket.removeAllListeners(eventName, function () {
+                        var args = arguments;
+                        $rootScope.$apply(function () {
+                            callback.apply(socket, args);
+                        });
+                    });
+                }
+            };
+        }])
+
+
+    .factory('socketService', ['$log', '$http', '$rootScope',
+        function ($log, $http, $rootScope) {
+            return {
+                getUserData: function () {
+                    return $http.get('/api/getUserData');
+                },
+
+                sendContactUs: function (contactUsModel) {
+                    return $http.post('/contactUs', contactUsModel);
+                }
+            }
+        }
+    ])
+
+    .factory('logoutService', ['$http',
+        function ($http) {
+            return {
+
+                logoutClient: function () {
+                    return $http.post('/api/logoutClient');
+                }
+            }
+        }]);

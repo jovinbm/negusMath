@@ -7,7 +7,9 @@ angular.module('adminHomeApp')
             var posts = [];
             var postsCount = 0;
             var mainSearchResultsPosts = [];
+            var mainSearchResultsPostsCount = 0;
             var suggestedPosts = [];
+            var suggestedPostsCount = 0;
 
             socket.on('newPost', function (data) {
                 //data here has the keys post, postCount
@@ -42,6 +44,11 @@ angular.module('adminHomeApp')
                         posts = $filter('preparePosts')(null, postsArray);
                     }
                     return posts;
+                },
+
+                updatePostsCount: function (newCount) {
+                    postsCount = newCount;
+                    return postsCount;
                 },
 
                 addNewToPosts: function (newPost) {
@@ -109,9 +116,18 @@ angular.module('adminHomeApp')
                     return $http.post('/api/mainSearch', searchObject);
                 },
 
-                updateMainSearchResults: function (resultValue) {
-                    mainSearchResultsPosts = resultValue;
+                updateMainSearchResults: function (resultsArray) {
+                    if (resultsArray == []) {
+                        mainSearchResultsPosts = [];
+                    } else {
+                        mainSearchResultsPosts = $filter('preparePosts')(null, resultsArray);
+                    }
                     return mainSearchResultsPosts;
+                },
+
+                updateMainSearchResultsCount: function (newCount) {
+                    mainSearchResultsPostsCount = newCount;
+                    return mainSearchResultsPostsCount;
                 },
 
                 getSuggestedPosts: function () {

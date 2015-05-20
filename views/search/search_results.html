@@ -15,26 +15,26 @@
 
                         <h2 class="text-outputs postHeading"><a ng-href="/#!/post/{{post.postIndex}}"
                                                                 ng-click="goToTop()"
-                                                                ng-bind-html="post.postHeading | highlightText"></a>
+                                                                ng-bind-html="post.postHeading"></a>
                         </h2>
 
                         <h3 class="text-muted postBy">
                             <small><a class="btn-link"
-                                      ng-bind-html="post.authorName | highlightText"></a>
-                                on <span ng-bind-html="post.createdAt | getPostDate"></span>
+                                      ng-bind-html="post.authorName"></a>
+                                on <span ng-bind-html="post.postDate"></span>
                             </small>
                             <br/>
                             <small class="text-muted"
-                                   ng-bind-html="post.createdAt | getTimeAgo">
+                                   ng-bind-html="post.timeAgo">
                             </small>
                         </h3>
 
-                        <div post-summary></div>
+                        <div post-summary model="post.postSummary"></div>
 
 
                     </div>
                     <div class="card-action clearfix">
-                        <div post-tags></div>
+                        <div post-tags model="post.postTags"></div>
                         <div class="pull-right">
                             <a ng-href="/#!/post/{{post.postIndex}}"
                                ng-click="goToTop()"
