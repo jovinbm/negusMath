@@ -707,7 +707,7 @@ angular.module('clientHomeApp')
             });
         }
     ]);
-angular.module('adminHomeApp')
+angular.module('clientHomeApp')
     .controller('SearchController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', 'fN',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, fN) {
 
@@ -1311,11 +1311,12 @@ angular.module('clientHomeApp')
         function ($filter, $http, $window, $rootScope, $interval, socket) {
 
             var post = {};
-            var editPostModel = {};
             var posts = [];
             var postsCount = 0;
             var mainSearchResultsPosts = [];
+            var mainSearchResultsPostsCount = 0;
             var suggestedPosts = [];
+            var suggestedPostsCount = 0;
 
             socket.on('newPost', function (data) {
                 //data here has the keys post, postCount
@@ -1350,6 +1351,11 @@ angular.module('clientHomeApp')
                         posts = $filter('preparePosts')(null, postsArray);
                     }
                     return posts;
+                },
+
+                updatePostsCount: function (newCount) {
+                    postsCount = newCount;
+                    return postsCount;
                 },
 
                 addNewToPosts: function (newPost) {
@@ -1394,9 +1400,18 @@ angular.module('clientHomeApp')
                     return $http.post('/api/mainSearch', searchObject);
                 },
 
-                updateMainSearchResults: function (resultValue) {
-                    mainSearchResultsPosts = resultValue;
+                updateMainSearchResults: function (resultsArray) {
+                    if (resultsArray == []) {
+                        mainSearchResultsPosts = [];
+                    } else {
+                        mainSearchResultsPosts = $filter('preparePosts')(null, resultsArray);
+                    }
                     return mainSearchResultsPosts;
+                },
+
+                updateMainSearchResultsCount: function (newCount) {
+                    mainSearchResultsPostsCount = newCount;
+                    return mainSearchResultsPostsCount;
                 },
 
                 getSuggestedPosts: function () {
