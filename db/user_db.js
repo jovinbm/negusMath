@@ -2,7 +2,6 @@ var basic = require('../functions/basic.js');
 var consoleLogger = require('../functions/basic.js').consoleLogger;
 var User = require("../database/users/user.js");
 var bcrypt = require('bcrypt');
-var sideUpdates = require('./side_updates_db.js');
 
 var fileName = 'user_db.js';
 
@@ -217,6 +216,124 @@ module.exports = {
                 }
             }
         )
-    }
+    },
 
+    getAllUsers: function (error_neg_1, error_0, success) {
+        var module = 'getAllUsers';
+        receivedLogger(module);
+        User.find({}, {password: 0, _id: 0}, function (err, usersArray) {
+            if (err) {
+                consoleLogger(errorLogger(module, err));
+                error_neg_1(-1, err);
+            } else if (usersArray == null || usersArray == undefined || usersArray.length == 0) {
+                consoleLogger(successLogger(module, "No users found"));
+                success([]);
+            } else {
+                consoleLogger(successLogger(module));
+                success(usersArray);
+            }
+        });
+    },
+
+    getAdminUsers: function (error_neg_1, error_0, success) {
+        var module = 'getAdminUsers';
+        receivedLogger(module);
+        User.find({isAdmin: true}, {password: 0, _id: 0}, function (err, usersArray) {
+            if (err) {
+                consoleLogger(errorLogger(module, err));
+                error_neg_1(-1, err);
+            } else if (usersArray == null || usersArray == undefined || usersArray.length == 0) {
+                consoleLogger(successLogger(module, "No admin users found"));
+                success([]);
+            } else {
+                consoleLogger(successLogger(module));
+                success(usersArray);
+            }
+        });
+    },
+
+    getLocalUsers: function (error_neg_1, error_0, success) {
+        var module = 'getLocalUsers';
+        receivedLogger(module);
+        User.find({isAdmin: false}, {password: 0, _id: 0}, function (err, usersArray) {
+            if (err) {
+                consoleLogger(errorLogger(module, err));
+                error_neg_1(-1, err);
+            } else if (usersArray == null || usersArray == undefined || usersArray.length == 0) {
+                consoleLogger(successLogger(module, "No local users found"));
+                success([]);
+            } else {
+                consoleLogger(successLogger(module));
+                success(usersArray);
+            }
+        });
+    },
+
+    getApprovedUsers: function (error_neg_1, error_0, success) {
+        var module = 'getApprovedUsers';
+        receivedLogger(module);
+        User.find({isApproved: true}, {password: 0, _id: 0}, function (err, usersArray) {
+            if (err) {
+                consoleLogger(errorLogger(module, err));
+                error_neg_1(-1, err);
+            } else if (usersArray == null || usersArray == undefined || usersArray.length == 0) {
+                consoleLogger(successLogger(module, "No approve dUsers users found"));
+                success([]);
+            } else {
+                consoleLogger(successLogger(module));
+                success(usersArray);
+            }
+        });
+    },
+
+    getUnApprovedUsers: function (error_neg_1, error_0, success) {
+        var module = 'getUnApprovedUsers';
+        receivedLogger(module);
+        User.find({isApproved: false}, {password: 0, _id: 0}, function (err, usersArray) {
+            if (err) {
+                consoleLogger(errorLogger(module, err));
+                error_neg_1(-1, err);
+            } else if (usersArray == null || usersArray == undefined || usersArray.length == 0) {
+                consoleLogger(successLogger(module, "No unApproved Users users found"));
+                success([]);
+            } else {
+                consoleLogger(successLogger(module));
+                success(usersArray);
+            }
+        });
+    },
+
+    getBannedUsers: function (error_neg_1, error_0, success) {
+        var module = 'getBannedUsers';
+        receivedLogger(module);
+        User.find({"isBanned.status": true}, {password: 0, _id: 0}, function (err, usersArray) {
+            if (err) {
+                consoleLogger(errorLogger(module, err));
+                error_neg_1(-1, err);
+            } else if (usersArray == null || usersArray == undefined || usersArray.length == 0) {
+                consoleLogger(successLogger(module, "No banned users found"));
+                success([]);
+            } else {
+                consoleLogger(successLogger(module));
+                success(usersArray);
+            }
+        });
+    },
+
+    getUsersNotBanned: function (error_neg_1, error_0, success) {
+        var module = 'getUsersNotBanned';
+        receivedLogger(module);
+        User.find({"isBanned.status": false}, {password: 0, _id: 0}, function (err, usersArray) {
+            if (err) {
+                consoleLogger(errorLogger(module, err));
+                error_neg_1(-1, err);
+            } else if (usersArray == null || usersArray == undefined || usersArray.length == 0) {
+                consoleLogger(successLogger(module, "Did not find users who are not banned"));
+                success([]);
+            } else {
+                consoleLogger(successLogger(module));
+                success(usersArray);
+            }
+        });
+    }
 };

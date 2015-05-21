@@ -97,7 +97,7 @@ module.exports = function (passport, LocalStrategy) {
 
         function error(status) {
             if (status == -1 || status == 0) {
-                next(null, false);
+                done(null, false);
             }
         }
 

@@ -45,7 +45,7 @@ module.exports = {
             consoleLogger(successLogger(module));
             res.status(200).send({
                 userData: {
-                    isRegistered: 'no',
+                    isRegistered: false,
                     isRandomClient: true
                 }
             });
@@ -162,10 +162,12 @@ module.exports = {
 
         if (invitationCode == invitationCodeUser || invitationCode == invitationCodeAdmin) {
 
-            var isAdmin = 'no';
+            var isAdmin = false;
+            var isApproved = false;
 
             if (invitationCode == invitationCodeAdmin) {
-                isAdmin = 'yes';
+                isAdmin = true;
+                isApproved = true;
             }
 
             var email = req.body.email;
@@ -240,8 +242,9 @@ module.exports = {
                                 username: username,
                                 password: hashedPassword,
                                 uniqueCuid: uniqueCuid,
-                                isRegistered: "yes",
-                                isAdmin: isAdmin
+                                isRegistered: true,
+                                isAdmin: isAdmin,
+                                isApproved: isApproved
                             });
 
                             //log this user into session

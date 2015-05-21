@@ -37,9 +37,9 @@ angular.module('clientHomeApp')
                 socketService.getUserData()
                     .success(function (resp) {
                         $scope.userData = globals.userData(resp.userData);
-                        $scope.clientIsRegistered = $scope.userData.isRegistered == 'yes';
+                        $scope.clientIsRegistered = $scope.userData.isRegistered;
 
-                        if ($scope.userData.isRegistered == 'yes') {
+                        if ($scope.userData.isRegistered) {
                             //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
                             socket.emit('joinRoom', {
                                 room: resp.userData.uniqueCuid

@@ -97,7 +97,7 @@ module.exports = {
         var module = "checkUserIsAdmin";
         receivedLogger(module);
 
-        if (req.customData.theUser.isAdmin == 'yes') {
+        if (req.customData.theUser.isAdmin) {
             consoleLogger(successLogger(module));
             next();
         } else {
@@ -125,7 +125,7 @@ module.exports = {
                 req.customData.theUser = userData;
             }
 
-            if (userData.isAdmin == 'yes') {
+            if (userData.isAdmin) {
                 consoleLogger(successLogger(module, 'User is Admin'));
                 success({
                     theUser: userData,
