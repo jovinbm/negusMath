@@ -1,7 +1,7 @@
 angular.module('clientHomeApp')
     .directive('postContent', ['$filter', '$rootScope', 'globals', 'PostService', function ($filter, $rootScope, globals, PostService) {
         return {
-            templateUrl: 'views/admin/partials/smalls/post_content.html',
+            templateUrl: 'views/client/partials/smalls/post_content.html',
             scope: {
                 postContent: '=model'
             },
@@ -12,7 +12,7 @@ angular.module('clientHomeApp')
     }])
     .directive('postSummary', ['$filter', '$rootScope', 'globals', 'PostService', function ($filter, $rootScope, globals, PostService) {
         return {
-            templateUrl: 'views/admin/partials/smalls/post_summary.html',
+            templateUrl: 'views/client/partials/smalls/post_summary.html',
             scope: {
                 postSummary: '=model'
             },
@@ -23,7 +23,7 @@ angular.module('clientHomeApp')
     }])
     .directive('postTags', ['$filter', '$rootScope', 'globals', 'PostService', function ($filter, $rootScope, globals, PostService) {
         return {
-            templateUrl: 'views/admin/partials/smalls/post_tags.html',
+            templateUrl: 'views/client/partials/smalls/post_tags.html',
             scope: {
                 postTags: '=model'
             },

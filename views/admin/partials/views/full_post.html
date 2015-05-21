@@ -39,7 +39,7 @@
 
                             <div class="pull-right">
                                 <a class="btn-link btn btn-default btn-sm"
-                                   ng-href="/#!/editPost/{{post.postIndex}}"
+                                   ng-href="/#!/home/editPost/{{post.postIndex}}"
                                    ng-click="goToTop()">Edit</a>
                                 <a class="btn-link btn btn-default btn-sm">Delete</a>
                             </div>
@@ -53,7 +53,7 @@
                         <dir-disqus disqus-shortname="negusmathproduction"
                                     disqus-identifier="{{post.postUniqueCuid}}"
                                     disqus-title="{{ post.postHeading }}"
-                                    disqus-url="{{post.postUrl}}"
+                                    disqus-url="{{post.postAbsoluteUrl}}"
                                     ready-to-bind="{{postIsLoaded}}">
                         </dir-disqus>
                     </div>

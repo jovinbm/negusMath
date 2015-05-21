@@ -67,29 +67,14 @@ angular.module('clientHomeApp')
             return moment(createdAt).format("ddd, MMM D, H:mm");
         }
     }])
-    .filter("AddPostUrl", ['$filter', function () {
-        //takes in a post or an array of posts, and adds a timeAgo key in them
-        return function (post, posts) {
-            function addUrl(post) {
-                if (post.postIndex) {
-                    post.postUrl = 'http://www.negusmath.com/#!/post/' + post.postIndex;
-                }
-                return post;
-            }
-
-            if (post) {
-                return addUrl(post);
-            } else if (posts) {
-                posts.forEach(function (post, index) {
-                    posts[index] = addUrl(post);
-                });
-                return posts;
-            }
+    .filter("getPostAbsoluteUrl", ['$filter', function () {
+        return function (postIndex) {
+            return 'http://www.negusmath.com/#!/home/post/' + postIndex;
         }
     }])
-    .filter("getPostUrl", ['$filter', function () {
+    .filter("getPostPath", ['$filter', function () {
         return function (postIndex) {
-            return 'http://www.negusmath.com/#!/post/' + postIndex;
+            return '/#!/home/post/' + postIndex;
         }
     }])
     .filter("makeVideoIframesResponsive", ['$filter', function () {
@@ -201,17 +186,17 @@ angular.module('clientHomeApp')
 
             function checkSearchState() {
                 //check latest state
-                if ($rootScope.$state.current.name == 'search') {
+                if ($rootScope.$state.current.name == 'home.search') {
                     return {
                         status: true,
                         queryString: $rootScope.$stateParams.queryString || ""
                     }
                 } else if ($rootScope.stateHistory.length > 0) {
-                    if ($rootScope.stateHistory[$rootScope.stateHistory.length - 1].hasOwnProperty('search')) {
+                    if ($rootScope.stateHistory[$rootScope.stateHistory.length - 1].hasOwnProperty('home.search')) {
                         //checking the previous state
                         return {
                             status: true,
-                            queryString: $rootScope.stateHistory[$rootScope.stateHistory.length - 1]['search'].queryString
+                            queryString: $rootScope.stateHistory[$rootScope.stateHistory.length - 1]['home.search'].queryString
                         }
                     } else {
                         return {
@@ -268,7 +253,8 @@ angular.module('clientHomeApp')
             function prepare(post) {
                 post.timeAgo = $filter('getTimeAgo')(post.createdAt);
                 post.postDate = $filter('getPostDate')(post.createdAt);
-                post.postUrl = $filter('getPostUrl')(post.postIndex);
+                post.postAbsoluteUrl = $filter('getPostAbsoluteUrl')(post.postIndex);
+                post.postPath = $filter('getPostPath')(post.postIndex);
                 post.postHeading = $filter('highlightText')(post.postHeading, true);
                 post.authorName = $filter('highlightText')(post.authorName, true);
                 post.postSummary = $filter('highlightText')($filter('getVideoResponsiveVersion')(post.postSummary), true);
@@ -302,13 +288,36 @@ angular.module('clientHomeApp')
             function prepare(post) {
                 post.timeAgo = $filter('getTimeAgo')(post.createdAt);
                 post.postDate = $filter('getPostDate')(post.createdAt);
-                post.postUrl = $filter('getPostUrl')(post.postIndex);
+                post.postAbsoluteUrl = $filter('getPostAbsoluteUrl')(post.postIndex);
+                post.postPath = $filter('getPostPath')(post.postIndex);
                 post.postHeading = $filter('highlightText')(post.postHeading, false);
                 post.authorName = $filter('highlightText')(post.authorName, false);
                 post.postSummary = $filter('highlightText')(post.postSummary, false);
                 post.postContent = $filter('highlightText')(post.postContent, false);
                 post.postTags = removePostTagsHighlight(post.postTags);
 
+                return post;
+            }
+
+            if (post) {
+                return prepare(post)
+            } else if (posts) {
+                posts.forEach(function (post, index) {
+                    posts[index] = prepare(post);
+                });
+                return posts;
+            }
+        }
+    }])
+    .filter("preparePostsNoChange", ['$filter', function ($filter) {
+        //does not change the post to make it responsive and does not highlight
+        return function (post, posts) {
+
+            function prepare(post) {
+                post.timeAgo = $filter('getTimeAgo')(post.createdAt);
+                post.postDate = $filter('getPostDate')(post.createdAt);
+                post.postAbsoluteUrl = $filter('getPostAbsoluteUrl')(post.postIndex);
+                post.postPath = $filter('getPostPath')(post.postIndex);
                 return post;
             }
 
@@ -369,5 +378,3 @@ angular.module('clientHomeApp')
             return true;
         }
     }]);
-
-

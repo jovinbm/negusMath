@@ -104,7 +104,7 @@ angular.module('clientHomeApp')
             //===============socket listeners===============
 
             $rootScope.$on('reconnect', function () {
-                if ($rootScope.$state.current.name == 'search') {
+                if ($rootScope.$state.current.name == 'home.search') {
                     getMainSearchResults();
                 }
             });

@@ -89,7 +89,7 @@ angular.module('adminHomeApp')
     .directive('loadingBanner', ['$rootScope', function ($rootScope) {
         var controller = ['$scope', '$rootScope', 'cfpLoadingBar', function ($scope, $rootScope, cfpLoadingBar) {
 
-            $rootScope.isLoading = false;
+            $rootScope.isLoading = true;
             $rootScope.isLoadingPercentage = 0;
             $rootScope.changeIsLoadingPercentage = function (num) {
                 $rootScope.isLoadingPercentage = num;

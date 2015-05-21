@@ -67,26 +67,6 @@ angular.module('indexApp')
             return moment(createdAt).format("ddd, MMM D, H:mm");
         }
     }])
-    .filter("AddPostUrl", ['$filter', function () {
-        //takes in a post or an array of posts, and adds a timeAgo key in them
-        return function (post, posts) {
-            function addUrl(post) {
-                if (post.postIndex) {
-                    post.postUrl = 'http://www.negusmath.com/#!/post/' + post.postIndex;
-                }
-                return post;
-            }
-
-            if (post) {
-                return addUrl(post);
-            } else if (posts) {
-                posts.forEach(function (post, index) {
-                    posts[index] = addUrl(post);
-                });
-                return posts;
-            }
-        }
-    }])
     .filter("makeVideoIframesResponsive", ['$filter', function () {
         //making embedded videos responsive
         return function (post, posts) {

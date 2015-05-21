@@ -1,91 +1,4 @@
 angular.module('clientHomeApp')
-    .controller('PostsController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
-
-            $scope.showThePager();
-            globals.defaultDocumentTitle();
-
-            $scope.posts = PostService.getCurrentPosts();
-            $scope.postsCount = PostService.getCurrentPostsCount();
-            $scope.suggestedPosts = PostService.getSuggestedPosts();
-
-            //variable that determines whether to show posts/suggested posts or not
-            $scope.mainSearchResultsPosts = false;
-
-            $scope.showThePostsOnly = function () {
-                $scope.hideLoadingBanner();
-                $scope.mainSearchResultsPosts = true;
-                $scope.hideSuggested();
-            };
-
-            $scope.showSuggestedPostsOnly = function () {
-                $scope.hideLoadingBanner();
-                $scope.mainSearchResultsPosts = false;
-                $scope.showSuggested();
-            };
-
-            function getPagePosts() {
-                $scope.showLoadingBanner();
-                PostService.getPostsFromServer($rootScope.$stateParams.pageNumber)
-                    .success(function (resp) {
-                        //this function  creates a banner to notify user that there are no posts by mimicking a response and calling the response handler
-                        //used if the user is accessing a page that is beyond the number of posts
-                        if (resp.postsArray.length == 0) {
-
-                            //empty the postsArray
-                            $scope.posts = PostService.updatePosts([]);
-
-                            var responseMimic = {
-                                banner: true,
-                                bannerClass: 'alert alert-dismissible alert-success',
-                                msg: "No more posts to show"
-                            };
-                            $rootScope.responseStatusHandler(responseMimic);
-                            $scope.mainSearchResultsPosts = false;
-                            $scope.showSuggestedPostsOnly();
-                            $scope.goToTop();
-                        } else {
-                            $scope.posts = PostService.updatePosts(resp.postsArray);
-                            $scope.showThePostsOnly();
-                            if (resp.postsCount) {
-                                $scope.postsCount = resp.postsCount;
-                                $scope.changePagingTotalCount($scope.postsCount);
-                            }
-                            $scope.showThePager();
-                        }
-                    })
-                    .error(function (errResp) {
-                        $rootScope.responseStatusHandler(errResp);
-                        //empty the postsArray
-                        $scope.posts = PostService.updatePosts([]);
-                        $scope.mainSearchResultsPosts = false;
-                        $scope.showSuggestedPostsOnly();
-                    });
-            }
-
-            getPagePosts();
-
-            //===============socket listeners===============
-
-            $rootScope.$on('newPost', function (event, data) {
-                //newPost goes to page 1, so update only if the page is 1
-                if ($rootScope.$stateParams.pageNumber == 1) {
-                    $scope.posts = PostService.addNewToPosts(data.post);
-                }
-                if (data.postsCount) {
-                    $scope.postsCount = data.postsCount;
-                    $scope.changePagingTotalCount($scope.postsCount);
-                }
-            });
-
-            $rootScope.$on('reconnect', function () {
-                if ($rootScope.$state.current.name == 'home') {
-                    getPagePosts();
-                }
-            });
-        }
-    ])
-
     .controller('FullPostController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', '$stateParams', 'fN',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, $stateParams, fN) {
             //hide paging
@@ -158,7 +71,7 @@ angular.module('clientHomeApp')
             $rootScope.$on('reconnect', function () {
                 //only update the post variable if the user is not editing the current post
                 if (!$rootScope.isEditingPost) {
-                    if ($rootScope.$state.current.name == 'post') {
+                    if ($rootScope.$state.current.name == 'home.post') {
                         getFullPost();
                     }
                 }

@@ -24,6 +24,31 @@ angular.module('clientHomeApp')
             }
         }
     }])
+    .directive('newPostBanner', ['$rootScope', function ($rootScope) {
+        return {
+            templateUrl: 'views/client/partials/smalls/new_post_banner.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.newPostBanner = {
+                    show: false,
+                    bannerClass: "",
+                    msg: ""
+                };
+
+                $rootScope.$on('newPostBanner', function (event, banner) {
+                    $scope.newPostBanner = banner;
+                });
+
+                $rootScope.$on('clearBanners', function () {
+                    $scope.newPostBanner = {
+                        show: false,
+                        bannerClass: "",
+                        msg: ""
+                    };
+                })
+            }
+        }
+    }])
     .directive('toastrDirective', ['$rootScope', function ($rootScope) {
         return {
             restrict: 'AE',
@@ -64,7 +89,7 @@ angular.module('clientHomeApp')
     .directive('loadingBanner', ['$rootScope', function ($rootScope) {
         var controller = ['$scope', '$rootScope', 'cfpLoadingBar', function ($scope, $rootScope, cfpLoadingBar) {
 
-            $rootScope.isLoading = false;
+            $rootScope.isLoading = true;
             $rootScope.isLoadingPercentage = 0;
             $rootScope.changeIsLoadingPercentage = function (num) {
                 $rootScope.isLoadingPercentage = num;

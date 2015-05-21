@@ -14,7 +14,7 @@
 
                 <div class="card-content">
 
-                    <h2 class="text-outputs postHeading"><a ng-href="/#!/post/{{post.postIndex}}"
+                    <h2 class="text-outputs postHeading"><a ng-href="{{post.postPath}}"
                                                             ng-click="goToTop()"
                                                             ng-bind-html="post.postHeading"></a>
                     </h2>
@@ -38,7 +38,7 @@
                 <div class="card-action clearfix">
 
                     <div class="pull-right">
-                        <a ng-href="/#!/post/{{post.postIndex}}"
+                        <a ng-href="{{post.postPath}}"
                            ng-click="goToTop()"
                            class="btn btn-default btn-sm">Read More</a>
                     </div>

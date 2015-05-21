@@ -103,7 +103,7 @@ angular.module('adminHomeApp')
                     if (newPost == {}) {
                         editPostModel = {}
                     } else {
-                        editPostModel = newPost;
+                        editPostModel = $filter('preparePostsNoChange')(newPost, null);
                     }
                     return editPostModel;
                 },

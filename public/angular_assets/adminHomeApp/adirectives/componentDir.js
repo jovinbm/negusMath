@@ -24,7 +24,7 @@ angular.module('adminHomeApp')
 
                 $scope.fillSearchBox = function () {
                     //check latest state
-                    if ($rootScope.$state.current.name == 'search') {
+                    if ($rootScope.$state.current.name == 'home.search') {
                         $scope.mainSearchModel.queryString = $rootScope.$stateParams.queryString ? $rootScope.$stateParams.queryString : "";
                     } else if ($rootScope.stateHistory.length > 0) {
                         if ($rootScope.stateHistory[$rootScope.stateHistory.length - 1].hasOwnProperty('search')) {
@@ -43,9 +43,9 @@ angular.module('adminHomeApp')
                 $scope.performMainSearch = function () {
                     if ($scope.mainSearchModel.queryString.length > 0) {
                         if ($location.port()) {
-                            $window.location.href = "http://" + $location.host() + ":" + $location.port() + "/#!/search/" + $scope.mainSearchModel.queryString + "/1";
+                            $window.location.href = "http://" + $location.host() + ":" + $location.port() + "/#!/home/search/" + $scope.mainSearchModel.queryString + "/1";
                         } else {
-                            $window.location.href = "http://" + $location.host() + "/#!/search/" + $scope.mainSearchModel.queryString + "/1";
+                            $window.location.href = "http://" + $location.host() + "/#!/home/search/" + $scope.mainSearchModel.queryString + "/1";
                         }
                     }
                 };
@@ -67,6 +67,95 @@ angular.module('adminHomeApp')
                             $rootScope.responseStatusHandler(errResponse);
                         });
                 };
+            }
+        }
+    }])
+    .directive('postStream', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', function ($q, $filter, $log, $interval, $window, $location, $rootScope, socket, mainService, socketService, globals, $modal, PostService) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/post_feed.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.showThePager();
+                globals.defaultDocumentTitle();
+
+                $scope.posts = PostService.getCurrentPosts();
+                $scope.postsCount = PostService.getCurrentPostsCount();
+                $scope.suggestedPosts = PostService.getSuggestedPosts();
+
+                //variable that determines whether to show posts/suggested posts or not
+                $scope.mainSearchResultsPosts = false;
+
+                $scope.showThePostsOnly = function () {
+                    $scope.hideLoadingBanner();
+                    $scope.mainSearchResultsPosts = true;
+                    $scope.hideSuggested();
+                };
+
+                $scope.showSuggestedPostsOnly = function () {
+                    $scope.hideLoadingBanner();
+                    $scope.mainSearchResultsPosts = false;
+                    $scope.showSuggested();
+                };
+
+                function getPagePosts() {
+                    $scope.showLoadingBanner();
+                    PostService.getPostsFromServer($rootScope.$stateParams.pageNumber || 1)
+                        .success(function (resp) {
+                            //this function  creates a banner to notify user that there are no posts by mimicking a response and calling the response handler
+                            //used if the user is accessing a page that is beyond the number of posts
+                            if (resp.postsArray.length == 0) {
+
+                                //empty the postsArray
+                                $scope.posts = PostService.updatePosts([]);
+
+                                var responseMimic = {
+                                    banner: true,
+                                    bannerClass: 'alert alert-dismissible alert-success',
+                                    msg: "No more posts to show"
+                                };
+                                $rootScope.responseStatusHandler(responseMimic);
+                                $scope.mainSearchResultsPosts = false;
+                                $scope.showSuggestedPostsOnly();
+                                $scope.goToTop();
+                            } else {
+                                $scope.posts = PostService.updatePosts(resp.postsArray);
+                                $scope.showThePostsOnly();
+                                if (resp.postsCount) {
+                                    $scope.postsCount = resp.postsCount;
+                                    $scope.changePagingTotalCount($scope.postsCount);
+                                }
+                                $scope.showThePager();
+                            }
+                        })
+                        .error(function (errResp) {
+                            $rootScope.responseStatusHandler(errResp);
+                            //empty the postsArray
+                            $scope.posts = PostService.updatePosts([]);
+                            $scope.mainSearchResultsPosts = false;
+                            $scope.showSuggestedPostsOnly();
+                        });
+                }
+
+                getPagePosts();
+
+                //===============socket listeners===============
+
+                $rootScope.$on('newPost', function (event, data) {
+                    //newPost goes to page 1, so update only if the page is 1
+                    if ($rootScope.$stateParams.pageNumber == 1) {
+                        $scope.posts = PostService.addNewToPosts(data.post);
+                    }
+                    if (data.postsCount) {
+                        $scope.postsCount = data.postsCount;
+                        $scope.changePagingTotalCount($scope.postsCount);
+                    }
+                });
+
+                $rootScope.$on('reconnect', function () {
+                    if ($rootScope.$state.current.name == 'home' || $rootScope.$state.current.name == 'home.stream') {
+                        getPagePosts();
+                    }
+                });
             }
         }
     }])
@@ -150,16 +239,38 @@ angular.module('adminHomeApp')
                 $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
                     //refresh the currentPage if the user is going to a new state
                     if (fromState.name != toState.name) {
-                        $scope.currentPage = $rootScope.$stateParams.pageNumber;
-                        $scope.pagingTotalCount = 1
+                        if($rootScope.$state.current.name != 'home') {
+                            $scope.currentPage = $rootScope.$stateParams.pageNumber;
+                        }
                     }
                 });
 
                 $scope.goToPage = function () {
                     //go to the current state's new page
-                    $rootScope.$state.go($rootScope.$state.current.name, {pageNumber: $scope.currentPage});
+                    console.log($scope.currentPage);
+                    if ($rootScope.$state.current.name == 'home') {
+                        $rootScope.$state.go('home.stream', {pageNumber: $scope.currentPage});
+                    } else {
+                        $rootScope.$state.go($rootScope.$state.current.name, {pageNumber: $scope.currentPage})
+                    }
                     $scope.goToTop();
                 };
+            }
+        }
+    }])
+    .directive('contactUs', ['globals', function (globals) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/contact_us.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+            }
+        }
+    }])
+    .directive('mainFooter', ['globals', function (globals) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/main_footer.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
             }
         }
     }]);
