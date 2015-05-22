@@ -24,6 +24,89 @@ function getTheUser(req) {
     return req.customData.theUser;
 }
 
+function countAllUsers(error_neg_1, error_0, success) {
+    User.count({}, function (err, total) {
+        if (err) {
+            consoleLogger(errorLogger(module, err));
+            error_neg_1(-1, err);
+        } else {
+            consoleLogger(successLogger(module));
+            success(total);
+        }
+    })
+}
+
+function countAdminUsers(error_neg_1, error_0, success) {
+    User.count({isAdmin: true}, function (err, total) {
+        if (err) {
+            consoleLogger(errorLogger(module, err));
+            error_neg_1(-1, err);
+        } else {
+            consoleLogger(successLogger(module));
+            success(total);
+        }
+    })
+}
+
+function countLocalUsers(error_neg_1, error_0, success) {
+    User.count({isAdmin: false}, function (err, total) {
+        if (err) {
+            consoleLogger(errorLogger(module, err));
+            error_neg_1(-1, err);
+        } else {
+            consoleLogger(successLogger(module));
+            success(total);
+        }
+    })
+}
+
+function countApprovedUsers(error_neg_1, error_0, success) {
+    User.count({isApproved: true}, function (err, total) {
+        if (err) {
+            consoleLogger(errorLogger(module, err));
+            error_neg_1(-1, err);
+        } else {
+            consoleLogger(successLogger(module));
+            success(total);
+        }
+    })
+}
+
+function countUsersNotApproved(error_neg_1, error_0, success) {
+    User.count({isApproved: false}, function (err, total) {
+        if (err) {
+            consoleLogger(errorLogger(module, err));
+            error_neg_1(-1, err);
+        } else {
+            consoleLogger(successLogger(module));
+            success(total);
+        }
+    })
+}
+
+function countBannedUsers(error_neg_1, error_0, success) {
+    User.count({"isBanned.status": true}, function (err, total) {
+        if (err) {
+            consoleLogger(errorLogger(module, err));
+            error_neg_1(-1, err);
+        } else {
+            consoleLogger(successLogger(module));
+            success(total);
+        }
+    })
+}
+
+function countUsersNotBanned(error_neg_1, error_0, success) {
+    User.count({"isBanned.status": false}, function (err, total) {
+        if (err) {
+            consoleLogger(errorLogger(module, err));
+            error_neg_1(-1, err);
+        } else {
+            consoleLogger(successLogger(module));
+            success(total);
+        }
+    })
+}
 
 module.exports = {
 
@@ -218,6 +301,76 @@ module.exports = {
         )
     },
 
+    getUsersCount: function (error_neg_1, error_0, finalSuccess) {
+        var usersCount = {
+            allUsers: 0,
+            adminUsers: 0,
+            localUsers: 0,
+            approvedUsers: 0,
+            usersNotApproved: 0,
+            bannedUsers: 0,
+            usersNotBanned: 0
+        };
+
+        getAllUsersCount();
+
+        function getAllUsersCount() {
+            countAllUsers(error_neg_1, error_0, success);
+            function success(num) {
+                usersCount.allUsers = num;
+                getAdminUsersCount();
+            }
+        }
+
+        function getAdminUsersCount() {
+            countAdminUsers(error_neg_1, error_0, success);
+            function success(num) {
+                usersCount.adminUsers = num;
+                getLocalUsersCount();
+            }
+        }
+
+        function getLocalUsersCount() {
+            countLocalUsers(error_neg_1, error_0, success);
+            function success(num) {
+                usersCount.localUsers = num;
+                getApprovedUsersCount();
+            }
+        }
+
+        function getApprovedUsersCount() {
+            countApprovedUsers(error_neg_1, error_0, success);
+            function success(num) {
+                usersCount.approvedUsers = num;
+                getUsersNotApprovedCount();
+            }
+        }
+
+        function getUsersNotApprovedCount() {
+            countUsersNotApproved(error_neg_1, error_0, success);
+            function success(num) {
+                usersCount.usersNotApproved = num;
+                getBannedUsersCount();
+            }
+        }
+
+        function getBannedUsersCount() {
+            countBannedUsers(error_neg_1, error_0, success);
+            function success(num) {
+                usersCount.bannedUsers = num;
+                getUsersNotBannedCount();
+            }
+        }
+
+        function getUsersNotBannedCount() {
+            countUsersNotBanned(error_neg_1, error_0, success);
+            function success(num) {
+                usersCount.usersNotBanned = num;
+                finalSuccess(usersCount);
+            }
+        }
+    },
+
     getAllUsers: function (error_neg_1, error_0, success) {
         var module = 'getAllUsers';
         receivedLogger(module);
@@ -248,6 +401,58 @@ module.exports = {
             } else {
                 consoleLogger(successLogger(module));
                 success(usersArray);
+            }
+        });
+    },
+
+    addAdminPrivileges: function (userUniqueCuid, error_neg_1, error_0, success) {
+        var module = 'addAdminPrivileges';
+        receivedLogger(module);
+        User.findOne({uniqueCuid: userUniqueCuid}, function (err, user) {
+            if (err) {
+                consoleLogger(errorLogger(module, err));
+                error_neg_1(-1, err);
+            } else if (user == null || user == undefined || user.length == 0) {
+                consoleLogger(successLogger(module, "Could not find the user with the given uniqueCuid"));
+                error_0(0);
+            } else {
+                consoleLogger(successLogger(module));
+                user.isAdmin = true;
+                user.save(function (err, theSavedUser) {
+                    if (err) {
+                        consoleLogger(errorLogger(module, err));
+                        error_neg_1(-1, err);
+                    } else {
+                        consoleLogger(successLogger(module));
+                        success(theSavedUser);
+                    }
+                });
+            }
+        });
+    },
+
+    removeAdminPrivileges: function (userUniqueCuid, error_neg_1, error_0, success) {
+        var module = 'removeAdminPrivileges';
+        receivedLogger(module);
+        User.findOne({uniqueCuid: userUniqueCuid}, function (err, user) {
+            if (err) {
+                consoleLogger(errorLogger(module, err));
+                error_neg_1(-1, err);
+            } else if (user == null || user == undefined || user.length == 0) {
+                consoleLogger(successLogger(module, "Could not find the user with the given uniqueCuid"));
+                error_0(0);
+            } else {
+                consoleLogger(successLogger(module));
+                user.isAdmin = false;
+                user.save(function (err, theSavedUser) {
+                    if (err) {
+                        consoleLogger(errorLogger(module, err));
+                        error_neg_1(-1, err);
+                    } else {
+                        consoleLogger(successLogger(module));
+                        success(theSavedUser);
+                    }
+                });
             }
         });
     },
@@ -286,8 +491,34 @@ module.exports = {
         });
     },
 
-    getUnApprovedUsers: function (error_neg_1, error_0, success) {
-        var module = 'getUnApprovedUsers';
+    approveUser: function (userUniqueCuid, error_neg_1, error_0, success) {
+        var module = 'approveUser';
+        receivedLogger(module);
+        User.findOne({uniqueCuid: userUniqueCuid}, function (err, user) {
+            if (err) {
+                consoleLogger(errorLogger(module, err));
+                error_neg_1(-1, err);
+            } else if (user == null || user == undefined || user.length == 0) {
+                consoleLogger(successLogger(module, "Could not find the user with the given uniqueCuid"));
+                error_0(0);
+            } else {
+                consoleLogger(successLogger(module));
+                user.isApproved = true;
+                user.save(function (err, theSavedUser) {
+                    if (err) {
+                        consoleLogger(errorLogger(module, err));
+                        error_neg_1(-1, err);
+                    } else {
+                        consoleLogger(successLogger(module));
+                        success(theSavedUser);
+                    }
+                });
+            }
+        });
+    },
+
+    getUsersNotApproved: function (error_neg_1, error_0, success) {
+        var module = 'getUsersNotApproved';
         receivedLogger(module);
         User.find({isApproved: false}, {password: 0, _id: 0}, function (err, usersArray) {
             if (err) {
@@ -316,6 +547,58 @@ module.exports = {
             } else {
                 consoleLogger(successLogger(module));
                 success(usersArray);
+            }
+        });
+    },
+
+    banUser: function (userUniqueCuid, error_neg_1, error_0, success) {
+        var module = 'banUser';
+        receivedLogger(module);
+        User.findOne({uniqueCuid: userUniqueCuid}, function (err, user) {
+            if (err) {
+                consoleLogger(errorLogger(module, err));
+                error_neg_1(-1, err);
+            } else if (user == null || user == undefined || user.length == 0) {
+                consoleLogger(successLogger(module, "Could not find the user with the given uniqueCuid"));
+                error_0(0);
+            } else {
+                consoleLogger(successLogger(module));
+                user.isBanned.status = true;
+                user.save(function (err, theSavedUser) {
+                    if (err) {
+                        consoleLogger(errorLogger(module, err));
+                        error_neg_1(-1, err);
+                    } else {
+                        consoleLogger(successLogger(module));
+                        success(theSavedUser);
+                    }
+                });
+            }
+        });
+    },
+
+    unBanUser: function (userUniqueCuid, error_neg_1, error_0, success) {
+        var module = 'unBanUser';
+        receivedLogger(module);
+        User.findOne({uniqueCuid: userUniqueCuid}, function (err, user) {
+            if (err) {
+                consoleLogger(errorLogger(module, err));
+                error_neg_1(-1, err);
+            } else if (user == null || user == undefined || user.length == 0) {
+                consoleLogger(successLogger(module, "Could not find the user with the given uniqueCuid"));
+                error_0(0);
+            } else {
+                consoleLogger(successLogger(module));
+                user.isBanned.status = false;
+                user.save(function (err, theSavedUser) {
+                    if (err) {
+                        consoleLogger(errorLogger(module, err));
+                        error_neg_1(-1, err);
+                    } else {
+                        consoleLogger(successLogger(module));
+                        success(theSavedUser);
+                    }
+                });
             }
         });
     },

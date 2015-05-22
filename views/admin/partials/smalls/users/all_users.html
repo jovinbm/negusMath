@@ -1,0 +1,77 @@
+<div class="panel panel-default">
+    <div class="ng-cloak">
+        <div class="panel-heading">All Users
+            <div class="input-group">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Filter users"
+                       ng-model="allUsersModel.filterString">
+                    <span class="input-group-addon" id="search-addon">
+                        <a href ng-click=""><i class="fa fa-search"></i></a>
+                    </span>
+            </div>
+        </div>
+
+        <div class="panel-body">
+            <div class="card">
+                <div class="card-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-condensed ng-cloak">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <strong>
+                                    <span ng-bind="userData.firstName + ' ' + userData.lastName"></span> (YOU)
+                                </strong>
+                            </tr>
+                            <tr ng-repeat="user in allUsers | filter: allUsersModel.filterString"
+                                ng-hide="user.uniqueCuid == userData.uniqueCuid"
+                                ng-class="{'warning': user.isBanned.status, 'success': user.isAdmin}">
+                                <td>{{user.firstName + ' ' + user.lastName}}
+                                    <small class="small-messages"
+                                           ng-show="user.isAdmin">(admin)
+                                    </small>
+                                    <small class="small-messages"
+                                           ng-show="user.isBanned.status">(banned)
+                                    </small>
+                                </td>
+
+                                <td>
+                                    <a class="btn btn-xs btn-default"
+                                       ng-hide="user.isBanned.status"
+                                       href ng-click="banUser(user.uniqueCuid)">Ban user</a>
+                                    <a class="btn btn-xs btn-default"
+                                       ng-show="user.isBanned.status"
+                                       href ng-click="unBanUser(user.uniqueCuid)">Reactivate</a>
+                                </td>
+                                <td>
+                                    <a class="btn btn-xs btn-default"
+                                       ng-hide="user.isApproved"
+                                       href ng-click="approveUser(user.uniqueCuid)">Approve</a>
+                                    <a class="btn btn-xs btn-default disabled"
+                                       ng-show="user.isApproved">Approved</a>
+                                </td>
+                                <td>
+                                    <a class="btn btn-xs btn-default"
+                                       ng-hide="user.isAdmin"
+                                       href ng-click="addAdminPrivileges(user.uniqueCuid)">Make Admin</a>
+                                    <a class="btn btn-xs btn-default"
+                                       ng-show="user.isAdmin"
+                                       href ng-click="removeAdminPrivileges(user.uniqueCuid)">Remove Admin</a>
+                                </td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

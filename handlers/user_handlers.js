@@ -27,6 +27,29 @@ function getTheUser(req) {
 
 module.exports = {
 
+    getUsersCount: function (req, res) {
+        var module = 'getUsersCount';
+        receivedLogger(module);
+
+        userDB.getUsersCount(error, error, success);
+
+        function success(usersCount) {
+            consoleLogger(successLogger(module));
+            res.status(200).send({
+                usersCount: usersCount
+            });
+        }
+
+        function error() {
+            consoleLogger(errorLogger(module));
+            res.status(500).send({
+                code: 500,
+                banner: true,
+                bannerClass: 'alert alert-dismissible alert-warning'
+            });
+        }
+    },
+
     getAllUsers: function (req, res) {
         var module = 'getAllUsers';
         receivedLogger(module);
@@ -71,6 +94,82 @@ module.exports = {
                 notify: true,
                 type: 'warning',
                 msg: 'Failed to retrieve admin users. Please reload page'
+            });
+        }
+    },
+
+    addAdminPrivileges: function (req, res, userUniqueCuid) {
+        var module = 'addAdminPrivileges';
+        receivedLogger(module);
+
+        userDB.addAdminPrivileges(userUniqueCuid, error_neg_1, error_0, success);
+
+        function success(user) {
+            consoleLogger(successLogger(module));
+            res.status(200).send({
+                user: user,
+                code: 200,
+                notify: true,
+                type: 'success',
+                msg: 'Saved'
+            });
+        }
+
+        function error_neg_1() {
+            consoleLogger(errorLogger(module));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: 'Failed execute your request. Please try again or reload page if problem persists'
+            });
+        }
+
+        function error_0() {
+            consoleLogger(errorLogger(module));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: 'User was not found on database'
+            });
+        }
+    },
+
+    removeAdminPrivileges: function (req, res, userUniqueCuid) {
+        var module = 'removeAdminPrivileges';
+        receivedLogger(module);
+
+        userDB.removeAdminPrivileges(userUniqueCuid, error_neg_1, error_0, success);
+
+        function success(user) {
+            consoleLogger(successLogger(module));
+            res.status(200).send({
+                user: user,
+                code: 200,
+                notify: true,
+                type: 'success',
+                msg: 'Saved'
+            });
+        }
+
+        function error_neg_1() {
+            consoleLogger(errorLogger(module));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: 'Failed execute your request. Please try again or reload page if problem persists'
+            });
+        }
+
+        function error_0() {
+            consoleLogger(errorLogger(module));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: 'User was not found on database'
             });
         }
     },
@@ -123,11 +222,49 @@ module.exports = {
         }
     },
 
-    getUnApprovedUsers: function (req, res) {
-        var module = 'getUnApprovedUsers';
+    approveUser: function (req, res, userUniqueCuid) {
+        var module = 'approveUser';
         receivedLogger(module);
 
-        userDB.getUnApprovedUsers(error, error, success);
+        userDB.approveUser(userUniqueCuid, error_neg_1, error_0, success);
+
+        function success(user) {
+            consoleLogger(successLogger(module));
+            res.status(200).send({
+                user: user,
+                code: 200,
+                notify: true,
+                type: 'success',
+                msg: 'Saved'
+            });
+        }
+
+        function error_neg_1() {
+            consoleLogger(errorLogger(module));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: 'Failed execute your request. Please try again or reload page if problem persists'
+            });
+        }
+
+        function error_0() {
+            consoleLogger(errorLogger(module));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: 'User was not found on database'
+            });
+        }
+    },
+
+    getUsersNotApproved: function (req, res) {
+        var module = 'getUsersNotApproved';
+        receivedLogger(module);
+
+        userDB.getUsersNotApproved(error, error, success);
 
         function success(usersArray) {
             consoleLogger(successLogger(module));
@@ -167,6 +304,82 @@ module.exports = {
                 notify: true,
                 type: 'warning',
                 msg: 'Failed to retrieve banned users. Please reload page'
+            });
+        }
+    },
+
+    banUser: function (req, res, userUniqueCuid) {
+        var module = 'banUser';
+        receivedLogger(module);
+
+        userDB.banUser(userUniqueCuid, error_neg_1, error_0, success);
+
+        function success(user) {
+            consoleLogger(successLogger(module));
+            res.status(200).send({
+                user: user,
+                code: 200,
+                notify: true,
+                type: 'success',
+                msg: 'Saved'
+            });
+        }
+
+        function error_neg_1() {
+            consoleLogger(errorLogger(module));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: 'Failed execute your request. Please try again or reload page if problem persists'
+            });
+        }
+
+        function error_0() {
+            consoleLogger(errorLogger(module));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: 'User was not found on database'
+            });
+        }
+    },
+
+    unBanUser: function (req, res, userUniqueCuid) {
+        var module = 'unBanUser';
+        receivedLogger(module);
+
+        userDB.unBanUser(userUniqueCuid, error_neg_1, error_0, success);
+
+        function success(user) {
+            consoleLogger(successLogger(module));
+            res.status(200).send({
+                user: user,
+                code: 200,
+                notify: true,
+                type: 'success',
+                msg: 'Saved'
+            });
+        }
+
+        function error_neg_1() {
+            consoleLogger(errorLogger(module));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: 'Failed execute your request. Please try again or reload page if problem persists'
+            });
+        }
+
+        function error_0() {
+            consoleLogger(errorLogger(module));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: 'User was not found on database'
             });
         }
     },

@@ -40,6 +40,11 @@ img {
     word-wrap: break-word;
 }
 
+.container-fluid-config {
+    padding-right: 1.5em;
+    padding-left: 1.5em;
+}
+
 h1,
 h2,
 h3,
@@ -129,6 +134,12 @@ a.active {
     margin-top: 0.9em;
     margin-bottom: 0.9em;
     font-size: 0.7em;
+}
+
+.small-messages {
+    margin-top: 0.9em;
+    margin-bottom: 0.9em;
+    font-size: 0.5em;
 }
 
 .required-star {

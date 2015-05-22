@@ -2,7 +2,7 @@ var envVariables = require('./environment_config.js');
 var databaseURL = envVariables.databaseURL();
 var databaseURL2 = envVariables.databaseURL2();
 var databaseURL3 = "mongodb://localhost:27017/math4";
-var dbUrl = databaseURL3;
+var dbUrl = databaseURL;
 
 //THE APP
 var express = require('express');
@@ -131,13 +131,19 @@ app.post('/api/getHotThisWeek', postAPI.getHotThisWeek);
 app.post('/api/mainSearch', postAPI.mainSearch);
 
 //user management api
-app.post('/api/getAllUsers', middleware.ensureAuthenticatedAngular, middleware.addUserData,middleware.checkUserIsAdmin, userAPI.getAllUsers);
-app.post('/api/getAdminUsers', middleware.ensureAuthenticatedAngular, middleware.addUserData,middleware.checkUserIsAdmin, userAPI.getAdminUsers);
-app.post('/api/getLocalUsers', middleware.ensureAuthenticatedAngular, middleware.addUserData,middleware.checkUserIsAdmin, userAPI.getLocalUsers);
-app.post('/api/getApprovedUsers', middleware.ensureAuthenticatedAngular, middleware.addUserData,middleware.checkUserIsAdmin, userAPI.getApprovedUsers);
-app.post('/api/getUnApprovedUsers', middleware.ensureAuthenticatedAngular, middleware.addUserData,middleware.checkUserIsAdmin, userAPI.getUnApprovedUsers);
-app.post('/api/getBannedUsers', middleware.ensureAuthenticatedAngular, middleware.addUserData,middleware.checkUserIsAdmin, userAPI.getBannedUsers);
-app.post('/api/getUsersNotBanned', middleware.ensureAuthenticatedAngular, middleware.addUserData,middleware.checkUserIsAdmin, userAPI.getUsersNotBanned);
+app.post('/api/getUsersCount', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkUserIsAdmin, userAPI.getUsersCount);
+app.post('/api/getAllUsers', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkUserIsAdmin, userAPI.getAllUsers);
+app.post('/api/getAdminUsers', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkUserIsAdmin, userAPI.getAdminUsers);
+app.post('/api/addAdminPrivileges', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkUserIsAdmin, userAPI.addAdminPrivileges);
+app.post('/api/removeAdminPrivileges', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkUserIsAdmin, userAPI.removeAdminPrivileges);
+app.post('/api/getLocalUsers', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkUserIsAdmin, userAPI.getLocalUsers);
+app.post('/api/getApprovedUsers', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkUserIsAdmin, userAPI.getApprovedUsers);
+app.post('/api/approveUser', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkUserIsAdmin, userAPI.approveUser);
+app.post('/api/getUsersNotApproved', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkUserIsAdmin, userAPI.getUsersNotApproved);
+app.post('/api/getBannedUsers', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkUserIsAdmin, userAPI.getBannedUsers);
+app.post('/api/banUser', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkUserIsAdmin, userAPI.banUser);
+app.post('/api/unBanUser', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkUserIsAdmin, userAPI.unBanUser);
+app.post('/api/getUsersNotBanned', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkUserIsAdmin, userAPI.getUsersNotBanned);
 
 //error handlers
 function logErrors(err, req, res, next) {

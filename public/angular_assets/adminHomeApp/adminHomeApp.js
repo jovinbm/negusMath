@@ -48,6 +48,10 @@ angular.module('adminHomeApp', [
                 url: '/search/:queryString/:pageNumber',
                 templateUrl: 'views/search/search_results.html'
             })
+            .state('users', {
+                url: '/users',
+                templateUrl: 'views/admin/partials/views/users.html'
+            })
             .state("otherwise", {url: '/home'});
 
         $locationProvider

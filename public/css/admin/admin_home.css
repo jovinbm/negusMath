@@ -30,7 +30,7 @@ section {
 }
 
 @media (max-width: 767px) {
-    section#postsSection {
+    section#no-padding-section {
         padding: 0;
     }
 }

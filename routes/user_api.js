@@ -24,8 +24,22 @@ function getTheUser(req) {
     return req.customData.theUser;
 }
 
+function checkUserUniqueCuid(req) {
+    if (req.body.userUniqueCuid) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 
 module.exports = {
+
+    getUsersCount: function (req, res) {
+        var module = 'getUsersCount';
+        receivedLogger(module);
+        user_handler.getUsersCount(req, res);
+    },
 
     getAllUsers: function (req, res) {
         var module = 'getAllUsers';
@@ -37,6 +51,42 @@ module.exports = {
         var module = 'getAdminUsers';
         receivedLogger(module);
         user_handler.getAdminUsers(req, res);
+    },
+
+    addAdminPrivileges: function (req, res) {
+        var module = 'addAdminPrivileges';
+        receivedLogger(module);
+
+        if (checkUserUniqueCuid(req)) {
+            var userUniqueCuid = req.body.userUniqueCuid;
+            user_handler.addAdminPrivileges(req, res, userUniqueCuid);
+        } else {
+            consoleLogger(errorLogger(module, 'Some request fields missing'));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'error',
+                msg: 'An error has occurred. Please try again'
+            });
+        }
+    },
+
+    removeAdminPrivileges: function (req, res) {
+        var module = 'removeAdminPrivileges';
+        receivedLogger(module);
+
+        if (checkUserUniqueCuid(req)) {
+            var userUniqueCuid = req.body.userUniqueCuid;
+            user_handler.removeAdminPrivileges(req, res, userUniqueCuid);
+        } else {
+            consoleLogger(errorLogger(module, 'Some request fields missing'));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'error',
+                msg: 'An error has occurred. Please try again'
+            });
+        }
     },
 
     getLocalUsers: function (req, res) {
@@ -51,16 +101,70 @@ module.exports = {
         user_handler.getApprovedUsers(req, res);
     },
 
-    getUnApprovedUsers: function (req, res) {
-        var module = 'getUnApprovedUsers';
+    approveUser: function (req, res) {
+        var module = 'approveUser';
         receivedLogger(module);
-        user_handler.getUnApprovedUsers(req, res);
+
+        if (checkUserUniqueCuid(req)) {
+            var userUniqueCuid = req.body.userUniqueCuid;
+            user_handler.approveUser(req, res, userUniqueCuid);
+        } else {
+            consoleLogger(errorLogger(module, 'Some request fields missing'));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'error',
+                msg: 'An error has occurred. Please try again'
+            });
+        }
+    },
+
+    getUsersNotApproved: function (req, res) {
+        var module = 'getUsersNotApproved';
+        receivedLogger(module);
+        user_handler.getUsersNotApproved(req, res);
     },
 
     getBannedUsers: function (req, res) {
         var module = 'getBannedUsers';
         receivedLogger(module);
         user_handler.getBannedUsers(req, res);
+    },
+
+    banUser: function (req, res) {
+        var module = 'banUser';
+        receivedLogger(module);
+
+        if (checkUserUniqueCuid(req)) {
+            var userUniqueCuid = req.body.userUniqueCuid;
+            user_handler.banUser(req, res, userUniqueCuid);
+        } else {
+            consoleLogger(errorLogger(module, 'Some request fields missing'));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'error',
+                msg: 'An error has occurred. Please try again'
+            });
+        }
+    },
+
+    unBanUser: function (req, res) {
+        var module = 'unBanUser';
+        receivedLogger(module);
+
+        if (checkUserUniqueCuid(req)) {
+            var userUniqueCuid = req.body.userUniqueCuid;
+            user_handler.unBanUser(req, res, userUniqueCuid);
+        } else {
+            consoleLogger(errorLogger(module, 'Some request fields missing'));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'error',
+                msg: 'An error has occurred. Please try again'
+            });
+        }
     },
 
     getUsersNotBanned: function (req, res) {

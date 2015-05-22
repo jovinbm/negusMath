@@ -8,24 +8,6 @@ angular.module('adminHomeApp')
                 indexPageUrl: $location.port() ? "http://" + $location.host() + ":" + $location.port() + "/index" : $scope.indexPageUrl = "http://" + $location.host() + "/index"
             };
 
-            var universalBanner = {
-                show: false,
-                bannerClass: "",
-                msg: ""
-            };
-
-            var registrationBanner = {
-                show: false,
-                bannerClass: "",
-                msg: ""
-            };
-
-            var newPostBanner = {
-                show: false,
-                bannerClass: "",
-                msg: ""
-            };
-
             return {
 
                 userData: function (data) {

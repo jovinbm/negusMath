@@ -1,0 +1,48 @@
+<div class="panel panel-default">
+    <div class="ng-cloak">
+        <div class="panel-heading">Admins
+            <div class="input-group">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Filter admins"
+                       ng-model="adminUsersModel.filterString">
+                    <span class="input-group-addon" id="search-addon">
+                        <a href ng-click=""><i class="fa fa-search"></i></a>
+                    </span>
+            </div>
+        </div>
+
+        <div class="panel-body">
+            <div class="card">
+                <div class="card-content">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-condensed ng-cloak">
+                            <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <strong>
+                                    <span ng-bind="userData.firstName + ' ' + userData.lastName"></span> (YOU)
+                                </strong>
+                            </tr>
+                            <tr ng-repeat="user in adminUsers | filter: adminUsersModel.filterString"
+                                ng-hide="user.uniqueCuid == userData.uniqueCuid">
+                                <td ng-bind="user.firstName + ' ' + user.lastName"></td>
+
+                                <td><a class="btn btn-xs btn-default"
+                                       href ng-click="removeAdminPrivileges(user.uniqueCuid)">Remove Admin</a></td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
