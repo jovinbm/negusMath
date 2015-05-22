@@ -18,6 +18,63 @@ angular.module('indexApp', [
         //partials->modals
     });
 angular.module('indexApp')
+    .directive('accountStatusBanner', ['$rootScope', function ($rootScope) {
+        return {
+            templateUrl: 'views/general/smalls/account_status.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.accountStatusBanner = {
+                    show: false,
+                    bannerClass: "",
+                    msg: ""
+                };
+
+                function determineAccountStatus(userData) {
+                    if (userData.isRegistered) {
+                        //checkApprovalStatus
+                        if (userData.isApproved === false) {
+                            return {
+                                show: true,
+                                bannerClass: "alert alert-warning",
+                                msg: "Your account is awaiting approval from the administrators. Please allow up to 3 business days. You will get an email notification as soon as your account is approved."
+                            };
+                        } else if (userData.isBanned) {
+                            if (userData.isBanned.status === true) {
+                                //checking banned status
+                                return {
+                                    show: true,
+                                    bannerClass: "alert alert-warning",
+                                    msg: "Your have been banned from this service. Please contact the administrators for more information"
+                                };
+                            } else {
+                                return {
+                                    show: false,
+                                    bannerClass: "",
+                                    msg: ""
+                                };
+                            }
+                        } else {
+                            return {
+                                show: false,
+                                bannerClass: "",
+                                msg: ""
+                            };
+                        }
+                    } else {
+                        return {
+                            show: false,
+                            bannerClass: "",
+                            msg: ""
+                        };
+                    }
+                }
+
+                $rootScope.$on('userDataChanges', function () {
+                    $scope.accountStatusBanner = determineAccountStatus($scope.userData);
+                });
+            }
+        }
+    }])
     .directive('signInBanner', ['$rootScope', function ($rootScope) {
         return {
             templateUrl: 'views/index/smalls/sign_in_banner.html',
@@ -349,14 +406,52 @@ angular.module('indexApp')
                 $filter('responseFilter')(resp);
             };
 
-            $scope.clientIsRegistered = true;
+            //function that determines if it's okay for the user to proceed
+            $scope.checkAccountStatus = function (userData) {
+                if (userData) {
+                    if (userData.isRegistered) {
+                        //checkApprovalStatus
+                        if (userData.isApproved === false) {
+                            return false
+                        } else if (userData.isBanned) {
+                            if (userData.isBanned.status === true) {
+                                //checking banned status
+                                return false;
+                            } else {
+                                return true;
+                            }
+                        } else {
+                            return true;
+                        }
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            };
+
+            //this important function broadcasts the availability of the users data to directives that require
+            //it e.g. the account status directive
+            $scope.broadcastUserData = function () {
+                $rootScope.$broadcast('userDataChanges');
+            };
+
+            $scope.clientIsRegistered = false;
+
+            //variable that holds the account status
+            $scope.accountStatusIsGood = false;
 
             //initial requests
             function initialRequests() {
                 socketService.getUserData()
                     .success(function (resp) {
                         $scope.userData = globals.userData(resp.userData);
+                        $scope.broadcastUserData();
+
+                        //important isRegistered variable
                         $scope.clientIsRegistered = $scope.userData.isRegistered;
+                        $scope.accountStatusIsGood = $scope.checkAccountStatus($scope.userData);
 
                         if ($scope.userData.isRegistered) {
                             //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
@@ -371,16 +466,12 @@ angular.module('indexApp')
                     });
             }
 
-            socket.on('joined', function () {
-                console.log("JOIN SUCCESS");
-            });
-
             initialRequests();
-
 
             //===============socket listeners===============
 
             $rootScope.$on('reconnectSuccess', function () {
+                initialRequests();
             });
         }
     ]);

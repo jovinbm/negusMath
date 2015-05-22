@@ -93,6 +93,85 @@ module.exports = {
         }
     },
 
+    checkAccountStatus: function (req, res, next) {
+        var module = "checkAccountStatus";
+        receivedLogger(module);
+
+        var theUser = getTheUser(req);
+
+        if (theUser.isRegistered) {
+            //checkApprovalStatus
+            if (theUser.isApproved === false) {
+                error();
+            } else if (theUser.isBanned) {
+                if (theUser.isBanned.status === true) {
+                    //checking banned status
+                    error();
+                } else {
+                    success();
+                }
+            } else {
+                success();
+            }
+        } else {
+            error();
+        }
+
+        function success() {
+            consoleLogger(successLogger(module));
+            next();
+        }
+
+        function error() {
+            consoleLogger(errorLogger(module));
+            res.redirect('index');
+        }
+
+    },
+
+    checkAccountStatusAngular: function (req, res, next) {
+        var module = "checkAccountStatusAngular";
+        receivedLogger(module);
+
+        var theUser = getTheUser(req);
+
+        if (theUser.isRegistered) {
+            //checkApprovalStatus
+            if (theUser.isApproved === false) {
+                error("Your account is awaiting approval from the administrators. Please allow up to 3 business days. You will get an email notification as soon as your account is approved.")
+            } else if (theUser.isBanned) {
+                if (theUser.isBanned.status === true) {
+                    //checking banned status
+                    error("Your have been banned from this service. Please contact the administrators for more information");
+                } else {
+                    success();
+                }
+            } else {
+                success();
+            }
+        } else {
+            error("You are not registered to use this website");
+        }
+
+        function success() {
+            consoleLogger(successLogger(module));
+            next();
+        }
+
+        function error(errorMessage) {
+            consoleLogger(errorLogger(module, errorMessage));
+            res.status(401).send({
+                code: 401,
+                banner: true,
+                bannerClass: 'alert alert-dismissible alert-warning',
+                msg: errorMessage,
+                redirect: true,
+                redirectPage: '/index'
+            });
+        }
+
+    },
+
     checkUserIsAdmin: function (req, res, next) {
         var module = "checkUserIsAdmin";
         receivedLogger(module);

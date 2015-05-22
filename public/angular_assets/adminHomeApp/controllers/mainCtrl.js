@@ -32,12 +32,20 @@ angular.module('adminHomeApp')
 
             //======================end time functions===================
 
+            //this important function broadcasts the availability of the users data to directives that require
+            //it e.g. the account status directive
+            $scope.broadcastUserData = function () {
+                $rootScope.$broadcast('userDataChanges');
+            };
+
+            $scope.clientIsRegistered = false;
 
             //initial requests
             function initialRequests() {
                 socketService.getUserData()
                     .success(function (resp) {
                         $scope.userData = globals.userData(resp.userData);
+                        $scope.broadcastUserData();
                         $scope.clientIsRegistered = $scope.userData.isRegistered;
 
                         if ($scope.userData.isRegistered) {
@@ -53,10 +61,6 @@ angular.module('adminHomeApp')
                         $scope.responseStatusHandler(errResponse);
                     });
             }
-
-            socket.on('joined', function () {
-                console.log("JOIN SUCCESS");
-            });
 
             initialRequests();
 
@@ -142,6 +146,7 @@ angular.module('adminHomeApp')
             //===============socket listeners===============
 
             $rootScope.$on('reconnect', function () {
+                initialRequests();
             });
         }
     ]);

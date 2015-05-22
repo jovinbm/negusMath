@@ -45,8 +45,7 @@ module.exports = {
             consoleLogger(successLogger(module));
             res.status(200).send({
                 userData: {
-                    isRegistered: false,
-                    isRandomClient: true
+                    isRegistered: false
                 }
             });
         }
@@ -64,8 +63,6 @@ module.exports = {
                 } else {
                     //remove private data
                     theSavedUser.password = "";
-
-                    theSavedUser.isRandomClient = false;
 
                     consoleLogger(successLogger(module));
                     return res.status(200).send({

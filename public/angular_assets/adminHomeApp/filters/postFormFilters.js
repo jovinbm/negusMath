@@ -1,7 +1,6 @@
 angular.module('adminHomeApp')
     .filter("validatePostHeading", ['$filter', '$rootScope', function ($filter, $rootScope) {
         return function (postHeading, broadcast) {
-            console.log("validatePostHeading");
             var errors = 0;
 
             function broadcastShowToast(type, text) {
@@ -30,7 +29,6 @@ angular.module('adminHomeApp')
     }])
     .filter("postHeadingMessages", ['$filter', '$rootScope', function ($filter, $rootScope) {
         return function (postHeading) {
-            console.log("postHeadingMessages");
             var messages = "";
 
             function addMessage(newMessage) {
@@ -59,7 +57,6 @@ angular.module('adminHomeApp')
     }])
     .filter("validatePostContent", ['$filter', '$rootScope', function ($filter, $rootScope) {
         return function (postContent, broadcast) {
-            console.log("validatePostContent");
             function broadcastShowToast(type, text) {
                 if (broadcast) {
                     $rootScope.showToast(type, text);
@@ -80,7 +77,6 @@ angular.module('adminHomeApp')
     }])
     .filter("postContentMessages", ['$filter', '$rootScope', function ($filter, $rootScope) {
         return function (postContent) {
-            console.log("postContentMessages");
             if (postContent) {
                 var postContentText = $("<div>" + postContent + "</div>").text();
                 if (postContentText.length == 0) {
@@ -95,7 +91,6 @@ angular.module('adminHomeApp')
     }])
     .filter("validatePostSummary", ['$filter', '$rootScope', function ($filter, $rootScope) {
         return function (postSummary, broadcast) {
-            console.log("validatePostSummary");
             var errors = 0;
 
             function broadcastShowToast(type, text) {
@@ -126,7 +121,6 @@ angular.module('adminHomeApp')
     }])
     .filter("postSummaryMessages", ['$filter', '$rootScope', function ($filter, $rootScope) {
         return function (postSummary) {
-            console.log("postSummaryMessages");
             var messages = "";
 
             function addMessage(newMessage) {
@@ -155,7 +149,6 @@ angular.module('adminHomeApp')
     }])
     .filter("validatePostTags", ['$filter', '$rootScope', function ($filter, $rootScope) {
         return function (postTags, broadcast) {
-            console.log("validatePostTags");
             var errors = 0;
 
             function broadcastShowToast(type, text) {
@@ -201,7 +194,6 @@ angular.module('adminHomeApp')
     }])
     .filter("postTagsMessages", ['$filter', '$rootScope', function ($filter, $rootScope) {
         return function (postTags) {
-            console.log("postTagsMessages");
             var messages = "";
 
             function addMessage(newMessage) {

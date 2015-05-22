@@ -105,8 +105,12 @@
                        class="btn btn-md btn-default btn-config">CONTACT
                     </a>
                 </div>
-                <div><a href="/"
-                        class="btn btn-xl">Continue to the forums
+
+                <div account-status-banner></div>
+
+                <div ng-if="accountStatusIsGood">
+                    <a href="/"
+                       class="btn btn-xl">Continue to the forums
                     </a>
                 </div>
             </div>

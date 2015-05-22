@@ -1,5 +1,5 @@
 <div class="panel panel-default">
-    <div class="ng-cloak">
+    <div>
         <div class="panel-heading">Waiting Approval
             <div class="input-group">
                 <input type="text"
@@ -12,28 +12,41 @@
             </div>
         </div>
 
-        <div class="panel-body">
+        <div class="panel-body ng-cloak">
             <div class="card">
                 <div class="card-content">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover table-condensed ng-cloak">
-                            <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="user in usersNotApproved | filter: usersNotApprovedModel.filterString"
-                                ng-hide="user.uniqueCuid == userData.uniqueCuid">
-                                <td ng-bind="user.firstName + ' ' + user.lastName"></td>
 
-                                <td><a class="btn btn-xs btn-default"
-                                       href ng-click="approveUser(user.uniqueCuid)">Approve</a></td>
+                    <div ng-show="usersNotApproved.length == 0">
+                        <div class="alert alert-success">
+                            <strong>All join requests have been approved</strong>
+                        </div>
+                    </div>
 
-                            </tr>
-                            </tbody>
-                        </table>
+                    <div ng-show="usersNotApproved.length > 0">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover table-condensed ng-cloak">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="user in usersNotApproved track by $index | filter: usersNotApprovedModel.filterString"
+                                    ng-hide="user.uniqueCuid == userData.uniqueCuid">
+                                    <td ng-bind="user.firstName + ' ' + user.lastName"></td>
+
+                                    <td>
+                                        <div>
+                                            <a class="btn btn-xs btn-default"
+                                               href ng-click="approveUser(user.uniqueCuid)">Approve</a>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                 </div>

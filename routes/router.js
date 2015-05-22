@@ -61,12 +61,5 @@ module.exports = {
             consoleLogger(successLogger(module));
         }
 
-    },
-
-    search_Html: function (req, res) {
-        var module = 'search_Html';
-        receivedLogger(module);
-
-        res.render('search/search_results.ejs');
     }
 };
