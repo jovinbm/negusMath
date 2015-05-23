@@ -5,3 +5,6 @@
 //set custom digit rules in the routes on angular apps e.g. [0-9] etc
 
 //email confirmation after creating account
+
+//cannot make admin if banned or not approved
+//cannot ban if user is not approved

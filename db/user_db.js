@@ -416,17 +416,21 @@ module.exports = {
                 consoleLogger(successLogger(module, "Could not find the user with the given uniqueCuid"));
                 error_0(0);
             } else {
-                consoleLogger(successLogger(module));
-                user.isAdmin = true;
-                user.save(function (err, theSavedUser) {
-                    if (err) {
-                        consoleLogger(errorLogger(module, err));
-                        error_neg_1(-1, err);
-                    } else {
-                        consoleLogger(successLogger(module));
-                        success(theSavedUser);
-                    }
-                });
+                if (user.isBanned.status === false && user.isApproved === true && user.isAdmin === false) {
+                    user.isAdmin = true;
+                    user.save(function (err, theSavedUser) {
+                        if (err) {
+                            consoleLogger(errorLogger(module, err));
+                            error_neg_1(-1, err);
+                        } else {
+                            consoleLogger(successLogger(module));
+                            success(theSavedUser);
+                        }
+                    });
+                } else {
+                    consoleLogger(successLogger(module, 'cannot make banned/unApproved/admin user admin'));
+                    success(null);
+                }
             }
         });
     },
@@ -442,17 +446,21 @@ module.exports = {
                 consoleLogger(successLogger(module, "Could not find the user with the given uniqueCuid"));
                 error_0(0);
             } else {
-                consoleLogger(successLogger(module));
-                user.isAdmin = false;
-                user.save(function (err, theSavedUser) {
-                    if (err) {
-                        consoleLogger(errorLogger(module, err));
-                        error_neg_1(-1, err);
-                    } else {
-                        consoleLogger(successLogger(module));
-                        success(theSavedUser);
-                    }
-                });
+                if (user.isAdmin === true) {
+                    user.isAdmin = false;
+                    user.save(function (err, theSavedUser) {
+                        if (err) {
+                            consoleLogger(errorLogger(module, err));
+                            error_neg_1(-1, err);
+                        } else {
+                            consoleLogger(successLogger(module));
+                            success(theSavedUser);
+                        }
+                    });
+                } else {
+                    consoleLogger(successLogger(module, 'user was not admin already'));
+                    success(null);
+                }
             }
         });
     },
@@ -502,17 +510,21 @@ module.exports = {
                 consoleLogger(successLogger(module, "Could not find the user with the given uniqueCuid"));
                 error_0(0);
             } else {
-                consoleLogger(successLogger(module));
-                user.isApproved = true;
-                user.save(function (err, theSavedUser) {
-                    if (err) {
-                        consoleLogger(errorLogger(module, err));
-                        error_neg_1(-1, err);
-                    } else {
-                        consoleLogger(successLogger(module));
-                        success(theSavedUser);
-                    }
-                });
+                if (user.isBanned.status === false && user.isApproved === false) {
+                    user.isApproved = true;
+                    user.save(function (err, theSavedUser) {
+                        if (err) {
+                            consoleLogger(errorLogger(module, err));
+                            error_neg_1(-1, err);
+                        } else {
+                            consoleLogger(successLogger(module));
+                            success(theSavedUser);
+                        }
+                    });
+                } else {
+                    consoleLogger(successLogger(module, 'user was banned/approved already'));
+                    success(null);
+                }
             }
         });
     },
@@ -562,17 +574,24 @@ module.exports = {
                 consoleLogger(successLogger(module, "Could not find the user with the given uniqueCuid"));
                 error_0(0);
             } else {
-                consoleLogger(successLogger(module));
-                user.isBanned.status = true;
-                user.save(function (err, theSavedUser) {
-                    if (err) {
-                        consoleLogger(errorLogger(module, err));
-                        error_neg_1(-1, err);
-                    } else {
-                        consoleLogger(successLogger(module));
-                        success(theSavedUser);
-                    }
-                });
+                if (user.isBanned.status === false) {
+                    //ban user and remove admin privileges
+                    user.isBanned.status = true;
+                    user.isAdmin = false;
+                    user.save(function (err, theSavedUser) {
+                        if (err) {
+                            consoleLogger(errorLogger(module, err));
+                            error_neg_1(-1, err);
+                        } else {
+                            consoleLogger(successLogger(module));
+                            success(theSavedUser);
+                        }
+                    });
+                } else {
+                    //user is banned, cannot make him admin
+                    consoleLogger(errorLogger(module, 'cannot ban an already banned user'));
+                    success(null);
+                }
             }
         });
     },
@@ -588,17 +607,21 @@ module.exports = {
                 consoleLogger(successLogger(module, "Could not find the user with the given uniqueCuid"));
                 error_0(0);
             } else {
-                consoleLogger(successLogger(module));
-                user.isBanned.status = false;
-                user.save(function (err, theSavedUser) {
-                    if (err) {
-                        consoleLogger(errorLogger(module, err));
-                        error_neg_1(-1, err);
-                    } else {
-                        consoleLogger(successLogger(module));
-                        success(theSavedUser);
-                    }
-                });
+                if (user.isBanned.status === true) {
+                    user.isBanned.status = false;
+                    user.save(function (err, theSavedUser) {
+                        if (err) {
+                            consoleLogger(errorLogger(module, err));
+                            error_neg_1(-1, err);
+                        } else {
+                            consoleLogger(successLogger(module));
+                            success(theSavedUser);
+                        }
+                    });
+                } else {
+                    consoleLogger(successLogger(module, 'user was already active'));
+                    success(null);
+                }
             }
         });
     },
