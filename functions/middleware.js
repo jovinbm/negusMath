@@ -116,7 +116,7 @@ module.exports = {
         var theUser = getTheUser(req);
 
         if (theUser) {
-            if (theUser.isRegistered && theUser.emailIsConfirmed && theUser.isApproved && theUser.isBanned.status) {
+            if (theUser.isRegistered && theUser.emailIsConfirmed && theUser.isApproved && !theUser.isBanned.status) {
                 success();
             } else {
                 error();
