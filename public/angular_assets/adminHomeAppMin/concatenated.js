@@ -1616,7 +1616,7 @@ angular.module('adminHomeApp')
             };
         }]);
 angular.module('adminHomeApp')
-    .directive('accountStatusBanner', ['$rootScope', 'socketService', 'globals', function ($rootScope, socketService, globals) {
+    .directive('accountStatusBanner', ['$rootScope', 'socketService', 'globals', '$location', '$window', function ($rootScope, socketService, globals, $location, $window) {
         return {
             scope: {},
             templateUrl: 'views/general/smalls/account_status.html',
