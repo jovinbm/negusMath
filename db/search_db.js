@@ -75,6 +75,7 @@ module.exports = {
                     consoleLogger(successLogger(module, 'No postSearch object found'));
                     error_0(0);
                 } else {
+                    consoleLogger(successLogger(module));
                     success(postSearchObject);
                 }
             });

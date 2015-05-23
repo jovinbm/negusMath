@@ -37,6 +37,8 @@ function getTheUser(req) {
 
 module.exports = {
     sendWelcomeEmail: function (theUser) {
+        var module = 'sendWelcomeEmail';
+        receivedLogger(module);
         emailTemplates(templatesDir, function (err, template) {
             if (err) {
                 consoleLogger(errorLogger(module, 'error sending email', err));
@@ -47,7 +49,8 @@ module.exports = {
                         var locals = {
                             email: theUser.email,
                             firstName: theUser.firstName,
-                            lastName: theUser.lastName
+                            lastName: theUser.lastName,
+                            emailConfirmLink: 'http://www.negusmath.com/confirm_email/' + theUser.hashedUniqueCuid
                         };
 
                         template('welcome-email', locals, function (err, html, text) {
@@ -74,7 +77,58 @@ module.exports = {
         });
     },
 
+    sendConfirmEmailLink: function (theUser) {
+        var module = 'sendConfirmEmailLink';
+        receivedLogger(module);
+        emailTemplates(templatesDir, function (err, template) {
+            if (err) {
+                consoleLogger(errorLogger(module, 'error sending email', err));
+                return false;
+            } else {
+                //only send if theUser exists
+                if (theUser) {
+                    if (theUser.email) {
+                        var locals = {
+                            email: theUser.email,
+                            firstName: theUser.firstName,
+                            lastName: theUser.lastName,
+                            emailConfirmLink: 'http://www.negusmath.com/confirm_email/' + theUser.hashedUniqueCuid
+                        };
+
+                        template('confirm-email', locals, function (err, html, text) {
+                            if (err) {
+                                consoleLogger(errorLogger(module, 'error sending email', err));
+                                return false;
+                            } else {
+                                transporter.sendMail({
+                                    from: 'NegusMath Admin <admin@mg.negusmath.com>',
+                                    to: locals.email,
+                                    subject: 'Confirm your email',
+                                    html: html
+                                }, function (err, responseStatus) {
+                                    if (err) {
+                                        consoleLogger(errorLogger(module, 'error sending email', err));
+                                        return false;
+                                    } else {
+                                        consoleLogger(successLogger(module));
+                                        return true;
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            }
+        });
+    },
+
     sendAddedAdminPrivilegesEmail: function (theUser) {
+        var module = 'sendAddedAdminPrivilegesEmail';
+        receivedLogger(module);
         emailTemplates(templatesDir, function (err, template) {
             if (err) {
                 consoleLogger(errorLogger(module, 'error sending email', err));
@@ -113,6 +167,8 @@ module.exports = {
     },
 
     sendRemovedAdminPrivilegesEmail: function (theUser) {
+        var module = 'sendRemovedAdminPrivilegesEmail';
+        receivedLogger(module);
         emailTemplates(templatesDir, function (err, template) {
             if (err) {
                 consoleLogger(errorLogger(module, 'error sending email', err));
@@ -151,6 +207,8 @@ module.exports = {
     },
 
     sendAccountApprovedEmail: function (theUser) {
+        var module = 'sendAccountApprovedEmail';
+        receivedLogger(module);
         emailTemplates(templatesDir, function (err, template) {
             if (err) {
                 consoleLogger(errorLogger(module, 'error sending email', err));
@@ -189,6 +247,8 @@ module.exports = {
     },
 
     sendAccountBannedEmail: function (theUser) {
+        var module = 'sendAccountBannedEmail';
+        receivedLogger(module);
         emailTemplates(templatesDir, function (err, template) {
             if (err) {
                 consoleLogger(errorLogger(module, 'error sending email', err));
@@ -227,6 +287,8 @@ module.exports = {
     },
 
     sendAccountUnBannedEmail: function (theUser) {
+        var module = 'sendAccountUnBannedEmail';
+        receivedLogger(module);
         emailTemplates(templatesDir, function (err, template) {
             if (err) {
                 consoleLogger(errorLogger(module, 'error sending email', err));
@@ -266,6 +328,8 @@ module.exports = {
 
 
     contactUs: function (userEmail, message) {
+        var module = 'contactUs';
+        receivedLogger(module);
         //send email to admin
         transporter.sendMail({
             from: userEmail,

@@ -27,19 +27,25 @@ module.exports = {
 
     //this function emits an event to the respective user
     emitToOne: function (socketRoom, serverEvent, content, success) {
+        var module = 'emitToOne';
+        receivedLogger(module);
         app.io.sockets.in(socketRoom).emit(serverEvent, content);
         if (success) {
             success();
         }
+        consoleLogger(successLogger(module));
     },
 
 
     //this function emits an event to all connected users
     emitToAll: function (serverEvent, content, success) {
+        var module = 'emitToAll';
+        receivedLogger(module);
         app.io.emit(serverEvent, content);
         if (success) {
             success();
         }
+        consoleLogger(successLogger(module));
     }
 
 };

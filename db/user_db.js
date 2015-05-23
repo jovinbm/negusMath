@@ -25,6 +25,8 @@ function getTheUser(req) {
 }
 
 function countAllUsers(error_neg_1, error_0, success) {
+    var module = 'countAllUsers';
+    receivedLogger(module);
     User.count({}, function (err, total) {
         if (err) {
             consoleLogger(errorLogger(module, err));
@@ -37,6 +39,8 @@ function countAllUsers(error_neg_1, error_0, success) {
 }
 
 function countAdminUsers(error_neg_1, error_0, success) {
+    var module = 'countAdminUsers';
+    receivedLogger(module);
     User.count({isAdmin: true}, function (err, total) {
         if (err) {
             consoleLogger(errorLogger(module, err));
@@ -49,6 +53,8 @@ function countAdminUsers(error_neg_1, error_0, success) {
 }
 
 function countLocalUsers(error_neg_1, error_0, success) {
+    var module = 'countLocalUsers';
+    receivedLogger(module);
     User.count({isAdmin: false}, function (err, total) {
         if (err) {
             consoleLogger(errorLogger(module, err));
@@ -61,6 +67,8 @@ function countLocalUsers(error_neg_1, error_0, success) {
 }
 
 function countApprovedUsers(error_neg_1, error_0, success) {
+    var module = 'countApprovedUsers';
+    receivedLogger(module);
     User.count({isApproved: true}, function (err, total) {
         if (err) {
             consoleLogger(errorLogger(module, err));
@@ -73,6 +81,8 @@ function countApprovedUsers(error_neg_1, error_0, success) {
 }
 
 function countUsersNotApproved(error_neg_1, error_0, success) {
+    var module = 'countUsersNotApproved';
+    receivedLogger(module);
     User.count({isApproved: false}, function (err, total) {
         if (err) {
             consoleLogger(errorLogger(module, err));
@@ -85,6 +95,8 @@ function countUsersNotApproved(error_neg_1, error_0, success) {
 }
 
 function countBannedUsers(error_neg_1, error_0, success) {
+    var module = 'countBannedUsers';
+    receivedLogger(module);
     User.count({"isBanned.status": true}, function (err, total) {
         if (err) {
             consoleLogger(errorLogger(module, err));
@@ -97,6 +109,8 @@ function countBannedUsers(error_neg_1, error_0, success) {
 }
 
 function countUsersNotBanned(error_neg_1, error_0, success) {
+    var module = 'countUsersNotBanned';
+    receivedLogger(module);
     User.count({"isBanned.status": false}, function (err, total) {
         if (err) {
             consoleLogger(errorLogger(module, err));
@@ -301,7 +315,69 @@ module.exports = {
         )
     },
 
+    confirmEmail: function (hashedUniqueCuid, error_neg_1, error_0, success) {
+        var module = 'confirmEmail';
+        receivedLogger(module);
+        User.findOne({hashedUniqueCuid: hashedUniqueCuid}, function (err, user) {
+            if (err) {
+                consoleLogger(errorLogger(module, err));
+                error_neg_1({
+                    confirmed: false,
+                    theUser: null,
+                    showBanner: true,
+                    bannerClass: 'alert alert-warning',
+                    msg: 'There was a problem confirming your email. Please try again'
+                });
+            } else if (user == null || user == undefined || user.length == 0) {
+                consoleLogger(successLogger(module, "Could not find the user with the given hashedUniqueCuid"));
+                error_0({
+                    confirmed: false,
+                    theUser: null,
+                    showBanner: true,
+                    bannerClass: 'alert alert-warning',
+                    msg: 'We could not find a user with your credentials in our records. Please try again or create a new account'
+                });
+            } else {
+                if (user.emailIsConfirmed === false) {
+                    user.emailIsConfirmed = true;
+                    user.save(function (err, theSavedUser) {
+                        if (err) {
+                            consoleLogger(errorLogger(module, err));
+                            error_neg_1({
+                                confirmed: false,
+                                theUser: null,
+                                showBanner: true,
+                                bannerClass: 'alert alert-warning',
+                                msg: 'There was a problem confirming your email. Please try again'
+                            });
+                        } else {
+                            consoleLogger(successLogger(module));
+                            success({
+                                confirmed: true,
+                                theUser: theSavedUser,
+                                showBanner: true,
+                                bannerClass: 'alert alert-success',
+                                msg: 'Your email has been successfully confirmed'
+                            });
+                        }
+                    });
+                } else {
+                    consoleLogger(successLogger(module, 'user was not admin already'));
+                    success({
+                        confirmed: true,
+                        theUser: user,
+                        showBanner: true,
+                        bannerClass: 'alert alert-success',
+                        msg: 'Your email account was already confirmed. No need to confirm again'
+                    });
+                }
+            }
+        });
+    },
+
     getUsersCount: function (error_neg_1, error_0, finalSuccess) {
+        var module = 'getUsersCount';
+        receivedLogger(module);
         var usersCount = {
             allUsers: 0,
             adminUsers: 0,
@@ -366,6 +442,7 @@ module.exports = {
             countUsersNotBanned(error_neg_1, error_0, success);
             function success(num) {
                 usersCount.usersNotBanned = num;
+                consoleLogger(successLogger(module));
                 finalSuccess(usersCount);
             }
         }

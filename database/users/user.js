@@ -3,7 +3,9 @@ var Schema = mongoose.Schema;
 
 var userSchema = new Schema({
     uniqueCuid: {type: String, unique: true, index: true},
+    hashedUniqueCuid: {type: String, unique: true, index: true},
     email: {type: String, unique: false, index: true},
+    emailIsConfirmed: {type: Boolean, unique: false, "default": false, index: true},
     username: {type: String, unique: false, index: true},
     firstName: {type: String, unique: false, index: true},
     lastName: {type: String, unique: false, index: true},

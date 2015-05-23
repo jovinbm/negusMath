@@ -232,7 +232,6 @@ module.exports = {
                         });
 
                         function continueWithHashedPassword(hashedPassword) {
-
                             var theUser = new User({
                                 email: email,
                                 firstName: firstName,
@@ -240,6 +239,7 @@ module.exports = {
                                 username: username,
                                 password: hashedPassword,
                                 uniqueCuid: uniqueCuid,
+                                hashedUniqueCuid: cuid(),
                                 isRegistered: true,
                                 isAdmin: isAdmin,
                                 isApproved: isApproved
@@ -269,19 +269,19 @@ module.exports = {
                             }
                         }
                     }
+                }
 
-                    function error() {
-                        //log the user out
-                        if (req.isAuthenticated()) {
-                            req.logout();
-                        }
-                        res.status(401).send({
-                            code: 401,
-                            registrationBanner: true,
-                            bannerClass: 'alert alert-dismissible alert-warning',
-                            msg: 'We could not create your account. Please check your details and try again'
-                        });
+                function error() {
+                    //log the user out
+                    if (req.isAuthenticated()) {
+                        req.logout();
                     }
+                    res.status(401).send({
+                        code: 401,
+                        registrationBanner: true,
+                        bannerClass: 'alert alert-dismissible alert-warning',
+                        msg: 'We could not create your account. Please check your details and try again'
+                    });
                 }
             }
         } else {

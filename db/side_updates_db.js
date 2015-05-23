@@ -47,5 +47,63 @@ module.exports = {
                     success();
                 }
             })
+    },
+
+    addNewFieldToAll: function () {
+        var module = 'addNewFieldToAll';
+        User.update({}, {
+                $set: {
+                    "emailIsConfirmed": false
+                }
+            },
+            {
+                upsert: false,
+                multi: true
+            }).exec(function (err) {
+                if (err) {
+                    consoleLogger("****************** " + errorLogger(module, err));
+                } else {
+                    consoleLogger("******************* " + successLogger(module));
+                }
+            });
+    },
+
+    addNewFieldWithAFunction: function () {
+        var module = 'addNewFieldWithAFunction';
+        User.find({}, function (err, usersArray) {
+            if (err) {
+                consoleLogger("****************** " + errorLogger(module, err));
+            } else {
+
+                var totalCount = usersArray.length;
+                var currentCount = 0;
+
+                function hash(userUniqueCuid, success) {
+                    success(cuid());
+                }
+
+                function doNext() {
+                    if (currentCount < totalCount) {
+                        function success(hashedUniqueCuid) {
+                            usersArray[currentCount].hashedUniqueCuid = hashedUniqueCuid;
+                            usersArray[currentCount].save(function (err) {
+                                if (err) {
+                                    consoleLogger("******************** " + errorLogger(module, err));
+                                } else {
+                                    ++currentCount;
+                                    doNext();
+                                }
+                            });
+                        }
+
+                        hash(usersArray[currentCount].uniqueCuid, success);
+                    } else {
+                        consoleLogger("******************* " + successLogger(module));
+                    }
+                }
+
+                doNext();
+            }
+        })
     }
 };

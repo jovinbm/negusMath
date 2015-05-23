@@ -1,31 +1,52 @@
 angular.module('clientHomeApp')
-    .directive('accountStatusBanner', ['$rootScope', '$window', '$location', function ($rootScope, $window, $location) {
+    .directive('accountStatusBanner', ['$rootScope', 'socketService', 'globals', function ($rootScope, socketService, globals) {
         return {
+            scope: {},
             templateUrl: 'views/general/smalls/account_status.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.accountStatusBanner = {
                     show: false,
                     bannerClass: "",
-                    msg: ""
+                    msg: "",
+                    showResendEmail: false
                 };
 
-                $scope.checkAccountStatus = function (userData) {
-                    if (userData) {
-                        if (userData.isRegistered) {
-                            //checkApprovalStatus
-                            if (userData.isApproved === false) {
-                                return false
-                            } else if (userData.isBanned) {
-                                if (userData.isBanned.status === true) {
-                                    //checking banned status
-                                    return false;
-                                } else {
-                                    return true;
-                                }
-                            } else {
-                                return true;
+                $scope.resendConfirmationEmail = function () {
+                    socketService.resendConfirmationEmail()
+                        .success(function (resp) {
+                            $rootScope.responseStatusHandler(resp);
+                        })
+                        .error(function (err) {
+                            $rootScope.responseStatusHandler(err);
+                        })
+                };
+
+
+                //initial requests
+                function getAccountDetails() {
+                    socketService.getUserData()
+                        .success(function (resp) {
+                            if (resp.userData.isRegistered == true) {
+                                $scope.accountStatusBanner = determineAccountStatus(resp.userData);
+                                checkAccountStatus(resp.userData);
                             }
+                        })
+                        .error(function () {
+                            $scope.accountStatusBanner = {
+                                show: true,
+                                bannerClass: "alert alert-warning",
+                                msg: "An error has occurred. Please reload page"
+                            };
+                        });
+                }
+
+                getAccountDetails();
+
+                $scope.checkAccount = function (userData) {
+                    if (userData) {
+                        if (userData.isRegistered && userData.emailIsConfirmed && userData.isApproved && userData.isBanned.status) {
+                            return true;
                         } else {
                             return false;
                         }
@@ -35,13 +56,21 @@ angular.module('clientHomeApp')
                 };
 
                 function determineAccountStatus(userData) {
+                    console.log(JSON.stringify(userData.emailIsConfirmed));
                     if (userData.isRegistered) {
-                        //checkApprovalStatus
-                        if (userData.isApproved === false) {
+                        if (!userData.emailIsConfirmed) {
                             return {
                                 show: true,
                                 bannerClass: "alert alert-warning",
-                                msg: "Your account is awaiting approval from the administrators. Please allow up to 3 business days. You will get an email notification as soon as your account is approved."
+                                msg: "Please confirm your account by clicking the confirmation link we sent on your email. Please also check your spam folder",
+                                showResendEmail: true
+                            };
+                        } else if (userData.isApproved === false) {
+                            return {
+                                show: true,
+                                bannerClass: "alert alert-warning",
+                                msg: "Your account is awaiting approval from the administrators. Please allow up to 3 business days. You will get an email notification as soon as your account is approved.",
+                                showResendEmail: false
                             };
                         } else if (userData.isBanned) {
                             if (userData.isBanned.status === true) {
@@ -49,42 +78,51 @@ angular.module('clientHomeApp')
                                 return {
                                     show: true,
                                     bannerClass: "alert alert-warning",
-                                    msg: "Your have been banned from this service. Please contact the administrators for more information"
+                                    msg: "Your have been banned from this service. Please contact the administrators for more information",
+                                    showResendEmail: false
                                 };
                             } else {
                                 return {
                                     show: false,
                                     bannerClass: "",
-                                    msg: ""
+                                    msg: "",
+                                    showResendEmail: false
                                 };
                             }
                         } else {
                             return {
                                 show: false,
                                 bannerClass: "",
-                                msg: ""
+                                msg: "",
+                                showResendEmail: false
                             };
                         }
                     } else {
                         return {
                             show: false,
                             bannerClass: "",
-                            msg: ""
+                            msg: "",
+                            showResendEmail: false
                         };
                     }
                 }
 
-                $rootScope.$on('userDataChanges', function () {
-                    $scope.accountStatusBanner = determineAccountStatus($scope.userData);
-
+                function checkAccountStatus(userData) {
                     //if account status is not okay, redirect user to index
-                    if (!$scope.checkAccountStatus($scope.userData)) {
+                    if (!($scope.checkAccount(userData))) {
                         if ($location.port()) {
                             $window.location.href = "http://" + $location.host() + ":" + $location.port() + "/index";
                         } else {
                             $window.location.href = "http://" + $location.host() + "/index";
                         }
                     }
+                }
+
+                $rootScope.$on('userDataChanges', function () {
+                });
+
+                $rootScope.$on('reconnect', function () {
+                    getAccountDetails();
                 });
             }
         }

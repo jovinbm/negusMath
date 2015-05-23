@@ -2,7 +2,7 @@ var envVariables = require('./environment_config.js');
 var databaseURL = envVariables.databaseURL();
 var databaseURL2 = envVariables.databaseURL2();
 var databaseURL3 = "mongodb://localhost:27017/math4";
-var dbUrl = databaseURL;
+var dbUrl = databaseURL3;
 
 //THE APP
 var express = require('express');
@@ -24,6 +24,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var mongoose = require('mongoose');
 var moment = require('moment');
 var emailModule = require('./functions/email.js');
+var sideUpdates = require('./db/side_updates_db.js');
 
 console.log("ENVIRONMENT = " + process.env.NODE_ENV);
 
@@ -111,7 +112,11 @@ app.get('/socket.io/socket.io.js', function (req, res) {
 //getting files
 app.get('/', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.renderHome_Html);
 app.get('/index', routes.index_Html);
+
+//email api
 app.get('/email_archive/:templateGroup', routes.renderEmail);
+app.post('/resendConfirmationEmail', middleware.ensureAuthenticatedAngular, middleware.addUserData, basicAPI.resendConfirmationEmail);
+app.get('/confirm_email/:hashedUniqueCuid', basicAPI.confirmEmail);
 
 //login api
 app.post('/createAccount', loginAPI.createAccount);

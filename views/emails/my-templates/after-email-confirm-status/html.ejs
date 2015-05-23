@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>Welcome to NegusMath</title>
+    <title>NegusMath - Confirm your email address</title>
     <style type="text/css">
         /* /\/\/\/\/\/\/\/\/ CLIENT-SPECIFIC STYLES /\/\/\/\/\/\/\/\/ */
         #outlook a {
@@ -617,82 +617,38 @@
                 <table border="0" cellpadding="0" cellspacing="0" id="templateContainer">
                     <tr>
                         <td align="center" valign="top">
-                            <!-- BEGIN PREHEADER // -->
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templatePreheader">
-                                <tr>
-                                    <td valign="top" class="preheaderContent"
-                                        style="padding-top:10px; padding-right:20px; padding-bottom:10px; padding-left:20px;"
-                                        mc:edit="preheader_content00">
-                                        Welcome
-                                    </td>
-                                    <!-- *|IFNOT:ARCHIVE_PAGE|* -->
-                                    <td valign="top" width="180" class="preheaderContent"
-                                        style="padding-top:10px; padding-right:20px; padding-bottom:10px; padding-left:0;"
-                                        mc:edit="preheader_content01">
-                                        Email not displaying correctly?<br/><a
-                                                href="http://www.negusmath.com/email_archive/welcome-email"
-                                                target="_blank">View it in your browser</a>.
-                                    </td>
-                                    <!-- *|END:IF|* -->
-                                </tr>
-                            </table>
-                            <!-- // END PREHEADER -->
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="center" valign="top">
-                            <!-- BEGIN HEADER // -->
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateHeader">
-                                <tr>
-                                    <td valign="top" class="headerContent">
-                                        <img src="http://www.negusmath.com/public/imgsmin/cover/light_stick.jpeg"
-                                             style="max-width:600px;" id="headerImage" mc:label="header_image"
-                                             mc:edit="header_image" mc:allowdesigner mc:allowtext/>
-                                    </td>
-                                </tr>
-                            </table>
-                            <!-- // END HEADER -->
-                        </td>
-                    </tr>
-                    <tr>
-                        <td align="center" valign="top">
                             <!-- BEGIN BODY // -->
                             <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateBody">
                                 <tr>
                                     <td valign="top" class="bodyContent" mc:edit="body_content">
-                                        <h2>Hello <%= firstName + ' ' + lastName %></h2>
+                                        <% if(confirmed) { %>
+                                        <h2>Dear <%= theUser.firstName + ' ' + theUser.lastName %></h2>
 
-                                        <h1>Welcome to NegusMath!</h1>
-
-                                        <h3>Please confirm your email address by clicking the following link</h3>
-                                        <a href="<%= emailConfirmLink %>"><%= emailConfirmLink %></a>
-                                        <br/>
-                                        <br/>
-
-                                        <h3>What we do</h3>
-                                        We are a non-profit organisation focused on helping
-                                        students with potential Mathematics talents all across Sub-Saharan Africa
-                                        achieve their goals.
-                                        We want to spread awareness of College Level Mathematics to every corner of
-                                        Africa, something
-                                        that has been missing for decades.
-                                        <br/>
-                                        <br/>
-
-                                        <h2>How to proceesd</h2>
-                                        <h4>Your account is awaiting approval</h4>
-                                        Thank you again for joining us. Our administrators have received your request.
-                                        Your account is currently awaiting approval and we will get back to you by email
-                                        as soon as you have been approved. In the mean time you can check your status <a
-                                                href="http://www.negusmath.com/index" target="_blank">by logging in at
-                                            our
-                                            homepage</a>.
-                                        <br/>
-                                        <br/>
-                                        Please don't hesitate to contact as at <a
+                                        <div>
+                                            <h3><%= msg %></h3>
+                                            Proceed to our <a href="http://www.negusmath.com/index"
+                                                              target="_blank">homepage</a>.
+                                            <br/>
+                                            <br/>
+                                            Please don't hesitate to contact as at <a
                                                 href="mailto:contact-us@mg.negusmath.com" target="_blank">contact-us@mg.negusmath.com</a>
-                                        or use the contact us form at our <a href="http://www.negusmath.com/index"
-                                                                             target="_blank">homepage</a>.
+                                            or use the contact us form at our <a href="http://www.negusmath.com/index"
+                                                                                 target="_blank">homepage</a>.
+                                        </div>
+                                        <% } %>
+
+                                        <% if(!confirmed) { %>
+
+                                        <div>
+                                            <h2><%= msg %></h2>
+                                            <br/>
+                                            Please don't hesitate to contact as at <a
+                                                href="mailto:contact-us@mg.negusmath.com" target="_blank">contact-us@mg.negusmath.com</a>
+                                            or use the contact us form at our <a href="http://www.negusmath.com/index"
+                                                                                 target="_blank">homepage</a>.
+                                        </div>
+                                        <% } %>
+
                                     </td>
                                 </tr>
                             </table>
@@ -706,8 +662,8 @@
                                 <tr>
                                     <td valign="top" class="footerContent" mc:edit="footer_content00">
                                         <a href="#">Follow on Twitter</a>&nbsp;&nbsp;&nbsp;<a
-                                                href="#">Friend on Facebook</a>&nbsp;&nbsp;&nbsp;<a
-                                                href="#">Forward to Friend</a>&nbsp;
+                                            href="#">Friend on Facebook</a>&nbsp;&nbsp;&nbsp;<a
+                                            href="#">Forward to Friend</a>&nbsp;
                                     </td>
                                 </tr>
                                 <tr>
@@ -715,13 +671,6 @@
                                         mc:edit="footer_content01">
                                         <em>Copyright &copy; 2015 NegusMath Inc, All rights reserved.</em>
                                         <br/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td valign="top" class="footerContent" style="padding-top:0; padding-bottom:40px;"
-                                        mc:edit="footer_content02">
-                                        <a href="#">unsubscribe from this list</a>&nbsp;&nbsp;&nbsp;<a href="#">update
-                                            subscription preferences</a>&nbsp;
                                     </td>
                                 </tr>
                             </table>

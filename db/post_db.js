@@ -30,6 +30,8 @@ function getTheUser(req) {
 //function that changes the angular tags in the format {'text': tag} into just an array of strings
 //takes in a single post or multiple posts
 function preparePostTagsToDatabase(post, updateOneOnly, postsArray, updateMany, success) {
+    var module = 'preparePostTagsToDatabase';
+    receivedLogger(module);
     if (updateOneOnly) {
         var temp = [];
         post.postTags.forEach(function (angularTag) {
@@ -45,6 +47,7 @@ function preparePostTagsToDatabase(post, updateOneOnly, postsArray, updateMany, 
             });
             post.postTags = temp;
         });
+        consoleLogger(successLogger(module));
         success(postsArray);
     }
 }
@@ -53,6 +56,8 @@ function preparePostTagsToDatabase(post, updateOneOnly, postsArray, updateMany, 
 //function that changes the string tags in a post into the {'text': tag} object format
 //for angular tags
 function preparePostTagsToClient(post, updateOneOnly, postsArray, updateMany, success) {
+    var module = 'preparePostTagsToClient';
+    receivedLogger(module);
     if (updateOneOnly) {
         var temp = [];
         post.postTags.forEach(function (tag) {
@@ -72,6 +77,7 @@ function preparePostTagsToClient(post, updateOneOnly, postsArray, updateMany, su
             });
             post.postTags = temp;
         });
+        consoleLogger(successLogger(module));
         success(postsArray);
     }
 }
