@@ -2,6 +2,7 @@ var basic = require('../functions/basic.js');
 var consoleLogger = require('../functions/basic.js').consoleLogger;
 var ioJs = require('../functions/io.js');
 var postDB = require('../db/post_db.js');
+var emailModule = require('../functions/email.js');
 
 var fileName = 'basic_handlers.js';
 

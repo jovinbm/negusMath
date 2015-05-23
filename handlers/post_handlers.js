@@ -3,6 +3,7 @@ var consoleLogger = require('../functions/basic.js').consoleLogger;
 var ioJs = require('../functions/io.js');
 var postDB = require('../db/post_db.js');
 var forms = require('../functions/forms.js');
+var emailModule = require('../functions/email.js');
 
 var fileName = 'post_handlers.js';
 

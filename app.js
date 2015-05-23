@@ -23,7 +23,7 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var mongoose = require('mongoose');
 var moment = require('moment');
-var email = require('./functions/email.js');
+var emailModule = require('./functions/email.js');
 
 console.log("ENVIRONMENT = " + process.env.NODE_ENV);
 

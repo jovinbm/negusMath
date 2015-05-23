@@ -3,6 +3,7 @@ var consoleLogger = require('../functions/basic.js').consoleLogger;
 var ioJs = require('../functions/io.js');
 var userDB = require('../db/user_db.js');
 var forms = require('../functions/forms.js');
+var emailModule = require('../functions/email.js');
 
 var fileName = 'user_handlers.js';
 
@@ -237,6 +238,9 @@ module.exports = {
                 type: 'success',
                 msg: 'Saved'
             });
+
+            //send approved email
+            emailModule.sendAccountApprovedEmail(user);
         }
 
         function error_neg_1() {

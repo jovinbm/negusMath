@@ -74,6 +74,44 @@ module.exports = {
         });
     },
 
+    sendAccountApprovedEmail: function (theUser) {
+        emailTemplates(templatesDir, function (err, template) {
+            if (err) {
+                consoleLogger(errorLogger(module, 'error sending email', err));
+            } else {
+                //only send if theUser exists
+                if (theUser) {
+                    if (theUser.email) {
+                        var locals = {
+                            email: theUser.email,
+                            firstName: theUser.firstName,
+                            lastName: theUser.lastName
+                        };
+
+                        template('account-approved', locals, function (err, html, text) {
+                            if (err) {
+                                consoleLogger(errorLogger(module, 'error sending email', err));
+                            } else {
+                                transporter.sendMail({
+                                    from: 'NegusMath Admin <admin@mg.negusmath.com>',
+                                    to: locals.email,
+                                    subject: 'Welcome to NegusMath!',
+                                    html: html
+                                }, function (err, responseStatus) {
+                                    if (err) {
+                                        consoleLogger(errorLogger(module, 'error sending email', err));
+                                    } else {
+                                        consoleLogger(successLogger(module, responseStatus.message));
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    },
+
     contactUs: function (userEmail, message) {
         //send email to admin
         transporter.sendMail({
