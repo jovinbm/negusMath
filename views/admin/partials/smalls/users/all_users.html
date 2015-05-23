@@ -36,7 +36,8 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr ng-repeat="user in allUsers track by $index | filter: allUsersModel.filterString"
+                                <!--<tr ng-repeat="user in allUsers track by $index | filter: allUsersModel.filterString"-->
+                                <tr ng-repeat="user in allUsers | filter: allUsersModel.filterString"
                                     ng-hide="user.uniqueCuid == userData.uniqueCuid"
                                     ng-class="{'warning': user.isBanned.status, 'success': user.isAdmin}">
                                     <td>{{user.firstName + ' ' + user.lastName}}
