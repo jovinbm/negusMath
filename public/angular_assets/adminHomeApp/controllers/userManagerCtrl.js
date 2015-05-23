@@ -17,62 +17,6 @@ angular.module('adminHomeApp')
 
             getUsersCount();
 
-            //user manipulation functions
-            $scope.addAdminPrivileges = function (userUniqueCuid) {
-                UserService.addAdminPrivileges(userUniqueCuid)
-                    .success(function (resp) {
-                        $rootScope.$broadcast('userChanges');
-                        $rootScope.responseStatusHandler(resp);
-                    })
-                    .error(function (errResponse) {
-                        $rootScope.responseStatusHandler(errResponse);
-                    })
-            };
-
-            $scope.removeAdminPrivileges = function (userUniqueCuid) {
-                UserService.removeAdminPrivileges(userUniqueCuid)
-                    .success(function (resp) {
-                        $rootScope.$broadcast('userChanges');
-                        $rootScope.responseStatusHandler(resp);
-                    })
-                    .error(function (errResponse) {
-                        $rootScope.responseStatusHandler(errResponse);
-                    })
-            };
-
-            $scope.approveUser = function (userUniqueCuid) {
-                UserService.approveUser(userUniqueCuid)
-                    .success(function (resp) {
-                        $rootScope.$broadcast('userChanges');
-                        $rootScope.responseStatusHandler(resp);
-                    })
-                    .error(function (errResponse) {
-                        $rootScope.responseStatusHandler(errResponse);
-                    })
-            };
-
-            $scope.banUser = function (userUniqueCuid) {
-                UserService.banUser(userUniqueCuid)
-                    .success(function (resp) {
-                        $rootScope.$broadcast('userChanges');
-                        $rootScope.responseStatusHandler(resp);
-                    })
-                    .error(function (errResponse) {
-                        $rootScope.responseStatusHandler(errResponse);
-                    })
-            };
-
-            $scope.unBanUser = function (userUniqueCuid) {
-                UserService.unBanUser(userUniqueCuid)
-                    .success(function (resp) {
-                        $rootScope.$broadcast('userChanges');
-                        $rootScope.responseStatusHandler(resp);
-                    })
-                    .error(function (errResponse) {
-                        $rootScope.responseStatusHandler(errResponse);
-                    })
-            };
-
             //===============socket listeners===============
 
             $rootScope.$on('userChanges', function () {

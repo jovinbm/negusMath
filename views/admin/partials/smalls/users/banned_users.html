@@ -31,24 +31,10 @@
                                     <th>Actions</th>
                                 </tr>
                                 </thead>
-                                <tbody>
-                                <tr ng-repeat="user in bannedUsers | filter: bannedUsersModel.filterString  | orderBy: 'firstName' track by user.uniqueCuid"
-                                    ng-hide="user.uniqueCuid == userData.uniqueCuid"
-                                    ng-class="{'success': user.isAdmin}">
-                                    <td>{{user.firstName + ' ' + user.lastName}}
-                                        <small class="small-messages"
-                                               ng-show="user.isAdmin">(admin)
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        <div>
-                                            <a class="btn btn-xs btn-default"
-                                               href ng-click="unBanUser(user.uniqueCuid)">Reactivate</a>
-                                        </div>
-                                    </td>
-
-                                </tr>
+                                <tbody ng-repeat="user in bannedUsers | filter: bannedUsersModel.filterString | orderBy: 'firstName' track by user.uniqueCuid"
+                                       ng-hide="user.uniqueCuid == userData.uniqueCuid"
+                                       user-display="user"
+                                       user="user">
                                 </tbody>
                             </table>
                         </div>

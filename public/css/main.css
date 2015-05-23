@@ -17,8 +17,8 @@
 body {
     font-family: "Roboto Slab", "Helvetica Neue", Helvetica, Arial, sans-serif;
     color: #222;
-    font-size: 15px;
-    line-height: 1.7em;
+    font-size: 1.4em;
+    line-height: 1.4em;
 }
 
 /*make all images responsive*/
@@ -136,7 +136,13 @@ a.active {
     font-size: 0.7em;
 }
 
-.small-messages {
+.small-font {
+    margin-top: 0.9em;
+    margin-bottom: 0.9em;
+    font-size: 0.8em;
+}
+
+.very-small-font {
     margin-top: 0.9em;
     margin-bottom: 0.9em;
     font-size: 0.5em;
@@ -149,7 +155,7 @@ a.active {
 }
 
 .card_date {
-    font-size: 1.5em;
+    font-size: 1.4em;
 }
 
 .card_content_main_heading {

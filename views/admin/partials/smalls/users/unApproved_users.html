@@ -31,27 +31,10 @@
                                     <th>Actions</th>
                                 </tr>
                                 </thead>
-                                <tbody>
-                                <tr ng-repeat="user in usersNotApproved | filter: usersNotApprovedModel.filterString | orderBy: 'firstName' track by user.uniqueCuid"
-                                    ng-hide="user.uniqueCuid == userData.uniqueCuid"
-                                    ng-class="{'warning': user.isBanned.status}">
-                                    <td>{{user.firstName + ' ' + user.lastName}}
-                                        <small class="small-messages"
-                                               ng-show="user.isAdmin">(admin)
-                                        </small>
-                                        <small class="small-messages"
-                                               ng-show="user.isBanned.status">(banned)
-                                        </small>
-                                    </td>
-
-                                    <td>
-                                        <div>
-                                            <a class="btn btn-xs btn-default"
-                                               href ng-click="approveUser(user.uniqueCuid)">Approve</a>
-                                        </div>
-                                    </td>
-
-                                </tr>
+                                <tbody ng-repeat="user in usersNotApproved | filter:usersNotApprovedModel.filterString | orderBy: 'firstName' track by user.uniqueCuid"
+                                       ng-hide="user.uniqueCuid == userData.uniqueCuid"
+                                       user-display="user"
+                                       user="user">
                                 </tbody>
                             </table>
                         </div>
