@@ -115,19 +115,11 @@ module.exports = {
 
         var theUser = getTheUser(req);
 
-        if (theUser.isRegistered) {
-            //checkApprovalStatus
-            if (theUser.isApproved === false) {
-                error();
-            } else if (theUser.isBanned) {
-                if (theUser.isBanned.status === true) {
-                    //checking banned status
-                    error();
-                } else {
-                    success();
-                }
-            } else {
+        if (theUser) {
+            if (theUser.isRegistered && theUser.emailIsConfirmed && theUser.isApproved && theUser.isBanned.status) {
                 success();
+            } else {
+                error();
             }
         } else {
             error();
@@ -151,22 +143,27 @@ module.exports = {
 
         var theUser = getTheUser(req);
 
-        if (theUser.isRegistered) {
-            //checkApprovalStatus
-            if (theUser.isApproved === false) {
-                error("Your account is awaiting approval from the administrators. Please allow up to 3 business days. You will get an email notification as soon as your account is approved.")
-            } else if (theUser.isBanned) {
-                if (theUser.isBanned.status === true) {
-                    //checking banned status
-                    error("Your have been banned from this service. Please contact the administrators for more information");
+        if (theUser) {
+            if (theUser.isRegistered) {
+                if (theUser.emailIsConfirmed == false) {
+                    error("Please confirm your account by clicking the confirmation link we sent on your email. Please also check your spam folder");
+                } else if (theUser.isApproved === false) {
+                    error("Your account is awaiting approval from the administrators. Please allow up to 3 business days. You will get an email notification as soon as your account is approved.")
+                } else if (theUser.isBanned) {
+                    if (theUser.isBanned.status === true) {
+                        //checking banned status
+                        error("Your have been banned from this service. Please contact the administrators for more information");
+                    } else {
+                        success();
+                    }
                 } else {
                     success();
                 }
             } else {
-                success();
+                error("You are not registered to use this website");
             }
         } else {
-            error("You are not registered to use this website");
+            error("We could not find your records. Please reload page. If problem persists contact us for more informatiuon")
         }
 
         function success() {
