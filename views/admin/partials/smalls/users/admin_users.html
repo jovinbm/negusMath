@@ -36,9 +36,14 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr ng-repeat="user in adminUsers track by $index | filter: adminUsersModel.filterString"
-                                    ng-hide="user.uniqueCuid == userData.uniqueCuid">
-                                    <td ng-bind="user.firstName + ' ' + user.lastName"></td>
+                                <tr ng-repeat="user in adminUsers | filter: adminUsersModel.filterString | orderBy: 'firstName' track by user.uniqueCuid"
+                                    ng-hide="user.uniqueCuid == userData.uniqueCuid"
+                                    ng-class="{'warning': user.isBanned.status}">
+                                    <td>{{user.firstName + ' ' + user.lastName}}
+                                        <small class="small-messages"
+                                               ng-show="user.isBanned.status">(banned)
+                                        </small>
+                                    </td>
 
                                     <td>
                                         <div>

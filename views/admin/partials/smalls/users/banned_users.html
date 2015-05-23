@@ -32,9 +32,14 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr ng-repeat="user in bannedUsers track by $index | filter: bannedUsersModel.filterString"
-                                    ng-hide="user.uniqueCuid == userData.uniqueCuid">
-                                    <td ng-bind="user.firstName + ' ' + user.lastName"></td>
+                                <tr ng-repeat="user in bannedUsers | filter: bannedUsersModel.filterString  | orderBy: 'firstName' track by user.uniqueCuid"
+                                    ng-hide="user.uniqueCuid == userData.uniqueCuid"
+                                    ng-class="{'success': user.isAdmin}">
+                                    <td>{{user.firstName + ' ' + user.lastName}}
+                                        <small class="small-messages"
+                                               ng-show="user.isAdmin">(admin)
+                                        </small>
+                                    </td>
 
                                     <td>
                                         <div>
