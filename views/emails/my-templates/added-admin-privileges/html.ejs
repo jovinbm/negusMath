@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>NegusMath - Not found</title>
+    <title>NegusMath - You are now an Admin</title>
     <style type="text/css">
         /* /\/\/\/\/\/\/\/\/ CLIENT-SPECIFIC STYLES /\/\/\/\/\/\/\/\/ */
         #outlook a {
@@ -617,56 +617,126 @@
                 <table border="0" cellpadding="0" cellspacing="0" id="templateContainer">
                     <tr>
                         <td align="center" valign="top">
-                            <!-- BEGIN BODY // -->
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateBody">
+                            <!-- BEGIN PREHEADER // -->
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templatePreheader">
                                 <tr>
-                                    <td valign="top" class="bodyContent" mc:edit="body_content">
-                                        <h1>Welcome to NegusMath!</h1>
-
-                                        <h3>We could not find the email you were looking for</h3>
-                                        Please check the link in your email and try again. If the problem persists,
-                                        please do not hesitate to contact us at <a
-                                            href="mailto:help@mg.negusmath.com"
-                                            target="_blank">help@mg.negusmath.com</a>
-                                        or use the contact us form at our <a href="http://www.negusmath.com/index"
-                                                                               target="_blank">homepage</a>.
+                                    <td valign="top" class="preheaderContent"
+                                        style="padding-top:10px; padding-right:20px; padding-bottom:10px; padding-left:20px;"
+                                        mc:edit="preheader_content00">
+                                        Important notice
                                     </td>
+                                    <!-- *|IFNOT:ARCHIVE_PAGE|* -->
+                                    <td valign="top" width="180" class="preheaderContent"
+                                        style="padding-top:10px; padding-right:20px; padding-bottom:10px; padding-left:0;"
+                                        mc:edit="preheader_content01">
+                                        Email not displaying correctly?<br/><a
+                                                href="http://www.negusmath.com/email_archive/added-admin-privileges"
+                                                target="_blank">View it in your browser</a>.
+                                    </td>
+                                    <!-- *|END:IF|* -->
                                 </tr>
                             </table>
-                            <!-- // END BODY -->
+                            <!-- // END PREHEADER -->
                         </td>
                     </tr>
                     <tr>
-                        <td align="center" valign="top">
-                            <!-- BEGIN FOOTER // -->
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateFooter">
+                        <td align="center" valign="top" id="bodyCell">
+                            <!-- BEGIN TEMPLATE // -->
+                            <table border="0" cellpadding="0" cellspacing="0" id="templateContainer">
                                 <tr>
-                                    <td valign="top" class="footerContent" mc:edit="footer_content00">
-                                        <a href="#">Follow on Twitter</a>&nbsp;&nbsp;&nbsp;<a
-                                            href="#">Friend on Facebook</a>&nbsp;&nbsp;&nbsp;<a
-                                            href="#">Forward to Friend</a>&nbsp;
+                                    <td align="center" valign="top">
+                                        <!-- BEGIN BODY // -->
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%"
+                                               id="templateBody">
+                                            <tr>
+                                                <td valign="top" class="bodyContent" mc:edit="body_content">
+
+                                                    <h2>Hello <%= firstName + ' ' + lastName %></h2>
+
+                                                    <h1>Congratulations, You are now an Admin at NegusMath</h1>
+
+                                                    <h3>You can now execute admin actions.</h3>
+                                                    You can now
+                                                    <ul>
+                                                        <li>Post new articles to the website</li>
+                                                        <li>Delete articles</li>
+                                                        <li>Edit articles</li>
+                                                        <li>Manage users
+                                                            <ul>
+                                                                <li>Ban users from site</li>
+                                                                <li>Promote other local users to admins</li>
+                                                                <li>Approve new users</li>
+                                                            </ul>
+                                                        </li>
+                                                        <li>..and so much more!</li>
+                                                    </ul>
+
+                                                    <br/>
+                                                    <br/>
+
+                                                    Please make sure you avoid the following
+                                                    <ul>
+                                                        <li>Random deletion and distribution of website content</li>
+                                                        <li>Performing administrator actions without consulting other
+                                                            administrators
+                                                        </li>
+                                                        <li>Continuous use of foul language in discussions</li>
+                                                        <li>Illegal spread of website content</li>
+                                                        <li>Incomplete registration data</li>
+                                                        <li>Going against our <a href="http://www.negusmath.com/terms"
+                                                                                 target="_blank">terms and
+                                                                agreements</a></li>
+                                                    </ul>
+
+                                                    <br/>
+                                                    Congratulations again and don't hesitate to contact us at <a
+                                                            href="mailto:contact-us@mg.negusmath.com" target="_blank">contact-us@mg.negusmath.com</a>
+                                                    or use the contact us form at our <a
+                                                            href="http://www.negusmath.com/index"
+                                                            target="_blank">homepage</a> if you have any questions.
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <!-- // END BODY -->
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td valign="top" class="footerContent" style="padding-top:0;"
-                                        mc:edit="footer_content01">
-                                        <em>Copyright &copy; 2015 NegusMath Inc, All rights reserved.</em>
-                                        <br/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td valign="top" class="footerContent" style="padding-top:0; padding-bottom:40px;"
-                                        mc:edit="footer_content02">
-                                        <a href="#">unsubscribe from this list</a>&nbsp;&nbsp;&nbsp;<a href="#">update
-                                        subscription preferences</a>&nbsp;
+                                    <td align="center" valign="top">
+                                        <!-- BEGIN FOOTER // -->
+                                        <table border="0" cellpadding="0" cellspacing="0" width="100%"
+                                               id="templateFooter">
+                                            <tr>
+                                                <td valign="top" class="footerContent" mc:edit="footer_content00">
+                                                    <a href="#">Follow on Twitter</a>&nbsp;&nbsp;&nbsp;<a
+                                                            href="#">Friend on Facebook</a>&nbsp;&nbsp;&nbsp;<a
+                                                            href="#">Forward to Friend</a>&nbsp;
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td valign="top" class="footerContent" style="padding-top:0;"
+                                                    mc:edit="footer_content01">
+                                                    <em>Copyright &copy; 2015 NegusMath Inc, All rights reserved.</em>
+                                                    <br/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td valign="top" class="footerContent"
+                                                    style="padding-top:0; padding-bottom:40px;"
+                                                    mc:edit="footer_content02">
+                                                    <a href="#">unsubscribe from this list</a>&nbsp;&nbsp;&nbsp;<a
+                                                            href="#">update
+                                                        subscription preferences</a>&nbsp;
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <!-- // END FOOTER -->
                                     </td>
                                 </tr>
                             </table>
-                            <!-- // END FOOTER -->
+                            <!-- // END TEMPLATE -->
                         </td>
                     </tr>
                 </table>
-                <!-- // END TEMPLATE -->
             </td>
         </tr>
     </table>

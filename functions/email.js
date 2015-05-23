@@ -74,6 +74,82 @@ module.exports = {
         });
     },
 
+    sendAddedAdminPrivilegesEmail: function (theUser) {
+        emailTemplates(templatesDir, function (err, template) {
+            if (err) {
+                consoleLogger(errorLogger(module, 'error sending email', err));
+            } else {
+                //only send if theUser exists
+                if (theUser) {
+                    if (theUser.email) {
+                        var locals = {
+                            email: theUser.email,
+                            firstName: theUser.firstName,
+                            lastName: theUser.lastName
+                        };
+
+                        template('added-admin-privileges', locals, function (err, html, text) {
+                            if (err) {
+                                consoleLogger(errorLogger(module, 'error sending email', err));
+                            } else {
+                                transporter.sendMail({
+                                    from: 'NegusMath Admin <admin@mg.negusmath.com>',
+                                    to: locals.email,
+                                    subject: 'Your are now an admin at NegusMath!',
+                                    html: html
+                                }, function (err, responseStatus) {
+                                    if (err) {
+                                        consoleLogger(errorLogger(module, 'error sending email', err));
+                                    } else {
+                                        consoleLogger(successLogger(module, responseStatus.message));
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    },
+
+    sendRemovedAdminPrivilegesEmail: function (theUser) {
+        emailTemplates(templatesDir, function (err, template) {
+            if (err) {
+                consoleLogger(errorLogger(module, 'error sending email', err));
+            } else {
+                //only send if theUser exists
+                if (theUser) {
+                    if (theUser.email) {
+                        var locals = {
+                            email: theUser.email,
+                            firstName: theUser.firstName,
+                            lastName: theUser.lastName
+                        };
+
+                        template('removed-admin-privileges', locals, function (err, html, text) {
+                            if (err) {
+                                consoleLogger(errorLogger(module, 'error sending email', err));
+                            } else {
+                                transporter.sendMail({
+                                    from: 'NegusMath Admin <admin@mg.negusmath.com>',
+                                    to: locals.email,
+                                    subject: 'You are no longer an Admin at NegusMath',
+                                    html: html
+                                }, function (err, responseStatus) {
+                                    if (err) {
+                                        consoleLogger(errorLogger(module, 'error sending email', err));
+                                    } else {
+                                        consoleLogger(successLogger(module, responseStatus.message));
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    },
+
     sendAccountApprovedEmail: function (theUser) {
         emailTemplates(templatesDir, function (err, template) {
             if (err) {
@@ -95,7 +171,7 @@ module.exports = {
                                 transporter.sendMail({
                                     from: 'NegusMath Admin <admin@mg.negusmath.com>',
                                     to: locals.email,
-                                    subject: 'Welcome to NegusMath!',
+                                    subject: 'Your NegusMath account is now active!',
                                     html: html
                                 }, function (err, responseStatus) {
                                     if (err) {
@@ -111,6 +187,83 @@ module.exports = {
             }
         });
     },
+
+    sendAccountBannedEmail: function (theUser) {
+        emailTemplates(templatesDir, function (err, template) {
+            if (err) {
+                consoleLogger(errorLogger(module, 'error sending email', err));
+            } else {
+                //only send if theUser exists
+                if (theUser) {
+                    if (theUser.email) {
+                        var locals = {
+                            email: theUser.email,
+                            firstName: theUser.firstName,
+                            lastName: theUser.lastName
+                        };
+
+                        template('account-banned', locals, function (err, html, text) {
+                            if (err) {
+                                consoleLogger(errorLogger(module, 'error sending email', err));
+                            } else {
+                                transporter.sendMail({
+                                    from: 'NegusMath Admin <admin@mg.negusmath.com>',
+                                    to: locals.email,
+                                    subject: 'Your have been banned from NegusMath!',
+                                    html: html
+                                }, function (err, responseStatus) {
+                                    if (err) {
+                                        consoleLogger(errorLogger(module, 'error sending email', err));
+                                    } else {
+                                        consoleLogger(successLogger(module, responseStatus.message));
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    },
+
+    sendAccountUnBannedEmail: function (theUser) {
+        emailTemplates(templatesDir, function (err, template) {
+            if (err) {
+                consoleLogger(errorLogger(module, 'error sending email', err));
+            } else {
+                //only send if theUser exists
+                if (theUser) {
+                    if (theUser.email) {
+                        var locals = {
+                            email: theUser.email,
+                            firstName: theUser.firstName,
+                            lastName: theUser.lastName
+                        };
+
+                        template('account-banned', locals, function (err, html, text) {
+                            if (err) {
+                                consoleLogger(errorLogger(module, 'error sending email', err));
+                            } else {
+                                transporter.sendMail({
+                                    from: 'NegusMath Admin <admin@mg.negusmath.com>',
+                                    to: locals.email,
+                                    subject: 'Your NegusMath account has been reactivated!',
+                                    html: html
+                                }, function (err, responseStatus) {
+                                    if (err) {
+                                        consoleLogger(errorLogger(module, 'error sending email', err));
+                                    } else {
+                                        consoleLogger(successLogger(module, responseStatus.message));
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    },
+
 
     contactUs: function (userEmail, message) {
         //send email to admin

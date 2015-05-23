@@ -114,6 +114,8 @@ module.exports = {
                 type: 'success',
                 msg: 'Saved'
             });
+
+            emailModule.sendAddedAdminPrivilegesEmail(user);
         }
 
         function error_neg_1() {
@@ -152,6 +154,8 @@ module.exports = {
                 type: 'success',
                 msg: 'Saved'
             });
+
+            emailModule.sendRemovedAdminPrivilegesEmail(user);
         }
 
         function error_neg_1() {
@@ -327,6 +331,8 @@ module.exports = {
                 type: 'success',
                 msg: 'Saved'
             });
+
+            emailModule.sendAccountBannedEmail(user);
         }
 
         function error_neg_1() {
@@ -365,6 +371,8 @@ module.exports = {
                 type: 'success',
                 msg: 'Saved'
             });
+
+            emailModule.sendAccountUnBannedEmail(user);
         }
 
         function error_neg_1() {
