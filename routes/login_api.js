@@ -9,6 +9,7 @@ var userDB = require('../db/user_db.js');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var bcrypt = require('bcrypt');
+var emailModule = require('../functions/email.js');
 
 var fileName = 'login_api.js';
 
@@ -28,7 +29,7 @@ var errorLogger = function (module, text, err) {
 };
 
 function getTheUser(req) {
-    return req.customData.theUser;
+    return basic.getTheUser(req);
 }
 
 module.exports = {
@@ -264,7 +265,7 @@ module.exports = {
                                 });
 
                                 //send a welcome email
-                                //emailModule.sendWelcomeEmail(theUser);
+                                emailModule.sendWelcomeEmail(theUser);
                             }
                         }
                     }

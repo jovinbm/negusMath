@@ -24,7 +24,7 @@ var errorLogger = function (module, text, err) {
 };
 
 function getTheUser(req) {
-    return req.customData.theUser;
+    return basic.getTheUser(req);
 }
 
 //function that changes the angular tags in the format {'text': tag} into just an array of strings

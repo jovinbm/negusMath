@@ -23,6 +23,7 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var mongoose = require('mongoose');
 var moment = require('moment');
+var email = require('./functions/email.js');
 
 console.log("ENVIRONMENT = " + process.env.NODE_ENV);
 
@@ -62,7 +63,7 @@ var errorLogger = function (module, text, err) {
 };
 
 function getTheUser(req) {
-    return req.customData.theUser;
+    return basic.getTheUser(req);
 }
 
 app.use(compression());
@@ -110,6 +111,7 @@ app.get('/socket.io/socket.io.js', function (req, res) {
 //getting files
 app.get('/', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.renderHome_Html);
 app.get('/index', routes.index_Html);
+app.get('/email_archive/:templateGroup', routes.renderEmail);
 
 //login api
 app.post('/createAccount', loginAPI.createAccount);

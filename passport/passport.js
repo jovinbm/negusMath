@@ -15,12 +15,12 @@ var errorLogger = function (module, text, err) {
     return eL(fileName, module, text, err);
 };
 
-function getTheUser(req) {
-    return req.customData.theUser;
-}
-
 var basic = require('../functions/basic.js');
 var consoleLogger = require('../functions/basic.js').consoleLogger;
+
+function getTheUser(req) {
+    return basic.getTheUser(req);
+}
 
 var cuid = require('cuid');
 var userDB = require('../db/user_db.js');

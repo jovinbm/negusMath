@@ -21,7 +21,7 @@ var errorLogger = function (module, text, err) {
 };
 
 function getTheUser(req) {
-    return req.customData.theUser;
+    return basic.getTheUser(req);
 }
 
 function checkUserUniqueCuid(req) {

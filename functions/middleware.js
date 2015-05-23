@@ -20,7 +20,7 @@ var errorLogger = function (module, text, err) {
 };
 
 function getTheUser(req) {
-    return req.customData.theUser;
+    return basic.getTheUser(req);
 }
 
 module.exports = {
@@ -90,6 +90,22 @@ module.exports = {
                 type: 'error',
                 msg: 'An error occurred while retrieving your personalized info. Please reload the page'
             });
+        }
+    },
+
+    returnUserData: function (req, callback) {
+        var module = "returnUserData";
+        receivedLogger(module);
+        userDB.findUserWithUniqueCuid(req.user.uniqueCuid, error, error, success);
+
+        function success(userData) {
+            consoleLogger(successLogger(module));
+            callback(userData);
+        }
+
+        function error(status, err) {
+            consoleLogger(errorLogger(module, 'error retrieving user data', err));
+            callback(false);
         }
     },
 

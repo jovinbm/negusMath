@@ -31,5 +31,17 @@ module.exports = {
                 return "ERROR: " + filename + ": " + module + ":";
             }
         }
+    },
+
+    getTheUser: function (req) {
+        if (req.customData) {
+            if (req.customData.theUser) {
+                return req.customData.theUser;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 };

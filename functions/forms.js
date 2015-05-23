@@ -21,7 +21,7 @@ var errorLogger = function (module, text, err) {
 };
 
 function getTheUser(req) {
-    return req.customData.theUser;
+    return basic.getTheUser(req);
 }
 
 var usernameRegex = /^[a-zA-Z0-9_]*$/;

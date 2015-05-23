@@ -3,6 +3,10 @@ var basic = require('../functions/basic.js');
 var consoleLogger = require('../functions/basic.js').consoleLogger;
 var middleware = require('../functions/middleware.js');
 
+var templatesDir = path.join(__dirname, '../views/emails/my-templates');
+var emailTemplates = require('email-templates');
+
+
 var fileName = 'router.js';
 
 var receivedLogger = function (module) {
@@ -21,7 +25,7 @@ var errorLogger = function (module, text, err) {
 };
 
 function getTheUser(req) {
-    return req.customData.theUser;
+    return basic.getTheUser(req);
 }
 
 module.exports = {
@@ -61,5 +65,63 @@ module.exports = {
             consoleLogger(successLogger(module));
         }
 
+    },
+
+    renderEmail: function (req, res) {
+        var module = 'renderEmail';
+        receivedLogger(module);
+
+        var temp = {
+            firstName: 'NegusMath',
+            lastName: 'User',
+            email: ''
+        };
+
+        if (req.isAuthenticated()) {
+            middleware.returnUserData(req, success);
+        } else {
+            success(temp);
+        }
+
+
+        function success(theUser) {
+
+            //check that theUser is not false
+            if (!theUser) {
+                theUser = temp;
+            }
+            var templateGroup = req.params.templateGroup;
+
+            emailTemplates(templatesDir, function (err, template) {
+                if (err) {
+                    consoleLogger(errorLogger(module, 'retrieving template directory', err));
+                    res.status(500).send('An error has occurred. Please try again');
+                } else {
+                    var locals = {
+                        email: theUser.email,
+                        firstName: theUser.firstName,
+                        lastName: theUser.lastName
+                    };
+
+                    template(templateGroup, locals, function (err, html, text) {
+                        if (err) {
+                            consoleLogger(errorLogger(module, 'error parsing email template/template not found. Sending not-found', err));
+                            template('not-found', locals, function (err, html, text) {
+                                if (err) {
+                                    consoleLogger(errorLogger(module, 'error parsing email template/template not found', err));
+                                    res.status(500).send('An error has occurred. Please try again');
+                                } else {
+                                    consoleLogger(successLogger(module, "sent not-found template due to error"));
+                                    res.status(200).send(html);
+                                }
+                            });
+                        } else {
+                            consoleLogger(successLogger(module));
+                            res.status(200).send(html);
+                        }
+                    });
+                }
+            })
+        }
     }
 };
