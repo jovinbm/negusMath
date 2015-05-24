@@ -97,7 +97,7 @@ angular.module('clientHomeApp')
 
                 $scope.checkAccount = function (userData) {
                     if (userData) {
-                        if (userData.isRegistered && userData.emailIsConfirmed && userData.isApproved && userData.isBanned.status) {
+                        if (userData.isRegistered && userData.emailIsConfirmed && userData.isApproved && !userData.isBanned.status) {
                             return true;
                         } else {
                             return false;
