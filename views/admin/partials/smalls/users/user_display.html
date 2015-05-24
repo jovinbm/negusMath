@@ -21,7 +21,7 @@
     <td>
         <div ng-hide="user.isApproved">
             <a class="btn btn-xs btn-default"
-               ng-disabled="user.isBanned.status === true && user.isApproved === true"
+               ng-disabled="user.isBanned.status === true"
                href ng-click="approveUser(user.uniqueCuid)">Approve</a>
         </div>
         <div ng-show="user.isApproved">
@@ -31,7 +31,7 @@
     <td>
         <div ng-hide="user.isAdmin">
             <a class="btn btn-xs btn-default"
-               ng-disabled="user.isBanned.status === true && user.isApproved === false && user.isAdmin === false"
+               ng-disabled="user.isBanned.status === true || user.isApproved === false || user.isAdmin === true"
                href ng-click="addAdminPrivileges(user.uniqueCuid)">Make Admin</a>
         </div>
         <div ng-show="user.isAdmin">
