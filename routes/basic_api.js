@@ -2,6 +2,7 @@ var basic = require('../functions/basic.js');
 var basic_handlers = require('../handlers/basic_handlers.js');
 var userDB = require('../db/user_db.js');
 var emailModule = require('../functions/email.js');
+var middleware = require('../functions/middleware.js');
 
 var fileName = 'basic_api.js';
 
@@ -44,14 +45,23 @@ module.exports = {
         var module = 'resendConfirmationEmail';
         receivedLogger(module);
 
-        if (!emailModule.sendConfirmEmailLink(getTheUser(req))) {
-            res.status(200).send({
-                code: 200,
-                notify: true,
-                type: 'success',
-                msg: 'Email sent!'
-            });
+        if (req.body.userUniqueCuid) {
+            var userUniqueCuid = req.body.userUniqueCuid;
+            middleware.returnUserWithUniqueCuid(userUniqueCuid, success);
+
+            //success will be called with false in case of error
+            function success(theUser) {
+                if (theUser) {
+                    basic_handlers.resendConfirmationEmail(req, res, theUser);
+                } else {
+                    error();
+                }
+            }
         } else {
+            error();
+        }
+
+        function error() {
             res.status(500).send({
                 code: 500,
                 notify: true,

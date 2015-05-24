@@ -12,8 +12,8 @@ angular.module('clientHomeApp')
                     showResendEmail: false
                 };
 
-                $scope.resendConfirmationEmail = function () {
-                    socketService.resendConfirmationEmail()
+                $scope.resendConfirmationEmail = function (userUniqueCuid) {
+                    socketService.resendConfirmationEmail(userUniqueCuid)
                         .success(function (resp) {
                             $rootScope.responseStatusHandler(resp);
                         })
@@ -27,6 +27,7 @@ angular.module('clientHomeApp')
                 function getAccountDetails() {
                     socketService.getUserData()
                         .success(function (resp) {
+                            $scope.theUser = resp.userData;
                             if (resp.userData.isRegistered == true) {
                                 $scope.accountStatusBanner = determineAccountStatus(resp.userData);
                                 checkAccountStatus(resp.userData);

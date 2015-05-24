@@ -31,8 +31,8 @@ angular.module('indexApp')
                     showResendEmail: false
                 };
 
-                $scope.resendConfirmationEmail = function () {
-                    socketService.resendConfirmationEmail()
+                $scope.resendConfirmationEmail = function (userUniqueCuid) {
+                    socketService.resendConfirmationEmail(userUniqueCuid)
                         .success(function (resp) {
                             $rootScope.responseStatusHandler(resp);
                         })
@@ -46,6 +46,7 @@ angular.module('indexApp')
                 function getAccountDetails() {
                     socketService.getUserData()
                         .success(function (resp) {
+                            $scope.theUser = resp.userData;
                             if (resp.userData.isRegistered == true) {
                                 $scope.accountStatusBanner = determineAccountStatus(resp.userData);
                             }
@@ -912,8 +913,10 @@ angular.module('indexApp')
                     return $http.post('/localUserLogin', loginData);
                 },
 
-                resendConfirmationEmail: function () {
-                    return $http.post('/resendConfirmationEmail');
+                resendConfirmationEmail: function (userUniqueCuid) {
+                    return $http.post('/resendConfirmationEmail', {
+                        userUniqueCuid: userUniqueCuid
+                    });
                 },
 
                 sendContactUs: function (contactUsModel) {

@@ -60,8 +60,10 @@ angular.module('indexApp')
                     return $http.post('/localUserLogin', loginData);
                 },
 
-                resendConfirmationEmail: function () {
-                    return $http.post('/resendConfirmationEmail');
+                resendConfirmationEmail: function (userUniqueCuid) {
+                    return $http.post('/resendConfirmationEmail', {
+                        userUniqueCuid: userUniqueCuid
+                    });
                 },
 
                 sendContactUs: function (contactUsModel) {

@@ -42,5 +42,28 @@ module.exports = {
             consoleLogger(errorLogger(module));
             res.render('emails/my-templates/after-email-confirm-status/html.ejs', status);
         }
+    },
+
+    resendConfirmationEmail: function (req, res, theUser) {
+        var module = 'resendConfirmationEmail';
+        receivedLogger(module);
+
+        if (!emailModule.sendConfirmEmailLink(theUser)) {
+            consoleLogger(successLogger(module));
+            res.status(200).send({
+                code: 200,
+                notify: true,
+                type: 'success',
+                msg: 'Email sent!'
+            });
+        } else {
+            consoleLogger(errorLogger(module));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'success',
+                msg: 'An error occurred. Please try again'
+            });
+        }
     }
 };

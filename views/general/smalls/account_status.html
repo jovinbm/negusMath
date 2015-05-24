@@ -5,7 +5,8 @@
             <strong ng-bind="accountStatusBanner.msg"></strong>
 
             <div ng-show="accountStatusBanner.showResendEmail">
-                <p>Didn't get an email? <a style="text-decoration: underline" href ng-click="resendConfirmationEmail()">Resend
+                <p>Didn't get an email? <a style="text-decoration: underline" href
+                                           ng-click="resendConfirmationEmail(theUser.uniqueCuid)">Resend
                     email</a></p>
             </div>
         </div>

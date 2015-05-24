@@ -50,8 +50,10 @@ angular.module('clientHomeApp')
                     return $http.get('/api/getUserData');
                 },
 
-                resendConfirmationEmail: function () {
-                    return $http.post('/resendConfirmationEmail');
+                resendConfirmationEmail: function (userUniqueCuid) {
+                    return $http.post('/resendConfirmationEmail', {
+                        userUniqueCuid: userUniqueCuid
+                    });
                 },
 
                 sendContactUs: function (contactUsModel) {

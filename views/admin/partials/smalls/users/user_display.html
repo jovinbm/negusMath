@@ -48,6 +48,14 @@
             <li class="list-unstyled clearfix"><strong>Unique ID:</strong> {{user.uniqueCuid}}</li>
             <li class="list-unstyled clearfix"><strong>Email:</strong> <a
                     ng-href="mailto:{{user.email}}" target="_blank">{{user.email}}</a>
+                <small class="very-small-font"
+                       ng-show="user.emailIsConfirmed">(confirmed)
+                </small>
+                <small class="very-small-font"
+                       ng-show="!user.emailIsConfirmed">(not confirmed) <a style="text-decoration: underline" href
+                                                                           ng-click="resendConfirmationEmail(user.uniqueCuid)">Resend
+                    email</a>
+                </small>
             </li>
             <li class="list-unstyled clearfix"><strong>Username:</strong> {{user.username}}</li>
         </ul>

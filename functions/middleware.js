@@ -109,6 +109,22 @@ module.exports = {
         }
     },
 
+    returnUserWithUniqueCuid: function (userUniqueCuid, callback) {
+        var module = "returnUserWithUniqueCuid";
+        receivedLogger(module);
+        userDB.findUserWithUniqueCuid(userUniqueCuid, error, error, success);
+
+        function success(userData) {
+            consoleLogger(successLogger(module));
+            callback(userData);
+        }
+
+        function error(status, err) {
+            consoleLogger(errorLogger(module, 'error retrieving user data', err));
+            callback(false);
+        }
+    },
+
     checkAccountStatus: function (req, res, next) {
         var module = "checkAccountStatus";
         receivedLogger(module);

@@ -1,5 +1,5 @@
 angular.module('adminHomeApp')
-    .directive('userDisplay', ['$filter', '$rootScope', 'UserService', function ($filter, $rootScope, UserService) {
+    .directive('userDisplay', ['$filter', '$rootScope', 'UserService', 'socketService', function ($filter, $rootScope, UserService, socketService) {
         return {
             templateUrl: 'views/admin/partials/smalls/users/user_display.html',
             restrict: 'AE',
@@ -10,6 +10,16 @@ angular.module('adminHomeApp')
                 //$scope.user included in scope
 
                 $scope.isCollapsed = true;
+
+                $scope.resendConfirmationEmail = function (userUniqueCuid) {
+                    socketService.resendConfirmationEmail(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.responseStatusHandler(resp);
+                        })
+                        .error(function (err) {
+                            $rootScope.responseStatusHandler(err);
+                        })
+                };
 
                 //user manipulation functions
                 $scope.addAdminPrivileges = function (userUniqueCuid) {

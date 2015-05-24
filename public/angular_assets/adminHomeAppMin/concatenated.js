@@ -1487,8 +1487,10 @@ angular.module('adminHomeApp')
                     return $http.get('/api/getUserData');
                 },
 
-                resendConfirmationEmail: function () {
-                    return $http.post('/resendConfirmationEmail');
+                resendConfirmationEmail: function (userUniqueCuid) {
+                    return $http.post('/resendConfirmationEmail', {
+                        userUniqueCuid: userUniqueCuid
+                    });
                 },
 
                 sendContactUs: function (contactUsModel) {
@@ -1629,8 +1631,8 @@ angular.module('adminHomeApp')
                     showResendEmail: false
                 };
 
-                $scope.resendConfirmationEmail = function () {
-                    socketService.resendConfirmationEmail()
+                $scope.resendConfirmationEmail = function (userUniqueCuid) {
+                    socketService.resendConfirmationEmail(userUniqueCuid)
                         .success(function (resp) {
                             $rootScope.responseStatusHandler(resp);
                         })
@@ -1644,6 +1646,7 @@ angular.module('adminHomeApp')
                 function getAccountDetails() {
                     socketService.getUserData()
                         .success(function (resp) {
+                            $scope.theUser = resp.userData;
                             if (resp.userData.isRegistered == true) {
                                 $scope.accountStatusBanner = determineAccountStatus(resp.userData);
                                 checkAccountStatus(resp.userData);
@@ -2479,7 +2482,7 @@ angular.module('adminHomeApp')
         }
     }]);
 angular.module('adminHomeApp')
-    .directive('userDisplay', ['$filter', '$rootScope', 'UserService', function ($filter, $rootScope, UserService) {
+    .directive('userDisplay', ['$filter', '$rootScope', 'UserService', 'socketService', function ($filter, $rootScope, UserService, socketService) {
         return {
             templateUrl: 'views/admin/partials/smalls/users/user_display.html',
             restrict: 'AE',
@@ -2490,6 +2493,16 @@ angular.module('adminHomeApp')
                 //$scope.user included in scope
 
                 $scope.isCollapsed = true;
+
+                $scope.resendConfirmationEmail = function (userUniqueCuid) {
+                    socketService.resendConfirmationEmail(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.responseStatusHandler(resp);
+                        })
+                        .error(function (err) {
+                            $rootScope.responseStatusHandler(err);
+                        })
+                };
 
                 //user manipulation functions
                 $scope.addAdminPrivileges = function (userUniqueCuid) {
