@@ -155,8 +155,8 @@ module.exports = {
 
         var invitationCode = req.body.invitationCode;
 
-        var invitationCodeUser = envVariables.invitationCode();
-        var invitationCodeAdmin = envVariables.invitationCodeAdmin();
+        var invitationCodeUser = 'kenyamath';
+        var invitationCodeAdmin = 'kenyaadmin';
 
         if (invitationCode == invitationCodeUser || invitationCode == invitationCodeAdmin) {
 
