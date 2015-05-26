@@ -26,7 +26,7 @@
     "email-templates": "^2.0.0-beta",
     "express": "^4.9.8",
     "express-session": "^1.9.3",
-    "gulp": "^3.8.11",
+    "gulp": "^3.4.0",
     "gulp-concat": "^2.5.2",
     "gulp-ext-replace": "^0.2.0",
     "gulp-imagemin": "^2.2.1",
