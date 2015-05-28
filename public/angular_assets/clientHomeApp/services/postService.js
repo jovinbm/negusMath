@@ -1,12 +1,12 @@
 angular.module('clientHomeApp')
-    .factory('PostService', ['$filter', '$http', '$window', '$rootScope', '$interval', 'socket',
-        function ($filter, $http, $window, $rootScope, $interval, socket) {
+    .factory('PostService', ['$filter', '$http', '$window', '$rootScope', 'socket',
+        function ($filter, $http, $window, $rootScope, socket) {
 
             var post = {};
             var editPostModel = {};
-            var posts = {};
-            var postsCount = 0;
-            var mainSearchResultsPosts = [];
+            var allPosts = {};
+            var allPostsCount = 0;
+            var mainSearchResultsPosts = {};
             var mainSearchResultsPostsCount = 0;
             var suggestedPosts = [];
             var suggestedPostsCount = 0;
@@ -23,12 +23,20 @@ angular.module('clientHomeApp')
 
             return {
 
-                getCurrentPosts: function () {
-                    return posts;
+                getAllPosts: function () {
+                    return allPosts;
                 },
 
-                getCurrentPostsCount: function () {
-                    return postsCount;
+                getPosts: function (pageNumber) {
+                    if (pageNumber) {
+                        return allPosts[pageNumber];
+                    } else {
+                        return [];
+                    }
+                },
+
+                getAllPostsCount: function () {
+                    return allPostsCount;
                 },
 
                 getPostsFromServer: function (pageNumber) {
@@ -39,16 +47,16 @@ angular.module('clientHomeApp')
 
                 updatePosts: function (postsArray, pageNumber) {
                     if (postsArray == []) {
-                        posts[pageNumber] = [];
+                        allPosts[pageNumber] = [];
                     } else {
-                        posts[pageNumber] = $filter('preparePosts')(null, postsArray);
+                        allPosts[pageNumber] = $filter('preparePosts')(null, postsArray);
                     }
-                    return posts[pageNumber];
+                    return allPosts[pageNumber];
                 },
 
-                updatePostsCount: function (newCount) {
-                    postsCount = newCount;
-                    return postsCount;
+                updateAllPostsCount: function (newCount) {
+                    allPostsCount = newCount;
+                    return allPostsCount;
                 },
 
                 addNewToPosts: function (newPost) {
@@ -63,12 +71,16 @@ angular.module('clientHomeApp')
 
                     var tempPost = makePost(newPost);
                     //unshift in firstPage
-                    posts['1'].unshift(tempPost);
-                    return posts;
+                    allPosts['1'].unshift(tempPost);
+                    return allPosts;
                 },
 
-                getCurrentPost: function () {
-                    return post;
+                getCurrentPost: function (postIndex) {
+                    if (postIndex) {
+                        return post[postIndex]
+                    } else {
+                        return {};
+                    }
                 },
 
                 getPostFromServer: function (postIndex) {
@@ -86,25 +98,48 @@ angular.module('clientHomeApp')
                     return post[newPost.postIndex];
                 },
 
-                getCurrentMainSearchResults: function () {
+                getCurrentEditPostModel: function () {
+                    if (editPostModel == {}) {
+                        return {}
+                    } else {
+                        return editPostModel;
+                    }
+                },
+
+                getCurrentEditPostModelFromServer: function (postIndex) {
+                    return $http.post('/api/getPost', {
+                        postIndex: postIndex
+                    });
+                },
+
+                updateCurrentEditPostModel: function (newPost) {
+                    if (newPost == {}) {
+                        editPostModel = {}
+                    } else {
+                        editPostModel = $filter('preparePostsNoChange')(newPost, null);
+                    }
+                    return editPostModel;
+                },
+
+                getAllMainSearchResults: function () {
                     return mainSearchResultsPosts;
                 },
 
-                getCurrentMainSearchResultsCount: function () {
-                    return mainSearchResultsPostsCount;
+                getMainSearchResultsCount: function (pageNumber) {
+                    return mainSearchResultsPostsCount[pageNumber];
                 },
 
                 mainSearch: function (searchObject) {
                     return $http.post('/api/mainSearch', searchObject);
                 },
 
-                updateMainSearchResults: function (resultsArray) {
+                updateMainSearchResults: function (resultsArray, pageNumber) {
                     if (resultsArray == []) {
-                        mainSearchResultsPosts = [];
+                        mainSearchResultsPosts[pageNumber] = [];
                     } else {
-                        mainSearchResultsPosts = $filter('preparePosts')(null, resultsArray);
+                        mainSearchResultsPosts[pageNumber] = $filter('preparePosts')(null, resultsArray);
                     }
-                    return mainSearchResultsPosts;
+                    return mainSearchResultsPosts[pageNumber];
                 },
 
                 updateMainSearchResultsCount: function (newCount) {
@@ -127,6 +162,20 @@ angular.module('clientHomeApp')
                         suggestedPosts = $filter('preparePostsNoChange')(null, suggestedPostsArray);
                     }
                     return suggestedPosts;
+                },
+
+                //admin actions
+
+                submitNewPost: function (newPost) {
+                    return $http.post('/api/newPost', {
+                        newPost: newPost
+                    });
+                },
+
+                submitPostUpdate: function (post) {
+                    return $http.post('/api/updatePost', {
+                        postUpdate: post
+                    });
                 }
             };
         }]);

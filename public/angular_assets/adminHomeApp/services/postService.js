@@ -4,11 +4,11 @@ angular.module('adminHomeApp')
 
             var post = {};
             var editPostModel = {};
-            var posts = {};
-            var postsCount = 0;
-            var mainSearchResultsPosts = [];
+            var allPosts = {};
+            var allPostsCount = 0;
+            var mainSearchResultsPosts = {};
             var mainSearchResultsPostsCount = 0;
-            var suggestedPosts = [];
+            var suggestedPosts = {};
             var suggestedPostsCount = 0;
 
             socket.on('newPost', function (data) {
@@ -23,16 +23,20 @@ angular.module('adminHomeApp')
 
             return {
 
-                getCurrentPosts: function (pageNumber) {
+                getAllPosts: function () {
+                    return allPosts;
+                },
+
+                getPosts: function (pageNumber) {
                     if (pageNumber) {
-                        return posts[pageNumber];
+                        return allPosts[pageNumber];
                     } else {
                         return [];
                     }
                 },
 
-                getCurrentPostsCount: function () {
-                    return postsCount;
+                getAllPostsCount: function () {
+                    return allPostsCount;
                 },
 
                 getPostsFromServer: function (pageNumber) {
@@ -43,16 +47,16 @@ angular.module('adminHomeApp')
 
                 updatePosts: function (postsArray, pageNumber) {
                     if (postsArray == []) {
-                        posts[pageNumber] = [];
+                        allPosts[pageNumber] = [];
                     } else {
-                        posts[pageNumber] = $filter('preparePosts')(null, postsArray);
+                        allPosts[pageNumber] = $filter('preparePosts')(null, postsArray);
                     }
-                    return posts[pageNumber];
+                    return allPosts[pageNumber];
                 },
 
-                updatePostsCount: function (newCount) {
-                    postsCount = newCount;
-                    return postsCount;
+                updateAllPostsCount: function (newCount) {
+                    allPostsCount = newCount;
+                    return allPostsCount;
                 },
 
                 addNewToPosts: function (newPost) {
@@ -67,8 +71,8 @@ angular.module('adminHomeApp')
 
                     var tempPost = makePost(newPost);
                     //unshift in firstPage
-                    posts['1'].unshift(tempPost);
-                    return posts;
+                    allPosts['1'].unshift(tempPost);
+                    return allPosts;
                 },
 
                 getCurrentPost: function (postIndex) {
@@ -117,25 +121,25 @@ angular.module('adminHomeApp')
                     return editPostModel;
                 },
 
-                getCurrentMainSearchResults: function () {
+                getAllMainSearchResults: function () {
                     return mainSearchResultsPosts;
                 },
 
-                getCurrentMainSearchResultsCount: function () {
-                    return mainSearchResultsPostsCount;
+                getMainSearchResultsCount: function (pageNumber) {
+                    return mainSearchResultsPostsCount[pageNumber];
                 },
 
                 mainSearch: function (searchObject) {
                     return $http.post('/api/mainSearch', searchObject);
                 },
 
-                updateMainSearchResults: function (resultsArray) {
+                updateMainSearchResults: function (resultsArray, pageNumber) {
                     if (resultsArray == []) {
-                        mainSearchResultsPosts = [];
+                        mainSearchResultsPosts[pageNumber] = [];
                     } else {
-                        mainSearchResultsPosts = $filter('preparePosts')(null, resultsArray);
+                        mainSearchResultsPosts[pageNumber] = $filter('preparePosts')(null, resultsArray);
                     }
-                    return mainSearchResultsPosts;
+                    return mainSearchResultsPosts[pageNumber];
                 },
 
                 updateMainSearchResultsCount: function (newCount) {
@@ -159,6 +163,8 @@ angular.module('adminHomeApp')
                     }
                     return suggestedPosts;
                 },
+
+                //admin actions
 
                 submitNewPost: function (newPost) {
                     return $http.post('/api/newPost', {

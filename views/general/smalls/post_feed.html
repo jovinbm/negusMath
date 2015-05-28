@@ -1,13 +1,13 @@
-<div ng-controller="SearchController">
-
-    <div class="ng-cloak">
-        <div class="panel-heading"><i class="fa fa-leanpub"></i> SEARCH RESULTS <span
-                class="pull-right"><a href ng-click="back()"><i class="fa fa-arrow-left"></i> BACK</a></span>
+<div>
+    <div>
+        <div class="panel-heading"><i class="fa fa-leanpub"></i> LATEST POSTS <span
+                class="pull-right hidden-xs hidden-sm"
+                ng-bind="$root.main.currentTime"></span>
         </div>
 
         <ul class="list-unstyled animated fadeIn">
             <li class="list-unstyled post clearfix">
-                <div ng-repeat="(pageNumber, posts) in mainSearchResultsPosts">
+                <div ng-repeat="(pageNumber, posts) in allPosts">
                     <div ng-repeat="post in posts">
                         <div class="card">
 
@@ -19,9 +19,10 @@
                                 </h2>
 
                                 <h3 class="text-muted postBy">
-                                    <small><a class="btn-link"
-                                              ng-bind-html="post.authorName"></a>
-                                        on <span ng-bind-html="post.postDate"></span>
+                                    <small>
+                                        <a class="btn-link"
+                                           ng-bind-html="post.authorName"></a> on <span
+                                            ng-bind-html="post.postDate"></span>
                                     </small>
                                     <br/>
                                     <small class="text-muted"
@@ -34,7 +35,7 @@
 
                             </div>
                             <div class="card-action clearfix">
-                                <div post-tags model="post.postTags"></div>
+
                                 <div class="pull-right">
                                     <a ng-href="{{post.postPath}}"
                                        ng-click="$root.main.goToTop()"
@@ -47,28 +48,27 @@
                     </div>
 
                     <!--index + 1 since it starts from 0 and my pages start from 1-->
-                    <div ng-hide="mainSearchResultsPosts.hasOwnProperty($index + 2) || mainSearchResultsPosts[$index + 1].length == 0 || mainSearchResultsPosts[$index + 1].length < 10"
+                    <div ng-hide="allPosts.hasOwnProperty($index + 2) || allPosts[$index + 1].length == 0 || allPosts[$index + 1].length < 10"
                          class="text-center">
                         <a href ng-click="showMore($index + 2)"
-                           class="btn btn-sm btn-default">Show More</a>
+                           class="btn btn-sm btn-info">Show More</a>
                     </div>
-
                 </div>
             </li>
 
             <!--<li>-->
-            <!--<div main-search-results-pager></div>-->
+            <!--<div post-stream-pager></div>-->
             <!--</li>-->
         </ul>
     </div>
+</div>
 
-    <div>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
 
-        <div suggested-posts></div>
-    </div>
+<div>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
 
+    <div suggested-posts></div>
 </div>

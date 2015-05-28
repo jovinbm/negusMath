@@ -7,26 +7,20 @@ angular.module('clientHomeApp')
             $scope.mainSearchModel = {
                 queryString: $rootScope.$stateParams.queryString || '',
                 postSearchUniqueCuid: "",
-                requestedPage: $rootScope.$stateParams.pageNumber || 1
+                requestedPage: 1
             };
 
             //change to default document title
             globals.changeDocumentTitle($rootScope.$stateParams.queryString + " - NegusMath Search");
 
-            $scope.mainSearchResultsPosts = PostService.getCurrentMainSearchResults();
+            $scope.mainSearchResultsPosts = PostService.getAllMainSearchResults();
             $scope.mainSearchResultsCount = 0;
 
-            $scope.changeCurrentPage = function (page) {
-                if (page != $rootScope.$stateParams.pageNumber) {
-                    //change page here****************************************
-                }
-            };
-
-            function getMainSearchResults() {
+            function getMainSearchResults(pageNumber) {
                 $scope.mainSearchModel = {
                     queryString: $rootScope.$stateParams.queryString || '',
                     postSearchUniqueCuid: $scope.mainSearchModel.postSearchUniqueCuid,
-                    requestedPage: $rootScope.$stateParams.pageNumber || 1
+                    requestedPage: pageNumber
                 };
 
                 PostService.mainSearch($scope.mainSearchModel)
@@ -34,9 +28,8 @@ angular.module('clientHomeApp')
                         //the response is the resultValue
                         if (resp.results.totalResults > 0) {
                             var theResult = resp.results;
-                            $scope.mainSearchResultsPosts = PostService.updateMainSearchResults(theResult.postsArray);
+                            $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults(theResult.postsArray, pageNumber);
                             $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(theResult.totalResults);
-                            $scope.changeCurrentPage(theResult.page);
                             $scope.mainSearchModel.postSearchUniqueCuid = theResult.searchUniqueCuid;
 
                             var responseMimic1 = {
@@ -47,7 +40,7 @@ angular.module('clientHomeApp')
                             $rootScope.main.responseStatusHandler(responseMimic1);
                         } else {
                             //empty the postsArray
-                            $scope.mainSearchResultsPosts = PostService.updateMainSearchResults([]);
+                            $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults([]);
                             $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(0);
                             var responseMimic2 = {
                                 banner: true,
@@ -60,17 +53,15 @@ angular.module('clientHomeApp')
                     .error(function (errResp) {
                         $rootScope.main.responseStatusHandler(errResp);
                         //empty the postsArray
-                        $scope.mainSearchResultsPosts = PostService.updateMainSearchResults([]);
+                        $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults([]);
                         $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(0);
                     });
             }
 
-            getMainSearchResults();
+            getMainSearchResults(1);
 
-            //this functions evaluates to true if object is not empty, useful for ng-show
-            //this function also creates a banner to notify user that there are no posts by mimicking a response and calling the response handler
-            $scope.checkIfPostsSearchResultsIsEmpty = function () {
-                return $scope.mainSearchResultsPosts.length == 0
+            $scope.showMore = function (pageNumber) {
+                getMainSearchResults(pageNumber);
             };
 
             //===============socket listeners===============
