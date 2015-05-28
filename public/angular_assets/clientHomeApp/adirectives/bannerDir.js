@@ -15,10 +15,10 @@ angular.module('clientHomeApp')
                 $scope.resendConfirmationEmail = function (userUniqueCuid) {
                     socketService.resendConfirmationEmail(userUniqueCuid)
                         .success(function (resp) {
-                            $rootScope.responseStatusHandler(resp);
+                            $rootScope.main.responseStatusHandler(resp);
                         })
                         .error(function (err) {
-                            $rootScope.responseStatusHandler(err);
+                            $rootScope.main.responseStatusHandler(err);
                         })
                 };
 
@@ -57,7 +57,6 @@ angular.module('clientHomeApp')
                 };
 
                 function determineAccountStatus(userData) {
-                    console.log(JSON.stringify(userData.emailIsConfirmed));
                     if (userData.isRegistered) {
                         if (!userData.emailIsConfirmed) {
                             return {

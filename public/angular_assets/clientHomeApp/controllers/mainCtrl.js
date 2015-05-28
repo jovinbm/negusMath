@@ -1,6 +1,6 @@
 angular.module('clientHomeApp')
-    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', 'logoutService', '$document', 'fN',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, logoutService, $document, fN) {
+    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'socketService', 'globals', '$document',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, socketService, globals, $document) {
 
             //index page url
             $scope.indexPageUrl = globals.allData.indexPageUrl;
@@ -14,39 +14,61 @@ angular.module('clientHomeApp')
             //Scroll to #some-id with 30 px "padding"
             //Note: Use this in a directive, not with document.getElementById
 
-            //scrolling to top
-            $scope.goToTop = function () {
-                var someElement = angular.element(document.getElementById('top'));
-                $document.scrollToElement(someElement, 80, duration);
+            $rootScope.main = {
+                currentTime: "",
+
+                clientIsRegistered: false,
+
+                showLoadingBannerDir: false,
+
+                showLoadingBanner: function () {
+                    this.showLoadingBannerDir = true;
+                },
+
+                hideLoadingBanner: function () {
+                    this.showLoadingBannerDir = false;
+                },
+
+                goToTop: function () {
+                    var someElement = angular.element(document.getElementById('top'));
+                    $document.scrollToElement(someElement, 80, duration);
+                },
+
+                broadcastUserData: function () {
+                    $rootScope.$broadcast('userDataChanges');
+                },
+
+                responseStatusHandler: function (resp) {
+                    $filter('responseFilter')(resp);
+                },
+
+                clearBanners: function () {
+                    $rootScope.$broadcast('clearBanners');
+                }
             };
 
             //=====================time functions=======================
-            $scope.currentTime = "";
 
             //set current Date
-            $scope.currentTime = moment().format("ddd, MMM D, H:mm");
+            $rootScope.main.currentTime = moment().format("ddd, MMM D, H:mm");
             var updateCurrentTime = function () {
-                $scope.currentTime = moment().format("ddd, MMM D, H:mm");
+                $rootScope.main.currentTime = moment().format("ddd, MMM D, H:mm");
             };
             $interval(updateCurrentTime, 20000, 0, true);
 
             //======================end time functions===================
 
+
             //this important function broadcasts the availability of the users data to directives that require
             //it e.g. the account status directive
-            $scope.broadcastUserData = function () {
-                $rootScope.$broadcast('userDataChanges');
-            };
-
-            $scope.clientIsRegistered = false;
 
             //initial requests
             function initialRequests() {
                 socketService.getUserData()
                     .success(function (resp) {
                         $scope.userData = globals.userData(resp.userData);
-                        $scope.broadcastUserData();
-                        $scope.clientIsRegistered = $scope.userData.isRegistered;
+                        $rootScope.main.broadcastUserData();
+                        $rootScope.main.clientIsRegistered = $scope.userData.isRegistered;
 
                         if ($scope.userData.isRegistered) {
                             //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
@@ -55,10 +77,10 @@ angular.module('clientHomeApp')
                             });
                         }
 
-                        $scope.responseStatusHandler(resp);
+                        $rootScope.main.responseStatusHandler(resp);
                     })
                     .error(function (errResponse) {
-                        $scope.responseStatusHandler(errResponse);
+                        $rootScope.main.responseStatusHandler(errResponse);
                     });
             }
 
@@ -81,67 +103,12 @@ angular.module('clientHomeApp')
             };
 
             $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-                $rootScope.clearBanners();
+                $rootScope.main.clearBanners();
                 $rootScope.clearToasts();
 
                 //variable to keep track of when the user is editing the post
                 $rootScope.isEditingPost = false;
             });
-
-            //register error handler error handler
-            $rootScope.responseStatusHandler = function (resp) {
-                $filter('responseFilter')(resp);
-            };
-
-            $rootScope.clearBanners = function () {
-                $rootScope.$broadcast('clearBanners');
-            };
-
-            //loading banner
-            $scope.showLoadingBanner = function () {
-                if ($rootScope.showHideLoadingBanner) {
-                    $rootScope.showHideLoadingBanner(true);
-                }
-            };
-
-            $scope.hideLoadingBanner = function () {
-                if ($rootScope.showHideLoadingBanner) {
-                    $rootScope.showHideLoadingBanner(false);
-                }
-            };
-
-            //pager
-            $scope.showThePager = function () {
-                if ($rootScope.showThePager) {
-                    $rootScope.showThePager();
-                }
-            };
-
-            $scope.hideThePager = function () {
-                if ($rootScope.hideThePager) {
-                    $rootScope.hideThePager();
-                }
-            };
-
-            //suggestedPosts
-            $scope.showSuggested = function () {
-                if ($rootScope.showHideSuggestedPosts) {
-                    $rootScope.showHideSuggestedPosts(true);
-                }
-            };
-
-            $scope.hideSuggested = function () {
-                if ($rootScope.showHideSuggestedPosts) {
-                    $rootScope.showHideSuggestedPosts(false);
-                }
-            };
-
-            //total posts count
-            $scope.changePagingTotalCount = function (newTotalCount) {
-                if ($rootScope.changePagingTotalCount) {
-                    $rootScope.changePagingTotalCount(newTotalCount);
-                }
-            };
 
             //===============socket listeners===============
 

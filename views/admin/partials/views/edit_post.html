@@ -2,8 +2,7 @@
      ng-controller="EditPostController">
 
     <!--the full post-->
-    <div ng-if="showEditPost"
-         class="ng-cloak">
+    <div>
         <div class="panel-heading"><a href ng-click="back()"><i class="fa fa-arrow-left"></i> BACK</a>
             <span class="pull-right hidden-sm hidden-xs"
                   ng-bind-html="post.postDate"></span>
@@ -79,9 +78,9 @@
 
                             <div class="pull-right">
                                 <a class="btn btn-default btn-sm"
-                                   href ng-click="cancelPostUpdate(); goToTop()">Cancel</a>
+                                   href ng-click="cancelPostUpdate(); $root.main.goToTop()">Cancel</a>
                                 <a class="btn btn-default btn-sm"
-                                   href ng-click="submitPostUpdate(); goToTop();">Save</a>
+                                   href ng-click="submitPostUpdate(); $root.main.goToTop();">Save</a>
                             </div>
 
                         </div>

@@ -1,6 +1,8 @@
 angular.module('adminHomeApp')
-    .controller('UserManagerController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'logoutService', 'UserService', '$document', 'fN',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, logoutService, UserService, $document) {
+    .controller('UserManagerController', ['$q', '$scope', '$rootScope', 'UserService',
+        function ($q, $scope, $rootScope, UserService) {
+
+            $rootScope.main.goToTop();
 
             $scope.usersCount = UserService.getUsersCount();
 
@@ -8,10 +10,10 @@ angular.module('adminHomeApp')
                 UserService.getUsersCountFromServer()
                     .success(function (resp) {
                         $scope.usersCount = UserService.updateUsersCount(resp.usersCount);
-                        $rootScope.responseStatusHandler(resp);
+                        $rootScope.main.responseStatusHandler(resp);
                     })
                     .error(function (errResponse) {
-                        $rootScope.responseStatusHandler(errResponse);
+                        $rootScope.main.responseStatusHandler(errResponse);
                     })
             }
 

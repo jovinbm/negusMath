@@ -6,7 +6,7 @@
                 <div class="panel panel-default">
 
                     <div class="panel-heading"><i class="fa fa-leanpub"></i> NEW POST <span class="pull-right"
-                                                                                            ng-bind="currentTime"></span>
+                                                                                            ng-bind="$root.main.currentTime"></span>
                     </div>
 
                     <div class="panel-body">
@@ -84,13 +84,13 @@
 
                                     </div>
 
-                                    <div class="card-action clearfix ng-cloak">
+                                    <div class="card-action clearfix">
 
                                         <div class="pull-right">
                                             <a class="btn btn-default btn-sm"
-                                               href ng-click="hideNewPost(); goToTop();">Cancel</a>
+                                               href ng-click="hideNewPost(); $root.main.goToTop();">Cancel</a>
                                             <a class="btn btn-default btn-sm"
-                                               href ng-click="submitNewPost(); goToTop();">POST</a>
+                                               href ng-click="submitNewPost(); $root.main.goToTop();">POST</a>
                                         </div>
 
                                     </div>

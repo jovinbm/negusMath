@@ -1,6 +1,6 @@
 angular.module('adminHomeApp')
-    .factory('mainService', ['$log', '$window', '$rootScope', 'socket', 'socketService', 'globals',
-        function ($log, $window, $rootScope, socket, socketService, globals) {
+    .factory('mainService', ['$log', '$window', '$rootScope', 'socket',
+        function ($log, $window, $rootScope, socket) {
 
             socket.on('reconnect', function () {
                 $log.info("'reconnect sequence' triggered");

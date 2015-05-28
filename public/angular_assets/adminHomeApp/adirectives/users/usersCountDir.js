@@ -1,5 +1,5 @@
 angular.module('adminHomeApp')
-    .directive('usersCount', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'UserService', function ($q, $filter, $log, $interval, $window, $location, $rootScope, socket, mainService, socketService, globals, $modal, UserService) {
+    .directive('usersCount', ['$q', '$log', '$rootScope', function ($q, $log, $rootScope) {
         return {
             templateUrl: 'views/admin/partials/smalls/users/user_statistics.html',
             restrict: 'AE',

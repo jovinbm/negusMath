@@ -58,79 +58,17 @@ angular.module('indexApp')
             }
         }
     }])
-    .directive('accountOuter', ['$rootScope', function ($rootScope, logoutService) {
+    .directive('mainFooter', [function () {
         return {
-            templateUrl: 'views/index/views/account_outer.html',
+            templateUrl: 'views/general/smalls/main_footer.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
-                //variable to hold state between local login and creating a new account
-                //values =  signIn, register
-                $scope.userLoginState = 'signIn';
-                $scope.changeUserLoginState = function (newState) {
-                    $scope.userLoginState = newState;
-                };
-            }
-        }
-    }])
-    .directive('signIn', ['$rootScope', 'socketService', function ($rootScope, socketService) {
-        return {
-            templateUrl: 'views/index/views/sign_in.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.loginFormModel = {
-                    username: "",
-                    password: ""
-                };
-
-                $scope.submitLocalLoginForm = function () {
-                    socketService.localUserLogin($scope.loginFormModel)
-                        .success(function (resp) {
-                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
-                            $rootScope.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $scope.loginFormModel.password = "";
-                            $rootScope.responseStatusHandler(errResponse);
-                        });
-                };
-            }
-        }
-    }])
-    .directive('createAccount', ['$rootScope', 'socketService', function ($rootScope, socketService) {
-        return {
-            templateUrl: 'views/index/views/create_account.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.registrationDetails = {
-                    email: "",
-                    firstName: "",
-                    lastName: "",
-                    username: "",
-                    password1: "",
-                    password2: "",
-                    invitationCode: ""
-                };
-
-                $scope.createAccount = function () {
-                    socketService.createAccount($scope.registrationDetails)
-                        .success(function (resp) {
-                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
-                            $rootScope.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-
-                            $scope.registrationDetails.password1 = "";
-                            $scope.registrationDetails.password2 = "";
-                            $scope.registrationDetails.invitationCode = "";
-                            $rootScope.responseStatusHandler(errResponse);
-                        });
-                };
             }
         }
     }])
     .directive('contactUs', ['$rootScope', 'socketService', function ($rootScope, socketService) {
         return {
-            templateUrl: 'views/index/views/create_account.html',
+            templateUrl: 'views/general/smalls/contact_us.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.contactUsModel = {

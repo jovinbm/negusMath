@@ -23,7 +23,7 @@ angular.module('adminHomeApp')
                     if (hotThisWeekArray == []) {
                         hotThisWeek = [];
                     } else {
-                        hotThisWeek = $filter('preparePosts')(null, hotThisWeekArray);
+                        hotThisWeek = $filter('preparePostsNoChange')(null, hotThisWeekArray);
                     }
                     return hotThisWeekArray;
                 }

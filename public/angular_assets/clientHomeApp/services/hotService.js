@@ -1,6 +1,6 @@
 angular.module('clientHomeApp')
-    .factory('HotService', ['$filter', '$log', '$http', '$window', '$rootScope', 'socket',
-        function ($filter, $log, $http, $window, $rootScope, socket) {
+    .factory('HotService', ['$filter', '$log', '$rootScope', 'socket','$http',
+        function ($filter, $log, $rootScope, socket, $http) {
 
             var hotThisWeek = [];
 
@@ -23,7 +23,7 @@ angular.module('clientHomeApp')
                     if (hotThisWeekArray == []) {
                         hotThisWeek = [];
                     } else {
-                        hotThisWeek = $filter('preparePosts')(null, hotThisWeekArray);
+                        hotThisWeek = $filter('preparePostsNoChange')(null, hotThisWeekArray);
                     }
                     return hotThisWeekArray;
                 }

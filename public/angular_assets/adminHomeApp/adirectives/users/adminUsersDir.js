@@ -1,5 +1,5 @@
 angular.module('adminHomeApp')
-    .directive('adminUsers', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'UserService', function ($q, $filter, $log, $interval, $window, $location, $rootScope, socket, mainService, socketService, globals, $modal, UserService) {
+    .directive('adminUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
         return {
             templateUrl: 'views/admin/partials/smalls/users/admin_users.html',
             restrict: 'AE',
@@ -14,10 +14,10 @@ angular.module('adminHomeApp')
                     UserService.getAdminUsersFromServer()
                         .success(function (resp) {
                             $scope.adminUsers = UserService.updateAdminUsers(resp.usersArray);
-                            $rootScope.responseStatusHandler(resp);
+                            $rootScope.main.responseStatusHandler(resp);
                         })
                         .error(function (errResponse) {
-                            $rootScope.responseStatusHandler(errResponse);
+                            $rootScope.main.responseStatusHandler(errResponse);
                         })
                 }
 

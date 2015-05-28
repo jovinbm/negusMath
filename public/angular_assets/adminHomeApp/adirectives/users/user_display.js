@@ -1,5 +1,5 @@
 angular.module('adminHomeApp')
-    .directive('userDisplay', ['$filter', '$rootScope', 'UserService', 'socketService', function ($filter, $rootScope, UserService, socketService) {
+    .directive('userDisplay', ['$rootScope', 'UserService', 'socketService', function ($rootScope, UserService, socketService) {
         return {
             templateUrl: 'views/admin/partials/smalls/users/user_display.html',
             restrict: 'AE',
@@ -14,10 +14,10 @@ angular.module('adminHomeApp')
                 $scope.resendConfirmationEmail = function (userUniqueCuid) {
                     socketService.resendConfirmationEmail(userUniqueCuid)
                         .success(function (resp) {
-                            $rootScope.responseStatusHandler(resp);
+                            $rootScope.main.responseStatusHandler(resp);
                         })
                         .error(function (err) {
-                            $rootScope.responseStatusHandler(err);
+                            $rootScope.main.responseStatusHandler(err);
                         })
                 };
 
@@ -26,10 +26,10 @@ angular.module('adminHomeApp')
                     UserService.addAdminPrivileges(userUniqueCuid)
                         .success(function (resp) {
                             $rootScope.$broadcast('userChanges');
-                            $rootScope.responseStatusHandler(resp);
+                            $rootScope.main.responseStatusHandler(resp);
                         })
                         .error(function (errResponse) {
-                            $rootScope.responseStatusHandler(errResponse);
+                            $rootScope.main.responseStatusHandler(errResponse);
                         })
                 };
 
@@ -37,10 +37,10 @@ angular.module('adminHomeApp')
                     UserService.removeAdminPrivileges(userUniqueCuid)
                         .success(function (resp) {
                             $rootScope.$broadcast('userChanges');
-                            $rootScope.responseStatusHandler(resp);
+                            $rootScope.main.responseStatusHandler(resp);
                         })
                         .error(function (errResponse) {
-                            $rootScope.responseStatusHandler(errResponse);
+                            $rootScope.main.responseStatusHandler(errResponse);
                         })
                 };
 
@@ -48,10 +48,10 @@ angular.module('adminHomeApp')
                     UserService.approveUser(userUniqueCuid)
                         .success(function (resp) {
                             $rootScope.$broadcast('userChanges');
-                            $rootScope.responseStatusHandler(resp);
+                            $rootScope.main.responseStatusHandler(resp);
                         })
                         .error(function (errResponse) {
-                            $rootScope.responseStatusHandler(errResponse);
+                            $rootScope.main.responseStatusHandler(errResponse);
                         })
                 };
 
@@ -59,10 +59,10 @@ angular.module('adminHomeApp')
                     UserService.banUser(userUniqueCuid)
                         .success(function (resp) {
                             $rootScope.$broadcast('userChanges');
-                            $rootScope.responseStatusHandler(resp);
+                            $rootScope.main.responseStatusHandler(resp);
                         })
                         .error(function (errResponse) {
-                            $rootScope.responseStatusHandler(errResponse);
+                            $rootScope.main.responseStatusHandler(errResponse);
                         })
                 };
 
@@ -70,10 +70,10 @@ angular.module('adminHomeApp')
                     UserService.unBanUser(userUniqueCuid)
                         .success(function (resp) {
                             $rootScope.$broadcast('userChanges');
-                            $rootScope.responseStatusHandler(resp);
+                            $rootScope.main.responseStatusHandler(resp);
                         })
                         .error(function (errResponse) {
-                            $rootScope.responseStatusHandler(errResponse);
+                            $rootScope.main.responseStatusHandler(errResponse);
                         })
                 };
             }

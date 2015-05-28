@@ -44,7 +44,7 @@ angular.module('adminHomeApp')
 
 
     .factory('socketService', ['$log', '$http', '$rootScope',
-        function ($log, $http, $rootScope) {
+        function ($log, $http) {
 
             return {
 

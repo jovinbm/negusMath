@@ -9,7 +9,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a href ng-click="goToTop();"
+            <a href ng-click="$root.main.goToTop();"
                class="navbar-brand">
                 <i class="fa fa-leanpub"></i>
                 NEGUS
@@ -18,7 +18,7 @@
 
         <!--this navbar will be collapsed on mobile-->
         <div class="collapse navbar-collapse navHeaderCollapse">
-            <ul class="nav navbar-nav navbar-right ng-cloak">
+            <ul class="nav navbar-nav navbar-right">
 
                 <li ng-class="{'active': $root.$state.current.name == 'home'}">
                     <a ui-sref="home">Home
@@ -55,7 +55,7 @@
             <div ng-if="!newPost">
                 <a type="button"
                    class="btn btn-primary btn-sm navbar-btn pull-right ng-cloak"
-                   href ng-click="goToTop(); showNewPost();"
+                   href ng-click="$root.main.goToTop(); showNewPost();"
                    role="button">
                     <i class="fa fa-pencil"></i> New Post
                 </a>
@@ -64,7 +64,7 @@
             <div ng-if="newPost">
                 <a type="button"
                    class="btn btn-warning btn-sm navbar-btn pull-right ng-cloak"
-                   href ng-click="goToTop(); hideNewPost();"
+                   href ng-click="$root.main.goToTop(); hideNewPost();"
                    role="button">
                     <i class="fa fa-pencil"></i> Cancel
                 </a>

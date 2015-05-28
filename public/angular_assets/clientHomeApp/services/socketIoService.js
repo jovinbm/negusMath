@@ -44,7 +44,7 @@ angular.module('clientHomeApp')
 
 
     .factory('socketService', ['$log', '$http', '$rootScope',
-        function ($log, $http, $rootScope) {
+        function ($log, $http) {
             return {
                 getUserData: function () {
                     return $http.get('/api/getUserData');

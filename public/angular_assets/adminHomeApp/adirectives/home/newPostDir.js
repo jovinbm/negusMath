@@ -1,5 +1,5 @@
 angular.module('adminHomeApp')
-    .directive('newPostDirective', ['$filter', '$rootScope', 'globals', 'PostService', function ($filter, $rootScope, globals, PostService) {
+    .directive('newPostDirective', ['$filter', '$rootScope', 'PostService', function ($filter, $rootScope, PostService) {
         return {
             templateUrl: 'views/admin/partials/smalls/new_post.html',
             restrict: 'AE',
@@ -7,6 +7,7 @@ angular.module('adminHomeApp')
                 $scope.newPost = false;
                 $scope.showNewPost = function () {
                     $scope.newPost = true;
+                    $rootScope.main.goToTop();
                 };
                 $rootScope.showNewPost = function () {
                     $scope.showNewPost();
@@ -62,15 +63,19 @@ angular.module('adminHomeApp')
                         PostService.submitNewPost(newPost).
                             success(function (resp) {
                                 $scope.hideNewPost();
-                                $rootScope.responseStatusHandler(resp);
+                                $rootScope.main.goToTop();
+                                $rootScope.main.responseStatusHandler(resp);
                                 $scope.newPostModel.postHeading = "";
                                 $scope.newPostModel.postContent = "";
                                 $scope.newPostModel.postSummary = "";
                                 $scope.newPostModel.postTags = [];
                             })
                             .error(function (errResponse) {
-                                $rootScope.responseStatusHandler(errResponse);
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $rootScope.main.goToTop();
                             })
+                    }else{
+                        $rootScope.main.goToTop();
                     }
                 }
             }

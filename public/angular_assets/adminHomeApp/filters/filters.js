@@ -61,23 +61,23 @@ angular.module('adminHomeApp')
             return $filter('timeago')(createdAt);
         }
     }])
-    .filter("getPostDate", ['$filter', function () {
+    .filter("getPostDate", [function () {
         //takes in a post or an array of posts, and adds a timeAgo key in them
         return function (createdAt) {
             return moment(createdAt).format("ddd, MMM D, H:mm");
         }
     }])
-    .filter("getPostAbsoluteUrl", ['$filter', function () {
+    .filter("getPostAbsoluteUrl", [function () {
         return function (postIndex) {
             return 'http://www.negusmath.com/#!/home/post/' + postIndex;
         }
     }])
-    .filter("getPostPath", ['$filter', function () {
+    .filter("getPostPath", [function () {
         return function (postIndex) {
             return '/#!/home/post/' + postIndex;
         }
     }])
-    .filter("makeVideoIframesResponsive", ['$filter', function () {
+    .filter("makeVideoIframesResponsive", [function () {
         //making embedded videos responsive
         return function (post, posts) {
             var theElement;
@@ -139,7 +139,7 @@ angular.module('adminHomeApp')
             }
         }
     }])
-    .filter("getVideoResponsiveVersion", ['$filter', function () {
+    .filter("getVideoResponsiveVersion", [function () {
         //making embedded videos responsive
         return function (textString) {
             var theElement;
@@ -174,7 +174,7 @@ angular.module('adminHomeApp')
             }
         }
     }])
-    .filter("highlightText", ['$filter', '$rootScope', function ($filter, $rootScope) {
+    .filter("highlightText", ['$rootScope', function ($rootScope) {
         //making embedded videos responsive
         //the highlight variable should be a boolean to make the function
         //know if to highlight or not
@@ -192,7 +192,8 @@ angular.module('adminHomeApp')
                         queryString: $rootScope.$stateParams.queryString || ""
                     }
                 } else if ($rootScope.stateHistory.length > 0) {
-                    if ($rootScope.stateHistory[$rootScope.stateHistory.length - 1].hasOwnProperty('home.search')) {
+                    //check if previous state was search and current state is post
+                    if ($rootScope.stateHistory[$rootScope.stateHistory.length - 1].hasOwnProperty('home.search') && $rootScope.$state.current.name == 'home.post') {
                         //checking the previous state
                         return {
                             status: true,
@@ -331,7 +332,7 @@ angular.module('adminHomeApp')
             }
         }
     }])
-    .filter("responseFilter", ['$q', '$filter', '$log', '$interval', '$window', '$location', '$rootScope', 'globals', function ($q, $filter, $log, $interval, $window, $location, $rootScope, globals) {
+    .filter("responseFilter", ['$q', '$log', '$window', '$rootScope', function ($q, $log, $window, $rootScope) {
         //making embedded videos responsive
         return function (resp) {
             function makeBanner(show, bannerClass, msg) {

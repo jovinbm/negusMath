@@ -13,18 +13,21 @@ angular.module('indexApp')
             $scope.checkAccountStatus = function (userData) {
                 if (userData) {
                     if (userData.isRegistered) {
-                        //checkApprovalStatus
-                        if (userData.isApproved === false) {
-                            return false
-                        } else if (userData.isBanned) {
-                            if (userData.isBanned.status === true) {
-                                //checking banned status
-                                return false;
+                        if (userData.emailIsConfirmed == false) {
+                            return false;
+                        } else {
+                            if (userData.isApproved === false) {
+                                return false
+                            } else if (userData.isBanned) {
+                                if (userData.isBanned.status === true) {
+                                    //checking banned status
+                                    return false;
+                                } else {
+                                    return true;
+                                }
                             } else {
                                 return true;
                             }
-                        } else {
-                            return true;
                         }
                     } else {
                         return false;

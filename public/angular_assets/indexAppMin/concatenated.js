@@ -18,6 +18,21 @@ angular.module('indexApp', [
         //partials->modals
     });
 angular.module('indexApp')
+    .directive('accountOuter', ['$rootScope', function ($rootScope, logoutService) {
+        return {
+            templateUrl: 'views/index/views/account_outer.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                //variable to hold state between local login and creating a new account
+                //values =  signIn, register
+                $scope.userLoginState = 'signIn';
+                $scope.changeUserLoginState = function (newState) {
+                    $scope.userLoginState = newState;
+                };
+            }
+        }
+    }]);
+angular.module('indexApp')
     .directive('accountStatusBanner', ['$rootScope', 'socketService', 'globals', '$location', '$window', function ($rootScope, socketService, globals, $location, $window) {
         return {
             scope: {},
@@ -63,7 +78,6 @@ angular.module('indexApp')
                 getAccountDetails();
 
                 function determineAccountStatus(userData) {
-                    console.log(JSON.stringify(userData.emailIsConfirmed));
                     if (userData.isRegistered) {
                         if (!userData.emailIsConfirmed) {
                             return {
@@ -265,6 +279,64 @@ angular.module('indexApp')
         }
     }]);
 angular.module('indexApp')
+    .directive('createAccount', ['$rootScope', 'socketService', function ($rootScope, socketService) {
+        return {
+            templateUrl: 'views/index/views/create_account.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.registrationDetails = {
+                    email: "",
+                    firstName: "",
+                    lastName: "",
+                    username: "",
+                    password1: "",
+                    password2: "",
+                    invitationCode: ""
+                };
+
+                $scope.createAccount = function () {
+                    socketService.createAccount($scope.registrationDetails)
+                        .success(function (resp) {
+                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
+                            $rootScope.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+
+                            $scope.registrationDetails.password1 = "";
+                            $scope.registrationDetails.password2 = "";
+                            $scope.registrationDetails.invitationCode = "";
+                            $rootScope.responseStatusHandler(errResponse);
+                        });
+                };
+            }
+        }
+    }]);
+angular.module('indexApp')
+    .directive('signIn', ['$rootScope', 'socketService', function ($rootScope, socketService) {
+        return {
+            templateUrl: 'views/index/views/sign_in.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.loginFormModel = {
+                    username: "",
+                    password: ""
+                };
+
+                $scope.submitLocalLoginForm = function () {
+                    socketService.localUserLogin($scope.loginFormModel)
+                        .success(function (resp) {
+                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
+                            $rootScope.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $scope.loginFormModel.password = "";
+                            $rootScope.responseStatusHandler(errResponse);
+                        });
+                };
+            }
+        }
+    }]);
+angular.module('indexApp')
     .directive('universalSearchBox', ['$window', '$location', '$rootScope', 'globals', function ($window, $location, $rootScope, globals) {
         return {
             templateUrl: 'views/admin/partials/smalls/universal_search_box.html',
@@ -324,79 +396,17 @@ angular.module('indexApp')
             }
         }
     }])
-    .directive('accountOuter', ['$rootScope', function ($rootScope, logoutService) {
+    .directive('mainFooter', [function () {
         return {
-            templateUrl: 'views/index/views/account_outer.html',
+            templateUrl: 'views/general/smalls/main_footer.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
-                //variable to hold state between local login and creating a new account
-                //values =  signIn, register
-                $scope.userLoginState = 'signIn';
-                $scope.changeUserLoginState = function (newState) {
-                    $scope.userLoginState = newState;
-                };
-            }
-        }
-    }])
-    .directive('signIn', ['$rootScope', 'socketService', function ($rootScope, socketService) {
-        return {
-            templateUrl: 'views/index/views/sign_in.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.loginFormModel = {
-                    username: "",
-                    password: ""
-                };
-
-                $scope.submitLocalLoginForm = function () {
-                    socketService.localUserLogin($scope.loginFormModel)
-                        .success(function (resp) {
-                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
-                            $rootScope.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $scope.loginFormModel.password = "";
-                            $rootScope.responseStatusHandler(errResponse);
-                        });
-                };
-            }
-        }
-    }])
-    .directive('createAccount', ['$rootScope', 'socketService', function ($rootScope, socketService) {
-        return {
-            templateUrl: 'views/index/views/create_account.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.registrationDetails = {
-                    email: "",
-                    firstName: "",
-                    lastName: "",
-                    username: "",
-                    password1: "",
-                    password2: "",
-                    invitationCode: ""
-                };
-
-                $scope.createAccount = function () {
-                    socketService.createAccount($scope.registrationDetails)
-                        .success(function (resp) {
-                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
-                            $rootScope.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-
-                            $scope.registrationDetails.password1 = "";
-                            $scope.registrationDetails.password2 = "";
-                            $scope.registrationDetails.invitationCode = "";
-                            $rootScope.responseStatusHandler(errResponse);
-                        });
-                };
             }
         }
     }])
     .directive('contactUs', ['$rootScope', 'socketService', function ($rootScope, socketService) {
         return {
-            templateUrl: 'views/index/views/create_account.html',
+            templateUrl: 'views/general/smalls/contact_us.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.contactUsModel = {
@@ -458,18 +468,21 @@ angular.module('indexApp')
             $scope.checkAccountStatus = function (userData) {
                 if (userData) {
                     if (userData.isRegistered) {
-                        //checkApprovalStatus
-                        if (userData.isApproved === false) {
-                            return false
-                        } else if (userData.isBanned) {
-                            if (userData.isBanned.status === true) {
-                                //checking banned status
-                                return false;
+                        if (userData.emailIsConfirmed == false) {
+                            return false;
+                        } else {
+                            if (userData.isApproved === false) {
+                                return false
+                            } else if (userData.isBanned) {
+                                if (userData.isBanned.status === true) {
+                                    //checking banned status
+                                    return false;
+                                } else {
+                                    return true;
+                                }
                             } else {
                                 return true;
                             }
-                        } else {
-                            return true;
                         }
                     } else {
                         return false;

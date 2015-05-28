@@ -1,5 +1,5 @@
 angular.module('adminHomeApp')
-    .directive('postContent', ['$filter', '$rootScope', 'globals', 'PostService', function ($filter, $rootScope, globals, PostService) {
+    .directive('postContent', [function () {
         return {
             templateUrl: 'views/admin/partials/smalls/post_content.html',
             scope: {
@@ -10,7 +10,7 @@ angular.module('adminHomeApp')
             }
         }
     }])
-    .directive('postSummary', ['$filter', '$rootScope', 'globals', 'PostService', function ($filter, $rootScope, globals, PostService) {
+    .directive('postSummary', [function () {
         return {
             templateUrl: 'views/admin/partials/smalls/post_summary.html',
             scope: {
@@ -21,7 +21,7 @@ angular.module('adminHomeApp')
             }
         }
     }])
-    .directive('postTags', ['$filter', '$rootScope', 'globals', 'PostService', function ($filter, $rootScope, globals, PostService) {
+    .directive('postTags', [function () {
         return {
             templateUrl: 'views/admin/partials/smalls/post_tags.html',
             scope: {

@@ -44,7 +44,6 @@ angular.module('indexApp')
                 getAccountDetails();
 
                 function determineAccountStatus(userData) {
-                    console.log(JSON.stringify(userData.emailIsConfirmed));
                     if (userData.isRegistered) {
                         if (!userData.emailIsConfirmed) {
                             return {

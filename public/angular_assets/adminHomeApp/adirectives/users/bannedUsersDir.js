@@ -1,5 +1,5 @@
 angular.module('adminHomeApp')
-    .directive('bannedUsers', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'UserService', function ($q, $filter, $log, $interval, $window, $location, $rootScope, socket, mainService, socketService, globals, $modal, UserService) {
+    .directive('bannedUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
         return {
             templateUrl: 'views/admin/partials/smalls/users/banned_users.html',
             restrict: 'AE',
@@ -16,10 +16,10 @@ angular.module('adminHomeApp')
                     UserService.getBannedUsersFromServer()
                         .success(function (resp) {
                             $scope.bannedUsers = UserService.updateBannedUsers(resp.usersArray);
-                            $rootScope.responseStatusHandler(resp);
+                            $rootScope.main.responseStatusHandler(resp);
                         })
                         .error(function (errResponse) {
-                            $rootScope.responseStatusHandler(errResponse);
+                            $rootScope.main.responseStatusHandler(errResponse);
                         })
                 }
 

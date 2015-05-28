@@ -1,6 +1,6 @@
 angular.module('clientHomeApp')
-    .controller('HotController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals', '$modal', 'PostService', 'HotService', 'fN',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals, $modal, PostService, HotService, fN) {
+    .controller('HotController', ['$q', '$log', '$scope', '$rootScope', 'HotService',
+        function ($q, $log, $scope, $rootScope, HotService) {
 
             $scope.hotThisWeek = HotService.getHotThisWeek();
 
@@ -11,7 +11,7 @@ angular.module('clientHomeApp')
                     })
                     .error(function (errResp) {
                         $scope.hotThisWeek = HotService.updateHotThisWeek([]);
-                        $rootScope.responseStatusHandler(errResp);
+                        $rootScope.main.responseStatusHandler(errResp);
                     });
             }
 

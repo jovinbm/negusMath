@@ -2,7 +2,7 @@
     <div class="container">
         <div class="row">
 
-            <div class="col-lg-8 ng-cloak" id="postStream">
+            <div class="col-lg-8 id="postStream">
                 <div loading-banner></div>
 
                 <div ng-if="$root.$state.current.name == 'home'">
@@ -11,84 +11,77 @@
 
                 <div ui-view></div>
 
-                <div suggested-posts></div>
-
-                <div pager-directive></div>
-
             </div>
 
             <div class="col-lg-4 col-lg-offset-0 hideMobileLearning hidden-xs hidden-sm"
                  id="sideBarColumn">
 
-                <div class="panel panel-default ng-cloak">
+                <div class="panel panel-default">
 
                     <div class="panel-heading"><i class="fa fa-youtube-play"></i> THIS WEEK'S VIDEOS
                     </div>
 
                     <div class="panel-body">
-                        <ul class="list-unstyled animated fadeIn videosThisWeek">
-                            <li class="list-unstyled clearfix post">
-                                <div class="card">
+                        <div class="card">
 
-                                    <div class="card-content">
-                                        <div class="embed-responsive embed-responsive-16by9">
-                                            <iframe class="embed-responsive-item"
-                                                    src="https://www.youtube.com/embed/PIVd4imGkjI"
-                                                    frameborder="0"
-                                                    allowfullscreen></iframe>
-                                        </div>
-                                    </div>
+                            <div class="card-content">
+                                <div class="embed-responsive embed-responsive-16by9">
+                                    <iframe class="embed-responsive-item"
+                                            src="https://www.youtube.com/embed/PIVd4imGkjI"
+                                            frameborder="0"
+                                            allowfullscreen></iframe>
                                 </div>
-                            </li>
+                            </div>
+                        </div>
 
-                            <li class="list-unstyled clearfix post">
-                                <div class="card">
+                        <br/>
 
-                                    <div class="card-content">
-                                        <div class="embed-responsive embed-responsive-16by9">
-                                            <iframe class="embed-responsive-item"
-                                                    src="https://www.youtube.com/embed/adKP2CzKaFM"
-                                                    frameborder="0"
-                                                    allowfullscreen></iframe>
-                                        </div>
-                                    </div>
+                        <div class="card">
+
+                            <div class="card-content">
+                                <div class="embed-responsive embed-responsive-16by9">
+                                    <iframe class="embed-responsive-item"
+                                            src="https://www.youtube.com/embed/adKP2CzKaFM"
+                                            frameborder="0"
+                                            allowfullscreen></iframe>
                                 </div>
-                            </li>
-                        </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="panel panel-default ng-cloak"
-                     ng-controller="HotController"
-                     ng-if="hotThisWeek.length != 0">
+                <div ng-controller="HotController">
+                    <div class="panel panel-default"
+                         ng-if="hotThisWeek.length > 0">
 
-                    <div class="panel-heading"><i class="fa fa-fire"></i> HOT THIS WEEK
-                    </div>
+                        <div class="panel-heading"><i class="fa fa-fire"></i> HOT THIS WEEK
+                        </div>
 
-                    <div class="panel-body">
+                        <div class="panel-body">
 
-                        <ul class="list-group hotThisWeek">
-                            <li class="list-group-item post"
-                                ng-repeat="hotPost in hotThisWeek">
-                                <p class="text-outputs">
-                                    <a ng-href="{{hotPost.postPath}}"
-                                       ng-click="goToTop()"
-                                       ng-bind-html="hotPost.postHeading">
-                                    </a> <br/>
-                                <h6 class="text-muted">
-                                    <small>
-                                        <a class="btn-link"
-                                           ng-bind-html="hotPost.authorName"></a> on
-                                        <span ng-bind-html="hotPost.postDate"></span>
-                                    </small>
-                                    <br/>
-                                    <small class="text-muted"
-                                           ng-bind-html="hotPost.timeAgo">
-                                    </small>
-                                </h6>
-                                </p>
-                            </li>
-                        </ul>
+                            <ul class="list-group hotThisWeek">
+                                <li class="list-group-item post"
+                                    ng-repeat="hotPost in hotThisWeek">
+                                    <p class="text-outputs">
+                                        <a ng-href="{{hotPost.postPath}}"
+                                           ng-click="$root.main.goToTop()"
+                                           ng-bind-html="hotPost.postHeading">
+                                        </a> <br/>
+                                    <h6 class="text-muted">
+                                        <small>
+                                            <a class="btn-link"
+                                               ng-bind-html="hotPost.authorName"></a> on
+                                            <span ng-bind-html="hotPost.postDate"></span>
+                                        </small>
+                                        <br/>
+                                        <small class="text-muted"
+                                               ng-bind-html="hotPost.timeAgo">
+                                        </small>
+                                    </h6>
+                                    </p>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 

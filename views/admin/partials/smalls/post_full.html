@@ -1,0 +1,62 @@
+<div class="panel panel-default">
+
+    <!--the full post-->
+    <div>
+        <div class="panel-heading"><a href ng-click="back()"><i class="fa fa-arrow-left"></i> BACK</a>
+            <span class="pull-right hidden-sm hidden-xs"
+                  ng-bind-html="post.postDate"></span>
+        </div>
+
+        <div class="panel-body">
+            <ul class="list-unstyled animated fadeIn">
+                <li class="list-unstyled clearfix">
+                    <div class="card">
+
+                        <div class="card-content">
+
+                            <h1 class="text-outputs postHeading"
+                                ng-bind-html="post.postHeading"></h1>
+
+                            <h3 class="text-muted postBy">
+                                <small>
+                                    <a class="btn-link"
+                                       ng-bind-html="post.authorName"></a> on
+                                    <span ng-bind-html="post.postDate"></span>
+                                </small>
+                                <br/>
+                                <small class="text-muted"
+                                       ng-bind-html="post.timeAgo">
+                                </small>
+                            </h3>
+
+                            <div post-content model="post.postContent"></div>
+                        </div>
+
+                        <div class="card-action clearfix">
+                            <div post-tags model="post.postTags"></div>
+
+                            <div class="pull-right">
+                                <a class="btn-link btn btn-default btn-sm"
+                                   ng-href="/#!/home/editPost/{{post.postIndex}}"
+                                   ng-click="$root.main.goToTop()">Edit</a>
+                                <a class="btn-link btn btn-default btn-sm">Delete</a>
+                            </div>
+
+                        </div>
+                    </div>
+                </li>
+
+                <li class="list-unstyled clearfix">
+                    <div id="disqus-div">
+                        <dir-disqus disqus-shortname="negusmathproduction"
+                                    disqus-identifier="{{post.postUniqueCuid}}"
+                                    disqus-title="{{ post.postHeading }}"
+                                    disqus-url="{{post.postAbsoluteUrl}}"
+                                    ready-to-bind="{{postIsLoaded}}">
+                        </dir-disqus>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

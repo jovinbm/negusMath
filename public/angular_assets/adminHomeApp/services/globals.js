@@ -1,7 +1,7 @@
 angular.module('adminHomeApp')
 
-    .factory('globals', ['$q', '$location', '$window', '$rootScope', 'socketService',
-        function ($q, $location, $window, $rootScope, socketService) {
+    .factory('globals', ['$q', '$location',
+        function ($q, $location) {
             var userData = {};
             var allData = {
                 documentTitle: "Negus Math - College Level Advanced Mathematics for Kenya Students",

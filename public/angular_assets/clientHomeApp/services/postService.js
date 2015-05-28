@@ -3,7 +3,8 @@ angular.module('clientHomeApp')
         function ($filter, $http, $window, $rootScope, $interval, socket) {
 
             var post = {};
-            var posts = [];
+            var editPostModel = {};
+            var posts = {};
             var postsCount = 0;
             var mainSearchResultsPosts = [];
             var mainSearchResultsPostsCount = 0;
@@ -36,13 +37,13 @@ angular.module('clientHomeApp')
                     })
                 },
 
-                updatePosts: function (postsArray) {
+                updatePosts: function (postsArray, pageNumber) {
                     if (postsArray == []) {
-                        posts = [];
+                        posts[pageNumber] = [];
                     } else {
-                        posts = $filter('preparePosts')(null, postsArray);
+                        posts[pageNumber] = $filter('preparePosts')(null, postsArray);
                     }
-                    return posts;
+                    return posts[pageNumber];
                 },
 
                 updatePostsCount: function (newCount) {
@@ -61,7 +62,8 @@ angular.module('clientHomeApp')
                     }
 
                     var tempPost = makePost(newPost);
-                    posts.unshift(tempPost);
+                    //unshift in firstPage
+                    posts['1'].unshift(tempPost);
                     return posts;
                 },
 
@@ -79,13 +81,17 @@ angular.module('clientHomeApp')
                     if (newPost == {}) {
                         post = {}
                     } else {
-                        post = $filter('preparePosts')(newPost, null);
+                        post[newPost.postIndex] = $filter('preparePosts')(newPost, null);
                     }
-                    return post;
+                    return post[newPost.postIndex];
                 },
 
                 getCurrentMainSearchResults: function () {
                     return mainSearchResultsPosts;
+                },
+
+                getCurrentMainSearchResultsCount: function () {
+                    return mainSearchResultsPostsCount;
                 },
 
                 mainSearch: function (searchObject) {
@@ -118,21 +124,9 @@ angular.module('clientHomeApp')
                     if (suggestedPostsArray == []) {
                         suggestedPosts = [];
                     } else {
-                        suggestedPosts = $filter('preparePosts')(null, suggestedPostsArray);
+                        suggestedPosts = $filter('preparePostsNoChange')(null, suggestedPostsArray);
                     }
                     return suggestedPosts;
-                },
-
-                submitNewPost: function (newPost) {
-                    return $http.post('/api/newPost', {
-                        newPost: newPost
-                    });
-                },
-
-                submitPostUpdate: function (post) {
-                    return $http.post('/api/updatePost', {
-                        postUpdate: post
-                    });
                 }
             };
         }]);

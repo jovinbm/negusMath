@@ -1,6 +1,6 @@
 angular.module('adminHomeApp')
-    .factory('UserService', ['$filter', '$http', '$window', '$rootScope', '$interval', 'socket',
-        function ($filter, $http, $window, $rootScope, $interval, socket) {
+    .factory('UserService', ['$filter', '$http',
+        function ($filter, $http) {
 
             var usersCount = {};
             var allUsers = [];

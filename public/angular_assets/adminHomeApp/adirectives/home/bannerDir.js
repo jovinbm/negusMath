@@ -1,5 +1,5 @@
 angular.module('adminHomeApp')
-    .directive('accountStatusBanner', ['$rootScope', 'socketService', 'globals', '$location', '$window', function ($rootScope, socketService, globals, $location, $window) {
+    .directive('accountStatusBanner', ['$rootScope', 'socketService', '$location', '$window', function ($rootScope, socketService, $location, $window) {
         return {
             scope: {},
             templateUrl: 'views/general/smalls/account_status.html',
@@ -15,10 +15,10 @@ angular.module('adminHomeApp')
                 $scope.resendConfirmationEmail = function (userUniqueCuid) {
                     socketService.resendConfirmationEmail(userUniqueCuid)
                         .success(function (resp) {
-                            $rootScope.responseStatusHandler(resp);
+                            $rootScope.main.responseStatusHandler(resp);
                         })
                         .error(function (err) {
-                            $rootScope.responseStatusHandler(err);
+                            $rootScope.main.responseStatusHandler(err);
                         })
                 };
 
@@ -57,7 +57,6 @@ angular.module('adminHomeApp')
                 };
 
                 function determineAccountStatus(userData) {
-                    console.log(JSON.stringify(userData.emailIsConfirmed));
                     if (userData.isRegistered) {
                         if (!userData.emailIsConfirmed) {
                             return {
@@ -222,17 +221,6 @@ angular.module('adminHomeApp')
             $rootScope.isLoadingPercentage = 0;
             $rootScope.changeIsLoadingPercentage = function (num) {
                 $rootScope.isLoadingPercentage = num;
-            };
-
-            //hides or shows the loading splash screen
-            $rootScope.showHideLoadingBanner = function (bool) {
-                if (bool) {
-                    $('#loading-splash-card').removeClass('hidden');
-                    $('.hideMobileLoading').addClass('hidden-xs hidden-sm');
-                } else {
-                    $('#loading-splash-card').addClass('hidden');
-                    $('.hideMobileLoading').removeClass('hidden-xs hidden-sm');
-                }
             };
 
             $rootScope.$on('cfpLoadingBar:loading', function (event, resp) {

@@ -1,10 +1,10 @@
 angular.module('adminHomeApp')
-    .factory('PostService', ['$filter', '$http', '$window', '$rootScope', '$interval', 'socket',
-        function ($filter, $http, $window, $rootScope, $interval, socket) {
+    .factory('PostService', ['$filter', '$http', '$window', '$rootScope', 'socket',
+        function ($filter, $http, $window, $rootScope, socket) {
 
             var post = {};
             var editPostModel = {};
-            var posts = [];
+            var posts = {};
             var postsCount = 0;
             var mainSearchResultsPosts = [];
             var mainSearchResultsPostsCount = 0;
@@ -23,8 +23,12 @@ angular.module('adminHomeApp')
 
             return {
 
-                getCurrentPosts: function () {
-                    return posts;
+                getCurrentPosts: function (pageNumber) {
+                    if (pageNumber) {
+                        return posts[pageNumber];
+                    } else {
+                        return [];
+                    }
                 },
 
                 getCurrentPostsCount: function () {
@@ -37,13 +41,13 @@ angular.module('adminHomeApp')
                     })
                 },
 
-                updatePosts: function (postsArray) {
+                updatePosts: function (postsArray, pageNumber) {
                     if (postsArray == []) {
-                        posts = [];
+                        posts[pageNumber] = [];
                     } else {
-                        posts = $filter('preparePosts')(null, postsArray);
+                        posts[pageNumber] = $filter('preparePosts')(null, postsArray);
                     }
-                    return posts;
+                    return posts[pageNumber];
                 },
 
                 updatePostsCount: function (newCount) {
@@ -62,12 +66,17 @@ angular.module('adminHomeApp')
                     }
 
                     var tempPost = makePost(newPost);
-                    posts.unshift(tempPost);
+                    //unshift in firstPage
+                    posts['1'].unshift(tempPost);
                     return posts;
                 },
 
-                getCurrentPost: function () {
-                    return post;
+                getCurrentPost: function (postIndex) {
+                    if (postIndex) {
+                        return post[postIndex]
+                    } else {
+                        return {};
+                    }
                 },
 
                 getPostFromServer: function (postIndex) {
@@ -80,9 +89,9 @@ angular.module('adminHomeApp')
                     if (newPost == {}) {
                         post = {}
                     } else {
-                        post = $filter('preparePosts')(newPost, null);
+                        post[newPost.postIndex] = $filter('preparePosts')(newPost, null);
                     }
-                    return post;
+                    return post[newPost.postIndex];
                 },
 
                 getCurrentEditPostModel: function () {
@@ -110,6 +119,10 @@ angular.module('adminHomeApp')
 
                 getCurrentMainSearchResults: function () {
                     return mainSearchResultsPosts;
+                },
+
+                getCurrentMainSearchResultsCount: function () {
+                    return mainSearchResultsPostsCount;
                 },
 
                 mainSearch: function (searchObject) {
@@ -142,7 +155,7 @@ angular.module('adminHomeApp')
                     if (suggestedPostsArray == []) {
                         suggestedPosts = [];
                     } else {
-                        suggestedPosts = $filter('preparePosts')(null, suggestedPostsArray);
+                        suggestedPosts = $filter('preparePostsNoChange')(null, suggestedPostsArray);
                     }
                     return suggestedPosts;
                 },

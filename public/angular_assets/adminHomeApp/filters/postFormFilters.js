@@ -1,5 +1,5 @@
 angular.module('adminHomeApp')
-    .filter("validatePostHeading", ['$filter', '$rootScope', function ($filter, $rootScope) {
+    .filter("validatePostHeading", ['$rootScope', function ($rootScope) {
         return function (postHeading, broadcast) {
             var errors = 0;
 
@@ -27,7 +27,7 @@ angular.module('adminHomeApp')
             return errors == 0;
         }
     }])
-    .filter("postHeadingMessages", ['$filter', '$rootScope', function ($filter, $rootScope) {
+    .filter("postHeadingMessages", [function () {
         return function (postHeading) {
             var messages = "";
 
@@ -55,7 +55,7 @@ angular.module('adminHomeApp')
 
         }
     }])
-    .filter("validatePostContent", ['$filter', '$rootScope', function ($filter, $rootScope) {
+    .filter("validatePostContent", ['$rootScope', function ($rootScope) {
         return function (postContent, broadcast) {
             function broadcastShowToast(type, text) {
                 if (broadcast) {
@@ -75,7 +75,7 @@ angular.module('adminHomeApp')
             }
         }
     }])
-    .filter("postContentMessages", ['$filter', '$rootScope', function ($filter, $rootScope) {
+    .filter("postContentMessages", [function () {
         return function (postContent) {
             if (postContent) {
                 var postContentText = $("<div>" + postContent + "</div>").text();
@@ -89,7 +89,7 @@ angular.module('adminHomeApp')
             }
         }
     }])
-    .filter("validatePostSummary", ['$filter', '$rootScope', function ($filter, $rootScope) {
+    .filter("validatePostSummary", ['$rootScope', function ($rootScope) {
         return function (postSummary, broadcast) {
             var errors = 0;
 
@@ -119,7 +119,7 @@ angular.module('adminHomeApp')
             return errors == 0;
         }
     }])
-    .filter("postSummaryMessages", ['$filter', '$rootScope', function ($filter, $rootScope) {
+    .filter("postSummaryMessages", [function () {
         return function (postSummary) {
             var messages = "";
 
@@ -147,7 +147,7 @@ angular.module('adminHomeApp')
 
         }
     }])
-    .filter("validatePostTags", ['$filter', '$rootScope', function ($filter, $rootScope) {
+    .filter("validatePostTags", ['$rootScope', function ($rootScope) {
         return function (postTags, broadcast) {
             var errors = 0;
 
@@ -192,7 +192,7 @@ angular.module('adminHomeApp')
             return errors == 0;
         }
     }])
-    .filter("postTagsMessages", ['$filter', '$rootScope', function ($filter, $rootScope) {
+    .filter("postTagsMessages", [function () {
         return function (postTags) {
             var messages = "";
 
