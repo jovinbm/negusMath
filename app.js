@@ -23,6 +23,7 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var mongoose = require('mongoose');
 var moment = require('moment');
+var multer = require('multer');
 var emailModule = require('./functions/email.js');
 var sideUpdates = require('./db/side_updates_db.js');
 
@@ -43,6 +44,7 @@ var routes = require('./routes/router.js');
 var basicAPI = require('./routes/basic_api.js');
 var postAPI = require('./routes/post_api.js');
 var userAPI = require('./routes/user_api.js');
+var uploadAPI = require('./routes/upload_api.js');
 var loginAPI = require('./routes/login_api.js');
 var logoutAPI = require('./routes/logout_api.js');
 
@@ -72,9 +74,11 @@ app.use(favicon(__dirname + '/public/favicon.ico'));
 
 app.use("/bower_components", express.static(path.join(__dirname, '/bower_components')));
 app.use("/public", express.static(path.join(__dirname, '/public')));
+app.use("/uploads", express.static(path.join(__dirname, '/uploads')));
 app.use("/views", express.static(path.join(__dirname, '/views')));
 app.use("/error", express.static(path.join(__dirname, '/public/error')));
 
+//prerender-node
 app.use(require('prerender-node').set('prerenderServiceUrl', 'https://jbmprerender.herokuapp.com/'));
 
 app.use(logger('dev'));
@@ -128,6 +132,7 @@ app.post('/api/logoutClient', middleware.ensureAuthenticatedAngular, middleware.
 //info api
 app.get('/api/getUserData', loginAPI.getUserData);
 
+//post and search api
 app.post('/api/getPosts', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, postAPI.getPosts);
 app.post('/api/getSuggestedPosts', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, postAPI.getSuggestedPosts);
 app.post('/api/getPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, postAPI.getPost);
@@ -151,6 +156,9 @@ app.post('/api/getBannedUsers', middleware.ensureAuthenticatedAngular, middlewar
 app.post('/api/banUser', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.banUser);
 app.post('/api/unBanUser', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.unBanUser);
 app.post('/api/getUsersNotBanned', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.getUsersNotBanned);
+
+//upload api
+app.post('/api/uploadPostImage', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, multer({dest: './uploads/images/posts'}), uploadAPI.upload);
 
 //error handlers
 function logErrors(err, req, res, next) {

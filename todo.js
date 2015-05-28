@@ -11,3 +11,7 @@
 
 //render complete first page
 //cache poststream
+
+//end some requests with res.status(500).end() instead of displaying errors to the user
+
+//put ng-show if state logic in the directive itself

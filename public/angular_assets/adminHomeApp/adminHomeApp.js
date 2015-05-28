@@ -12,7 +12,8 @@ angular.module('adminHomeApp', [
     'ngSanitize',
     'angularUtils.directives.dirDisqus',
     'ngTagsInput',
-    'ui.utils'
+    'ui.utils',
+    'ngFileUpload'
 ])
     .run(function ($templateCache, $http, $rootScope, $state, $stateParams) {
         $rootScope.$state = $state;
@@ -39,6 +40,10 @@ angular.module('adminHomeApp', [
             .state('home.post', {
                 url: '/post/:postIndex',
                 templateUrl: 'views/admin/partials/views/full_post.html'
+            })
+            .state('home.newPost', {
+                url: '/newPost',
+                templateUrl: 'views/admin/partials/views/new_post.html'
             })
             .state('home.editPost', {
                 url: '/editPost/:postIndex',

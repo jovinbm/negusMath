@@ -1369,6 +1369,14 @@ angular.module('clientHomeApp')
                         allData.documentTitle = newDocumentTitle;
                     }
                     return allData.documentTitle
+                },
+
+                getLocationHost: function () {
+                    if ($location.port()) {
+                        return "http://" + $location.host() + ":" + $location.port();
+                    } else {
+                        return "http://" + $location.host();
+                    }
                 }
             };
         }]);

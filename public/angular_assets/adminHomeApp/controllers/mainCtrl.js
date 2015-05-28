@@ -5,6 +5,9 @@ angular.module('adminHomeApp')
             //index page url
             $scope.indexPageUrl = globals.allData.indexPageUrl;
 
+            //website host
+            $rootScope.currentHost = globals.getLocationHost();
+
             //disqus
             $scope.showDisqus = $location.host().search("negusmath") !== -1;
 

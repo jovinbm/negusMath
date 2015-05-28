@@ -1,0 +1,32 @@
+<div class="panel panel-default no-margin-bottom">
+
+    <div class="panel-heading">Uploads</div>
+
+    <div class="panel-body">
+
+        <div class="card">
+
+            <div class="card-content"
+                 ng-show="uploads.length > 0">
+                <ul class="list-unstyled">
+                    <li ng-repeat="file in uploads">
+                        {{file.originalname}} - <a ng-href="{{$root.currentHost + '/' +file.path}}"
+                                                   target="_blank">Link</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card-action clearfix">
+                <div ng-bind="files[0].name"
+                     class="very-small-font"></div>
+
+                <div class="btn btn-xs btn-default" ngf-select ng-model="files">Select File</div>
+
+                <div class="btn btn-xs btn-default" ng-click="upload(files)">Upload</div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<p class="very-small-font">Upload files here to get links. Use these links when you want to attach images, pdfs or other files to the post.</p>

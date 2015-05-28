@@ -52,19 +52,19 @@
                 </li>
             </ul>
 
-            <div ng-if="!newPost">
+            <div ng-if="$root.$state.current.name != 'home.newPost'">
                 <a type="button"
                    class="btn btn-primary btn-sm navbar-btn pull-right ng-cloak"
-                   href ng-click="$root.main.goToTop(); showNewPost();"
+                   href="/#!/home/newPost"
                    role="button">
                     <i class="fa fa-pencil"></i> New Post
                 </a>
             </div>
 
-            <div ng-if="newPost">
+            <div ng-if="$root.$state.current.name == 'home.newPost'">
                 <a type="button"
                    class="btn btn-warning btn-sm navbar-btn pull-right ng-cloak"
-                   href ng-click="$root.main.goToTop(); hideNewPost();"
+                   href ng-click="$root.back()"
                    role="button">
                     <i class="fa fa-pencil"></i> Cancel
                 </a>
