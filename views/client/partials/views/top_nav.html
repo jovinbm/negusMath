@@ -19,16 +19,24 @@
         <!--this navbar will be collapsed on mobile-->
         <div class="collapse navbar-collapse navHeaderCollapse">
             <ul class="nav navbar-nav navbar-right">
+
                 <li ng-class="{'active': $root.$state.current.name == 'home'}">
                     <a ng-href="/#!/home/1">Home
                     </a>
                 </li>
+
                 <li ng-if="!$root.main.clientIsRegistered">
                     <a ng-href="{{indexPageUrl}}">Register</a>
                 </li>
+
                 <li ng-if="!$root.main.clientIsRegistered">
                     <a ng-href="{{indexPageUrl}}">Sign In</a>
                 </li>
+
+                <li>
+                    <a ng-href="{{indexPageUrl}}">About</a>
+                </li>
+
                 <li class="dropdown"
                     ng-if="$root.main.clientIsRegistered">
 

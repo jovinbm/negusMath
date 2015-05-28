@@ -2,7 +2,7 @@ angular.module('adminHomeApp')
     .directive('postStreamPager', ['$rootScope', 'PostService', function ($rootScope, PostService) {
         return {
 
-            templateUrl: 'views/admin/partials/smalls/pager.html',
+            templateUrl: 'views/general/smalls/pager.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.pagingMaxSize = 5;
@@ -37,7 +37,7 @@ angular.module('adminHomeApp')
     .directive('mainSearchResultsPager', ['$rootScope', 'PostService', function ($rootScope, PostService) {
         return {
 
-            templateUrl: 'views/admin/partials/smalls/pager.html',
+            templateUrl: 'views/general/smalls/pager.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.pagingMaxSize = 5;

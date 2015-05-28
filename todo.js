@@ -8,3 +8,6 @@
 
 //cannot make admin if banned or not approved
 //cannot ban if user is not approved
+
+//render complete first page
+//cache poststream
