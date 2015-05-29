@@ -37,8 +37,8 @@ module.exports = {
         var finalFilePath = 'images/post_images/' + file.name;
         s3.uploadPublicFileToBucket('negusmath_assets', finalFilePath, file.path, error_neg_1, success);
         function success(data) {
-            consoleLogger(JSON.stringify(data));
             consoleLogger(successLogger(module));
+            file.amazonS3Url = data.amazonS3Url;
             res.status(200).send({
                 fileData: file,
                 uploaded: true,

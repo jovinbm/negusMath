@@ -10,7 +10,7 @@
                  ng-show="uploads.length > 0">
                 <ul class="list-unstyled">
                     <li ng-repeat="file in uploads">
-                        {{file.originalname}} - <a ng-href="{{$root.currentHost + '/' +file.path}}"
+                        {{file.originalname}} - <a ng-href="{{file.amazonS3Url}}"
                                                    target="_blank">Link</a>
                     </li>
                 </ul>

@@ -49,9 +49,11 @@ module.exports = {
             onFileSizeLimit: function (file) {
                 consoleLogger(errorLogger(module, 'file size exceeds limit'));
                 fs.unlink('./' + file.path);
+                return false;
             },
             onFilesLimit: function () {
                 consoleLogger(errorLogger(module, 'multiple files detected'));
+                return false;
             }
         };
     }

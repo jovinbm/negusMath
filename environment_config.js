@@ -6,6 +6,8 @@ module.exports = {
     // heroku config:set INVITATION_CODE_ADMIN=
     //math4Username
     //math4Password
+    //AWS_ACCESS_KEY_ID for jovinbm
+    //AWS_SECRET_ACCESS_KEY for jovinbm
     databaseURL: function () {
         return process.env.DATABASE_URL;
     },

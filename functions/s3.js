@@ -108,7 +108,9 @@ module.exports = {
                     consoleLogger(errorLogger(module, err));
                     error_neg_1(-1);
                 } else {
+                    //get the url
                     consoleLogger(successLogger(module));
+                    data.amazonS3Url = 'https://' + toBucket + '.s3.amazonaws.com/' + key;
                     success(data);
                 }
             });
