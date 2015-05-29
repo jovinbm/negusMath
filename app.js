@@ -161,6 +161,8 @@ app.post('/api/getUsersNotBanned', middleware.ensureAuthenticatedAngular, middle
 
 //upload api
 app.post('/api/uploadPostImage', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, multer(upload_params.postImageParams()), uploadAPI.uploadPostImage);
+app.post('/api/uploadPdf', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, multer(upload_params.pdfParams()), uploadAPI.uploadPdf);
+app.post('/api/uploadZip', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, multer(upload_params.zipParams()), uploadAPI.uploadZip);
 
 //error handlers
 function logErrors(err, req, res, next) {

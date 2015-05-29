@@ -51,7 +51,115 @@ module.exports = {
             middleware.deleteFile(file.path, err_del, success_del);
 
             function success_del() {
-                consoleLogger(successLogger(module, 'file successfuly removed from file system'));
+                consoleLogger(successLogger(module, 'file successfully removed from file system'));
+            }
+
+            function err_del() {
+                consoleLogger(errorLogger(module, "file not removed from file system"));
+            }
+        }
+
+        function error_neg_1() {
+            consoleLogger(errorLogger(module));
+            //remove file from filesystem
+            middleware.deleteFile(file.path, deleteError, deleteSuccess);
+
+            function deleteSuccess() {
+                res.status(500).send({
+                    code: 500,
+                    notify: true,
+                    type: 'warning',
+                    msg: 'A problem occurred while uploading your image, please try again.'
+                });
+            }
+
+            function deleteError() {
+                consoleLogger(errorLogger(module, "file not removed from file system"));
+                res.status(500).send({
+                    code: 500,
+                    notify: true,
+                    type: 'warning',
+                    msg: 'A problem occurred while uploading your image, please try again.'
+                });
+            }
+        }
+    },
+
+    uploadPdfToS3: function (req, res, file) {
+        var module = 'uploadPdfToS3';
+        receivedLogger(module);
+        var finalFilePath = 'pdf_files/' + file.name;
+        s3.uploadPublicFileToBucket('negusmath_assets', finalFilePath, file.path, error_neg_1, success);
+        function success(data) {
+            consoleLogger(successLogger(module));
+            file.amazonS3Url = data.amazonS3Url;
+            res.status(200).send({
+                fileData: file,
+                uploaded: true,
+                code: 500,
+                notify: true,
+                type: 'success',
+                msg: 'File successfully uploaded.'
+            });
+
+            middleware.deleteFile(file.path, err_del, success_del);
+
+            function success_del() {
+                consoleLogger(successLogger(module, 'file successfully removed from file system'));
+            }
+
+            function err_del() {
+                consoleLogger(errorLogger(module, "file not removed from file system"));
+            }
+        }
+
+        function error_neg_1() {
+            consoleLogger(errorLogger(module));
+            //remove file from filesystem
+            middleware.deleteFile(file.path, deleteError, deleteSuccess);
+
+            function deleteSuccess() {
+                res.status(500).send({
+                    code: 500,
+                    notify: true,
+                    type: 'warning',
+                    msg: 'A problem occurred while uploading your image, please try again.'
+                });
+            }
+
+            function deleteError() {
+                consoleLogger(errorLogger(module, "file not removed from file system"));
+                res.status(500).send({
+                    code: 500,
+                    notify: true,
+                    type: 'warning',
+                    msg: 'A problem occurred while uploading your image, please try again.'
+                });
+            }
+        }
+    },
+
+    uploadZipToS3: function (req, res, file) {
+        var module = 'uploadZipToS3';
+        receivedLogger(module);
+        var finalFilePath = 'zip_files/' + file.name;
+        s3.uploadPublicFileToBucket('negusmath_assets', finalFilePath, file.path, error_neg_1, success);
+        function success(data) {
+            consoleLogger(successLogger(module));
+            file.amazonS3Url = data.amazonS3Url;
+            res.status(200).send({
+                fileData: file,
+                uploaded: true,
+                code: 500,
+                notify: true,
+                type: 'success',
+                msg: 'File successfully uploaded.'
+            });
+
+            middleware.deleteFile(file.path, err_del, success_del);
+
+            function success_del() {
+                consoleLogger(successLogger(module, 'file successfully removed from file system'));
             }
 
             function err_del() {

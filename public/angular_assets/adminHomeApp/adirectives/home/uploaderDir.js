@@ -5,6 +5,10 @@ angular.module('adminHomeApp')
             templateUrl: 'views/general/smalls/simple_uploader.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
+                $scope.selectedFileType = {
+                    type: 'image'
+                };
+
                 $scope.isUploading = false;
                 $scope.uploads = [];
                 $scope.uploading = {
@@ -28,22 +32,63 @@ angular.module('adminHomeApp')
                         var file = files[0];
                         var fields = {};
                         $scope.showUploading();
-                        uploadService.uploadPostImage(fields, file)
-                            .progress(function (evt) {
-                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                            })
-                            .success(function (data, status, headers, config) {
-                                $rootScope.main.responseStatusHandler(data);
-                                console.log(JSON.stringify(data.fileData));
-                                $scope.uploads.push(data.fileData);
-                                $scope.hideProgressBars();
-                            })
-                            .error(function (errResponse) {
-                                $rootScope.main.responseStatusHandler(errResponse);
-                                $scope.hideProgressBars();
-                            });
+                        if ($scope.selectedFileType.type === 'image') {
+                            uploadPostImage(fields, file);
+                        } else if ($scope.selectedFileType.type === 'pdf') {
+                            uploadPdf(fields, file);
+                        } else if ($scope.selectedFileType.type === 'zip') {
+                            uploadZip(fields, file);
+                        }
                     }
                 };
+
+                function uploadPostImage(fields, file) {
+                    uploadService.uploadPostImage(fields, file)
+                        .progress(function (evt) {
+                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                        })
+                        .success(function (data, status, headers, config) {
+                            $rootScope.main.responseStatusHandler(data);
+                            $scope.uploads.push(data.fileData);
+                            $scope.hideProgressBars();
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                            $scope.hideProgressBars();
+                        });
+                }
+
+                function uploadPdf(fields, file) {
+                    uploadService.uploadPdf(fields, file)
+                        .progress(function (evt) {
+                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                        })
+                        .success(function (data, status, headers, config) {
+                            $rootScope.main.responseStatusHandler(data);
+                            $scope.uploads.push(data.fileData);
+                            $scope.hideProgressBars();
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                            $scope.hideProgressBars();
+                        });
+                }
+
+                function uploadZip(fields, file) {
+                    uploadService.uploadZip(fields, file)
+                        .progress(function (evt) {
+                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                        })
+                        .success(function (data, status, headers, config) {
+                            $rootScope.main.responseStatusHandler(data);
+                            $scope.uploads.push(data.fileData);
+                            $scope.hideProgressBars();
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                            $scope.hideProgressBars();
+                        });
+                }
             }
         }
     }]);

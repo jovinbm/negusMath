@@ -56,5 +56,67 @@ module.exports = {
                 return false;
             }
         };
+    },
+
+    pdfParams: function () {
+        var module = 'pdfParams';
+        receivedLogger(module);
+        return {
+            dest: './uploads/pdfs',
+            rename: function (fieldname, filename) {
+                return filename.replace(/\W+/g, '-').toLowerCase() + Date.now()
+            },
+            limits: {
+                fieldNameSize: 100,
+                files: 1,
+                fileSize: 104857600 //in bytes, 100mb
+            },
+            onError: function (err, next) {
+                consoleLogger(errorLogger(module, err));
+                var error = new Error(module + err);
+                error.customStatus = 'upload';
+                next(error);
+            },
+            onFileSizeLimit: function (file) {
+                consoleLogger(errorLogger(module, 'file size exceeds limit'));
+                fs.unlink('./' + file.path);
+                return false;
+            },
+            onFilesLimit: function () {
+                consoleLogger(errorLogger(module, 'multiple files detected'));
+                return false;
+            }
+        };
+    },
+
+    zipParams: function () {
+        var module = 'zipParams';
+        receivedLogger(module);
+        return {
+            dest: './uploads/zip_files',
+            rename: function (fieldname, filename) {
+                return filename.replace(/\W+/g, '-').toLowerCase() + Date.now()
+            },
+            limits: {
+                fieldNameSize: 100,
+                files: 1,
+                fileSize: 209715200 //in bytes, 200mb
+            },
+            onError: function (err, next) {
+                consoleLogger(errorLogger(module, err));
+                var error = new Error(module + err);
+                error.customStatus = 'upload';
+                next(error);
+            },
+            onFileSizeLimit: function (file) {
+                consoleLogger(errorLogger(module, 'file size exceeds limit'));
+                fs.unlink('./' + file.path);
+                return false;
+            },
+            onFilesLimit: function () {
+                consoleLogger(errorLogger(module, 'multiple files detected'));
+                return false;
+            }
+        };
     }
 };

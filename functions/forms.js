@@ -550,7 +550,105 @@ module.exports = {
         if (errors == 0) {
             if (!(file.mimetype.indexOf('image') > -1)) {
                 ++errors;
-                error('Please upload a valid image type');
+                error('Please upload a valid image file');
+            }
+        }
+
+        if (errors == 0) {
+            consoleLogger(successLogger(module));
+            callback();
+        }
+
+        function error(errorMessage) {
+            consoleLogger(errorLogger(module, errorMessage));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: errorMessage
+            });
+
+            //file is not image, remove it
+            middleware.deleteFile(file.path, error_deleting, removed);
+            function removed() {
+                consoleLogger(successLogger(module, "file successfully removed from filesystem"));
+            }
+
+            function error_deleting() {
+                consoleLogger(errorLogger(module, "file not removed from file system"));
+            }
+        }
+    },
+
+    checkFileIsPdf: function (req, res, file, callback) {
+        var module = 'checkFileIsPdf';
+        receivedLogger(module);
+        var errors = 0;
+
+        //check that all arguments exist i.e. all fields are not null
+        for (var i = 0, len = arguments.length; i < len; i++) {
+            if (errors == 0) {
+                if (arguments[i] == null || arguments[i] == undefined) {
+                    errors++;
+                    error('An error occurred. Some fields missing. Please try again');
+                }
+            }
+        }
+
+        //file type
+        if (errors == 0) {
+            if (!(file.mimetype.indexOf('pdf') > -1)) {
+                ++errors;
+                error('Please upload a valid pdf file');
+            }
+        }
+
+        if (errors == 0) {
+            consoleLogger(successLogger(module));
+            callback();
+        }
+
+        function error(errorMessage) {
+            consoleLogger(errorLogger(module, errorMessage));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: errorMessage
+            });
+
+            //file is not image, remove it
+            middleware.deleteFile(file.path, error_deleting, removed);
+            function removed() {
+                consoleLogger(successLogger(module, "file successfully removed from filesystem"));
+            }
+
+            function error_deleting() {
+                consoleLogger(errorLogger(module, "file not removed from file system"));
+            }
+        }
+    },
+
+    checkFileIsZip: function (req, res, file, callback) {
+        var module = 'checkFileIsZip';
+        receivedLogger(module);
+        var errors = 0;
+
+        //check that all arguments exist i.e. all fields are not null
+        for (var i = 0, len = arguments.length; i < len; i++) {
+            if (errors == 0) {
+                if (arguments[i] == null || arguments[i] == undefined) {
+                    errors++;
+                    error('An error occurred. Some fields missing. Please try again');
+                }
+            }
+        }
+
+        //file type
+        if (errors == 0) {
+            if (!(file.mimetype.indexOf('zip') > -1)) {
+                ++errors;
+                error('Please upload a valid zip file');
             }
         }
 

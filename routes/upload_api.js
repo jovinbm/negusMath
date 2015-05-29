@@ -40,12 +40,76 @@ module.exports = {
 
         //check that the file was not truncated due to exceeding a specified limit in params
         if (!theFile.truncated) {
-            //ensure file is image
             forms.checkFileIsImage(req, res, theFile, callback);
             function callback() {
-                //means file is image, or else all errors would be resolved in the forms module
                 consoleLogger(successLogger(module));
                 upload_handlers.uploadPostImageToS3(req, res, theFile);
+                //res.status(200).send({
+                //    fileData: theFile,
+                //    uploaded: true,
+                //    code: 500,
+                //    notify: true,
+                //    type: 'success',
+                //    msg: 'File successfully uploaded.'
+                //});
+            }
+        } else {
+            //file was truncated, nb, file is removed by the params definition
+            consoleLogger(errorLogger(module, 'file truncated'));
+            res.status(401).send({
+                code: 401,
+                notify: true,
+                type: 'warning',
+                msg: 'File should be less than ' + middleware.getHumanReadableFileSize(theFile.size)
+            });
+        }
+    },
+
+    uploadPdf: function (req, res) {
+        var module = 'uploadPdf';
+        receivedLogger(module);
+
+        var theFile = req.files.file;
+
+        //check that the file was not truncated due to exceeding a specified limit in params
+        if (!theFile.truncated) {
+            forms.checkFileIsPdf(req, res, theFile, callback);
+            function callback() {
+                consoleLogger(successLogger(module));
+                upload_handlers.uploadPdfToS3(req, res, theFile);
+                //res.status(200).send({
+                //    fileData: theFile,
+                //    uploaded: true,
+                //    code: 500,
+                //    notify: true,
+                //    type: 'success',
+                //    msg: 'File successfully uploaded.'
+                //});
+            }
+        } else {
+            //file was truncated, nb, file is removed by the params definition
+            consoleLogger(errorLogger(module, 'file truncated'));
+            res.status(401).send({
+                code: 401,
+                notify: true,
+                type: 'warning',
+                msg: 'File should be less than ' + middleware.getHumanReadableFileSize(theFile.size)
+            });
+        }
+    },
+
+    uploadZip: function (req, res) {
+        var module = 'uploadZip';
+        receivedLogger(module);
+
+        var theFile = req.files.file;
+
+        //check that the file was not truncated due to exceeding a specified limit in params
+        if (!theFile.truncated) {
+            forms.checkFileIsZip(req, res, theFile, callback);
+            function callback() {
+                consoleLogger(successLogger(module));
+                upload_handlers.uploadZipToS3(req, res, theFile);
                 //res.status(200).send({
                 //    fileData: theFile,
                 //    uploaded: true,
