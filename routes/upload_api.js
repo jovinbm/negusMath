@@ -1,7 +1,14 @@
 var basic = require('../functions/basic.js');
 var consoleLogger = require('../functions/basic.js').consoleLogger;
 var user_handler = require('../handlers/user_handlers.js');
+var upload_handlers = require('../handlers/upload_handlers.js');
 var userDB = require('../db/user_db.js');
+var multer = require('multer');
+var middleware = require('../functions/middleware.js');
+var forms = require('../functions/forms.js');
+var fs = require('fs');
+var path = require('path');
+var s3 = require('../functions/s3.js');
 
 var fileName = 'upload_api.js';
 
@@ -25,12 +32,38 @@ function getTheUser(req) {
 }
 
 module.exports = {
-    upload: function (req, res) {
-        consoleLogger(JSON.stringify(req.body));
-        consoleLogger(JSON.stringify(req.files));
+    uploadPostImage: function (req, res) {
+        var module = 'uploadPostImage';
+        receivedLogger(module);
 
-        res.status(200).send({
-            fileData: req.files.file
-        });
+        var theFile = req.files.file;
+
+        //check that the file was not truncated due to exceeding a specified limit in params
+        if (!theFile.truncated) {
+            //ensure file is image
+            forms.checkFileIsImage(req, res, theFile, callback);
+            function callback() {
+                //means file is image, or else all errors would be resolved in the forms module
+                consoleLogger(successLogger(module));
+                upload_handlers.uploadPostImageToS3(req, res, theFile);
+                //res.status(200).send({
+                //    fileData: theFile,
+                //    uploaded: true,
+                //    code: 500,
+                //    notify: true,
+                //    type: 'success',
+                //    msg: 'File successfully uploaded.'
+                //});
+            }
+        } else {
+            //file was truncated, nb, file is removed by the params definition
+            consoleLogger(errorLogger(module, 'file truncated'));
+            res.status(401).send({
+                code: 401,
+                notify: true,
+                type: 'warning',
+                msg: 'File should be less than ' + middleware.getHumanReadableFileSize(theFile.size)
+            });
+        }
     }
 };

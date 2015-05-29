@@ -1,6 +1,8 @@
 var userDB = require('../db/user_db.js');
 var basic = require('../functions/basic.js');
 var consoleLogger = require('../functions/basic.js').consoleLogger;
+var fs = require('fs');
+var path = require('path');
 
 var fileName = 'middleware.js';
 
@@ -262,5 +264,62 @@ module.exports = {
 
             error();
         }
+    },
+
+    getHumanReadableFileSize: function (sizeInBytes) {
+        var module = 'getHumanReadableFileSize';
+        receivedLogger(module);
+        var sizes = {
+            TB: 1099511627776,
+            GB: 1073741824,
+            MB: 1048576,
+            KB: 1024
+        };
+        var ext = "";
+        var divider = "";
+        if (sizeInBytes > sizes.TB) {
+            ext = "TB";
+            divider = sizes.TB;
+        } else if (sizeInBytes > sizes.GB) {
+            ext = "GB";
+            divider = sizes.GB;
+        } else if (sizeInBytes > sizes.MB) {
+            ext = "MB";
+            divider = sizes.MB;
+        } else if (sizeInBytes > sizes.KB) {
+            ext = "KB";
+            divider = sizes.KB;
+        } else {
+            ext = "bytes";
+            divider = 1;
+        }
+
+        consoleLogger(successLogger(module));
+        return (sizeInBytes / divider) + " " + ext;
+    },
+
+    deleteFile: function (pathFromRoot, error_neg_1, success) {
+        var module = 'deleteFile';
+        receivedLogger(module);
+
+        var theFullPath = path.join(__dirname, '../', pathFromRoot);
+        fs.exists(theFullPath, function (exists) {
+            if (exists) {
+                fs.unlink(theFullPath, callback);
+                function callback(err) {
+                    if (err) {
+                        consoleLogger(errorLogger(module, err));
+                        error_neg_1();
+                    } else {
+                        consoleLogger(successLogger(module));
+                        success();
+                    }
+                }
+            } else {
+                //file already deleted
+                consoleLogger(successLogger(module));
+                success();
+            }
+        });
     }
 };

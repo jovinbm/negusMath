@@ -24,8 +24,10 @@ var LocalStrategy = require('passport-local').Strategy;
 var mongoose = require('mongoose');
 var moment = require('moment');
 var multer = require('multer');
+var s3 = require('./functions/s3.js');
 var emailModule = require('./functions/email.js');
 var sideUpdates = require('./db/side_updates_db.js');
+var upload_params = require('./functions/upload_params.js');
 
 console.log("ENVIRONMENT = " + process.env.NODE_ENV);
 
@@ -158,7 +160,7 @@ app.post('/api/unBanUser', middleware.ensureAuthenticatedAngular, middleware.add
 app.post('/api/getUsersNotBanned', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.getUsersNotBanned);
 
 //upload api
-app.post('/api/uploadPostImage', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, multer({dest: './uploads/images/posts'}), uploadAPI.upload);
+app.post('/api/uploadPostImage', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, multer(upload_params.postImageParams()), uploadAPI.uploadPostImage);
 
 //error handlers
 function logErrors(err, req, res, next) {
@@ -191,7 +193,21 @@ function errorHandler(err, req, res, next) {
     res.sendFile(path.join(__dirname, './public/error/', '500.html'));
 }
 
+function resolveUploadErrors(err, req, res, next) {
+    if (err.customStatus = 'upload') {
+        res.status(500).send({
+            code: 500,
+            notify: true,
+            type: 'warning',
+            msg: 'An error has occurred. Please try again'
+        });
+    } else {
+        next(err);
+    }
+}
+
 app.use(logErrors);
+app.use(resolveUploadErrors);
 app.use(clientErrorHandler);
 app.use(errorHandler);
 

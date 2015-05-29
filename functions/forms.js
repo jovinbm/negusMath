@@ -1,7 +1,10 @@
 var basic = require('../functions/basic.js');
 var consoleLogger = require('../functions/basic.js').consoleLogger;
 var path = require('path');
+var fs = require('fs');
 var cheerio = require('cheerio');
+var multer = require('multer');
+var middleware = require('../functions/middleware.js');
 
 var fileName = 'forms_db.js';
 
@@ -37,9 +40,11 @@ module.exports = {
 
         //check that all arguments exist i.e. all fields are not null
         for (var i = 0, len = arguments.length; i < len; i++) {
-            if (arguments[i] == null || arguments[i] == undefined) {
-                errors++;
-                error('An error occurred. Some fields missing. Please try again');
+            if (errors == 0) {
+                if (arguments[i] == null || arguments[i] == undefined) {
+                    errors++;
+                    error('An error occurred. Some fields missing. Please try again');
+                }
             }
         }
 
@@ -142,9 +147,11 @@ module.exports = {
 
         //check that all arguments exist i.e. all fields are not null
         for (var i = 0, len = arguments.length; i < len; i++) {
-            if (arguments[i] == null || arguments[i] == undefined) {
-                errors++;
-                error('An error occurred. Some fields missing. Please try again');
+            if (errors == 0) {
+                if (arguments[i] == null || arguments[i] == undefined) {
+                    errors++;
+                    error('An error occurred. Some fields missing. Please try again');
+                }
             }
         }
 
@@ -193,9 +200,11 @@ module.exports = {
 
         //check that all arguments exist i.e. all fields are not null
         for (var i = 0, len = arguments.length; i < len; i++) {
-            if (arguments[i] == null || arguments[i] == undefined) {
-                errors++;
-                error('An error occurred. Some fields missing. Please try again');
+            if (errors == 0) {
+                if (arguments[i] == null || arguments[i] == undefined) {
+                    errors++;
+                    error('An error occurred. Some fields missing. Please try again');
+                }
             }
         }
 
@@ -230,9 +239,11 @@ module.exports = {
 
         //check that all arguments exist i.e. all fields are not null
         for (var i = 0, len = arguments.length; i < len; i++) {
-            if (arguments[i] == null || arguments[i] == undefined) {
-                errors++;
-                error('An error occurred. Some fields missing. Please try again');
+            if (errors == 0) {
+                if (arguments[i] == null || arguments[i] == undefined) {
+                    errors++;
+                    error('An error occurred. Some fields missing. Please try again');
+                }
             }
         }
 
@@ -280,9 +291,11 @@ module.exports = {
 
         //check that all arguments exist i.e. all fields are not null
         for (var i = 0, len = arguments.length; i < len; i++) {
-            if (arguments[i] == null || arguments[i] == undefined) {
-                errors++;
-                error('An error occurred. Some fields missing. Please try again');
+            if (errors == 0) {
+                if (arguments[i] == null || arguments[i] == undefined) {
+                    errors++;
+                    error('An error occurred. Some fields missing. Please try again');
+                }
             }
         }
 
@@ -332,9 +345,11 @@ module.exports = {
 
         //check that all arguments exist i.e. all fields are not null
         for (var i = 0, len = arguments.length; i < len; i++) {
-            if (arguments[i] == null || arguments[i] == undefined) {
-                errors++;
-                error('An error occurred. Some fields missing. Please try again');
+            if (errors == 0) {
+                if (arguments[i] == null || arguments[i] == undefined) {
+                    errors++;
+                    error('An error occurred. Some fields missing. Please try again');
+                }
             }
         }
 
@@ -475,9 +490,11 @@ module.exports = {
 
         //check that all arguments exist i.e. all fields are not null
         for (var i = 0, len = arguments.length; i < len; i++) {
-            if (arguments[i] == null || arguments[i] == undefined) {
-                errors++;
-                error('An error occurred. Some fields missing. Please try again');
+            if (errors == 0) {
+                if (arguments[i] == null || arguments[i] == undefined) {
+                    errors++;
+                    error('An error occurred. Some fields missing. Please try again');
+                }
             }
         }
 
@@ -511,6 +528,55 @@ module.exports = {
                 bannerClass: 'alert alert-dismissible alert-warning',
                 msg: errorMessage
             });
+        }
+    },
+
+    checkFileIsImage: function (req, res, file, callback) {
+        var module = 'checkFileIsImage';
+        receivedLogger(module);
+        var errors = 0;
+
+        //check that all arguments exist i.e. all fields are not null
+        for (var i = 0, len = arguments.length; i < len; i++) {
+            if (errors == 0) {
+                if (arguments[i] == null || arguments[i] == undefined) {
+                    errors++;
+                    error('An error occurred. Some fields missing. Please try again');
+                }
+            }
+        }
+
+        //file type
+        if (errors == 0) {
+            if (!(file.mimetype.indexOf('image') > -1)) {
+                ++errors;
+                error('Please upload a valid image type');
+            }
+        }
+
+        if (errors == 0) {
+            consoleLogger(successLogger(module));
+            callback();
+        }
+
+        function error(errorMessage) {
+            consoleLogger(errorLogger(module, errorMessage));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: errorMessage
+            });
+
+            //file is not image, remove it
+            middleware.deleteFile(file.path, error_deleting, removed);
+            function removed() {
+                consoleLogger(successLogger(module, "file successfully removed from filesystem"));
+            }
+
+            function error_deleting() {
+                consoleLogger(errorLogger(module, "file not removed from file system"));
+            }
         }
     }
 };

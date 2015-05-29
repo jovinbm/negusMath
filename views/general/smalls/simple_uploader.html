@@ -17,16 +17,33 @@
             </div>
 
             <div class="card-action clearfix">
-                <div ng-bind="files[0].name"
-                     class="very-small-font"></div>
+                <div ng-show="!isUploading">
+                    <div ng-bind="files[0].name"
+                         class="very-small-font"></div>
 
-                <div class="btn btn-xs btn-default" ngf-select ng-model="files">Select File</div>
+                    <div class="btn btn-xs btn-default" ngf-select ng-model="files">Select File</div>
 
-                <div class="btn btn-xs btn-default" ng-click="upload(files)">Upload</div>
+                    <div class="btn btn-xs btn-default" ng-click="upload(files)">Upload</div>
+                </div>
+
+                <div ng-show="isUploading && uploading.show">
+                    <div>Uploading... <i class="fa fa-circle-o-notch fa-spin"></i></div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped active"
+                             role="progressbar"
+                             ng-attr-aria-valuenow="{{uploading.percent}}"
+                             aria-valuemin="0"
+                             aria-valuemax="100"
+                             ng-attr-style="{{'width: ' + uploading.percent + '%;'}}">
+                            {{uploading.percent}}%
+                        </div>
+                    </div>
+                </div>
 
             </div>
 
         </div>
     </div>
 </div>
-<p class="very-small-font">Upload files here to get links. Use these links when you want to attach images, pdfs or other files to the post.</p>
+<p class="very-small-font">Upload files here to get links. Use these links when you want to attach images, pdf or zip
+    files to the post.</p>

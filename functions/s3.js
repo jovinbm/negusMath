@@ -1,4 +1,5 @@
 var fs = require('fs');
+var path = require('path');
 var AWS = require('aws-sdk');
 AWS.config.region = 'us-east-1';
 
@@ -26,8 +27,10 @@ function getTheUser(req) {
     return basic.getTheUser(req);
 }
 
-function ensureBucket(bucketName, error_neg_1, success) {
+function ensurePublicBucket(bucketName, error_neg_1, success) {
     var module = 'ensureBucket';
+    receivedLogger(module);
+
     var s3 = new AWS.S3();
     var params = {
         Bucket: bucketName
@@ -58,8 +61,10 @@ function ensureBucket(bucketName, error_neg_1, success) {
     });
 }
 
-function listBucket(error_neg_1, success) {
+function listBuckets(error_neg_1, success) {
     var module = 'listBucket';
+    receivedLogger(module);
+
     var s3 = new AWS.S3();
     s3.listBuckets(function (err, data) {
         if (err) {
@@ -75,30 +80,38 @@ function listBucket(error_neg_1, success) {
 
 module.exports = {
     ensureBucket: function (bucketName, error_neg_1, success) {
-        ensureBucket(bucketName, error_neg_1, success);
+        ensurePublicBucket(bucketName, error_neg_1, success);
     },
 
     listBuckets: function (error_neg_1, success) {
-        listBucket(error_neg_1, success)
+        listBuckets(error_neg_1, success)
     },
 
-    uploadPublicFileToBucket: function (toBucket, key, filePath, error_neg_1, success) {
+    uploadPublicFileToBucket: function (toBucket, key, filePathFromRoot, error_neg_1, success) {
         var module = 'uploadPublicFileToBucket';
-        var s3 = new AWS.S3();
-        var params = {
-            Bucket: toBucket,
-            Key: key,
-            ACL: 'public-read-write',
-            Body: fs.createReadStream(filePath)
-        };
-        s3.putObject(params, function (err, data) {
-            if (err) {
-                consoleLogger(errorLogger(module, err));
-                error_neg_1(-1);
-            } else {
-                consoleLogger(successLogger(module));
-                success(data);
-            }
-        });
+        receivedLogger(module);
+
+        ensurePublicBucket(toBucket, error_neg_1, bucketAvailable);
+
+        function bucketAvailable() {
+            var filePath = path.join(__dirname, '../', filePathFromRoot);
+
+            var s3 = new AWS.S3();
+            var params = {
+                Bucket: toBucket,
+                Key: key,
+                ACL: 'public-read-write',
+                Body: fs.createReadStream(filePath)
+            };
+            s3.putObject(params, function (err, data) {
+                if (err) {
+                    consoleLogger(errorLogger(module, err));
+                    error_neg_1(-1);
+                } else {
+                    consoleLogger(successLogger(module));
+                    success(data);
+                }
+            });
+        }
     }
 };
