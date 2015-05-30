@@ -12,6 +12,7 @@ var postSchema = new Schema({
     postContent: {type: String, required: true},
     postSummary: {type: String, required: true},
     postTags: {type: Array, default: [], index: true, unique: false},
+    postUploads: {type: Array, default: [], index: true, unique: false},
     numberOfVisits: {type: Number, default: 0, index: true},
     createdAt: {type: Date, default: Date.now, index: true}
 });
@@ -25,7 +26,8 @@ postSchema.index({
     postHeading: "text",
     postSummary: "text",
     postContent: "text",
-    postTags: "text"
+    postTags: "text",
+    postUploads: "text"
 });
 
 var autoIncrement = require('mongoose-auto-increment');

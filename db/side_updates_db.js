@@ -51,9 +51,9 @@ module.exports = {
 
     addNewFieldToAll: function () {
         var module = 'addNewFieldToAll';
-        User.update({}, {
+        Post.update({}, {
                 $set: {
-                    "emailIsConfirmed": false
+                    "postUploads": []
                 }
             },
             {
@@ -97,6 +97,38 @@ module.exports = {
                         }
 
                         hash(usersArray[currentCount].uniqueCuid, success);
+                    } else {
+                        consoleLogger("******************* " + successLogger(module));
+                    }
+                }
+
+                doNext();
+            }
+        })
+    },
+
+    addEmptyArrayFieldToAll: function () {
+        var module = 'addEmptyArrayFieldToAll';
+        Post.find({}, function (err, postsArray) {
+            if (err) {
+                consoleLogger("****************** " + errorLogger(module, err));
+            } else {
+
+                var totalCount = postsArray.length;
+                var currentCount = 0;
+
+                function doNext() {
+                    if (currentCount < totalCount) {
+                        consoleLogger(postsArray[currentCount].postUploads);
+                        postsArray[currentCount].postUploads = [];
+                        postsArray[currentCount].save(function (err) {
+                            if (err) {
+                                consoleLogger("******************** " + errorLogger(module, err));
+                            } else {
+                                ++currentCount;
+                                doNext();
+                            }
+                        });
                     } else {
                         consoleLogger("******************* " + successLogger(module));
                     }
