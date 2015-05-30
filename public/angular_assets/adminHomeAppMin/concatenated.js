@@ -394,508 +394,6 @@ angular.module('adminHomeApp')
         }
     ]);
 angular.module('adminHomeApp')
-
-    .factory('fN', [function () {
-        return {
-            calcObjectLength: function (obj) {
-                var len = 0;
-                for (var prop in obj) {
-                    if (obj.hasOwnProperty(prop)) {
-                        len++;
-                    }
-                }
-                return len
-            }
-        };
-    }]);
-angular.module('adminHomeApp')
-
-    .factory('globals', ['$q', '$location',
-        function ($q, $location) {
-            var userData = {};
-            var allData = {
-                documentTitle: "Negus Math - College Level Advanced Mathematics for Kenya Students",
-                indexPageUrl: $location.port() ? "http://" + $location.host() + ":" + $location.port() + "/index" : $scope.indexPageUrl = "http://" + $location.host() + "/index"
-            };
-
-            return {
-
-                userData: function (data) {
-                    if (data) {
-                        userData = data;
-                        return userData;
-                    } else {
-                        return userData;
-                    }
-                },
-
-                allData: allData,
-
-                getDocumentTitle: function () {
-                    return allData.documentTitle
-                },
-
-                defaultDocumentTitle: function () {
-                    allData.documentTitle = "Negus Math - College Level Advanced Mathematics for Kenya Students";
-                },
-
-                changeDocumentTitle: function (newDocumentTitle) {
-                    if (newDocumentTitle) {
-                        allData.documentTitle = newDocumentTitle;
-                    }
-                    return allData.documentTitle
-                },
-
-                getLocationHost: function () {
-                    if ($location.port()) {
-                        return "http://" + $location.host() + ":" + $location.port();
-                    } else {
-                        return "http://" + $location.host();
-                    }
-                }
-            };
-        }]);
-angular.module('adminHomeApp')
-    .factory('HotService', ['$filter', '$log', '$http', '$window', '$rootScope', 'socket',
-        function ($filter, $log, $http, $window, $rootScope, socket) {
-
-            var hotThisWeek = [];
-
-            socket.on('hotThisWeekPosts', function (data) {
-                //data here has the keys post, postCount
-                $rootScope.$broadcast('hotThisWeekPosts', data);
-            });
-
-            return {
-
-                getHotThisWeek: function () {
-                    return hotThisWeek;
-                },
-
-                getHotThisWeekFromServer: function () {
-                    return $http.post('/api/getHotThisWeek', {})
-                },
-
-                updateHotThisWeek: function (hotThisWeekArray) {
-                    if (hotThisWeekArray == []) {
-                        hotThisWeek = [];
-                    } else {
-                        hotThisWeek = $filter('preparePostsNoChange')(null, hotThisWeekArray);
-                    }
-                    return hotThisWeekArray;
-                }
-            };
-        }]);
-angular.module('adminHomeApp')
-    .factory('mainService', ['$log', '$window', '$rootScope', 'socket',
-        function ($log, $window, $rootScope, socket) {
-
-            socket.on('reconnect', function () {
-                $log.info("'reconnect sequence' triggered");
-                $rootScope.$broadcast('reconnect');
-            });
-
-            return {
-                done: function () {
-                    return 1;
-                }
-            };
-        }]);
-angular.module('adminHomeApp')
-    .factory('PostService', ['$filter', '$http', '$window', '$rootScope', 'socket',
-        function ($filter, $http, $window, $rootScope, socket) {
-
-            var post = {};
-            var editPostModel = {};
-            var allPosts = {};
-            var allPostsCount = 0;
-            var mainSearchResultsPosts = {};
-            var mainSearchResultsPostsCount = 0;
-            var suggestedPosts = {};
-            var suggestedPostsCount = 0;
-
-            socket.on('newPost', function (data) {
-                //data here has the keys post, postCount
-                $rootScope.$broadcast('newPost', data);
-            });
-
-            socket.on('postUpdate', function (data) {
-                //data here has the keys post, postCount
-                $rootScope.$broadcast('postUpdate', data);
-            });
-
-            return {
-
-                getAllPosts: function () {
-                    return allPosts;
-                },
-
-                getPosts: function (pageNumber) {
-                    if (pageNumber) {
-                        return allPosts[pageNumber];
-                    } else {
-                        return [];
-                    }
-                },
-
-                getAllPostsCount: function () {
-                    return allPostsCount;
-                },
-
-                getPostsFromServer: function (pageNumber) {
-                    return $http.post('/api/getPosts', {
-                        page: pageNumber
-                    })
-                },
-
-                updatePosts: function (postsArray, pageNumber) {
-                    if (postsArray == []) {
-                        allPosts[pageNumber] = [];
-                    } else {
-                        allPosts[pageNumber] = $filter('preparePosts')(null, postsArray);
-                    }
-                    return allPosts[pageNumber];
-                },
-
-                updateAllPostsCount: function (newCount) {
-                    allPostsCount = newCount;
-                    return allPostsCount;
-                },
-
-                addNewToPosts: function (newPost) {
-                    function makePost(theNewPost) {
-                        if (newPost == {}) {
-                            theNewPost = {}
-                        } else {
-                            theNewPost = $filter('preparePosts')(theNewPost, null);
-                        }
-                        return theNewPost;
-                    }
-
-                    var tempPost = makePost(newPost);
-                    //unshift in firstPage
-                    allPosts['1'].unshift(tempPost);
-                    return allPosts;
-                },
-
-                getCurrentPost: function (postIndex) {
-                    if (postIndex) {
-                        return post[postIndex]
-                    } else {
-                        return {};
-                    }
-                },
-
-                getPostFromServer: function (postIndex) {
-                    return $http.post('/api/getPost', {
-                        postIndex: postIndex
-                    });
-                },
-
-                updatePost: function (newPost) {
-                    if (newPost == {}) {
-                        post = {}
-                    } else {
-                        post[newPost.postIndex] = $filter('preparePosts')(newPost, null);
-                    }
-                    return post[newPost.postIndex];
-                },
-
-                getCurrentEditPostModel: function () {
-                    if (editPostModel == {}) {
-                        return {}
-                    } else {
-                        return editPostModel;
-                    }
-                },
-
-                getCurrentEditPostModelFromServer: function (postIndex) {
-                    return $http.post('/api/getPost', {
-                        postIndex: postIndex
-                    });
-                },
-
-                updateCurrentEditPostModel: function (newPost) {
-                    if (newPost == {}) {
-                        editPostModel = {}
-                    } else {
-                        editPostModel = $filter('preparePostsNoChange')(newPost, null);
-                    }
-                    return editPostModel;
-                },
-
-                getAllMainSearchResults: function () {
-                    return mainSearchResultsPosts;
-                },
-
-                getMainSearchResultsCount: function (pageNumber) {
-                    return mainSearchResultsPostsCount[pageNumber];
-                },
-
-                mainSearch: function (searchObject) {
-                    return $http.post('/api/mainSearch', searchObject);
-                },
-
-                updateMainSearchResults: function (resultsArray, pageNumber) {
-                    if (resultsArray == []) {
-                        mainSearchResultsPosts[pageNumber] = [];
-                    } else {
-                        mainSearchResultsPosts[pageNumber] = $filter('preparePosts')(null, resultsArray);
-                    }
-                    return mainSearchResultsPosts[pageNumber];
-                },
-
-                updateMainSearchResultsCount: function (newCount) {
-                    mainSearchResultsPostsCount = newCount;
-                    return mainSearchResultsPostsCount;
-                },
-
-                getSuggestedPosts: function () {
-                    return suggestedPosts;
-                },
-
-                getSuggestedPostsFromServer: function () {
-                    return $http.post('/api/getSuggestedPosts', {})
-                },
-
-                updateSuggestedPosts: function (suggestedPostsArray) {
-                    if (suggestedPostsArray == []) {
-                        suggestedPosts = [];
-                    } else {
-                        suggestedPosts = $filter('preparePostsNoChange')(null, suggestedPostsArray);
-                    }
-                    return suggestedPosts;
-                },
-
-                //admin actions
-
-                submitNewPost: function (newPost) {
-                    return $http.post('/api/newPost', {
-                        newPost: newPost
-                    });
-                },
-
-                submitPostUpdate: function (post) {
-                    return $http.post('/api/updatePost', {
-                        postUpdate: post
-                    });
-                }
-            };
-        }]);
-angular.module('adminHomeApp')
-
-    .factory('socket', ['$log', '$location', '$rootScope',
-        function ($log, $location, $rootScope) {
-            var url;
-            if ($location.port()) {
-                url = $location.host() + ":" + $location.port();
-            } else {
-                url = $location.host();
-            }
-            var socket = io.connect(url);
-            //return socket;
-            return {
-                on: function (eventName, callback) {
-                    socket.on(eventName, function () {
-                        var args = arguments;
-                        $rootScope.$apply(function () {
-                            callback.apply(socket, args);
-                        });
-                    });
-                },
-
-                emit: function (eventName, data, callback) {
-                    socket.emit(eventName, data, function () {
-                        var args = arguments;
-                        $rootScope.$apply(function () {
-                            if (callback) {
-                                callback.apply(socket, args);
-                            }
-                        });
-                    });
-                },
-
-                removeAllListeners: function (eventName, callback) {
-                    socket.removeAllListeners(eventName, function () {
-                        var args = arguments;
-                        $rootScope.$apply(function () {
-                            callback.apply(socket, args);
-                        });
-                    });
-                }
-            };
-        }])
-
-
-    .factory('socketService', ['$log', '$http', '$rootScope',
-        function ($log, $http) {
-
-            return {
-
-                getUserData: function () {
-                    return $http.get('/api/getUserData');
-                },
-
-                resendConfirmationEmail: function (userUniqueCuid) {
-                    return $http.post('/resendConfirmationEmail', {
-                        userUniqueCuid: userUniqueCuid
-                    });
-                },
-
-                sendContactUs: function (contactUsModel) {
-                    return $http.post('/contactUs', contactUsModel);
-                }
-            }
-        }
-    ])
-
-    .factory('logoutService', ['$http',
-        function ($http) {
-            return {
-
-                logoutClient: function () {
-                    return $http.post('/api/logoutClient');
-                }
-            }
-        }]);
-angular.module('adminHomeApp')
-    .factory('uploadService', ['$q', '$location', 'Upload', 'globals',
-        function ($q, $location, Upload, globals) {
-            return {
-                uploadPostImage: function (fields, file) {
-                    return Upload.upload({
-                        url: globals.getLocationHost() + '/api/uploadPostImage',
-                        fields: fields,
-                        file: file
-                    });
-                },
-
-                uploadPdf: function (fields, file) {
-                    return Upload.upload({
-                        url: globals.getLocationHost() + '/api/uploadPdf',
-                        fields: fields,
-                        file: file
-                    });
-                },
-
-                uploadZip: function (fields, file) {
-                    return Upload.upload({
-                        url: globals.getLocationHost() + '/api/uploadZip',
-                        fields: fields,
-                        file: file
-                    });
-                }
-            }
-        }]);
-angular.module('adminHomeApp')
-    .factory('UserService', ['$filter', '$http',
-        function ($filter, $http) {
-
-            var usersCount = {};
-            var allUsers = [];
-            var adminUsers = [];
-            var usersNotApproved = [];
-            var bannedUsers = [];
-
-            return {
-
-                getUsersCount: function () {
-                    return usersCount;
-                },
-
-                getUsersCountFromServer: function () {
-                    return $http.post('/api/getUsersCount', {})
-                },
-
-                updateUsersCount: function (newUsersCount) {
-                    usersCount = newUsersCount;
-                    return usersCount;
-                },
-
-                getAllUsers: function () {
-                    return allUsers;
-                },
-
-                getAllUsersFromServer: function () {
-                    return $http.post('/api/getAllUsers', {})
-                },
-
-                updateAllUsers: function (usersArray) {
-                    allUsers = usersArray;
-                    return allUsers;
-                },
-
-                getAdminUsers: function () {
-                    return adminUsers;
-                },
-
-                getAdminUsersFromServer: function () {
-                    return $http.post('/api/getAdminUsers', {})
-                },
-
-                updateAdminUsers: function (usersArray) {
-                    adminUsers = usersArray;
-                    return adminUsers;
-                },
-
-                getUsersNotApproved: function () {
-                    return usersNotApproved;
-                },
-
-                getUsersNotApprovedFromServer: function () {
-                    return $http.post('/api/getUsersNotApproved', {})
-                },
-
-                updateUsersNotApproved: function (usersArray) {
-                    usersNotApproved = usersArray;
-                    return usersNotApproved;
-                },
-
-                getBannedUsers: function () {
-                    return bannedUsers;
-                },
-
-                getBannedUsersFromServer: function () {
-                    return $http.post('/api/getBannedUsers', {})
-                },
-
-                updateBannedUsers: function (usersArray) {
-                    bannedUsers = usersArray;
-                    return bannedUsers;
-                },
-
-                addAdminPrivileges: function (userUniqueCuid) {
-                    return $http.post('/api/addAdminPrivileges', {
-                        userUniqueCuid: userUniqueCuid
-                    })
-                },
-
-                removeAdminPrivileges: function (userUniqueCuid) {
-                    return $http.post('/api/removeAdminPrivileges', {
-                        userUniqueCuid: userUniqueCuid
-                    })
-                },
-
-                approveUser: function (userUniqueCuid) {
-                    return $http.post('/api/approveUser', {
-                        userUniqueCuid: userUniqueCuid
-                    })
-                },
-
-                banUser: function (userUniqueCuid) {
-                    return $http.post('/api/banUser', {
-                        userUniqueCuid: userUniqueCuid
-                    })
-                },
-
-                unBanUser: function (userUniqueCuid) {
-                    return $http.post('/api/unBanUser', {
-                        userUniqueCuid: userUniqueCuid
-                    })
-                }
-            };
-        }]);
-angular.module('adminHomeApp')
     .filter("timeago", function () {
         //time: the time
         //local: compared to what time? default: now
@@ -1507,6 +1005,740 @@ angular.module('adminHomeApp')
         }
     }]);
 angular.module('adminHomeApp')
+
+    .factory('fN', [function () {
+        return {
+            calcObjectLength: function (obj) {
+                var len = 0;
+                for (var prop in obj) {
+                    if (obj.hasOwnProperty(prop)) {
+                        len++;
+                    }
+                }
+                return len
+            }
+        };
+    }]);
+angular.module('adminHomeApp')
+
+    .factory('globals', ['$q', '$location',
+        function ($q, $location) {
+            var userData = {};
+            var allData = {
+                documentTitle: "Negus Math - College Level Advanced Mathematics for Kenya Students",
+                indexPageUrl: $location.port() ? "http://" + $location.host() + ":" + $location.port() + "/index" : $scope.indexPageUrl = "http://" + $location.host() + "/index"
+            };
+
+            return {
+
+                userData: function (data) {
+                    if (data) {
+                        userData = data;
+                        return userData;
+                    } else {
+                        return userData;
+                    }
+                },
+
+                allData: allData,
+
+                getDocumentTitle: function () {
+                    return allData.documentTitle
+                },
+
+                defaultDocumentTitle: function () {
+                    allData.documentTitle = "Negus Math - College Level Advanced Mathematics for Kenya Students";
+                },
+
+                changeDocumentTitle: function (newDocumentTitle) {
+                    if (newDocumentTitle) {
+                        allData.documentTitle = newDocumentTitle;
+                    }
+                    return allData.documentTitle
+                },
+
+                getLocationHost: function () {
+                    if ($location.port()) {
+                        return "http://" + $location.host() + ":" + $location.port();
+                    } else {
+                        return "http://" + $location.host();
+                    }
+                }
+            };
+        }]);
+angular.module('adminHomeApp')
+    .factory('HotService', ['$filter', '$log', '$http', '$window', '$rootScope', 'socket',
+        function ($filter, $log, $http, $window, $rootScope, socket) {
+
+            var hotThisWeek = [];
+
+            socket.on('hotThisWeekPosts', function (data) {
+                //data here has the keys post, postCount
+                $rootScope.$broadcast('hotThisWeekPosts', data);
+            });
+
+            return {
+
+                getHotThisWeek: function () {
+                    return hotThisWeek;
+                },
+
+                getHotThisWeekFromServer: function () {
+                    return $http.post('/api/getHotThisWeek', {})
+                },
+
+                updateHotThisWeek: function (hotThisWeekArray) {
+                    if (hotThisWeekArray == []) {
+                        hotThisWeek = [];
+                    } else {
+                        hotThisWeek = $filter('preparePostsNoChange')(null, hotThisWeekArray);
+                    }
+                    return hotThisWeekArray;
+                }
+            };
+        }]);
+angular.module('adminHomeApp')
+    .factory('mainService', ['$log', '$window', '$rootScope', 'socket',
+        function ($log, $window, $rootScope, socket) {
+
+            socket.on('reconnect', function () {
+                $log.info("'reconnect sequence' triggered");
+                $rootScope.$broadcast('reconnect');
+            });
+
+            return {
+                done: function () {
+                    return 1;
+                }
+            };
+        }]);
+angular.module('adminHomeApp')
+    .factory('PostService', ['$filter', '$http', '$window', '$rootScope', 'socket',
+        function ($filter, $http, $window, $rootScope, socket) {
+
+            var post = {};
+            var editPostModel = {};
+            var allPosts = {};
+            var allPostsCount = 0;
+            var mainSearchResultsPosts = {};
+            var mainSearchResultsPostsCount = 0;
+            var suggestedPosts = {};
+            var suggestedPostsCount = 0;
+
+            socket.on('newPost', function (data) {
+                //data here has the keys post, postCount
+                $rootScope.$broadcast('newPost', data);
+            });
+
+            socket.on('postUpdate', function (data) {
+                //data here has the keys post, postCount
+                $rootScope.$broadcast('postUpdate', data);
+            });
+
+            return {
+
+                getAllPosts: function () {
+                    return allPosts;
+                },
+
+                getPosts: function (pageNumber) {
+                    if (pageNumber) {
+                        return allPosts[pageNumber];
+                    } else {
+                        return [];
+                    }
+                },
+
+                getAllPostsCount: function () {
+                    return allPostsCount;
+                },
+
+                getPostsFromServer: function (pageNumber) {
+                    return $http.post('/api/getPosts', {
+                        page: pageNumber
+                    })
+                },
+
+                updatePosts: function (postsArray, pageNumber) {
+                    if (postsArray == []) {
+                        allPosts[pageNumber] = [];
+                    } else {
+                        allPosts[pageNumber] = $filter('preparePosts')(null, postsArray);
+                    }
+                    return allPosts[pageNumber];
+                },
+
+                updateAllPostsCount: function (newCount) {
+                    allPostsCount = newCount;
+                    return allPostsCount;
+                },
+
+                addNewToPosts: function (newPost) {
+                    function makePost(theNewPost) {
+                        if (newPost == {}) {
+                            theNewPost = {}
+                        } else {
+                            theNewPost = $filter('preparePosts')(theNewPost, null);
+                        }
+                        return theNewPost;
+                    }
+
+                    var tempPost = makePost(newPost);
+                    //unshift in firstPage
+                    allPosts['1'].unshift(tempPost);
+                    return allPosts;
+                },
+
+                getCurrentPost: function (postIndex) {
+                    if (postIndex) {
+                        return post[postIndex]
+                    } else {
+                        return {};
+                    }
+                },
+
+                getPostFromServer: function (postIndex) {
+                    return $http.post('/api/getPost', {
+                        postIndex: postIndex
+                    });
+                },
+
+                updatePost: function (newPost) {
+                    if (newPost == {}) {
+                        post = {}
+                    } else {
+                        post[newPost.postIndex] = $filter('preparePosts')(newPost, null);
+                    }
+                    return post[newPost.postIndex];
+                },
+
+                getCurrentEditPostModel: function () {
+                    if (editPostModel == {}) {
+                        return {}
+                    } else {
+                        return editPostModel;
+                    }
+                },
+
+                getCurrentEditPostModelFromServer: function (postIndex) {
+                    return $http.post('/api/getPost', {
+                        postIndex: postIndex
+                    });
+                },
+
+                updateCurrentEditPostModel: function (newPost) {
+                    if (newPost == {}) {
+                        editPostModel = {}
+                    } else {
+                        editPostModel = $filter('preparePostsNoChange')(newPost, null);
+                    }
+                    return editPostModel;
+                },
+
+                getAllMainSearchResults: function () {
+                    return mainSearchResultsPosts;
+                },
+
+                getMainSearchResultsCount: function (pageNumber) {
+                    return mainSearchResultsPostsCount[pageNumber];
+                },
+
+                mainSearch: function (searchObject) {
+                    return $http.post('/api/mainSearch', searchObject);
+                },
+
+                updateMainSearchResults: function (resultsArray, pageNumber) {
+                    if (resultsArray == []) {
+                        mainSearchResultsPosts[pageNumber] = [];
+                    } else {
+                        mainSearchResultsPosts[pageNumber] = $filter('preparePosts')(null, resultsArray);
+                    }
+                    return mainSearchResultsPosts[pageNumber];
+                },
+
+                updateMainSearchResultsCount: function (newCount) {
+                    mainSearchResultsPostsCount = newCount;
+                    return mainSearchResultsPostsCount;
+                },
+
+                getSuggestedPosts: function () {
+                    return suggestedPosts;
+                },
+
+                getSuggestedPostsFromServer: function () {
+                    return $http.post('/api/getSuggestedPosts', {})
+                },
+
+                updateSuggestedPosts: function (suggestedPostsArray) {
+                    if (suggestedPostsArray == []) {
+                        suggestedPosts = [];
+                    } else {
+                        suggestedPosts = $filter('preparePostsNoChange')(null, suggestedPostsArray);
+                    }
+                    return suggestedPosts;
+                },
+
+                //admin actions
+
+                submitNewPost: function (newPost) {
+                    return $http.post('/api/newPost', {
+                        newPost: newPost
+                    });
+                },
+
+                submitPostUpdate: function (post) {
+                    return $http.post('/api/updatePost', {
+                        postUpdate: post
+                    });
+                }
+            };
+        }]);
+angular.module('adminHomeApp')
+
+    .factory('socket', ['$log', '$location', '$rootScope',
+        function ($log, $location, $rootScope) {
+            var url;
+            if ($location.port()) {
+                url = $location.host() + ":" + $location.port();
+            } else {
+                url = $location.host();
+            }
+            var socket = io.connect(url);
+            //return socket;
+            return {
+                on: function (eventName, callback) {
+                    socket.on(eventName, function () {
+                        var args = arguments;
+                        $rootScope.$apply(function () {
+                            callback.apply(socket, args);
+                        });
+                    });
+                },
+
+                emit: function (eventName, data, callback) {
+                    socket.emit(eventName, data, function () {
+                        var args = arguments;
+                        $rootScope.$apply(function () {
+                            if (callback) {
+                                callback.apply(socket, args);
+                            }
+                        });
+                    });
+                },
+
+                removeAllListeners: function (eventName, callback) {
+                    socket.removeAllListeners(eventName, function () {
+                        var args = arguments;
+                        $rootScope.$apply(function () {
+                            callback.apply(socket, args);
+                        });
+                    });
+                }
+            };
+        }])
+
+
+    .factory('socketService', ['$log', '$http', '$rootScope',
+        function ($log, $http) {
+
+            return {
+
+                getUserData: function () {
+                    return $http.get('/api/getUserData');
+                },
+
+                resendConfirmationEmail: function (userUniqueCuid) {
+                    return $http.post('/resendConfirmationEmail', {
+                        userUniqueCuid: userUniqueCuid
+                    });
+                },
+
+                sendContactUs: function (contactUsModel) {
+                    return $http.post('/contactUs', contactUsModel);
+                }
+            }
+        }
+    ])
+
+    .factory('logoutService', ['$http',
+        function ($http) {
+            return {
+
+                logoutClient: function () {
+                    return $http.post('/api/logoutClient');
+                }
+            }
+        }]);
+angular.module('adminHomeApp')
+    .factory('uploadService', ['$q', '$location', 'Upload', 'globals',
+        function ($q, $location, Upload, globals) {
+            return {
+                uploadPostImage: function (fields, file) {
+                    return Upload.upload({
+                        url: globals.getLocationHost() + '/api/uploadPostImage',
+                        fields: fields,
+                        file: file
+                    });
+                },
+
+                uploadPdf: function (fields, file) {
+                    return Upload.upload({
+                        url: globals.getLocationHost() + '/api/uploadPdf',
+                        fields: fields,
+                        file: file
+                    });
+                },
+
+                uploadZip: function (fields, file) {
+                    return Upload.upload({
+                        url: globals.getLocationHost() + '/api/uploadZip',
+                        fields: fields,
+                        file: file
+                    });
+                }
+            }
+        }]);
+angular.module('adminHomeApp')
+    .factory('UserService', ['$filter', '$http',
+        function ($filter, $http) {
+
+            var usersCount = {};
+            var allUsers = [];
+            var adminUsers = [];
+            var usersNotApproved = [];
+            var bannedUsers = [];
+
+            return {
+
+                getUsersCount: function () {
+                    return usersCount;
+                },
+
+                getUsersCountFromServer: function () {
+                    return $http.post('/api/getUsersCount', {})
+                },
+
+                updateUsersCount: function (newUsersCount) {
+                    usersCount = newUsersCount;
+                    return usersCount;
+                },
+
+                getAllUsers: function () {
+                    return allUsers;
+                },
+
+                getAllUsersFromServer: function () {
+                    return $http.post('/api/getAllUsers', {})
+                },
+
+                updateAllUsers: function (usersArray) {
+                    allUsers = usersArray;
+                    return allUsers;
+                },
+
+                getAdminUsers: function () {
+                    return adminUsers;
+                },
+
+                getAdminUsersFromServer: function () {
+                    return $http.post('/api/getAdminUsers', {})
+                },
+
+                updateAdminUsers: function (usersArray) {
+                    adminUsers = usersArray;
+                    return adminUsers;
+                },
+
+                getUsersNotApproved: function () {
+                    return usersNotApproved;
+                },
+
+                getUsersNotApprovedFromServer: function () {
+                    return $http.post('/api/getUsersNotApproved', {})
+                },
+
+                updateUsersNotApproved: function (usersArray) {
+                    usersNotApproved = usersArray;
+                    return usersNotApproved;
+                },
+
+                getBannedUsers: function () {
+                    return bannedUsers;
+                },
+
+                getBannedUsersFromServer: function () {
+                    return $http.post('/api/getBannedUsers', {})
+                },
+
+                updateBannedUsers: function (usersArray) {
+                    bannedUsers = usersArray;
+                    return bannedUsers;
+                },
+
+                addAdminPrivileges: function (userUniqueCuid) {
+                    return $http.post('/api/addAdminPrivileges', {
+                        userUniqueCuid: userUniqueCuid
+                    })
+                },
+
+                removeAdminPrivileges: function (userUniqueCuid) {
+                    return $http.post('/api/removeAdminPrivileges', {
+                        userUniqueCuid: userUniqueCuid
+                    })
+                },
+
+                approveUser: function (userUniqueCuid) {
+                    return $http.post('/api/approveUser', {
+                        userUniqueCuid: userUniqueCuid
+                    })
+                },
+
+                banUser: function (userUniqueCuid) {
+                    return $http.post('/api/banUser', {
+                        userUniqueCuid: userUniqueCuid
+                    })
+                },
+
+                unBanUser: function (userUniqueCuid) {
+                    return $http.post('/api/unBanUser', {
+                        userUniqueCuid: userUniqueCuid
+                    })
+                }
+            };
+        }]);
+angular.module('adminHomeApp')
+    .directive('adminUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/users/admin_users.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+
+                $scope.adminUsersModel = {
+                    filterString: ""
+                };
+                $scope.adminUsers = UserService.getAdminUsers();
+
+                function getAdminUsers() {
+                    UserService.getAdminUsersFromServer()
+                        .success(function (resp) {
+                            $scope.adminUsers = UserService.updateAdminUsers(resp.usersArray);
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                }
+
+                getAdminUsers();
+
+                $rootScope.$on('userChanges', function () {
+                    getAdminUsers();
+                });
+
+                $rootScope.$on('reconnect', function () {
+                });
+            }
+        }
+    }]);
+angular.module('adminHomeApp')
+    .directive('allUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/users/all_users.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+
+                //the model to be used when searching
+                $scope.allUsersModel = {
+                    filterString: ""
+                };
+
+                $scope.allUsers = UserService.getAllUsers();
+
+                function getAllUsers() {
+                    UserService.getAllUsersFromServer()
+                        .success(function (resp) {
+                            $scope.allUsers = UserService.updateAllUsers(resp.usersArray);
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                }
+
+                getAllUsers();
+
+                $rootScope.$on('userChanges', function () {
+                    getAllUsers();
+                });
+
+                $rootScope.$on('reconnect', function () {
+                });
+            }
+        }
+    }]);
+angular.module('adminHomeApp')
+    .directive('bannedUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/users/banned_users.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+
+                //the model to be used when searching
+                $scope.bannedUsersModel = {
+                    filterString: ""
+                };
+
+                $scope.bannedUsers = UserService.getBannedUsers();
+
+                function getBannedUsers() {
+                    UserService.getBannedUsersFromServer()
+                        .success(function (resp) {
+                            $scope.bannedUsers = UserService.updateBannedUsers(resp.usersArray);
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                }
+
+                getBannedUsers();
+
+                $rootScope.$on('userChanges', function () {
+                    getBannedUsers();
+                });
+
+                $rootScope.$on('reconnect', function () {
+                });
+            }
+        }
+    }]);
+angular.module('adminHomeApp')
+    .directive('unApprovedUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/users/unApproved_users.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+
+                $scope.usersNotApprovedModel = {
+                    filterString: ""
+                };
+                $scope.usersNotApproved = UserService.getUsersNotApproved();
+
+                function getUsersNotApproved() {
+                    UserService.getUsersNotApprovedFromServer()
+                        .success(function (resp) {
+                            $scope.usersNotApproved = UserService.updateUsersNotApproved(resp.usersArray);
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                }
+
+                getUsersNotApproved();
+
+                $rootScope.$on('userChanges', function () {
+                    getUsersNotApproved();
+                });
+
+                $rootScope.$on('reconnect', function () {
+                });
+            }
+        }
+    }]);
+angular.module('adminHomeApp')
+    .directive('userDisplay', ['$rootScope', 'UserService', 'socketService', function ($rootScope, UserService, socketService) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/users/user_display.html',
+            restrict: 'AE',
+            scope: {
+                user: '='
+            },
+            link: function ($scope, $element, $attrs) {
+                //$scope.user included in scope
+
+                $scope.isCollapsed = true;
+
+                $scope.resendConfirmationEmail = function (userUniqueCuid) {
+                    socketService.resendConfirmationEmail(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (err) {
+                            $rootScope.main.responseStatusHandler(err);
+                        })
+                };
+
+                //user manipulation functions
+                $scope.addAdminPrivileges = function (userUniqueCuid) {
+                    UserService.addAdminPrivileges(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.$broadcast('userChanges');
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                };
+
+                $scope.removeAdminPrivileges = function (userUniqueCuid) {
+                    UserService.removeAdminPrivileges(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.$broadcast('userChanges');
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                };
+
+                $scope.approveUser = function (userUniqueCuid) {
+                    UserService.approveUser(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.$broadcast('userChanges');
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                };
+
+                $scope.banUser = function (userUniqueCuid) {
+                    UserService.banUser(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.$broadcast('userChanges');
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                };
+
+                $scope.unBanUser = function (userUniqueCuid) {
+                    UserService.unBanUser(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.$broadcast('userChanges');
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                };
+            }
+        }
+    }]);
+angular.module('adminHomeApp')
+    .directive('usersCount', ['$q', '$log', '$rootScope', function ($q, $log, $rootScope) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/users/user_statistics.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $rootScope.$on('userChanges', function () {
+                });
+            }
+        }
+    }]);
+angular.module('adminHomeApp')
     .directive('accountStatusBanner', ['$rootScope', 'socketService', '$location', '$window', function ($rootScope, socketService, $location, $window) {
         return {
             scope: {},
@@ -1834,7 +2066,8 @@ angular.module('adminHomeApp')
                     postHeading: "",
                     postContent: "",
                     postSummary: "",
-                    postTags: []
+                    postTags: [],
+                    postUploads: []
                 };
 
                 //broadcast here helps distinguish from the inform checking and the checking on submit, which requires notifications
@@ -1864,28 +2097,29 @@ angular.module('adminHomeApp')
                 };
 
                 $scope.submitNewPost = function () {
-                    if ($scope.validateForm(true)) {
-                        var newPost = {
-                            postHeading: $scope.newPostModel.postHeading,
-                            postContent: $scope.newPostModel.postContent,
-                            postSummary: $scope.newPostModel.postSummary,
-                            postTags: $scope.newPostModel.postTags
-                        };
-                        PostService.submitNewPost(newPost).
-                            success(function (resp) {
-                                $rootScope.main.responseStatusHandler(resp);
-                                $scope.newPostModel.postHeading = "";
-                                $scope.newPostModel.postContent = "";
-                                $scope.newPostModel.postSummary = "";
-                                $scope.newPostModel.postTags = [];
-                            })
-                            .error(function (errResponse) {
-                                $rootScope.main.responseStatusHandler(errResponse);
-                                $rootScope.main.goToTop();
-                            })
-                    } else {
-                        $rootScope.main.goToTop();
-                    }
+                    console.log($scope.newPostModel);
+                    //if ($scope.validateForm(true)) {
+                    //    var newPost = {
+                    //        postHeading: $scope.newPostModel.postHeading,
+                    //        postContent: $scope.newPostModel.postContent,
+                    //        postSummary: $scope.newPostModel.postSummary,
+                    //        postTags: $scope.newPostModel.postTags
+                    //    };
+                    //    PostService.submitNewPost(newPost).
+                    //        success(function (resp) {
+                    //            $rootScope.main.responseStatusHandler(resp);
+                    //            $scope.newPostModel.postHeading = "";
+                    //            $scope.newPostModel.postContent = "";
+                    //            $scope.newPostModel.postSummary = "";
+                    //            $scope.newPostModel.postTags = [];
+                    //        })
+                    //        .error(function (errResponse) {
+                    //            $rootScope.main.responseStatusHandler(errResponse);
+                    //            $rootScope.main.goToTop();
+                    //        })
+                    //} else {
+                    //    $rootScope.main.goToTop();
+                    //}
                 }
             }
         }
@@ -2296,6 +2530,98 @@ angular.module('adminHomeApp')
         }
     }]);
 angular.module('adminHomeApp')
+    .directive('newPostUploader', ['$rootScope', 'uploadService', function ($rootScope, uploadService) {
+        return {
+
+            templateUrl: 'views/general/smalls/new_post_uploader.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.selectedFileType = {
+                    type: 'image'
+                };
+
+                $scope.isUploading = false;
+                $scope.uploading = {
+                    show: false,
+                    percent: 0
+                };
+
+                $scope.showUploading = function () {
+                    $scope.isUploading = true;
+                    $scope.uploading.percent = 0;
+                    $scope.uploading.show = true;
+                };
+
+                $scope.hideProgressBars = function () {
+                    $scope.isUploading = false;
+                    $scope.uploading.show = false;
+                };
+
+                $scope.upload = function (files) {
+                    if (files && files.length) {
+                        var file = files[0];
+                        var fields = {};
+                        $scope.showUploading();
+                        if ($scope.selectedFileType.type === 'image') {
+                            uploadPostImage(fields, file);
+                        } else if ($scope.selectedFileType.type === 'pdf') {
+                            uploadPdf(fields, file);
+                        } else if ($scope.selectedFileType.type === 'zip') {
+                            uploadZip(fields, file);
+                        }
+                    }
+                };
+
+                function uploadPostImage(fields, file) {
+                    uploadService.uploadPostImage(fields, file)
+                        .progress(function (evt) {
+                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                        })
+                        .success(function (data, status, headers, config) {
+                            $rootScope.main.responseStatusHandler(data);
+                            $scope.newPostModel.postUploads.push(data.fileData);
+                            $scope.hideProgressBars();
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                            $scope.hideProgressBars();
+                        });
+                }
+
+                function uploadPdf(fields, file) {
+                    uploadService.uploadPdf(fields, file)
+                        .progress(function (evt) {
+                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                        })
+                        .success(function (data, status, headers, config) {
+                            $rootScope.main.responseStatusHandler(data);
+                            $scope.newPostModel.postUploads.push(data.fileData);
+                            $scope.hideProgressBars();
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                            $scope.hideProgressBars();
+                        });
+                }
+
+                function uploadZip(fields, file) {
+                    uploadService.uploadZip(fields, file)
+                        .progress(function (evt) {
+                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                        })
+                        .success(function (data, status, headers, config) {
+                            $rootScope.main.responseStatusHandler(data);
+                            $scope.newPostModel.postUploads.push(data.fileData);
+                            $scope.hideProgressBars();
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                            $scope.hideProgressBars();
+                        });
+                }
+            }
+        }
+    }])
     .directive('uploaderDirective', ['$rootScope', 'uploadService', function ($rootScope, uploadService) {
         return {
 
@@ -2386,238 +2712,6 @@ angular.module('adminHomeApp')
                             $scope.hideProgressBars();
                         });
                 }
-            }
-        }
-    }]);
-angular.module('adminHomeApp')
-    .directive('adminUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
-        return {
-            templateUrl: 'views/admin/partials/smalls/users/admin_users.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-
-                $scope.adminUsersModel = {
-                    filterString: ""
-                };
-                $scope.adminUsers = UserService.getAdminUsers();
-
-                function getAdminUsers() {
-                    UserService.getAdminUsersFromServer()
-                        .success(function (resp) {
-                            $scope.adminUsers = UserService.updateAdminUsers(resp.usersArray);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                }
-
-                getAdminUsers();
-
-                $rootScope.$on('userChanges', function () {
-                    getAdminUsers();
-                });
-
-                $rootScope.$on('reconnect', function () {
-                });
-            }
-        }
-    }]);
-angular.module('adminHomeApp')
-    .directive('allUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
-        return {
-            templateUrl: 'views/admin/partials/smalls/users/all_users.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-
-                //the model to be used when searching
-                $scope.allUsersModel = {
-                    filterString: ""
-                };
-
-                $scope.allUsers = UserService.getAllUsers();
-
-                function getAllUsers() {
-                    UserService.getAllUsersFromServer()
-                        .success(function (resp) {
-                            $scope.allUsers = UserService.updateAllUsers(resp.usersArray);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                }
-
-                getAllUsers();
-
-                $rootScope.$on('userChanges', function () {
-                    getAllUsers();
-                });
-
-                $rootScope.$on('reconnect', function () {
-                });
-            }
-        }
-    }]);
-angular.module('adminHomeApp')
-    .directive('bannedUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
-        return {
-            templateUrl: 'views/admin/partials/smalls/users/banned_users.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-
-                //the model to be used when searching
-                $scope.bannedUsersModel = {
-                    filterString: ""
-                };
-
-                $scope.bannedUsers = UserService.getBannedUsers();
-
-                function getBannedUsers() {
-                    UserService.getBannedUsersFromServer()
-                        .success(function (resp) {
-                            $scope.bannedUsers = UserService.updateBannedUsers(resp.usersArray);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                }
-
-                getBannedUsers();
-
-                $rootScope.$on('userChanges', function () {
-                    getBannedUsers();
-                });
-
-                $rootScope.$on('reconnect', function () {
-                });
-            }
-        }
-    }]);
-angular.module('adminHomeApp')
-    .directive('unApprovedUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
-        return {
-            templateUrl: 'views/admin/partials/smalls/users/unApproved_users.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-
-                $scope.usersNotApprovedModel = {
-                    filterString: ""
-                };
-                $scope.usersNotApproved = UserService.getUsersNotApproved();
-
-                function getUsersNotApproved() {
-                    UserService.getUsersNotApprovedFromServer()
-                        .success(function (resp) {
-                            $scope.usersNotApproved = UserService.updateUsersNotApproved(resp.usersArray);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                }
-
-                getUsersNotApproved();
-
-                $rootScope.$on('userChanges', function () {
-                    getUsersNotApproved();
-                });
-
-                $rootScope.$on('reconnect', function () {
-                });
-            }
-        }
-    }]);
-angular.module('adminHomeApp')
-    .directive('userDisplay', ['$rootScope', 'UserService', 'socketService', function ($rootScope, UserService, socketService) {
-        return {
-            templateUrl: 'views/admin/partials/smalls/users/user_display.html',
-            restrict: 'AE',
-            scope: {
-                user: '='
-            },
-            link: function ($scope, $element, $attrs) {
-                //$scope.user included in scope
-
-                $scope.isCollapsed = true;
-
-                $scope.resendConfirmationEmail = function (userUniqueCuid) {
-                    socketService.resendConfirmationEmail(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (err) {
-                            $rootScope.main.responseStatusHandler(err);
-                        })
-                };
-
-                //user manipulation functions
-                $scope.addAdminPrivileges = function (userUniqueCuid) {
-                    UserService.addAdminPrivileges(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                };
-
-                $scope.removeAdminPrivileges = function (userUniqueCuid) {
-                    UserService.removeAdminPrivileges(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                };
-
-                $scope.approveUser = function (userUniqueCuid) {
-                    UserService.approveUser(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                };
-
-                $scope.banUser = function (userUniqueCuid) {
-                    UserService.banUser(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                };
-
-                $scope.unBanUser = function (userUniqueCuid) {
-                    UserService.unBanUser(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                };
-            }
-        }
-    }]);
-angular.module('adminHomeApp')
-    .directive('usersCount', ['$q', '$log', '$rootScope', function ($q, $log, $rootScope) {
-        return {
-            templateUrl: 'views/admin/partials/smalls/users/user_statistics.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $rootScope.$on('userChanges', function () {
-                });
             }
         }
     }]);

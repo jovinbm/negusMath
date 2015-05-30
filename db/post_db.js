@@ -244,7 +244,8 @@ module.exports = {
                 postHeading: postObject.postHeading,
                 postContent: postObject.postContent,
                 postSummary: postObject.postSummary,
-                postTags: postObject.postTags
+                postTags: postObject.postTags,
+                postUploads: postObject.postUploads
             });
             consoleLogger(successLogger(module));
             success(post);
@@ -286,7 +287,8 @@ module.exports = {
                 postHeading: postObject.postHeading,
                 postContent: postObject.postContent,
                 postSummary: postObject.postSummary,
-                postTags: postObject.postTags
+                postTags: postObject.postTags,
+                postUploads: postObject.postUploads
             };
             consoleLogger(successLogger(module));
             success(post);
@@ -317,6 +319,7 @@ module.exports = {
                     thePost.postContent = postToUpdate.postContent;
                     thePost.postSummary = postToUpdate.postSummary;
                     thePost.postTags = postToUpdate.postTags;
+                    thePost.postUploads = postToUpdate.postUploads;
 
                     thePost.save(function (err, savedPost) {
                         if (err) {

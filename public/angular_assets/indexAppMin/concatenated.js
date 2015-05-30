@@ -537,6 +537,180 @@ angular.module('indexApp')
         }
     ]);
 angular.module('indexApp')
+
+    .factory('fN', ['$q', '$location', '$window', '$rootScope', 'socketService',
+        function ($q, $location, $window, $rootScope, socketService) {
+            return {
+                calcObjectLength: function (obj) {
+                    var len = 0;
+                    for (var prop in obj) {
+                        if (obj.hasOwnProperty(prop)) {
+                            len++;
+                        }
+                    }
+                    return len
+                }
+            };
+        }]);
+angular.module('indexApp')
+
+    .factory('globals', ['$q', '$location', '$window', '$rootScope', 'socketService',
+        function ($q, $location, $window, $rootScope, socketService) {
+            var userData = {};
+            var allData = {
+                documentTitle: "Negus Math - College Level Advanced Mathematics for Kenya Students",
+                indexPageUrl: $location.port() ? "http://" + $location.host() + ":" + $location.port() + "/index" : $scope.indexPageUrl = "http://" + $location.host() + "/index"
+            };
+
+            var universalBanner = {
+                show: false,
+                bannerClass: "",
+                msg: ""
+            };
+
+            var registrationBanner = {
+                show: false,
+                bannerClass: "",
+                msg: ""
+            };
+
+            return {
+
+                userData: function (data) {
+                    if (data) {
+                        userData = data;
+                        return userData;
+                    } else {
+                        return userData;
+                    }
+                },
+
+                allData: allData,
+
+                getDocumentTitle: function () {
+                    return allData.documentTitle
+                },
+
+                defaultDocumentTitle: function () {
+                    allData.documentTitle = "Negus Math - College Level Advanced Mathematics for Kenya Students";
+                },
+
+                changeDocumentTitle: function (newDocumentTitle) {
+                    if (newDocumentTitle) {
+                        allData.documentTitle = newDocumentTitle;
+                    }
+                    return allData.documentTitle
+                },
+
+                getLocationHost: function () {
+                    if ($location.port()) {
+                        return "http://" + $location.host() + ":" + $location.port();
+                    } else {
+                        return "http://" + $location.host();
+                    }
+                }
+            };
+        }]);
+angular.module('indexApp')
+    .factory('mainService', ['$log', '$window', '$rootScope', 'socket', 'socketService', 'globals',
+        function ($log, $window, $rootScope, socket, socketService, globals) {
+
+            socket.on('reconnect', function () {
+                $log.info("'reconnect sequence' triggered");
+                $rootScope.$broadcast('reconnectSuccess');
+            });
+
+            return {
+                done: function () {
+                    return 1;
+                }
+            };
+        }]);
+angular.module('indexApp')
+
+    .factory('socket', ['$log', '$location', '$rootScope',
+        function ($log, $location, $rootScope) {
+            var url;
+            if ($location.port()) {
+                url = $location.host() + ":" + $location.port();
+            } else {
+                url = $location.host();
+            }
+            var socket = io.connect(url);
+            //return socket;
+            return {
+                on: function (eventName, callback) {
+                    socket.on(eventName, function () {
+                        var args = arguments;
+                        $rootScope.$apply(function () {
+                            callback.apply(socket, args);
+                        });
+                    });
+                },
+
+                emit: function (eventName, data, callback) {
+                    socket.emit(eventName, data, function () {
+                        var args = arguments;
+                        $rootScope.$apply(function () {
+                            if (callback) {
+                                callback.apply(socket, args);
+                            }
+                        });
+                    });
+                },
+
+                removeAllListeners: function (eventName, callback) {
+                    socket.removeAllListeners(eventName, function () {
+                        var args = arguments;
+                        $rootScope.$apply(function () {
+                            callback.apply(socket, args);
+                        });
+                    });
+                }
+            };
+        }])
+
+
+    .factory('socketService', ['$log', '$http', '$rootScope',
+        function ($log, $http, $rootScope) {
+
+            return {
+
+                getUserData: function () {
+                    return $http.get('/api/getUserData');
+                },
+
+                createAccount: function (details) {
+                    return $http.post('/createAccount', details);
+                },
+
+                localUserLogin: function (loginData) {
+                    return $http.post('/localUserLogin', loginData);
+                },
+
+                resendConfirmationEmail: function (userUniqueCuid) {
+                    return $http.post('/resendConfirmationEmail', {
+                        userUniqueCuid: userUniqueCuid
+                    });
+                },
+
+                sendContactUs: function (contactUsModel) {
+                    return $http.post('/contactUs', contactUsModel);
+                }
+            }
+        }
+    ])
+
+    .factory('logoutService', ['$http',
+        function ($http) {
+            return {
+
+                logoutClient: function () {
+                    return $http.post('/api/logoutClient');
+                }
+            }
+        }]);
+angular.module('indexApp')
     .filter("timeago", function () {
         //time: the time
         //local: compared to what time? default: now
@@ -781,178 +955,3 @@ angular.module('indexApp')
     }]);
 
 
-
-angular.module('indexApp')
-
-    .factory('fN', ['$q', '$location', '$window', '$rootScope', 'socketService',
-        function ($q, $location, $window, $rootScope, socketService) {
-            return {
-                calcObjectLength: function (obj) {
-                    var len = 0;
-                    for (var prop in obj) {
-                        if (obj.hasOwnProperty(prop)) {
-                            len++;
-                        }
-                    }
-                    return len
-                }
-            };
-        }]);
-angular.module('indexApp')
-
-    .factory('globals', ['$q', '$location', '$window', '$rootScope', 'socketService',
-        function ($q, $location, $window, $rootScope, socketService) {
-            var userData = {};
-            var allData = {
-                documentTitle: "Negus Math - College Level Advanced Mathematics for Kenya Students",
-                indexPageUrl: $location.port() ? "http://" + $location.host() + ":" + $location.port() + "/index" : $scope.indexPageUrl = "http://" + $location.host() + "/index"
-            };
-
-            var universalBanner = {
-                show: false,
-                bannerClass: "",
-                msg: ""
-            };
-
-            var registrationBanner = {
-                show: false,
-                bannerClass: "",
-                msg: ""
-            };
-
-            return {
-
-                userData: function (data) {
-                    if (data) {
-                        userData = data;
-                        return userData;
-                    } else {
-                        return userData;
-                    }
-                },
-
-                allData: allData,
-
-                getDocumentTitle: function () {
-                    return allData.documentTitle
-                },
-
-                defaultDocumentTitle: function () {
-                    allData.documentTitle = "Negus Math - College Level Advanced Mathematics for Kenya Students";
-                },
-
-                changeDocumentTitle: function (newDocumentTitle) {
-                    if (newDocumentTitle) {
-                        allData.documentTitle = newDocumentTitle;
-                    }
-                    return allData.documentTitle
-                },
-
-                getLocationHost: function () {
-                    if ($location.port()) {
-                        return "http://" + $location.host() + ":" + $location.port();
-                    } else {
-                        return "http://" + $location.host();
-                    }
-                }
-            };
-        }]);
-angular.module('indexApp')
-    .factory('mainService', ['$log', '$window', '$rootScope', 'socket', 'socketService', 'globals',
-        function ($log, $window, $rootScope, socket, socketService, globals) {
-
-            socket.on('reconnect', function () {
-                $log.info("'reconnect sequence' triggered");
-                $rootScope.$broadcast('reconnectSuccess');
-            });
-
-            return {
-                done: function () {
-                    return 1;
-                }
-            };
-        }]);
-angular.module('indexApp')
-
-    .factory('socket', ['$log', '$location', '$rootScope',
-        function ($log, $location, $rootScope) {
-            var url;
-            if ($location.port()) {
-                url = $location.host() + ":" + $location.port();
-            } else {
-                url = $location.host();
-            }
-            var socket = io.connect(url);
-            //return socket;
-            return {
-                on: function (eventName, callback) {
-                    socket.on(eventName, function () {
-                        var args = arguments;
-                        $rootScope.$apply(function () {
-                            callback.apply(socket, args);
-                        });
-                    });
-                },
-
-                emit: function (eventName, data, callback) {
-                    socket.emit(eventName, data, function () {
-                        var args = arguments;
-                        $rootScope.$apply(function () {
-                            if (callback) {
-                                callback.apply(socket, args);
-                            }
-                        });
-                    });
-                },
-
-                removeAllListeners: function (eventName, callback) {
-                    socket.removeAllListeners(eventName, function () {
-                        var args = arguments;
-                        $rootScope.$apply(function () {
-                            callback.apply(socket, args);
-                        });
-                    });
-                }
-            };
-        }])
-
-
-    .factory('socketService', ['$log', '$http', '$rootScope',
-        function ($log, $http, $rootScope) {
-
-            return {
-
-                getUserData: function () {
-                    return $http.get('/api/getUserData');
-                },
-
-                createAccount: function (details) {
-                    return $http.post('/createAccount', details);
-                },
-
-                localUserLogin: function (loginData) {
-                    return $http.post('/localUserLogin', loginData);
-                },
-
-                resendConfirmationEmail: function (userUniqueCuid) {
-                    return $http.post('/resendConfirmationEmail', {
-                        userUniqueCuid: userUniqueCuid
-                    });
-                },
-
-                sendContactUs: function (contactUsModel) {
-                    return $http.post('/contactUs', contactUsModel);
-                }
-            }
-        }
-    ])
-
-    .factory('logoutService', ['$http',
-        function ($http) {
-            return {
-
-                logoutClient: function () {
-                    return $http.post('/api/logoutClient');
-                }
-            }
-        }]);

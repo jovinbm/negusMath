@@ -7,9 +7,9 @@
         <div class="card">
 
             <div class="card-content"
-                 ng-show="postUploads.length > 0">
+                 ng-show="newPostModel.postUploads.length > 0">
                 <ul class="list-unstyled">
-                    <li ng-repeat="file in uploads">
+                    <li ng-repeat="file in newPostModel.postUploads">
                         {{file.originalname}} - <a ng-href="{{file.amazonS3Url}}"
                                                    target="_blank">Link</a>
                     </li>
@@ -88,7 +88,7 @@
                 </div>
 
                 <div ng-show="isUploading && uploading.show">
-                    <div>Uploading... <i class="fa fa-circle-o-notch fa-spin"></i></div>
+                    <div>Uploading...</div>
                     <div class="progress">
                         <div class="progress-bar progress-bar-striped active"
                              role="progressbar"

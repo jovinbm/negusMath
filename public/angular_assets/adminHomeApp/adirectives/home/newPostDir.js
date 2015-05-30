@@ -11,7 +11,8 @@ angular.module('adminHomeApp')
                     postHeading: "",
                     postContent: "",
                     postSummary: "",
-                    postTags: []
+                    postTags: [],
+                    postUploads: []
                 };
 
                 //broadcast here helps distinguish from the inform checking and the checking on submit, which requires notifications
@@ -41,28 +42,29 @@ angular.module('adminHomeApp')
                 };
 
                 $scope.submitNewPost = function () {
-                    if ($scope.validateForm(true)) {
-                        var newPost = {
-                            postHeading: $scope.newPostModel.postHeading,
-                            postContent: $scope.newPostModel.postContent,
-                            postSummary: $scope.newPostModel.postSummary,
-                            postTags: $scope.newPostModel.postTags
-                        };
-                        PostService.submitNewPost(newPost).
-                            success(function (resp) {
-                                $rootScope.main.responseStatusHandler(resp);
-                                $scope.newPostModel.postHeading = "";
-                                $scope.newPostModel.postContent = "";
-                                $scope.newPostModel.postSummary = "";
-                                $scope.newPostModel.postTags = [];
-                            })
-                            .error(function (errResponse) {
-                                $rootScope.main.responseStatusHandler(errResponse);
-                                $rootScope.main.goToTop();
-                            })
-                    } else {
-                        $rootScope.main.goToTop();
-                    }
+                    console.log($scope.newPostModel);
+                    //if ($scope.validateForm(true)) {
+                    //    var newPost = {
+                    //        postHeading: $scope.newPostModel.postHeading,
+                    //        postContent: $scope.newPostModel.postContent,
+                    //        postSummary: $scope.newPostModel.postSummary,
+                    //        postTags: $scope.newPostModel.postTags
+                    //    };
+                    //    PostService.submitNewPost(newPost).
+                    //        success(function (resp) {
+                    //            $rootScope.main.responseStatusHandler(resp);
+                    //            $scope.newPostModel.postHeading = "";
+                    //            $scope.newPostModel.postContent = "";
+                    //            $scope.newPostModel.postSummary = "";
+                    //            $scope.newPostModel.postTags = [];
+                    //        })
+                    //        .error(function (errResponse) {
+                    //            $rootScope.main.responseStatusHandler(errResponse);
+                    //            $rootScope.main.goToTop();
+                    //        })
+                    //} else {
+                    //    $rootScope.main.goToTop();
+                    //}
                 }
             }
         }

@@ -353,6 +353,14 @@ module.exports = {
             }
         }
 
+        //validate that the post is not null
+        if (errors == 0) {
+            if ((theNewPost == null || theNewPost == undefined)) {
+                ++errors;
+                error('Missing post');
+            }
+        }
+
         //check that all fields in the new post are available
 
         //validate heading
