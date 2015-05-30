@@ -64,6 +64,336 @@ angular.module('adminHomeApp', [
             .hashPrefix('!');
     }]);
 angular.module('adminHomeApp')
+    .controller('HotController', ['$q', '$log', '$scope', '$rootScope', 'HotService',
+        function ($q, $log, $scope, $rootScope, HotService) {
+
+            $scope.hotThisWeek = HotService.getHotThisWeek();
+
+            function getHotThisWeek() {
+                HotService.getHotThisWeekFromServer()
+                    .success(function (resp) {
+                        $scope.hotThisWeek = HotService.updateHotThisWeek(resp.hotThisWeek);
+                    })
+                    .error(function (errResp) {
+                        $scope.hotThisWeek = HotService.updateHotThisWeek([]);
+                        $rootScope.main.responseStatusHandler(errResp);
+                    });
+            }
+
+            getHotThisWeek();
+
+            //===============socket listeners===============
+
+            $rootScope.$on('reconnect', function () {
+                getHotThisWeek();
+            });
+        }
+    ]);
+angular.module('adminHomeApp')
+    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'socketService', 'globals', '$document',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, socketService, globals, $document) {
+
+            //index page url
+            $scope.indexPageUrl = globals.allData.indexPageUrl;
+
+            //website host
+            $rootScope.currentHost = globals.getLocationHost();
+
+            //disqus
+            $scope.showDisqus = $location.host().search("negusmath") !== -1;
+
+            //scrolling functions
+            var duration = 0; //milliseconds
+            var offset = 40; //pixels; adjust for floating menu, context etc
+            //Scroll to #some-id with 30 px "padding"
+            //Note: Use this in a directive, not with document.getElementById
+
+            $rootScope.main = {
+                currentTime: "",
+
+                clientIsRegistered: false,
+
+                showLoadingBannerDir: false,
+
+                showLoadingBanner: function () {
+                    this.showLoadingBannerDir = true;
+                },
+
+                hideLoadingBanner: function () {
+                    this.showLoadingBannerDir = false;
+                },
+
+                goToTop: function () {
+                    var someElement = angular.element(document.getElementById('top'));
+                    $document.scrollToElement(someElement, 80, duration);
+                },
+
+                broadcastUserData: function () {
+                    $rootScope.$broadcast('userDataChanges');
+                },
+
+                responseStatusHandler: function (resp) {
+                    $filter('responseFilter')(resp);
+                },
+
+                clearBanners: function () {
+                    $rootScope.$broadcast('clearBanners');
+                }
+            };
+
+            //=====================time functions=======================
+            //set current Date
+            $scope.currentTime = moment().format("ddd, MMM D, H:mm");
+            var updateCurrentTime = function () {
+                $scope.currentTime = moment().format("ddd, MMM D, H:mm");
+            };
+            $interval(updateCurrentTime, 20000, 0, true);
+
+            //======================end time functions===================
+
+            //initial requests
+            function initialRequests() {
+                socketService.getUserData()
+                    .success(function (resp) {
+                        $scope.userData = globals.userData(resp.userData);
+                        $rootScope.main.broadcastUserData();
+                        $rootScope.main.clientIsRegistered = $scope.userData.isRegistered;
+
+                        if ($scope.userData.isRegistered) {
+                            //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
+                            socket.emit('joinRoom', {
+                                room: resp.userData.uniqueCuid
+                            });
+                        }
+
+                        $rootScope.main.responseStatusHandler(resp);
+                    })
+                    .error(function (errResponse) {
+                        $rootScope.main.responseStatusHandler(errResponse);
+                    });
+            }
+
+            initialRequests();
+
+            //$scope functions to be used in other controllers and directives
+            //back navigation functionality
+            var history = [];
+            $rootScope.stateHistory = [];
+            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+                history.push($location.$$path);
+                //push the previous state also
+                var temp = {};
+                temp[fromState.name] = fromParams;
+                $rootScope.stateHistory.push(temp);
+            });
+            $rootScope.back = function () {
+                var prevUrl = history.length > 1 ? history.splice(-2)[0] : "/";
+                $location.path(prevUrl);
+            };
+
+            $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+                $rootScope.main.clearBanners();
+                $rootScope.clearToasts();
+
+                //variable to keep track of when the user is editing the post
+                $rootScope.isEditingPost = false;
+            });
+
+            //===============socket listeners===============
+
+            $rootScope.$on('reconnect', function () {
+                initialRequests();
+            });
+        }
+    ]);
+angular.module('adminHomeApp')
+    .controller('EditPostController', ['$q', '$filter', '$log', '$window', '$location', '$scope', '$rootScope', 'globals', 'PostService', 'fN',
+        function ($q, $filter, $log, $window, $location, $scope, $rootScope, globals, PostService, fN) {
+
+            $rootScope.main.goToTop();
+
+            $scope.editPostModel = PostService.getCurrentEditPostModel();
+
+            function getFullEditPostModel() {
+                PostService.getCurrentEditPostModelFromServer($rootScope.$stateParams.postIndex)
+                    .success(function (resp) {
+                        $rootScope.main.responseStatusHandler(resp);
+                        if (fN.calcObjectLength(resp.thePost) != 0) {
+                            $scope.editPostModel = PostService.updateCurrentEditPostModel(resp.thePost);
+                            globals.changeDocumentTitle($scope.editPostModel.postHeading);
+                        } else {
+                            //empty the post
+                            $scope.editPostModel = PostService.updateCurrentEditPostModel({});
+                        }
+
+                    })
+                    .error(function (errResponse) {
+                        $rootScope.main.responseStatusHandler(errResponse);
+                        //empty the post
+                        $scope.editPostModel = PostService.updateCurrentEditPostModel({});
+                    });
+            }
+
+            getFullEditPostModel();
+
+            $scope.cancelPostUpdate = function () {
+                $rootScope.showToast('success', 'Update cancelled');
+                if ($location.port()) {
+                    $window.location.href = "http://" + $location.host() + ":" + $location.port() + $scope.editPostModel.postPath;
+                } else {
+                    $window.location.href = "http://" + $location.host() + $scope.editPostModel.postPath
+                }
+            };
+
+            $scope.validateEditForm = function (notify) {
+                var errors = 0;
+                if (!$filter("validatePostHeading")($scope.editPostModel.postHeading, notify)) {
+                    errors++;
+                }
+                if (errors == 0) {
+                    if (!$filter("validatePostContent")($scope.editPostModel.postContent, notify)) {
+                        errors++;
+                    }
+                }
+                if (errors == 0) {
+                    if (!$filter("validatePostSummary")($scope.editPostModel.postSummary, notify)) {
+                        errors++;
+                    }
+                }
+                if (errors == 0) {
+                    if (!$filter("validatePostTags")($scope.editPostModel.postTags, notify)) {
+                        errors++;
+                    }
+                }
+                return errors == 0;
+            };
+
+            $scope.submitPostUpdate = function () {
+                if ($scope.validateEditForm(true)) {
+                    PostService.submitPostUpdate($scope.editPostModel)
+                        .success(function (resp) {
+                            $rootScope.main.responseStatusHandler(resp);
+                            $rootScope.showToast('success', 'Saved');
+                            if ($location.port()) {
+                                $window.location.href = "http://" + $location.host() + ":" + $location.port() + $scope.editPostModel.postPath;
+                            } else {
+                                $window.location.href = "http://" + $location.host() + $scope.editPostModel.postPath
+                            }
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                }
+            };
+        }
+    ]);
+angular.module('adminHomeApp')
+    .controller('SearchController', ['$q', '$log', '$scope', '$rootScope', 'globals', 'PostService',
+        function ($q, $log, $scope, $rootScope, globals, PostService) {
+
+            $rootScope.main.goToTop();
+
+            $scope.mainSearchModel = {
+                queryString: $rootScope.$stateParams.queryString || '',
+                postSearchUniqueCuid: "",
+                requestedPage: 1
+            };
+
+            //change to default document title
+            globals.changeDocumentTitle($rootScope.$stateParams.queryString + " - NegusMath Search");
+
+            $scope.mainSearchResultsPosts = PostService.getAllMainSearchResults();
+            $scope.mainSearchResultsCount = 0;
+
+            function getMainSearchResults(pageNumber) {
+                $scope.mainSearchModel = {
+                    queryString: $rootScope.$stateParams.queryString || '',
+                    postSearchUniqueCuid: $scope.mainSearchModel.postSearchUniqueCuid,
+                    requestedPage: pageNumber
+                };
+
+                PostService.mainSearch($scope.mainSearchModel)
+                    .success(function (resp) {
+                        //the response is the resultValue
+                        if (resp.results.totalResults > 0) {
+                            var theResult = resp.results;
+                            $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults(theResult.postsArray, pageNumber);
+                            $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(theResult.totalResults);
+                            $scope.mainSearchModel.postSearchUniqueCuid = theResult.searchUniqueCuid;
+
+                            var responseMimic1 = {
+                                banner: true,
+                                bannerClass: 'alert alert-dismissible alert-success',
+                                msg: "The search returned " + $scope.mainSearchResultsCount + " results"
+                            };
+                            $rootScope.main.responseStatusHandler(responseMimic1);
+                        } else {
+                            //empty the postsArray
+                            $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults([]);
+                            $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(0);
+                            var responseMimic2 = {
+                                banner: true,
+                                bannerClass: 'alert alert-dismissible alert-success',
+                                msg: "The search returned 0 results"
+                            };
+                            $rootScope.main.responseStatusHandler(responseMimic2);
+                        }
+                    })
+                    .error(function (errResp) {
+                        $rootScope.main.responseStatusHandler(errResp);
+                        //empty the postsArray
+                        $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults([]);
+                        $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(0);
+                    });
+            }
+
+            getMainSearchResults(1);
+
+            $scope.showMore = function (pageNumber) {
+                getMainSearchResults(pageNumber);
+            };
+
+            //===============socket listeners===============
+
+            $rootScope.$on('reconnect', function () {
+                if ($rootScope.$state.current.name == 'home.search') {
+                    getMainSearchResults();
+                }
+            });
+        }
+    ]);
+angular.module('adminHomeApp')
+    .controller('UserManagerController', ['$q', '$scope', '$rootScope', 'UserService',
+        function ($q, $scope, $rootScope, UserService) {
+
+            $rootScope.main.goToTop();
+
+            $scope.usersCount = UserService.getUsersCount();
+
+            function getUsersCount() {
+                UserService.getUsersCountFromServer()
+                    .success(function (resp) {
+                        $scope.usersCount = UserService.updateUsersCount(resp.usersCount);
+                        $rootScope.main.responseStatusHandler(resp);
+                    })
+                    .error(function (errResponse) {
+                        $rootScope.main.responseStatusHandler(errResponse);
+                    })
+            }
+
+            getUsersCount();
+
+            //===============socket listeners===============
+
+            $rootScope.$on('userChanges', function () {
+                getUsersCount();
+            });
+
+            $rootScope.$on('reconnect', function () {
+            });
+        }
+    ]);
+angular.module('adminHomeApp')
     .filter("timeago", function () {
         //time: the time
         //local: compared to what time? default: now
@@ -674,336 +1004,6 @@ angular.module('adminHomeApp')
             return messages;
         }
     }]);
-angular.module('adminHomeApp')
-    .controller('HotController', ['$q', '$log', '$scope', '$rootScope', 'HotService',
-        function ($q, $log, $scope, $rootScope, HotService) {
-
-            $scope.hotThisWeek = HotService.getHotThisWeek();
-
-            function getHotThisWeek() {
-                HotService.getHotThisWeekFromServer()
-                    .success(function (resp) {
-                        $scope.hotThisWeek = HotService.updateHotThisWeek(resp.hotThisWeek);
-                    })
-                    .error(function (errResp) {
-                        $scope.hotThisWeek = HotService.updateHotThisWeek([]);
-                        $rootScope.main.responseStatusHandler(errResp);
-                    });
-            }
-
-            getHotThisWeek();
-
-            //===============socket listeners===============
-
-            $rootScope.$on('reconnect', function () {
-                getHotThisWeek();
-            });
-        }
-    ]);
-angular.module('adminHomeApp')
-    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'socketService', 'globals', '$document',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, socketService, globals, $document) {
-
-            //index page url
-            $scope.indexPageUrl = globals.allData.indexPageUrl;
-
-            //website host
-            $rootScope.currentHost = globals.getLocationHost();
-
-            //disqus
-            $scope.showDisqus = $location.host().search("negusmath") !== -1;
-
-            //scrolling functions
-            var duration = 0; //milliseconds
-            var offset = 40; //pixels; adjust for floating menu, context etc
-            //Scroll to #some-id with 30 px "padding"
-            //Note: Use this in a directive, not with document.getElementById
-
-            $rootScope.main = {
-                currentTime: "",
-
-                clientIsRegistered: false,
-
-                showLoadingBannerDir: false,
-
-                showLoadingBanner: function () {
-                    this.showLoadingBannerDir = true;
-                },
-
-                hideLoadingBanner: function () {
-                    this.showLoadingBannerDir = false;
-                },
-
-                goToTop: function () {
-                    var someElement = angular.element(document.getElementById('top'));
-                    $document.scrollToElement(someElement, 80, duration);
-                },
-
-                broadcastUserData: function () {
-                    $rootScope.$broadcast('userDataChanges');
-                },
-
-                responseStatusHandler: function (resp) {
-                    $filter('responseFilter')(resp);
-                },
-
-                clearBanners: function () {
-                    $rootScope.$broadcast('clearBanners');
-                }
-            };
-
-            //=====================time functions=======================
-            //set current Date
-            $scope.currentTime = moment().format("ddd, MMM D, H:mm");
-            var updateCurrentTime = function () {
-                $scope.currentTime = moment().format("ddd, MMM D, H:mm");
-            };
-            $interval(updateCurrentTime, 20000, 0, true);
-
-            //======================end time functions===================
-
-            //initial requests
-            function initialRequests() {
-                socketService.getUserData()
-                    .success(function (resp) {
-                        $scope.userData = globals.userData(resp.userData);
-                        $rootScope.main.broadcastUserData();
-                        $rootScope.main.clientIsRegistered = $scope.userData.isRegistered;
-
-                        if ($scope.userData.isRegistered) {
-                            //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
-                            socket.emit('joinRoom', {
-                                room: resp.userData.uniqueCuid
-                            });
-                        }
-
-                        $rootScope.main.responseStatusHandler(resp);
-                    })
-                    .error(function (errResponse) {
-                        $rootScope.main.responseStatusHandler(errResponse);
-                    });
-            }
-
-            initialRequests();
-
-            //$scope functions to be used in other controllers and directives
-            //back navigation functionality
-            var history = [];
-            $rootScope.stateHistory = [];
-            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
-                history.push($location.$$path);
-                //push the previous state also
-                var temp = {};
-                temp[fromState.name] = fromParams;
-                $rootScope.stateHistory.push(temp);
-            });
-            $rootScope.back = function () {
-                var prevUrl = history.length > 1 ? history.splice(-2)[0] : "/";
-                $location.path(prevUrl);
-            };
-
-            $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-                $rootScope.main.clearBanners();
-                $rootScope.clearToasts();
-
-                //variable to keep track of when the user is editing the post
-                $rootScope.isEditingPost = false;
-            });
-
-            //===============socket listeners===============
-
-            $rootScope.$on('reconnect', function () {
-                initialRequests();
-            });
-        }
-    ]);
-angular.module('adminHomeApp')
-    .controller('EditPostController', ['$q', '$filter', '$log', '$window', '$location', '$scope', '$rootScope', 'globals', 'PostService', 'fN',
-        function ($q, $filter, $log, $window, $location, $scope, $rootScope, globals, PostService, fN) {
-
-            $rootScope.main.goToTop();
-
-            $scope.editPostModel = PostService.getCurrentEditPostModel();
-
-            function getFullEditPostModel() {
-                PostService.getCurrentEditPostModelFromServer($rootScope.$stateParams.postIndex)
-                    .success(function (resp) {
-                        $rootScope.main.responseStatusHandler(resp);
-                        if (fN.calcObjectLength(resp.thePost) != 0) {
-                            $scope.editPostModel = PostService.updateCurrentEditPostModel(resp.thePost);
-                            globals.changeDocumentTitle($scope.editPostModel.postHeading);
-                        } else {
-                            //empty the post
-                            $scope.editPostModel = PostService.updateCurrentEditPostModel({});
-                        }
-
-                    })
-                    .error(function (errResponse) {
-                        $rootScope.main.responseStatusHandler(errResponse);
-                        //empty the post
-                        $scope.editPostModel = PostService.updateCurrentEditPostModel({});
-                    });
-            }
-
-            getFullEditPostModel();
-
-            $scope.cancelPostUpdate = function () {
-                $rootScope.showToast('success', 'Update cancelled');
-                if ($location.port()) {
-                    $window.location.href = "http://" + $location.host() + ":" + $location.port() + $scope.editPostModel.postPath;
-                } else {
-                    $window.location.href = "http://" + $location.host() + $scope.editPostModel.postPath
-                }
-            };
-
-            $scope.validateEditForm = function (notify) {
-                var errors = 0;
-                if (!$filter("validatePostHeading")($scope.editPostModel.postHeading, notify)) {
-                    errors++;
-                }
-                if (errors == 0) {
-                    if (!$filter("validatePostContent")($scope.editPostModel.postContent, notify)) {
-                        errors++;
-                    }
-                }
-                if (errors == 0) {
-                    if (!$filter("validatePostSummary")($scope.editPostModel.postSummary, notify)) {
-                        errors++;
-                    }
-                }
-                if (errors == 0) {
-                    if (!$filter("validatePostTags")($scope.editPostModel.postTags, notify)) {
-                        errors++;
-                    }
-                }
-                return errors == 0;
-            };
-
-            $scope.submitPostUpdate = function () {
-                if ($scope.validateEditForm(true)) {
-                    PostService.submitPostUpdate($scope.editPostModel)
-                        .success(function (resp) {
-                            $rootScope.main.responseStatusHandler(resp);
-                            $rootScope.showToast('success', 'Saved');
-                            if ($location.port()) {
-                                $window.location.href = "http://" + $location.host() + ":" + $location.port() + $scope.editPostModel.postPath;
-                            } else {
-                                $window.location.href = "http://" + $location.host() + $scope.editPostModel.postPath
-                            }
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                }
-            };
-        }
-    ]);
-angular.module('adminHomeApp')
-    .controller('SearchController', ['$q', '$log', '$scope', '$rootScope', 'globals', 'PostService',
-        function ($q, $log, $scope, $rootScope, globals, PostService) {
-
-            $rootScope.main.goToTop();
-
-            $scope.mainSearchModel = {
-                queryString: $rootScope.$stateParams.queryString || '',
-                postSearchUniqueCuid: "",
-                requestedPage: 1
-            };
-
-            //change to default document title
-            globals.changeDocumentTitle($rootScope.$stateParams.queryString + " - NegusMath Search");
-
-            $scope.mainSearchResultsPosts = PostService.getAllMainSearchResults();
-            $scope.mainSearchResultsCount = 0;
-
-            function getMainSearchResults(pageNumber) {
-                $scope.mainSearchModel = {
-                    queryString: $rootScope.$stateParams.queryString || '',
-                    postSearchUniqueCuid: $scope.mainSearchModel.postSearchUniqueCuid,
-                    requestedPage: pageNumber
-                };
-
-                PostService.mainSearch($scope.mainSearchModel)
-                    .success(function (resp) {
-                        //the response is the resultValue
-                        if (resp.results.totalResults > 0) {
-                            var theResult = resp.results;
-                            $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults(theResult.postsArray, pageNumber);
-                            $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(theResult.totalResults);
-                            $scope.mainSearchModel.postSearchUniqueCuid = theResult.searchUniqueCuid;
-
-                            var responseMimic1 = {
-                                banner: true,
-                                bannerClass: 'alert alert-dismissible alert-success',
-                                msg: "The search returned " + $scope.mainSearchResultsCount + " results"
-                            };
-                            $rootScope.main.responseStatusHandler(responseMimic1);
-                        } else {
-                            //empty the postsArray
-                            $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults([]);
-                            $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(0);
-                            var responseMimic2 = {
-                                banner: true,
-                                bannerClass: 'alert alert-dismissible alert-success',
-                                msg: "The search returned 0 results"
-                            };
-                            $rootScope.main.responseStatusHandler(responseMimic2);
-                        }
-                    })
-                    .error(function (errResp) {
-                        $rootScope.main.responseStatusHandler(errResp);
-                        //empty the postsArray
-                        $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults([]);
-                        $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(0);
-                    });
-            }
-
-            getMainSearchResults(1);
-
-            $scope.showMore = function (pageNumber) {
-                getMainSearchResults(pageNumber);
-            };
-
-            //===============socket listeners===============
-
-            $rootScope.$on('reconnect', function () {
-                if ($rootScope.$state.current.name == 'home.search') {
-                    getMainSearchResults();
-                }
-            });
-        }
-    ]);
-angular.module('adminHomeApp')
-    .controller('UserManagerController', ['$q', '$scope', '$rootScope', 'UserService',
-        function ($q, $scope, $rootScope, UserService) {
-
-            $rootScope.main.goToTop();
-
-            $scope.usersCount = UserService.getUsersCount();
-
-            function getUsersCount() {
-                UserService.getUsersCountFromServer()
-                    .success(function (resp) {
-                        $scope.usersCount = UserService.updateUsersCount(resp.usersCount);
-                        $rootScope.main.responseStatusHandler(resp);
-                    })
-                    .error(function (errResponse) {
-                        $rootScope.main.responseStatusHandler(errResponse);
-                    })
-            }
-
-            getUsersCount();
-
-            //===============socket listeners===============
-
-            $rootScope.$on('userChanges', function () {
-                getUsersCount();
-            });
-
-            $rootScope.$on('reconnect', function () {
-            });
-        }
-    ]);
 angular.module('adminHomeApp')
 
     .factory('fN', [function () {
@@ -2346,7 +2346,7 @@ angular.module('adminHomeApp')
                         })
                         .success(function (data, status, headers, config) {
                             $rootScope.main.responseStatusHandler(data);
-                            $scope.newPostModel.postUploads.push(data.fileData);
+                            $scope.editPostModel.postUploads.push(data.fileData);
                             $scope.hideProgressBars();
                         })
                         .error(function (errResponse) {
@@ -2362,7 +2362,7 @@ angular.module('adminHomeApp')
                         })
                         .success(function (data, status, headers, config) {
                             $rootScope.main.responseStatusHandler(data);
-                            $scope.newPostModel.postUploads.push(data.fileData);
+                            $scope.editPostModel.postUploads.push(data.fileData);
                             $scope.hideProgressBars();
                         })
                         .error(function (errResponse) {
@@ -2378,7 +2378,99 @@ angular.module('adminHomeApp')
                         })
                         .success(function (data, status, headers, config) {
                             $rootScope.main.responseStatusHandler(data);
-                            $scope.newPostModel.postUploads.push(data.fileData);
+                            $scope.editPostModel.postUploads.push(data.fileData);
+                            $scope.hideProgressBars();
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                            $scope.hideProgressBars();
+                        });
+                }
+            }
+        }
+    }])
+    .directive('editPostUploader', ['$rootScope', 'uploadService', function ($rootScope, uploadService) {
+        return {
+
+            templateUrl: 'views/general/smalls/edit_post_uploader.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.selectedFileType = {
+                    type: 'image'
+                };
+
+                $scope.isUploading = false;
+                $scope.uploading = {
+                    show: false,
+                    percent: 0
+                };
+
+                $scope.showUploading = function () {
+                    $scope.isUploading = true;
+                    $scope.uploading.percent = 0;
+                    $scope.uploading.show = true;
+                };
+
+                $scope.hideProgressBars = function () {
+                    $scope.isUploading = false;
+                    $scope.uploading.show = false;
+                };
+
+                $scope.upload = function (files) {
+                    if (files && files.length) {
+                        var file = files[0];
+                        var fields = {};
+                        $scope.showUploading();
+                        if ($scope.selectedFileType.type === 'image') {
+                            uploadPostImage(fields, file);
+                        } else if ($scope.selectedFileType.type === 'pdf') {
+                            uploadPdf(fields, file);
+                        } else if ($scope.selectedFileType.type === 'zip') {
+                            uploadZip(fields, file);
+                        }
+                    }
+                };
+
+                function uploadPostImage(fields, file) {
+                    uploadService.uploadPostImage(fields, file)
+                        .progress(function (evt) {
+                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                        })
+                        .success(function (data, status, headers, config) {
+                            $rootScope.main.responseStatusHandler(data);
+                            $scope.editPostModel.postUploads.push(data.fileData);
+                            $scope.hideProgressBars();
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                            $scope.hideProgressBars();
+                        });
+                }
+
+                function uploadPdf(fields, file) {
+                    uploadService.uploadPdf(fields, file)
+                        .progress(function (evt) {
+                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                        })
+                        .success(function (data, status, headers, config) {
+                            $rootScope.main.responseStatusHandler(data);
+                            $scope.editPostModel.postUploads.push(data.fileData);
+                            $scope.hideProgressBars();
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                            $scope.hideProgressBars();
+                        });
+                }
+
+                function uploadZip(fields, file) {
+                    uploadService.uploadZip(fields, file)
+                        .progress(function (evt) {
+                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                        })
+                        .success(function (data, status, headers, config) {
+                            $rootScope.main.responseStatusHandler(data);
+                            $scope.editPostModel.postUploads.push(data.fileData);
                             $scope.hideProgressBars();
                         })
                         .error(function (errResponse) {

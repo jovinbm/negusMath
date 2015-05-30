@@ -1,10 +1,110 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+<div class="panel panel-default no-margin-bottom">
 
-</body>
-</html>
+    <div class="panel-heading">Uploads</div>
+
+    <div class="panel-body">
+
+        <div class="card">
+
+            <div class="card-content"
+                 ng-show="editPostModel.postUploads.length > 0">
+                <ul class="list-unstyled">
+                    <li ng-repeat="file in editPostModel.postUploads">
+                        {{file.originalname}} - <a ng-href="{{file.amazonS3Url}}"
+                                                   target="_blank">Link</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card-action clearfix">
+                <div ng-show="!isUploading">
+
+                    <strong>Select file type: </strong>
+                    <br/>
+
+                    <label class="radio-inline">
+                        <input type="radio"
+                               ng-model="selectedFileType.type"
+                               value="image"
+                               id="image"
+                               name="uploadType"> Image
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio"
+                               ng-model="selectedFileType.type"
+                               value="pdf"
+                               id="pdf"
+                               name="uploadType"> PDF
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio"
+                               ng-model="selectedFileType.type"
+                               value="zip"
+                               id="zip"
+                               name="uploadType"> Zip
+                    </label>
+
+                    <div ng-bind="files[0].name"
+                         class="very-small-font"></div>
+
+                    <div ng-show="selectedFileType.type == 'image'">
+                        <div class="btn btn-xs btn-default"
+                             ngf-select
+                             ng-model="files"
+                             ngf-max-size='307200'
+                             accept="image/*">Select File
+                        </div>
+
+                        <div class="btn btn-xs btn-default" ng-click="upload(files)">Upload</div>
+
+                        <div class="very-small-font">Maximum allowed pdf size is 300 KB
+                        </div>
+                    </div>
+                    <div ng-show="selectedFileType.type == 'pdf'">
+                        <div class="btn btn-xs btn-default"
+                             ngf-select
+                             ng-model="files"
+                             ngf-max-size='104857600'
+                             accept="application/pdf">Select File
+                        </div>
+
+                        <div class="btn btn-xs btn-default" ng-click="upload(files)">Upload</div>
+
+                        <div class="very-small-font">Maximum allowed pdf size is 100 MB
+                        </div>
+                    </div>
+                    <div ng-show="selectedFileType.type == 'zip'">
+                        <div class="btn btn-xs btn-default"
+                             ngf-select
+                             ng-model="files"
+                             ngf-max-size='209715200'
+                             accept="application/zip,application/x-zip,application/x-zip-compressed">Select File
+                        </div>
+
+                        <div class="btn btn-xs btn-default" ng-click="upload(files)">Upload</div>
+                        <div class="very-small-font">Maximum allowed zip size is 200 MB
+                        </div>
+                    </div>
+                </div>
+
+                <div ng-show="isUploading && uploading.show">
+                    <div>Uploading...</div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped active"
+                             role="progressbar"
+                             ng-attr-aria-valuenow="{{uploading.percent}}"
+                             aria-valuemin="0"
+                             aria-valuemax="100"
+                             ng-attr-style="{{'width: ' + uploading.percent + '%;'}}">
+                            {{uploading.percent}}%
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+<p class="very-small-font">Upload files here to get links. Use these links when you want to attach images, pdf or zip
+    files to the post.</p>
