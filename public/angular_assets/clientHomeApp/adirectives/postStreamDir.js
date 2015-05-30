@@ -60,7 +60,7 @@ angular.module('clientHomeApp')
                 $rootScope.$on('newPost', function (event, data) {
                     PostService.addNewToPosts(data.post);
                     if (data.postsCount) {
-                        $scope.allPostsCount = PostService.updatePostsCount(data.postsCount);
+                        $scope.allPostsCount = PostService.updateAllPostsCount(data.postsCount);
                     }
                 });
 
