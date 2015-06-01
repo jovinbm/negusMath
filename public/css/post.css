@@ -1,0 +1,39 @@
+@media (min-width: 768px) {
+    .postHeading {
+        font-size: 18px;
+    }
+
+    .postBy {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 767px) {
+    .postHeading {
+        font-size: 15px;
+    }
+
+    .postBy {
+        font-size: 11px;
+    }
+}
+
+div.panel-body {
+    padding: 0;
+}
+
+@media (min-width: 768px) {
+    div.postStream {
+        padding-left: 0;
+        padding-right: 0;
+        background-color: #fff;
+    }
+}
+
+@media (max-width: 767px) {
+    div.postStream {
+        padding-left: 0;
+        padding-right: 0;
+        background-color: #fff;
+    }
+}

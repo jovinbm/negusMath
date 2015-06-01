@@ -1,4 +1,3 @@
-<!--start of nav-->
 <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
@@ -21,16 +20,17 @@
         <div class="collapse navbar-collapse navHeaderCollapse">
             <ul class="nav navbar-nav navbar-right">
                 <li>
-                    <a href="#services" du-smooth-scroll du-scrollspy>About</a>
+                    <a href="#services"
+                       du-smooth-scroll>About</a>
                 </li>
                 <li ng-if="!clientIsRegistered">
                     <a href="#login"
-                       du-smooth-scroll du-scrollspy
+                       du-smooth-scroll
                        ng-click="changeUserLoginState('register')">Register</a>
                 </li>
                 <li ng-if="!clientIsRegistered">
                     <a href="#login"
-                       du-smooth-scroll du-scrollspy
+                       du-smooth-scroll
                        ng-click="changeUserLoginState('signIn')">Sign In</a>
                 </li>
                 <li class="dropdown"
@@ -54,4 +54,3 @@
         </div>
     </div>
 </nav>
-<!--end of nav-->

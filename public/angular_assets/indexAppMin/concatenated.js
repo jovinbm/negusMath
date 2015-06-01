@@ -11,12 +11,11 @@ angular.module('indexApp', [
     'ui.utils'
 ])
     .run(function ($templateCache, $http) {
-        //views
-
-        //partials
-        //partials->navs
-        //partials->modals
     });
+
+//configuration of various modules
+angular.module('indexApp', ['duScroll'])
+    .value('duScrollOffset', 60);
 angular.module('indexApp')
     .directive('accountOuter', ['$rootScope', function ($rootScope, logoutService) {
         return {

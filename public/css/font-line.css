@@ -1,0 +1,22 @@
+body {
+    font-family: "Roboto Slab", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #222;
+    font-size: 1.4em;
+    line-height: 1.4em;
+}
+
+.small-font {
+    margin-top: 0.9em;
+    margin-bottom: 0.9em;
+    font-size: 0.9em;
+}
+
+.very-small-font {
+    margin-top: 0.9em;
+    margin-bottom: 0.9em;
+    font-size: 0.7em;
+}
+
+.text-outputs {
+    word-wrap: break-word;
+}

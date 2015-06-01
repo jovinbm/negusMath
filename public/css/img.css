@@ -1,0 +1,6 @@
+/*make all images responsive*/
+img {
+    display: block;
+    height: auto;
+    max-width: 100%;
+}

@@ -1,0 +1,18 @@
+/*search highlight*/
+.highlight {
+    background-color: yellow
+}
+
+.site-search-div {
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+    margin-bottom: 1.5em;
+}
+
+@media (max-width: 767px) {
+
+    .site-search-div {
+        padding-left: 0.7em;
+        padding-right: 0.7em;
+    }
+}

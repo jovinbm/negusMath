@@ -17,3 +17,5 @@
 //put ng-show if state logic in the directive itself
 
 //check that passport deserializes user and puts user in req.user, console.log req
+
+//reset account

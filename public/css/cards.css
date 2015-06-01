@@ -55,3 +55,9 @@
 .card .card-action a {
     text-transform: uppercase;
 }
+
+/*custom additions*/
+div.card {
+    margin-top: 0;
+    margin-bottom: 0;
+}

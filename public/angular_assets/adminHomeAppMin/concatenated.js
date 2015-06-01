@@ -1507,238 +1507,6 @@ angular.module('adminHomeApp')
             };
         }]);
 angular.module('adminHomeApp')
-    .directive('adminUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
-        return {
-            templateUrl: 'views/admin/partials/smalls/users/admin_users.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-
-                $scope.adminUsersModel = {
-                    filterString: ""
-                };
-                $scope.adminUsers = UserService.getAdminUsers();
-
-                function getAdminUsers() {
-                    UserService.getAdminUsersFromServer()
-                        .success(function (resp) {
-                            $scope.adminUsers = UserService.updateAdminUsers(resp.usersArray);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                }
-
-                getAdminUsers();
-
-                $rootScope.$on('userChanges', function () {
-                    getAdminUsers();
-                });
-
-                $rootScope.$on('reconnect', function () {
-                });
-            }
-        }
-    }]);
-angular.module('adminHomeApp')
-    .directive('allUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
-        return {
-            templateUrl: 'views/admin/partials/smalls/users/all_users.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-
-                //the model to be used when searching
-                $scope.allUsersModel = {
-                    filterString: ""
-                };
-
-                $scope.allUsers = UserService.getAllUsers();
-
-                function getAllUsers() {
-                    UserService.getAllUsersFromServer()
-                        .success(function (resp) {
-                            $scope.allUsers = UserService.updateAllUsers(resp.usersArray);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                }
-
-                getAllUsers();
-
-                $rootScope.$on('userChanges', function () {
-                    getAllUsers();
-                });
-
-                $rootScope.$on('reconnect', function () {
-                });
-            }
-        }
-    }]);
-angular.module('adminHomeApp')
-    .directive('bannedUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
-        return {
-            templateUrl: 'views/admin/partials/smalls/users/banned_users.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-
-                //the model to be used when searching
-                $scope.bannedUsersModel = {
-                    filterString: ""
-                };
-
-                $scope.bannedUsers = UserService.getBannedUsers();
-
-                function getBannedUsers() {
-                    UserService.getBannedUsersFromServer()
-                        .success(function (resp) {
-                            $scope.bannedUsers = UserService.updateBannedUsers(resp.usersArray);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                }
-
-                getBannedUsers();
-
-                $rootScope.$on('userChanges', function () {
-                    getBannedUsers();
-                });
-
-                $rootScope.$on('reconnect', function () {
-                });
-            }
-        }
-    }]);
-angular.module('adminHomeApp')
-    .directive('unApprovedUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
-        return {
-            templateUrl: 'views/admin/partials/smalls/users/unApproved_users.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-
-                $scope.usersNotApprovedModel = {
-                    filterString: ""
-                };
-                $scope.usersNotApproved = UserService.getUsersNotApproved();
-
-                function getUsersNotApproved() {
-                    UserService.getUsersNotApprovedFromServer()
-                        .success(function (resp) {
-                            $scope.usersNotApproved = UserService.updateUsersNotApproved(resp.usersArray);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                }
-
-                getUsersNotApproved();
-
-                $rootScope.$on('userChanges', function () {
-                    getUsersNotApproved();
-                });
-
-                $rootScope.$on('reconnect', function () {
-                });
-            }
-        }
-    }]);
-angular.module('adminHomeApp')
-    .directive('userDisplay', ['$rootScope', 'UserService', 'socketService', function ($rootScope, UserService, socketService) {
-        return {
-            templateUrl: 'views/admin/partials/smalls/users/user_display.html',
-            restrict: 'AE',
-            scope: {
-                user: '='
-            },
-            link: function ($scope, $element, $attrs) {
-                //$scope.user included in scope
-
-                $scope.isCollapsed = true;
-
-                $scope.resendConfirmationEmail = function (userUniqueCuid) {
-                    socketService.resendConfirmationEmail(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (err) {
-                            $rootScope.main.responseStatusHandler(err);
-                        })
-                };
-
-                //user manipulation functions
-                $scope.addAdminPrivileges = function (userUniqueCuid) {
-                    UserService.addAdminPrivileges(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                };
-
-                $scope.removeAdminPrivileges = function (userUniqueCuid) {
-                    UserService.removeAdminPrivileges(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                };
-
-                $scope.approveUser = function (userUniqueCuid) {
-                    UserService.approveUser(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                };
-
-                $scope.banUser = function (userUniqueCuid) {
-                    UserService.banUser(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                };
-
-                $scope.unBanUser = function (userUniqueCuid) {
-                    UserService.unBanUser(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                };
-            }
-        }
-    }]);
-angular.module('adminHomeApp')
-    .directive('usersCount', ['$q', '$log', '$rootScope', function ($q, $log, $rootScope) {
-        return {
-            templateUrl: 'views/admin/partials/smalls/users/user_statistics.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $rootScope.$on('userChanges', function () {
-                });
-            }
-        }
-    }]);
-angular.module('adminHomeApp')
     .directive('accountStatusBanner', ['$rootScope', 'socketService', '$location', '$window', function ($rootScope, socketService, $location, $window) {
         return {
             scope: {},
@@ -2803,6 +2571,238 @@ angular.module('adminHomeApp')
                             $scope.hideProgressBars();
                         });
                 }
+            }
+        }
+    }]);
+angular.module('adminHomeApp')
+    .directive('adminUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/users/admin_users.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+
+                $scope.adminUsersModel = {
+                    filterString: ""
+                };
+                $scope.adminUsers = UserService.getAdminUsers();
+
+                function getAdminUsers() {
+                    UserService.getAdminUsersFromServer()
+                        .success(function (resp) {
+                            $scope.adminUsers = UserService.updateAdminUsers(resp.usersArray);
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                }
+
+                getAdminUsers();
+
+                $rootScope.$on('userChanges', function () {
+                    getAdminUsers();
+                });
+
+                $rootScope.$on('reconnect', function () {
+                });
+            }
+        }
+    }]);
+angular.module('adminHomeApp')
+    .directive('allUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/users/all_users.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+
+                //the model to be used when searching
+                $scope.allUsersModel = {
+                    filterString: ""
+                };
+
+                $scope.allUsers = UserService.getAllUsers();
+
+                function getAllUsers() {
+                    UserService.getAllUsersFromServer()
+                        .success(function (resp) {
+                            $scope.allUsers = UserService.updateAllUsers(resp.usersArray);
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                }
+
+                getAllUsers();
+
+                $rootScope.$on('userChanges', function () {
+                    getAllUsers();
+                });
+
+                $rootScope.$on('reconnect', function () {
+                });
+            }
+        }
+    }]);
+angular.module('adminHomeApp')
+    .directive('bannedUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/users/banned_users.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+
+                //the model to be used when searching
+                $scope.bannedUsersModel = {
+                    filterString: ""
+                };
+
+                $scope.bannedUsers = UserService.getBannedUsers();
+
+                function getBannedUsers() {
+                    UserService.getBannedUsersFromServer()
+                        .success(function (resp) {
+                            $scope.bannedUsers = UserService.updateBannedUsers(resp.usersArray);
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                }
+
+                getBannedUsers();
+
+                $rootScope.$on('userChanges', function () {
+                    getBannedUsers();
+                });
+
+                $rootScope.$on('reconnect', function () {
+                });
+            }
+        }
+    }]);
+angular.module('adminHomeApp')
+    .directive('unApprovedUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/users/unApproved_users.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+
+                $scope.usersNotApprovedModel = {
+                    filterString: ""
+                };
+                $scope.usersNotApproved = UserService.getUsersNotApproved();
+
+                function getUsersNotApproved() {
+                    UserService.getUsersNotApprovedFromServer()
+                        .success(function (resp) {
+                            $scope.usersNotApproved = UserService.updateUsersNotApproved(resp.usersArray);
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                }
+
+                getUsersNotApproved();
+
+                $rootScope.$on('userChanges', function () {
+                    getUsersNotApproved();
+                });
+
+                $rootScope.$on('reconnect', function () {
+                });
+            }
+        }
+    }]);
+angular.module('adminHomeApp')
+    .directive('userDisplay', ['$rootScope', 'UserService', 'socketService', function ($rootScope, UserService, socketService) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/users/user_display.html',
+            restrict: 'AE',
+            scope: {
+                user: '='
+            },
+            link: function ($scope, $element, $attrs) {
+                //$scope.user included in scope
+
+                $scope.isCollapsed = true;
+
+                $scope.resendConfirmationEmail = function (userUniqueCuid) {
+                    socketService.resendConfirmationEmail(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (err) {
+                            $rootScope.main.responseStatusHandler(err);
+                        })
+                };
+
+                //user manipulation functions
+                $scope.addAdminPrivileges = function (userUniqueCuid) {
+                    UserService.addAdminPrivileges(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.$broadcast('userChanges');
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                };
+
+                $scope.removeAdminPrivileges = function (userUniqueCuid) {
+                    UserService.removeAdminPrivileges(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.$broadcast('userChanges');
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                };
+
+                $scope.approveUser = function (userUniqueCuid) {
+                    UserService.approveUser(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.$broadcast('userChanges');
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                };
+
+                $scope.banUser = function (userUniqueCuid) {
+                    UserService.banUser(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.$broadcast('userChanges');
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                };
+
+                $scope.unBanUser = function (userUniqueCuid) {
+                    UserService.unBanUser(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.$broadcast('userChanges');
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                };
+            }
+        }
+    }]);
+angular.module('adminHomeApp')
+    .directive('usersCount', ['$q', '$log', '$rootScope', function ($q, $log, $rootScope) {
+        return {
+            templateUrl: 'views/admin/partials/smalls/users/user_statistics.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $rootScope.$on('userChanges', function () {
+                });
             }
         }
     }]);

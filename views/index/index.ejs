@@ -44,7 +44,6 @@
     <link href='http://fonts.googleapis.com/css?family=Roboto+Slab:400,100,300,700' rel='stylesheet' type='text/css'>
 
     <!-- loads custom css file -->
-    <link rel="stylesheet" href="/public/cssmin/main.min.css">
     <link rel="stylesheet" href="/public/cssmin/index/index.min.css">
 
     <!--google analytics-->
@@ -85,12 +84,12 @@
                 <div ng-if="!clientIsRegistered"
                      class="ng-cloak">
                     <a href="#login"
-                       du-smooth-scroll du-scrollspy
+                       du-smooth-scroll
                        ng-click="changeUserLoginState('register')"
                        class="btn btn-md btn-default btn-config">REGISTER
                     </a>
                     <a href="#login"
-                       du-smooth-scroll du-scrollspy
+                       du-smooth-scroll
                        ng-click="changeUserLoginState('signIn')"
                        class="btn btn-md btn-default btn-config">SIGN IN
                     </a>
@@ -98,11 +97,11 @@
                 <div ng-if="clientIsRegistered"
                      class="ng-cloak">
                     <a href="#services"
-                       du-smooth-scroll du-scrollspy
+                       du-smooth-scroll
                        class="btn btn-md btn-default btn-config">ABOUT
                     </a>
                     <a href="#contact"
-                       du-smooth-scroll du-scrollspy
+                       du-smooth-scroll
                        class="btn btn-md btn-default btn-config">CONTACT
                     </a>
                 </div>

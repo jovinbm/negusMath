@@ -1,0 +1,21 @@
+.allBannerOuterDivs {
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+}
+
+@media (max-width: 767px) {
+
+    .allBannerOuterDivs {
+        padding-left: 0.7em;
+        padding-right: 0.7em;
+    }
+}
+
+div.alert.alert-success, div.alert.alert-warning, div.alert.alert-info {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+div#universalBanner {
+    padding: 0;
+}

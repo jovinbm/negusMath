@@ -3,14 +3,11 @@
     <div class="container">
         <div class="row">
 
-            <div id="newPost"
-                 class="col-lg-9 col_no_padding">
+            <div class="col-lg-9 no-padding-left">
 
                 <div class="panel panel-default">
 
-                    <div class="panel-heading"><a href ng-click="back()"><i class="fa fa-arrow-left"></i> BACK</a>
-            <span class="pull-right hidden-sm hidden-xs"
-                  ng-bind-html="post.postDate"></span>
+                    <div class="panel-heading"><a href ng-click="back()"><i class="fa fa-arrow-left"></i> BACK</a><span class="pull-right hidden-sm hidden-xs" ng-bind-html="post.postDate"></span>
                     </div>
 
                     <div class="panel-body">
@@ -96,7 +93,7 @@
                 </div>
             </div>
 
-            <div class="col_no_padding col-lg-3">
+            <div class="no-padding-side col-lg-3">
                 <div edit-post-uploader></div>
             </div>
 
