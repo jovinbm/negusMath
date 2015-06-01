@@ -66,26 +66,23 @@ module.exports = {
     addUserData: function (req, res, next) {
         var module = "addUserData";
         receivedLogger(module);
-        userDB.findUserWithUniqueCuid(req.user.uniqueCuid, error, error, success);
 
-        function success(userData) {
+        if (req.user) {
             if (req.customData) {
-                req.customData.theUser = userData;
+                req.customData.theUser = req.user;
                 consoleLogger(successLogger(module));
                 next();
             } else {
                 req.customData = {};
-                req.customData.theUser = userData;
+                req.customData.theUser = req.user;
                 consoleLogger(successLogger(module));
                 next();
             }
-        }
-
-        function error(status, err) {
+        } else {
             //log the user out
             req.logout();
 
-            consoleLogger(errorLogger(module, 'error retrieving user data', err));
+            consoleLogger(errorLogger(module, 'error retrieving user data from req object', err));
             res.status(500).send({
                 code: 500,
                 notify: true,

@@ -40,31 +40,19 @@ module.exports = {
         var module = 'renderHome_Html';
         receivedLogger(module);
 
-        if (req.isAuthenticated()) {
-            //gets user details from checkIfUserIsAdminReturn middleware which calls success with an
-            //object with 3 keys: 'success' = boolean, true if succeded, 'userdata' and
-            //'isAdmin'
-            middleware.checkUserIsAdminAndReturn(req, res, error, success);
-
-            function success(details) {
-                if (details.isAdmin) {
-                    res.render('admin/adminHome.ejs');
-                    consoleLogger(successLogger(module));
-                } else {
-                    res.render('client/clientHome.ejs');
-                    consoleLogger(successLogger(module));
-                }
+        var theUser = getTheUser(req);
+        if (theUser) {
+            if (theUser.isAdmin) {
+                consoleLogger(successLogger(module));
+                res.render('admin/adminHome.ejs');
+            } else {
+                consoleLogger(successLogger(module));
+                res.render('client/clientHome.ejs');
             }
-
-            function error() {
-                consoleLogger(errorLogger(module));
-            }
-
         } else {
-            res.render('client/clientHome.ejs');
             consoleLogger(successLogger(module));
+            res.render('client/clientHome.ejs');
         }
-
     },
 
     renderEmail: function (req, res) {
