@@ -80,14 +80,14 @@ module.exports = {
             }
         } else {
             //log the user out
-            req.logout();
-
-            consoleLogger(errorLogger(module, 'error retrieving user data from req object', err));
-            res.status(500).send({
-                code: 500,
-                notify: true,
-                type: 'error',
-                msg: 'An error occurred while retrieving your personalized info. Please reload the page'
+            req.session.destroy(function (err) {
+                consoleLogger(errorLogger(module, 'error retrieving user data from req object', err));
+                res.status(500).send({
+                    code: 500,
+                    notify: true,
+                    type: 'error',
+                    msg: 'An error occurred while retrieving your personalized info. Please reload the page'
+                });
             });
         }
     },
@@ -249,17 +249,17 @@ module.exports = {
 
         function error_not_found(status, err) {
             //log the user out
-            req.logout();
+            req.session.destroy(function (err) {
+                consoleLogger(errorLogger(module, 'error retrieving user data', err));
+                res.status(500).send({
+                    code: 500,
+                    notify: true,
+                    type: 'error',
+                    msg: 'An error occurred while retrieving your personalized info. Please reload the page'
+                });
 
-            consoleLogger(errorLogger(module, 'error retrieving user data', err));
-            res.status(500).send({
-                code: 500,
-                notify: true,
-                type: 'error',
-                msg: 'An error occurred while retrieving your personalized info. Please reload the page'
+                error();
             });
-
-            error();
         }
     },
 

@@ -29,12 +29,13 @@ module.exports = {
         var module = 'logoutClient';
         receivedLogger(module);
 
-        req.logout();
-        consoleLogger(successLogger(module));
-        res.status(200).send({
-            code: 200,
-            redirect: true,
-            redirectPage: "/index"
+        req.session.destroy(function (err) {
+            consoleLogger(successLogger(module));
+            res.status(200).send({
+                code: 200,
+                redirect: true,
+                redirectPage: "/index"
+            });
         });
     }
 };
