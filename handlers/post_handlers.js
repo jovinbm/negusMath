@@ -110,7 +110,6 @@ module.exports = {
         }
     },
 
-
     getPosts: function (req, res, page) {
         var module = 'getPosts';
         receivedLogger(module);
@@ -217,6 +216,57 @@ module.exports = {
                 notify: true,
                 type: 'warning',
                 msg: 'Failed to retrieve this weeks top posts. Please reload page '
+            });
+        }
+    },
+
+    trashPost: function (req, res, postUniqueCuid) {
+        var module = 'trashPost';
+        receivedLogger(module);
+
+        postDB.trashPost(req, res, postUniqueCuid, trashed);
+
+        function trashed(trashedPost) {
+            consoleLogger(successLogger(module));
+            res.status(200).send({
+                code: 200,
+                notify: true,
+                type: 'success',
+                msg: 'The post has been sent to trash'
+            });
+        }
+    },
+
+    unTrashPost: function (req, res, postUniqueCuid) {
+        var module = 'unTrashPost';
+        receivedLogger(module);
+
+        postDB.unTrashPost(req, res, postUniqueCuid, unTrashed);
+
+        function unTrashed(unTrashedPost) {
+            consoleLogger(successLogger(module));
+            res.status(200).send({
+                code: 200,
+                notify: true,
+                type: 'success',
+                msg: 'The post has been sent to removed from trash'
+            });
+        }
+    },
+
+    deletePost: function (req, res, postUniqueCuid) {
+        var module = 'deletePost';
+        receivedLogger(module);
+
+        postDB.deletePost(req, res, postUniqueCuid, deleted);
+
+        function deleted() {
+            consoleLogger(successLogger(module));
+            res.status(200).send({
+                code: 200,
+                notify: true,
+                type: 'success',
+                msg: 'The post has been permanently deleted'
             });
         }
     },

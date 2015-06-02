@@ -40,7 +40,7 @@ angular.module('adminHomeApp')
                             $rootScope.main.responseStatusHandler(responseMimic1);
                         } else {
                             //empty the postsArray
-                            $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults([]);
+                            $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults([], pageNumber);
                             $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(0);
                             var responseMimic2 = {
                                 banner: true,
@@ -53,7 +53,7 @@ angular.module('adminHomeApp')
                     .error(function (errResp) {
                         $rootScope.main.responseStatusHandler(errResp);
                         //empty the postsArray
-                        $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults([]);
+                        $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults([], pageNumber);
                         $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(0);
                     });
             }
@@ -68,7 +68,7 @@ angular.module('adminHomeApp')
 
             $rootScope.$on('reconnect', function () {
                 if ($rootScope.$state.current.name == 'home.search') {
-                    getMainSearchResults();
+                    getMainSearchResults($rootScope.$stateParams.pageNumber);
                 }
             });
         }

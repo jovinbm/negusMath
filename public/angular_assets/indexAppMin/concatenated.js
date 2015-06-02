@@ -11,6 +11,9 @@ angular.module('indexApp', [
     'ui.utils'
 ])
     .run(function ($templateCache, $http) {
+        $rootScope.Utils = {
+            keys: Object.keys
+        }
     });
 
 //configuration of various modules

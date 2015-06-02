@@ -130,10 +130,16 @@ angular.module('adminHomeApp')
             }
 
             if (post) {
-                return makeResp(post)
+                if (Object.keys(post).length > 0) {
+                    return makeResp(post);
+                } else {
+                    return post;
+                }
             } else if (posts) {
                 posts.forEach(function (post, index) {
-                    posts[index] = makeResp(post);
+                    if (Object.keys(post).length > 0) {
+                        posts[index] = makeResp(post);
+                    }
                 });
                 return posts;
             }
@@ -244,9 +250,11 @@ angular.module('adminHomeApp')
         //making embedded videos responsive
         return function (post, posts) {
             function highlightPostTags(postTags) {
-                postTags.forEach(function (tag, index) {
-                    postTags[index].text = $filter('highlightText')(tag.text, true);
-                });
+                if (postTags.length > 0) {
+                    postTags.forEach(function (tag, index) {
+                        postTags[index].text = $filter('highlightText')(tag.text, true);
+                    });
+                }
 
                 return postTags;
             }
@@ -266,10 +274,16 @@ angular.module('adminHomeApp')
             }
 
             if (post) {
-                return prepare(post)
+                if (Object.keys(post).length > 0) {
+                    return prepare(post);
+                } else {
+                    return post;
+                }
             } else if (posts) {
                 posts.forEach(function (post, index) {
-                    posts[index] = prepare(post);
+                    if (Object.keys(post).length > 0) {
+                        posts[index] = prepare(post);
+                    }
                 });
                 return posts;
             }
@@ -279,9 +293,11 @@ angular.module('adminHomeApp')
         //making embedded videos responsive
         return function (post, posts) {
             function removePostTagsHighlight(postTags) {
-                postTags.forEach(function (tag, index) {
-                    postTags[index].text = $filter('highlightText')(tag.text, false);
-                });
+                if (postTags.length > 0) {
+                    postTags.forEach(function (tag, index) {
+                        postTags[index].text = $filter('highlightText')(tag.text, false);
+                    });
+                }
 
                 return postTags;
             }
@@ -301,10 +317,16 @@ angular.module('adminHomeApp')
             }
 
             if (post) {
-                return prepare(post)
+                if (Object.keys(post).length > 0) {
+                    return prepare(post);
+                } else {
+                    return post;
+                }
             } else if (posts) {
                 posts.forEach(function (post, index) {
-                    posts[index] = prepare(post);
+                    if (Object.keys(post).length > 0) {
+                        posts[index] = prepare(post);
+                    }
                 });
                 return posts;
             }
@@ -323,10 +345,16 @@ angular.module('adminHomeApp')
             }
 
             if (post) {
-                return prepare(post)
+                if (Object.keys(post).length > 0) {
+                    return prepare(post);
+                } else {
+                    return post;
+                }
             } else if (posts) {
                 posts.forEach(function (post, index) {
-                    posts[index] = prepare(post);
+                    if (Object.keys(post).length > 0) {
+                        posts[index] = prepare(post);
+                    }
                 });
                 return posts;
             }

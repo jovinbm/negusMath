@@ -19,3 +19,5 @@
 //check that passport deserializes user and puts user in req.user, console.log req
 
 //reset account
+
+//improve search algorithm, there is a lot of blocking code, make sure trashed post are not shown on search results

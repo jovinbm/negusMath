@@ -45,7 +45,7 @@ angular.module('adminHomeApp')
                 getAccountDetails();
 
                 $scope.checkAccount = function (userData) {
-                    if (userData) {
+                    if (userData && Object.keys(userData).length > 0) {
                         if (userData.isRegistered && userData.emailIsConfirmed && userData.isApproved && !userData.isBanned.status) {
                             return true;
                         } else {

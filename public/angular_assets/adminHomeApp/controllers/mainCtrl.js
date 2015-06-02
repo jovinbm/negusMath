@@ -47,6 +47,15 @@ angular.module('adminHomeApp')
 
                 clearBanners: function () {
                     $rootScope.$broadcast('clearBanners');
+                },
+
+                isLoading: true,
+
+                startLoading: function () {
+                    this.isLoading = true;
+                },
+                finishedLoading: function () {
+                    $rootScope.isLoading = false;
                 }
             };
 

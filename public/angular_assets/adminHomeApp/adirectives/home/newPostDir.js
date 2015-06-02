@@ -18,7 +18,6 @@ angular.module('adminHomeApp')
                 //broadcast here helps distinguish from the inform checking and the checking on submit, which requires notifications
                 //broadcast takes a boolean value
                 $scope.validateForm = function (notify) {
-                    console.log(notify);
                     var errors = 0;
                     if (!$filter("validatePostHeading")($scope.newPostModel.postHeading, notify)) {
                         errors++;
@@ -56,6 +55,7 @@ angular.module('adminHomeApp')
                                 $scope.newPostModel.postContent = "";
                                 $scope.newPostModel.postSummary = "";
                                 $scope.newPostModel.postTags = [];
+                                $rootScope.back();
                             })
                             .error(function (errResponse) {
                                 $rootScope.main.responseStatusHandler(errResponse);

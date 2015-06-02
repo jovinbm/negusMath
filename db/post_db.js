@@ -89,7 +89,7 @@ module.exports = {
         var module = 'getPosts';
         receivedLogger(module);
         var errors = 0;
-        Post.find()
+        Post.find({isTrashed: false})
             .sort({postIndex: sort})
             .skip((page - 1) * 10)
             .limit(limit)
@@ -108,7 +108,7 @@ module.exports = {
                 function doneTags(postsArray) {
                     if (errors == 0) {
                         var postsCount = 0;
-                        Post.count({}, function (err, count) {
+                        Post.count({isTrashed: false}, function (err, count) {
                             if (err) {
                                 consoleLogger(errorLogger(module, 'Failed to count posts', err));
                                 error_neg_1(-1, err);
@@ -133,7 +133,8 @@ module.exports = {
         Post.find({
             postUniqueCuid: {
                 $in: theArray
-            }
+            },
+            isTrashed: false
         })
             .exec(function (err, postsArray) {
                 if (err) {
@@ -159,7 +160,10 @@ module.exports = {
 
         function done() {
             var errors = 0;
-            Post.findOne({postIndex: postIndex})
+            Post.findOne({
+                postIndex: postIndex,
+                isTrashed: false
+            })
                 .exec(function (err, thePost) {
                     if (err) {
                         consoleLogger(errorLogger(module, err));
@@ -182,7 +186,10 @@ module.exports = {
     getSuggestedPosts: function (quantity, error_neg_1, error_0, success) {
         var module = 'getSuggestedPosts';
         receivedLogger(module);
-        Post.find({numberOfVisits: {$gt: 0}})
+        Post.find({
+            numberOfVisits: {$gt: 0},
+            isTrashed: false
+        })
             .sort({numberOfVisits: -1})
             .limit(quantity)
             .exec(function (err, postsArray) {
@@ -205,7 +212,10 @@ module.exports = {
     getHotThisWeek: function (quantity, error_neg_1, error_0, success) {
         var module = 'getHotThisWeek';
         receivedLogger(module);
-        Post.find({numberOfVisits: {$gt: 0}})
+        Post.find({
+            numberOfVisits: {$gt: 0},
+            isTrashed: false
+        })
             .sort({numberOfVisits: -1})
             .limit(quantity)
             .exec(function (err, hotThisWeekArray) {
@@ -335,11 +345,112 @@ module.exports = {
             });
     },
 
+    trashPost: function (req, res, postUniqueCuid, success) {
+        var module = 'trashPost';
+        receivedLogger(module);
+
+        Post.findOne({postUniqueCuid: postUniqueCuid})
+            .exec(function (err, thePost) {
+                if (err) {
+                    error('Failed to delete post, please try again');
+                } else if (thePost == null || thePost == undefined || thePost.length == 0) {
+                    error('The post was not found on the database');
+                } else {
+                    //update the post
+                    thePost.isTrashed = true;
+
+                    thePost.save(function (err, trashedPost) {
+                        if (err) {
+                            error('An error occurred, please try again.');
+                        } else {
+                            //this returns an object
+                            consoleLogger(successLogger(module));
+                            success(trashedPost);
+                        }
+                    });
+                }
+            });
+
+        function error(errorMessage) {
+            consoleLogger(errorLogger(module, errorMessage));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: errorMessage
+            });
+        }
+    },
+
+    unTrashPost: function (req, res, postUniqueCuid, success) {
+        var module = 'unTrashPost';
+        receivedLogger(module);
+
+        Post.findOne({postUniqueCuid: postUniqueCuid})
+            .exec(function (err, thePost) {
+                if (err) {
+                    error('Failed to remove post from trash, please try again.');
+                } else if (thePost == null || thePost == undefined || thePost.length == 0) {
+                    error('The post was not found on the database.');
+                } else {
+                    //update the post
+                    thePost.isTrashed = false;
+
+                    thePost.save(function (err, unTrashedPost) {
+                        if (err) {
+                            error('An error occurred, please try again.');
+                        } else {
+                            //this returns an object
+                            consoleLogger(successLogger(module));
+                            success(unTrashedPost);
+                        }
+                    });
+                }
+            });
+
+        function error(errorMessage) {
+            consoleLogger(errorLogger(module, errorMessage));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: errorMessage
+            });
+        }
+    },
+
+    deletePost: function (req, res, postUniqueCuid, success) {
+        var module = 'deletePost';
+        receivedLogger(module);
+
+        Post.remove({postUniqueCuid: postUniqueCuid})
+            .exec(function (err) {
+                if (err) {
+                    error('Failed to delete post, please try again.');
+                } else {
+                    consoleLogger(successLogger(module));
+                    success();
+                }
+            });
+
+        function error(errorMessage) {
+            consoleLogger(errorLogger(module, errorMessage));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'warning',
+                msg: errorMessage
+            });
+        }
+    },
+
     getCount: function (error_neg_1, error_0, success) {
         var module = 'getCount';
         receivedLogger(module);
         var postCount;
-        Post.count({}, function (err, count) {
+        Post.count({
+            isTrashed: false
+        }, function (err, count) {
             if (err) {
                 consoleLogger(errorLogger(module, err));
                 error_neg_1(-1, err);

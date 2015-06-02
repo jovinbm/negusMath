@@ -1,13 +1,8 @@
 <div>
-    <div class="panel-heading"><i class="fa fa-leanpub"></i> SUGGESTED POSTS
-            <span class="pull-right">
-            <a ng-href="/#!/home/1"><i class="fa fa-arrow-left"></i> Home</a>
-            </span>
-    </div>
+    <div class="panel-heading"><i class="fa fa-leanpub"></i> SUGGESTED POSTS</div>
 
-    <ul class="list-unstyled animated fadeIn">
-        <li class="list-unstyled post clearfix"
-            ng-repeat="post in suggestedPosts">
+    <div ng-show="suggestedPosts.length > 0">
+        <div ng-repeat="post in suggestedPosts">
             <div class="card">
 
                 <div class="card-content">
@@ -43,6 +38,12 @@
 
                 </div>
             </div>
-        </li>
-    </ul>
+            <br/>
+        </div>
+    </div>
+
+    <div class="alert alert-success"
+         ng-show="suggestedPosts.length == 0">
+        <strong>We don't any suggestions for you yet...</strong>
+    </div>
 </div>

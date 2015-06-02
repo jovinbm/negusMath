@@ -9,11 +9,12 @@ angular.module('clientHomeApp')
                 $scope.numPages = 5;
                 $scope.itemsPerPage = 10;
                 $scope.pagingTotalCount = 1;
-                $scope.$watch(PostService.getCurrentPostsCount, function (newValue, oldValue) {
+                $scope.$watch(PostService.getAllPostsCount, function (newValue, oldValue) {
                     $scope.pagingTotalCount = newValue;
                 });
 
                 $scope.currentPage = $rootScope.$stateParams.pageNumber;
+
                 $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
                     //refresh the currentPage if the user is going to a new state
                     if (fromState.name != toState.name) {
@@ -44,11 +45,13 @@ angular.module('clientHomeApp')
                 $scope.numPages = 5;
                 $scope.itemsPerPage = 10;
                 $scope.pagingTotalCount = 1;
-                $scope.$watch(PostService.getCurrentMainSearchResultsCount, function (newValue, oldValue) {
+
+                $scope.$watch(PostService.getMainSearchResultsCount, function (newValue, oldValue) {
                     $scope.pagingTotalCount = newValue;
                 });
 
                 $scope.currentPage = $rootScope.$stateParams.pageNumber;
+
                 $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
                     //refresh the currentPage if the user is going to a new state
                     if (fromState.name != toState.name) {

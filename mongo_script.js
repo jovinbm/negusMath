@@ -1,6 +1,6 @@
 db.posts.update({}, {
         $set: {
-            "postUploads": []
+            "isTrashed": false
         }
     },
     {

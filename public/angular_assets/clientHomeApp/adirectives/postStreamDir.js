@@ -33,7 +33,7 @@ angular.module('clientHomeApp')
                                     }
                                 } else {
                                     //empty the postsArray
-                                    $scope.allPosts[pageNumber] = PostService.updatePosts([]);
+                                    $scope.allPosts[pageNumber] = PostService.updatePosts([], pageNumber);
 
                                     //var responseMimic = {
                                     //    banner: true,
@@ -45,7 +45,7 @@ angular.module('clientHomeApp')
                             })
                             .error(function (errResp) {
                                 $rootScope.main.responseStatusHandler(errResp);
-                                $scope.allPosts[pageNumber] = PostService.updatePosts([]);
+                                $scope.allPosts[pageNumber] = PostService.updatePosts([], pageNumber);
                             });
                     }
                 }

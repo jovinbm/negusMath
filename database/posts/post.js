@@ -14,7 +14,8 @@ var postSchema = new Schema({
     postTags: {type: Array, default: [], index: true, unique: false},
     postUploads: {type: Array, default: [], index: true, unique: false},
     numberOfVisits: {type: Number, default: 0, index: true},
-    createdAt: {type: Date, default: Date.now, index: true}
+    createdAt: {type: Date, default: Date.now, index: true},
+    isTrashed: {type: Boolean, default: false, index: true}
 });
 
 var textSearch = require('mongoose-text-search');

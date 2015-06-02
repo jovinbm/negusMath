@@ -1,7 +1,7 @@
 angular.module('adminHomeApp')
-    .directive('suggestedPosts', ['$rootScope', 'PostService', function ($rootScope, PostService) {
+    .directive('suggestedPosts', ['$rootScope', 'PostService', '$timeout', function ($rootScope, PostService, $timeout) {
         return {
-            templateUrl: 'views/admin/partials/smalls/suggested_posts.html',
+            templateUrl: 'views/general/smalls/suggested_posts.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.suggestedPosts = PostService.getSuggestedPosts();
@@ -13,19 +13,17 @@ angular.module('adminHomeApp')
                             if ((resp.postsArray.length > 0)) {
                                 $scope.suggestedPosts = PostService.updateSuggestedPosts(resp.postsArray);
                             } else {
-                                //empty the suggestedPosts
-                                $scope.suggestedPosts = [];
+                                $scope.suggestedPosts = PostService.getSuggestedPosts();
                             }
 
                         })
                         .error(function (errResp) {
-                            //empty the suggestedPosts
-                            $scope.suggestedPosts = PostService.updateSuggestedPosts([]);
+                            $scope.suggestedPosts = PostService.getSuggestedPosts();
                             $rootScope.main.responseStatusHandler(errResp);
                         });
                 }
 
-                getSuggestedPosts();
+                $timeout(getSuggestedPosts, 5000);
             }
         }
     }]);

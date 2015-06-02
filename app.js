@@ -142,6 +142,9 @@ app.post('/api/getHotThisWeek', middleware.ensureAuthenticatedAngular, middlewar
 app.post('/api/mainSearch', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, postAPI.mainSearch);
 app.post('/api/newPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, postAPI.newPost);
 app.post('/api/updatePost', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, postAPI.updatePost);
+app.post('/api/trashPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, postAPI.trashPost);
+app.post('/api/unTrashPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, postAPI.unTrashPost);
+app.post('/api/deletePost', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, postAPI.deletePost);
 
 
 //user management api

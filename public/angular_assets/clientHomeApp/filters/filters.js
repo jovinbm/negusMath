@@ -130,10 +130,16 @@ angular.module('clientHomeApp')
             }
 
             if (post) {
-                return makeResp(post)
+                if (Object.keys(post).length > 0) {
+                    return makeResp(post);
+                } else {
+                    return post;
+                }
             } else if (posts) {
                 posts.forEach(function (post, index) {
-                    posts[index] = makeResp(post);
+                    if (Object.keys(post).length > 0) {
+                        posts[index] = makeResp(post);
+                    }
                 });
                 return posts;
             }
@@ -192,6 +198,7 @@ angular.module('clientHomeApp')
                         queryString: $rootScope.$stateParams.queryString || ""
                     }
                 } else if ($rootScope.stateHistory.length > 0) {
+                    //check if previous state was search and current state is post
                     if ($rootScope.stateHistory[$rootScope.stateHistory.length - 1].hasOwnProperty('home.search') && $rootScope.$state.current.name == 'home.post') {
                         //checking the previous state
                         return {
@@ -243,9 +250,11 @@ angular.module('clientHomeApp')
         //making embedded videos responsive
         return function (post, posts) {
             function highlightPostTags(postTags) {
-                postTags.forEach(function (tag, index) {
-                    postTags[index].text = $filter('highlightText')(tag.text, true);
-                });
+                if (postTags.length > 0) {
+                    postTags.forEach(function (tag, index) {
+                        postTags[index].text = $filter('highlightText')(tag.text, true);
+                    });
+                }
 
                 return postTags;
             }
@@ -265,10 +274,16 @@ angular.module('clientHomeApp')
             }
 
             if (post) {
-                return prepare(post)
+                if (Object.keys(post).length > 0) {
+                    return prepare(post);
+                } else {
+                    return post;
+                }
             } else if (posts) {
                 posts.forEach(function (post, index) {
-                    posts[index] = prepare(post);
+                    if (Object.keys(post).length > 0) {
+                        posts[index] = prepare(post);
+                    }
                 });
                 return posts;
             }
@@ -278,9 +293,11 @@ angular.module('clientHomeApp')
         //making embedded videos responsive
         return function (post, posts) {
             function removePostTagsHighlight(postTags) {
-                postTags.forEach(function (tag, index) {
-                    postTags[index].text = $filter('highlightText')(tag.text, false);
-                });
+                if (postTags.length > 0) {
+                    postTags.forEach(function (tag, index) {
+                        postTags[index].text = $filter('highlightText')(tag.text, false);
+                    });
+                }
 
                 return postTags;
             }
@@ -300,10 +317,16 @@ angular.module('clientHomeApp')
             }
 
             if (post) {
-                return prepare(post)
+                if (Object.keys(post).length > 0) {
+                    return prepare(post);
+                } else {
+                    return post;
+                }
             } else if (posts) {
                 posts.forEach(function (post, index) {
-                    posts[index] = prepare(post);
+                    if (Object.keys(post).length > 0) {
+                        posts[index] = prepare(post);
+                    }
                 });
                 return posts;
             }
@@ -322,10 +345,16 @@ angular.module('clientHomeApp')
             }
 
             if (post) {
-                return prepare(post)
+                if (Object.keys(post).length > 0) {
+                    return prepare(post);
+                } else {
+                    return post;
+                }
             } else if (posts) {
                 posts.forEach(function (post, index) {
-                    posts[index] = prepare(post);
+                    if (Object.keys(post).length > 0) {
+                        posts[index] = prepare(post);
+                    }
                 });
                 return posts;
             }

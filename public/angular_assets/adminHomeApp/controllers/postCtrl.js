@@ -10,14 +10,13 @@ angular.module('adminHomeApp')
                 PostService.getCurrentEditPostModelFromServer($rootScope.$stateParams.postIndex)
                     .success(function (resp) {
                         $rootScope.main.responseStatusHandler(resp);
-                        if (fN.calcObjectLength(resp.thePost) != 0) {
+                        if (Object.keys(resp.thePost).length > 0) {
                             $scope.editPostModel = PostService.updateCurrentEditPostModel(resp.thePost);
                             globals.changeDocumentTitle($scope.editPostModel.postHeading);
                         } else {
                             //empty the post
                             $scope.editPostModel = PostService.updateCurrentEditPostModel({});
                         }
-
                     })
                     .error(function (errResponse) {
                         $rootScope.main.responseStatusHandler(errResponse);

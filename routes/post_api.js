@@ -96,6 +96,57 @@ module.exports = {
         }
     },
 
+    trashPost: function (req, res) {
+        var module = 'trashPost';
+        receivedLogger(module);
+        if (req.body.postUniqueCuid) {
+            var postUniqueCuid = req.body.postUniqueCuid;
+            post_handler.trashPost(req, res, postUniqueCuid);
+        } else {
+            consoleLogger(errorLogger(module, 'Some request fields missing'));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'error',
+                msg: 'An error has occurred. Please try again'
+            });
+        }
+    },
+
+    unTrashPost: function (req, res) {
+        var module = 'unTrashPost';
+        receivedLogger(module);
+        if (req.body.postUniqueCuid) {
+            var postUniqueCuid = req.body.postUniqueCuid;
+            post_handler.unTrashPost(req, res, postUniqueCuid);
+        } else {
+            consoleLogger(errorLogger(module, 'Some request fields missing'));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'error',
+                msg: 'An error has occurred. Please try again'
+            });
+        }
+    },
+
+    deletePost: function (req, res) {
+        var module = 'deletePost';
+        receivedLogger(module);
+        if (req.body.postUniqueCuid) {
+            var postUniqueCuid = req.body.postUniqueCuid;
+            post_handler.deletePost(req, res, postUniqueCuid);
+        } else {
+            consoleLogger(errorLogger(module, 'Some request fields missing'));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'error',
+                msg: 'An error has occurred. Please try again'
+            });
+        }
+    },
+
 
     getHotThisWeek: function (req, res) {
         var module = 'getHotThisWeek';

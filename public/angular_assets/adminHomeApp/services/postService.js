@@ -54,6 +54,24 @@ angular.module('adminHomeApp')
                     return allPosts[pageNumber];
                 },
 
+                removePostWithUniqueCuid: function (postUniqueCuid) {
+                    var found = 0;
+                    for (var pageNumber in allPosts) {
+                        if (found == 0) {
+                            if (allPosts.hasOwnProperty(pageNumber)) {
+                                allPosts[pageNumber].forEach(function (post, index) {
+                                    if (found == 0) {
+                                        if (post.postUniqueCuid == postUniqueCuid) {
+                                            allPosts[pageNumber].splice(index, 1);
+                                            ++found;
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                },
+
                 updateAllPostsCount: function (newCount) {
                     allPostsCount = newCount;
                     return allPostsCount;
@@ -176,6 +194,16 @@ angular.module('adminHomeApp')
                     return $http.post('/api/updatePost', {
                         postUpdate: post
                     });
+                },
+
+                trashPost: function (postUniqueCuid) {
+                    return $http.post('/api/trashPost', {
+                        postUniqueCuid: postUniqueCuid
+                    });
+                },
+
+                unTrashPost: function (postUniqueCuid) {
+                    return $http.post('/api/unTrashPost');
                 }
             };
         }]);
