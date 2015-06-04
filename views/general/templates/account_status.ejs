@@ -1,0 +1,23 @@
+<% if (theUser && accountStatusBanner.show) { %>
+
+<div class="row">
+    <div class="col-lg-12 allBannerOuterDivs">
+        <div class="<%= accountStatusBanner.bannerClass %>">
+            <strong><%= accountStatusBanner.msg %></strong>
+
+            <% if (accountStatusBanner.showResendEmail) { %>
+
+            <div>
+                <p resend-email-scope>Didn't get an email?
+                    <a style="text-decoration: underline" href
+                       ng-click="resendConfirmationEmail(userData.uniqueCuid)">Resend
+                        email</a>
+                </p>
+            </div>
+
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<% } %>

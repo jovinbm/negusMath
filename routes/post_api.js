@@ -148,11 +148,11 @@ module.exports = {
     },
 
 
-    getHotThisWeek: function (req, res) {
-        var module = 'getHotThisWeek';
+    getPopularStories: function (req, res) {
+        var module = 'getPopularStories';
         receivedLogger(module);
         var quantity = 7;
-        post_handler.getHotThisWeek(req, res, quantity);
+        post_handler.getPopularStories(req, res, quantity);
     },
 
 

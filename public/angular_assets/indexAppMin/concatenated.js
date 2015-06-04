@@ -20,9 +20,8 @@ angular.module('indexApp', [
 angular.module('indexApp', ['duScroll'])
     .value('duScrollOffset', 60);
 angular.module('indexApp')
-    .directive('accountOuter', ['$rootScope', function ($rootScope, logoutService) {
+    .directive('accountOuterScope', ['$rootScope', function ($rootScope, logoutService) {
         return {
-            templateUrl: 'views/index/views/account_outer.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 //variable to hold state between local login and creating a new account
@@ -35,113 +34,8 @@ angular.module('indexApp')
         }
     }]);
 angular.module('indexApp')
-    .directive('accountStatusBanner', ['$rootScope', 'socketService', 'globals', '$location', '$window', function ($rootScope, socketService, globals, $location, $window) {
+    .directive('signInBannerScope', ['$rootScope', function ($rootScope) {
         return {
-            scope: {},
-            templateUrl: 'views/general/smalls/account_status.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.accountStatusBanner = {
-                    show: false,
-                    bannerClass: "",
-                    msg: "",
-                    showResendEmail: false
-                };
-
-                $scope.resendConfirmationEmail = function (userUniqueCuid) {
-                    socketService.resendConfirmationEmail(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.responseStatusHandler(resp);
-                        })
-                        .error(function (err) {
-                            $rootScope.responseStatusHandler(err);
-                        })
-                };
-
-
-                //initial requests
-                function getAccountDetails() {
-                    socketService.getUserData()
-                        .success(function (resp) {
-                            $scope.theUser = resp.userData;
-                            if (resp.userData.isRegistered == true) {
-                                $scope.accountStatusBanner = determineAccountStatus(resp.userData);
-                            }
-                        })
-                        .error(function () {
-                            $scope.accountStatusBanner = {
-                                show: true,
-                                bannerClass: "alert alert-warning",
-                                msg: "An error has occurred. Please reload page"
-                            };
-                        });
-                }
-
-                getAccountDetails();
-
-                function determineAccountStatus(userData) {
-                    if (userData.isRegistered) {
-                        if (!userData.emailIsConfirmed) {
-                            return {
-                                show: true,
-                                bannerClass: "alert alert-warning",
-                                msg: "Please confirm your account by clicking the confirmation link we sent on your email. Please also check your spam folder",
-                                showResendEmail: true
-                            };
-                        } else if (userData.isApproved === false) {
-                            return {
-                                show: true,
-                                bannerClass: "alert alert-warning",
-                                msg: "Your account is awaiting approval from the administrators. Please allow up to 3 business days. You will get an email notification as soon as your account is approved.",
-                                showResendEmail: false
-                            };
-                        } else if (userData.isBanned) {
-                            if (userData.isBanned.status === true) {
-                                //checking banned status
-                                return {
-                                    show: true,
-                                    bannerClass: "alert alert-warning",
-                                    msg: "Your have been banned from this service. Please contact the administrators for more information",
-                                    showResendEmail: false
-                                };
-                            } else {
-                                return {
-                                    show: false,
-                                    bannerClass: "",
-                                    msg: "",
-                                    showResendEmail: false
-                                };
-                            }
-                        } else {
-                            return {
-                                show: false,
-                                bannerClass: "",
-                                msg: "",
-                                showResendEmail: false
-                            };
-                        }
-                    } else {
-                        return {
-                            show: false,
-                            bannerClass: "",
-                            msg: "",
-                            showResendEmail: false
-                        };
-                    }
-                }
-
-                $rootScope.$on('userDataChanges', function () {
-                });
-
-                $rootScope.$on('reconnect', function () {
-                    getAccountDetails();
-                });
-            }
-        }
-    }])
-    .directive('signInBanner', ['$rootScope', function ($rootScope) {
-        return {
-            templateUrl: 'views/index/smalls/sign_in_banner.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.signInBanner = {
@@ -164,9 +58,8 @@ angular.module('indexApp')
             }
         }
     }])
-    .directive('registrationBanner', ['$rootScope', function ($rootScope) {
+    .directive('registrationBannerScope', ['$rootScope', function ($rootScope) {
         return {
-            templateUrl: 'views/index/smalls/registration_banner.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.registrationBanner = {
@@ -275,140 +168,14 @@ angular.module('indexApp')
         }];
 
         return {
-            templateUrl: 'views/client/partials/smalls/loading_banner.html',
+            templateUrl: 'views/client/partials/templates/loading_banner.html',
             restrict: 'AE',
             controller: controller
         }
     }]);
 angular.module('indexApp')
-    .directive('createAccount', ['$rootScope', 'socketService', function ($rootScope, socketService) {
+    .directive('contactUsScope', ['$rootScope', 'socketService', function ($rootScope, socketService) {
         return {
-            templateUrl: 'views/index/views/create_account.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.registrationDetails = {
-                    email: "",
-                    firstName: "",
-                    lastName: "",
-                    username: "",
-                    password1: "",
-                    password2: "",
-                    invitationCode: ""
-                };
-
-                $scope.createAccount = function () {
-                    socketService.createAccount($scope.registrationDetails)
-                        .success(function (resp) {
-                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
-                            $rootScope.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-
-                            $scope.registrationDetails.password1 = "";
-                            $scope.registrationDetails.password2 = "";
-                            $scope.registrationDetails.invitationCode = "";
-                            $rootScope.responseStatusHandler(errResponse);
-                        });
-                };
-            }
-        }
-    }]);
-angular.module('indexApp')
-    .directive('signIn', ['$rootScope', 'socketService', function ($rootScope, socketService) {
-        return {
-            templateUrl: 'views/index/views/sign_in.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.loginFormModel = {
-                    username: "",
-                    password: ""
-                };
-
-                $scope.submitLocalLoginForm = function () {
-                    socketService.localUserLogin($scope.loginFormModel)
-                        .success(function (resp) {
-                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
-                            $rootScope.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $scope.loginFormModel.password = "";
-                            $rootScope.responseStatusHandler(errResponse);
-                        });
-                };
-            }
-        }
-    }]);
-angular.module('indexApp')
-    .directive('universalSearchBox', ['$window', '$location', '$rootScope', 'globals', function ($window, $location, $rootScope, globals) {
-        return {
-            templateUrl: 'views/admin/partials/smalls/universal_search_box.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.mainSearchModel = {
-                    queryString: "",
-                    postSearchUniqueCuid: "",
-                    requestedPage: 1
-                };
-
-                $scope.fillSearchBox = function () {
-                    //check latest state
-                    if ($rootScope.$state.current.name == 'search') {
-                        $scope.mainSearchModel.queryString = $rootScope.$stateParams.queryString ? $rootScope.$stateParams.queryString : "";
-                    } else if ($rootScope.stateHistory.length > 0) {
-                        if ($rootScope.stateHistory[$rootScope.stateHistory.length - 1].hasOwnProperty('search')) {
-                            //checking the previous state
-                            $scope.mainSearchModel.queryString = $rootScope.stateHistory[$rootScope.stateHistory.length - 1]['search'].queryString
-                        } else {
-                            $scope.mainSearchModel.queryString = "";
-                        }
-                    } else {
-                        $scope.mainSearchModel.queryString = "";
-                    }
-                };
-
-                $scope.fillSearchBox();
-
-                $scope.performMainSearch = function () {
-                    if ($scope.mainSearchModel.queryString.length > 0) {
-                        if ($location.port()) {
-                            $window.location.href = "http://" + $location.host() + ":" + $location.port() + "/#!/search/" + $scope.mainSearchModel.queryString + "/1";
-                        } else {
-                            $window.location.href = "http://" + $location.host() + "/#!/search/" + $scope.mainSearchModel.queryString + "/1";
-                        }
-                    }
-                };
-            }
-        }
-    }])
-    .directive('topNav', ['$rootScope', 'logoutService', function ($rootScope, logoutService) {
-        return {
-
-            templateUrl: 'views/index/views/top_nav.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.logoutClient = function () {
-                    logoutService.logoutClient()
-                        .success(function (resp) {
-                            $rootScope.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.responseStatusHandler(errResponse);
-                        });
-                };
-            }
-        }
-    }])
-    .directive('mainFooter', [function () {
-        return {
-            templateUrl: 'views/general/smalls/main_footer.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-            }
-        }
-    }])
-    .directive('contactUs', ['$rootScope', 'socketService', function ($rootScope, socketService) {
-        return {
-            templateUrl: 'views/general/smalls/contact_us.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.contactUsModel = {
@@ -451,6 +218,97 @@ angular.module('indexApp')
                                 $rootScope.responseStatusHandler(errResp);
                             });
                     }
+                };
+            }
+        }
+    }]);
+angular.module('indexApp')
+    .directive('createAccountScope', ['$rootScope', 'socketService', function ($rootScope, socketService) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.registrationDetails = {
+                    email: "",
+                    firstName: "",
+                    lastName: "",
+                    username: "",
+                    password1: "",
+                    password2: "",
+                    invitationCode: ""
+                };
+
+                $scope.createAccount = function () {
+                    socketService.createAccount($scope.registrationDetails)
+                        .success(function (resp) {
+                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
+                            $rootScope.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $scope.registrationDetails.password1 = "";
+                            $scope.registrationDetails.password2 = "";
+                            $scope.registrationDetails.invitationCode = "";
+                            $rootScope.responseStatusHandler(errResponse);
+                        });
+                };
+            }
+        }
+    }]);
+angular.module('indexApp')
+    .directive('logoutScope', ['$rootScope', 'logoutService', function ($rootScope, logoutService) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.logoutClient = function () {
+                    logoutService.logoutClient()
+                        .success(function (resp) {
+                            $rootScope.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.responseStatusHandler(errResponse);
+                        });
+                };
+            }
+        }
+    }]);
+angular.module('indexApp')
+    .directive('resendEmailScope', ['$rootScope', 'socketService', function ($rootScope, socketService) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+
+                $scope.resendConfirmationEmail = function (userUniqueCuid) {
+                    console.log(userUniqueCuid);
+                    socketService.resendConfirmationEmail(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.responseStatusHandler(resp);
+                        })
+                        .error(function (err) {
+                            $rootScope.responseStatusHandler(err);
+                        })
+                };
+            }
+        }
+    }]);
+angular.module('indexApp')
+    .directive('signInScope', ['$rootScope', 'socketService', function ($rootScope, socketService) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.loginFormModel = {
+                    username: "",
+                    password: ""
+                };
+
+                $scope.submitLocalLoginForm = function () {
+                    socketService.localUserLogin($scope.loginFormModel)
+                        .success(function (resp) {
+                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
+                            $rootScope.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $scope.loginFormModel.password = "";
+                            $rootScope.responseStatusHandler(errResponse);
+                        });
                 };
             }
         }
@@ -538,6 +396,180 @@ angular.module('indexApp')
             });
         }
     ]);
+angular.module('indexApp')
+
+    .factory('fN', ['$q', '$location', '$window', '$rootScope', 'socketService',
+        function ($q, $location, $window, $rootScope, socketService) {
+            return {
+                calcObjectLength: function (obj) {
+                    var len = 0;
+                    for (var prop in obj) {
+                        if (obj.hasOwnProperty(prop)) {
+                            len++;
+                        }
+                    }
+                    return len
+                }
+            };
+        }]);
+angular.module('indexApp')
+
+    .factory('globals', ['$q', '$location', '$window', '$rootScope', 'socketService',
+        function ($q, $location, $window, $rootScope, socketService) {
+            var userData = {};
+            var allData = {
+                documentTitle: "Negus Math - College Level Advanced Mathematics for Kenya Students",
+                indexPageUrl: $location.port() ? "http://" + $location.host() + ":" + $location.port() + "/index" : $scope.indexPageUrl = "http://" + $location.host() + "/index"
+            };
+
+            var universalBanner = {
+                show: false,
+                bannerClass: "",
+                msg: ""
+            };
+
+            var registrationBanner = {
+                show: false,
+                bannerClass: "",
+                msg: ""
+            };
+
+            return {
+
+                userData: function (data) {
+                    if (data) {
+                        userData = data;
+                        return userData;
+                    } else {
+                        return userData;
+                    }
+                },
+
+                allData: allData,
+
+                getDocumentTitle: function () {
+                    return allData.documentTitle
+                },
+
+                defaultDocumentTitle: function () {
+                    allData.documentTitle = "Negus Math - College Level Advanced Mathematics for Kenya Students";
+                },
+
+                changeDocumentTitle: function (newDocumentTitle) {
+                    if (newDocumentTitle) {
+                        allData.documentTitle = newDocumentTitle;
+                    }
+                    return allData.documentTitle
+                },
+
+                getLocationHost: function () {
+                    if ($location.port()) {
+                        return "http://" + $location.host() + ":" + $location.port();
+                    } else {
+                        return "http://" + $location.host();
+                    }
+                }
+            };
+        }]);
+angular.module('indexApp')
+    .factory('mainService', ['$log', '$window', '$rootScope', 'socket', 'socketService', 'globals',
+        function ($log, $window, $rootScope, socket, socketService, globals) {
+
+            socket.on('reconnect', function () {
+                $log.info("'reconnect sequence' triggered");
+                $rootScope.$broadcast('reconnectSuccess');
+            });
+
+            return {
+                done: function () {
+                    return 1;
+                }
+            };
+        }]);
+angular.module('indexApp')
+
+    .factory('socket', ['$log', '$location', '$rootScope',
+        function ($log, $location, $rootScope) {
+            var url;
+            if ($location.port()) {
+                url = $location.host() + ":" + $location.port();
+            } else {
+                url = $location.host();
+            }
+            var socket = io.connect(url);
+            //return socket;
+            return {
+                on: function (eventName, callback) {
+                    socket.on(eventName, function () {
+                        var args = arguments;
+                        $rootScope.$apply(function () {
+                            callback.apply(socket, args);
+                        });
+                    });
+                },
+
+                emit: function (eventName, data, callback) {
+                    socket.emit(eventName, data, function () {
+                        var args = arguments;
+                        $rootScope.$apply(function () {
+                            if (callback) {
+                                callback.apply(socket, args);
+                            }
+                        });
+                    });
+                },
+
+                removeAllListeners: function (eventName, callback) {
+                    socket.removeAllListeners(eventName, function () {
+                        var args = arguments;
+                        $rootScope.$apply(function () {
+                            callback.apply(socket, args);
+                        });
+                    });
+                }
+            };
+        }])
+
+
+    .factory('socketService', ['$log', '$http', '$rootScope',
+        function ($log, $http, $rootScope) {
+
+            return {
+
+                getUserData: function () {
+                    return $http.get('/api/getUserData');
+                },
+
+                createAccount: function (details) {
+                    return $http.post('/createAccount', details);
+                },
+
+                localUserLogin: function (loginData) {
+                    return $http.post('/localUserLogin', loginData);
+                },
+
+                resendConfirmationEmail: function (userUniqueCuid) {
+                    return $http.post('/resendConfirmationEmail', {
+                        userUniqueCuid: userUniqueCuid
+                    });
+                },
+
+                sendContactUs: function (contactUsModel) {
+                    return $http.post('/contactUs', contactUsModel);
+                }
+            }
+        }
+    ])
+
+    .factory('logoutService', ['$http',
+        function ($http) {
+            return {
+
+                logoutClient: function () {
+                    return $http.post('/api/logoutClient');
+                }
+            }
+        }]);
 angular.module('indexApp')
     .filter("timeago", function () {
         //time: the time
@@ -783,178 +815,3 @@ angular.module('indexApp')
     }]);
 
 
-
-angular.module('indexApp')
-
-    .factory('fN', ['$q', '$location', '$window', '$rootScope', 'socketService',
-        function ($q, $location, $window, $rootScope, socketService) {
-            return {
-                calcObjectLength: function (obj) {
-                    var len = 0;
-                    for (var prop in obj) {
-                        if (obj.hasOwnProperty(prop)) {
-                            len++;
-                        }
-                    }
-                    return len
-                }
-            };
-        }]);
-angular.module('indexApp')
-
-    .factory('globals', ['$q', '$location', '$window', '$rootScope', 'socketService',
-        function ($q, $location, $window, $rootScope, socketService) {
-            var userData = {};
-            var allData = {
-                documentTitle: "Negus Math - College Level Advanced Mathematics for Kenya Students",
-                indexPageUrl: $location.port() ? "http://" + $location.host() + ":" + $location.port() + "/index" : $scope.indexPageUrl = "http://" + $location.host() + "/index"
-            };
-
-            var universalBanner = {
-                show: false,
-                bannerClass: "",
-                msg: ""
-            };
-
-            var registrationBanner = {
-                show: false,
-                bannerClass: "",
-                msg: ""
-            };
-
-            return {
-
-                userData: function (data) {
-                    if (data) {
-                        userData = data;
-                        return userData;
-                    } else {
-                        return userData;
-                    }
-                },
-
-                allData: allData,
-
-                getDocumentTitle: function () {
-                    return allData.documentTitle
-                },
-
-                defaultDocumentTitle: function () {
-                    allData.documentTitle = "Negus Math - College Level Advanced Mathematics for Kenya Students";
-                },
-
-                changeDocumentTitle: function (newDocumentTitle) {
-                    if (newDocumentTitle) {
-                        allData.documentTitle = newDocumentTitle;
-                    }
-                    return allData.documentTitle
-                },
-
-                getLocationHost: function () {
-                    if ($location.port()) {
-                        return "http://" + $location.host() + ":" + $location.port();
-                    } else {
-                        return "http://" + $location.host();
-                    }
-                }
-            };
-        }]);
-angular.module('indexApp')
-    .factory('mainService', ['$log', '$window', '$rootScope', 'socket', 'socketService', 'globals',
-        function ($log, $window, $rootScope, socket, socketService, globals) {
-
-            socket.on('reconnect', function () {
-                $log.info("'reconnect sequence' triggered");
-                $rootScope.$broadcast('reconnectSuccess');
-            });
-
-            return {
-                done: function () {
-                    return 1;
-                }
-            };
-        }]);
-angular.module('indexApp')
-
-    .factory('socket', ['$log', '$location', '$rootScope',
-        function ($log, $location, $rootScope) {
-            var url;
-            if ($location.port()) {
-                url = $location.host() + ":" + $location.port();
-            } else {
-                url = $location.host();
-            }
-            var socket = io.connect(url);
-            //return socket;
-            return {
-                on: function (eventName, callback) {
-                    socket.on(eventName, function () {
-                        var args = arguments;
-                        $rootScope.$apply(function () {
-                            callback.apply(socket, args);
-                        });
-                    });
-                },
-
-                emit: function (eventName, data, callback) {
-                    socket.emit(eventName, data, function () {
-                        var args = arguments;
-                        $rootScope.$apply(function () {
-                            if (callback) {
-                                callback.apply(socket, args);
-                            }
-                        });
-                    });
-                },
-
-                removeAllListeners: function (eventName, callback) {
-                    socket.removeAllListeners(eventName, function () {
-                        var args = arguments;
-                        $rootScope.$apply(function () {
-                            callback.apply(socket, args);
-                        });
-                    });
-                }
-            };
-        }])
-
-
-    .factory('socketService', ['$log', '$http', '$rootScope',
-        function ($log, $http, $rootScope) {
-
-            return {
-
-                getUserData: function () {
-                    return $http.get('/api/getUserData');
-                },
-
-                createAccount: function (details) {
-                    return $http.post('/createAccount', details);
-                },
-
-                localUserLogin: function (loginData) {
-                    return $http.post('/localUserLogin', loginData);
-                },
-
-                resendConfirmationEmail: function (userUniqueCuid) {
-                    return $http.post('/resendConfirmationEmail', {
-                        userUniqueCuid: userUniqueCuid
-                    });
-                },
-
-                sendContactUs: function (contactUsModel) {
-                    return $http.post('/contactUs', contactUsModel);
-                }
-            }
-        }
-    ])
-
-    .factory('logoutService', ['$http',
-        function ($http) {
-            return {
-
-                logoutClient: function () {
-                    return $http.post('/api/logoutClient');
-                }
-            }
-        }]);

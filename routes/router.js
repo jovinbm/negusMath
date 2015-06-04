@@ -33,26 +33,23 @@ module.exports = {
         var module = 'index_Html';
         receivedLogger(module);
 
-        res.render('index/index.ejs');
+        var main = {
+            theUser: req.user,
+            accountStatusBanner: middleware.returnAccountStatusBanner(req.user)
+        };
+        res.render('index/index.ejs', main);
+
     },
 
     renderHome_Html: function (req, res) {
         var module = 'renderHome_Html';
         receivedLogger(module);
 
-        var theUser = getTheUser(req);
-        if (theUser) {
-            if (theUser.isAdmin) {
-                consoleLogger(successLogger(module));
-                res.render('admin/adminHome.ejs');
-            } else {
-                consoleLogger(successLogger(module));
-                res.render('client/clientHome.ejs');
-            }
-        } else {
-            consoleLogger(successLogger(module));
-            res.render('client/clientHome.ejs');
-        }
+        var main = {
+            theUser: req.user,
+            accountStatusBanner: middleware.returnAccountStatusBanner(req.user)
+        };
+        res.render('all/adminHome.ejs', main);
     },
 
     renderEmail: function (req, res) {

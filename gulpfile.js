@@ -13,26 +13,15 @@ var imagemin = require('gulp-imagemin');
 var pngquant = require('imagemin-pngquant');
 
 // Concatenate & Minify JS
-gulp.task('minifyAllAdminCSS', function () {
-    return gulp.src(['public/css/*.css', 'public/css/admin/**/*.css'])
+gulp.task('minifyAllMainCSS', function () {
+    return gulp.src(['public/css/*.css', 'public/css/main/**/*.css'])
         .pipe(sourcemaps.init())
-        .pipe(concat('admin.css'))
-        .pipe(gulp.dest('public/cssmin/admin'))
-        .pipe(rename('admin.min.css'))
+        .pipe(concat('main.css'))
+        .pipe(gulp.dest('public/cssmin/main'))
+        .pipe(rename('main.min.css'))
         .pipe(minifyCss())
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('public/cssmin/admin'));
-});
-
-gulp.task('minifyAllClientCSS', function () {
-    return gulp.src(['public/css/*.css', 'public/css/client/**/*.css'])
-        .pipe(sourcemaps.init())
-        .pipe(concat('client.css'))
-        .pipe(gulp.dest('public/cssmin/client'))
-        .pipe(rename('client.min.css'))
-        .pipe(minifyCss())
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('public/cssmin/client'));
+        .pipe(gulp.dest('public/cssmin/main'));
 });
 
 gulp.task('minifyAllIndexCSS', function () {
@@ -46,28 +35,16 @@ gulp.task('minifyAllIndexCSS', function () {
         .pipe(gulp.dest('public/cssmin/index'));
 });
 
-gulp.task('minifyAdminHomeAppJS', function () {
-    return gulp.src('public/angular_assets/adminHomeApp/**/*.js')
+gulp.task('minifyMainAppJS', function () {
+    return gulp.src('public/angular_assets/aMainApp/**/*.js')
         .pipe(sourcemaps.init())
         .pipe(concat('concatenated.js'))
-        .pipe(gulp.dest('public/angular_assets/adminHomeAppMin'))
+        .pipe(gulp.dest('public/angular_assets/aMainAppMin'))
         .pipe(rename('concatenated.min.js'))
         .pipe(ngAnnotate())
         .pipe(uglify())
         .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('public/angular_assets/adminHomeAppMin'));
-});
-
-gulp.task('minifyClientHomeAppJS', function () {
-    return gulp.src('public/angular_assets/clientHomeApp/**/*.js')
-        .pipe(sourcemaps.init())
-        .pipe(concat('concatenated.js'))
-        .pipe(gulp.dest('public/angular_assets/clientHomeAppMin'))
-        .pipe(rename('concatenated.min.js'))
-        .pipe(ngAnnotate())
-        .pipe(uglify())
-        .pipe(sourcemaps.write('.'))
-        .pipe(gulp.dest('public/angular_assets/clientHomeAppMin'));
+        .pipe(gulp.dest('public/angular_assets/aMainAppMin'));
 });
 
 gulp.task('minifyIndexAppJS', function () {
@@ -94,12 +71,11 @@ gulp.task('minifyAllImages', function () {
 
 // Watch Files For Changes
 gulp.task('watch', function () {
-    gulp.watch('public/css/**/*.css', ['minifyAllAdminCSS', 'minifyAllClientCSS', 'minifyAllIndexCSS']);
-    gulp.watch('public/angular_assets/adminHomeApp/**/*.js', ['minifyAdminHomeAppJS']);
-    gulp.watch('public/angular_assets/clientHomeApp/**/*.js', ['minifyClientHomeAppJS']);
+    gulp.watch('public/css/**/*.css', ['minifyAllMainCSS', 'minifyAllIndexCSS']);
+    gulp.watch('public/angular_assets/amainApp/**/*.js', ['minifyMainAppJS']);
     gulp.watch('public/angular_assets/indexApp/**/*.js', ['minifyIndexAppJS']);
     gulp.watch('public/imgs/**/*', ['minifyAllImages']);
 });
 
 // Default Task
-gulp.task('default', ['minifyIndexAppJS', 'minifyAdminHomeAppJS', 'minifyClientHomeAppJS', 'minifyAllAdminCSS', 'minifyAllClientCSS', 'minifyAllIndexCSS', 'minifyAllImages', 'watch']);
+gulp.task('default', ['minifyIndexAppJS', 'minifyMainAppJS', 'minifyAllMainCSS', 'minifyAllIndexCSS', 'minifyAllImages', 'watch']);

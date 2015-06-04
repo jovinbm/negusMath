@@ -196,16 +196,16 @@ module.exports = {
         }
     },
 
-    getHotThisWeek: function (req, res, quantity) {
-        var module = 'getHotThisWeek';
+    getPopularStories: function (req, res, quantity) {
+        var module = 'getPopularStories';
         receivedLogger(module);
 
-        postDB.getHotThisWeek(quantity, error, error, success);
+        postDB.getPopularStories(quantity, error, error, success);
 
-        function success(hotThisWeekArray) {
+        function success(popularStoriesArray) {
             consoleLogger(successLogger(module));
             res.status(200).send({
-                hotThisWeek: hotThisWeekArray
+                popularStories: popularStoriesArray
             });
         }
 

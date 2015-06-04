@@ -209,8 +209,8 @@ module.exports = {
     },
 
 
-    getHotThisWeek: function (quantity, error_neg_1, error_0, success) {
-        var module = 'getHotThisWeek';
+    getPopularStories: function (quantity, error_neg_1, error_0, success) {
+        var module = 'getPopularStories';
         receivedLogger(module);
         Post.find({
             numberOfVisits: {$gt: 0},
@@ -218,18 +218,18 @@ module.exports = {
         })
             .sort({numberOfVisits: -1})
             .limit(quantity)
-            .exec(function (err, hotThisWeekArray) {
+            .exec(function (err, popularStoriesArray) {
                 if (err) {
                     consoleLogger(errorLogger(module, err));
                     error_neg_1(-1, err);
-                } else if (hotThisWeekArray.length == 0) {
-                    consoleLogger(successLogger(module, "HotThisWeek is empty"));
+                } else if (popularStoriesArray.length == 0) {
+                    consoleLogger(successLogger(module, "Popular Stories is empty"));
                     //will call success with the empty postsArray
                     preparePostTagsToClient(null, null, [], true, success);
                 } else {
                     consoleLogger(successLogger(module));
-                    //will call success with the hotThisWeekArray
-                    preparePostTagsToClient(null, null, hotThisWeekArray, true, success);
+                    //will call success with the popularStoriesArray
+                    preparePostTagsToClient(null, null, popularStoriesArray, true, success);
                 }
             });
     },

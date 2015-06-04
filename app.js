@@ -138,7 +138,7 @@ app.get('/api/getUserData', loginAPI.getUserData);
 app.post('/api/getPosts', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, postAPI.getPosts);
 app.post('/api/getSuggestedPosts', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, postAPI.getSuggestedPosts);
 app.post('/api/getPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, postAPI.getPost);
-app.post('/api/getHotThisWeek', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, postAPI.getHotThisWeek);
+app.post('/api/getPopularStories', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, postAPI.getPopularStories);
 app.post('/api/mainSearch', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, postAPI.mainSearch);
 app.post('/api/newPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, postAPI.newPost);
 app.post('/api/updatePost', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, postAPI.updatePost);

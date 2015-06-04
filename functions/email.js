@@ -343,7 +343,7 @@ module.exports = {
             to: userEmail,
             subject: 'We have received your message',
             html: {
-                path: path.join(__dirname, "../views/admin/emails/contact_us_reply.html")
+                path: path.join(__dirname, "../views/all/emails/contact_us_reply.html")
             }
         });
     }
