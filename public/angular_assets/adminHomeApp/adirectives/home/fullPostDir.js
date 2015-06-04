@@ -25,7 +25,7 @@ angular.module('adminHomeApp')
                             $rootScope.main.responseStatusHandler(resp);
                             if (Object.keys(resp.thePost).length > 0) {
                                 $scope.main.post = PostService.updatePost(resp.thePost);
-                                globals.changeDocumentTitle($scope.post.postHeading);
+                                globals.changeDocumentTitle($scope.main.post.postHeading);
 
                                 //check first that this is a production env --> showDisqus before bootstrapping disqus
                                 if ($scope.showDisqus) {

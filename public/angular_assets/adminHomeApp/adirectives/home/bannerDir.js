@@ -99,9 +99,9 @@ angular.module('adminHomeApp')
                         }
                     } else {
                         return {
-                            show: false,
-                            bannerClass: "",
-                            msg: "",
+                            show: true,
+                            bannerClass: "alert alert-warning",
+                            msg: "You are not registered. Please reload this page",
                             showResendEmail: false
                         };
                     }
