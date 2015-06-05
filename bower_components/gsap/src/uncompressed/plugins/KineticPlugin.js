@@ -1,16 +1,15 @@
 /*!
- * VERSION: 0.5.2
- * DATE: 2014-07-17
+ * VERSION: 0.5.1
+ * DATE: 2014-02-14
  * UPDATES AND DOCS AT: http://www.greensock.com
  *
- * @license Copyright (c) 2008-2015, GreenSock. All rights reserved.
- * This work is subject to the terms at http://greensock.com/standard-license or for
+ * @license Copyright (c) 2008-2014, GreenSock. All rights reserved.
+ * This work is subject to the terms at http://www.greensock.com/terms_of_use.html or for
  * Club GreenSock members, the software agreement that was issued with your membership.
  * 
  * @author: Jack Doyle, jack@greensock.com
  */
-var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(global) !== "undefined") ? global : this || window; //helps ensure compatibility with AMD/RequireJS and CommonJS/Node
-(_gsScope._gsQueue || (_gsScope._gsQueue = [])).push( function() {
+(window._gsQueue || (window._gsQueue = [])).push( function() {
 	
 	"use strict";
 
@@ -19,7 +18,7 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 		_setterFuncs = {},
 		_numExp = /(\d|\.)+/g,
 		_directionalRotationExp = /(?:_cw|_ccw|_short)/,
-		_plugins = _gsScope._gsDefine.globals.com.greensock.plugins,
+		_plugins = window._gsDefine.globals.com.greensock.plugins,
 		_colorLookup = {aqua:[0,255,255],
 			lime:[0,255,0],
 			silver:[192,192,192],
@@ -181,10 +180,10 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 		}
 	}
 
-	var KineticPlugin = _gsScope._gsDefine.plugin({
+	var KineticPlugin = window._gsDefine.plugin({
 		propName: "kinetic",
 		API: 2,
-		version: "0.5.2",
+		version: "0.5.1",
 
 		//called when the tween renders for the first time. This is where initial values should be recorded and any setup routines should run.
 		init: function(target, value, tween) {
@@ -332,4 +331,4 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 		}
 	};
 
-}); if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); }
+}); if (window._gsDefine) { window._gsQueue.pop()(); }

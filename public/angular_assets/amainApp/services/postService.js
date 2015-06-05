@@ -1,6 +1,6 @@
 angular.module('mainApp')
-    .factory('PostService', ['$filter', '$http', '$window', '$rootScope', 'socket',
-        function ($filter, $http, $window, $rootScope, socket) {
+    .factory('PostService', ['$filter', '$http', '$window', '$rootScope', 'socket', 'globals',
+        function ($filter, $http, $window, $rootScope, socket, globals) {
 
             var post = {};
             var editPostModel = {};

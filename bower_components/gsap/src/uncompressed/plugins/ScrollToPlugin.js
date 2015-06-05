@@ -1,16 +1,15 @@
 /*!
- * VERSION: 1.7.5
- * DATE: 2015-02-26
- * UPDATES AND DOCS AT: http://greensock.com
+ * VERSION: 1.7.3
+ * DATE: 2014-01-14
+ * UPDATES AND DOCS AT: http://www.greensock.com
  *
- * @license Copyright (c) 2008-2015, GreenSock. All rights reserved.
- * This work is subject to the terms at http://greensock.com/standard-license or for
+ * @license Copyright (c) 2008-2014, GreenSock. All rights reserved.
+ * This work is subject to the terms at http://www.greensock.com/terms_of_use.html or for
  * Club GreenSock members, the software agreement that was issued with your membership.
  * 
  * @author: Jack Doyle, jack@greensock.com
  **/
-var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(global) !== "undefined") ? global : this || window; //helps ensure compatibility with AMD/RequireJS and CommonJS/Node
-(_gsScope._gsQueue || (_gsScope._gsQueue = [])).push( function() {
+(window._gsQueue || (window._gsQueue = [])).push( function() {
 
 	"use strict";
 
@@ -21,13 +20,13 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 				scroll = "scroll" + dim,
 				client = "client" + dim,
 				body = document.body;
-			return (element === _window || element === _doc || element === body) ? Math.max(_doc[scroll], body[scroll]) - (_window["inner" + dim] || _doc[client] || body[client]) : element[scroll] - element["offset" + dim];
+			return (element === _window || element === _doc || element === body) ? Math.max(_doc[scroll], body[scroll]) - (_window["inner" + dim] || Math.max(_doc[client], body[client])) : element[scroll] - element["offset" + dim];
 		},
 
-		ScrollToPlugin = _gsScope._gsDefine.plugin({
+		ScrollToPlugin = window._gsDefine.plugin({
 			propName: "scrollTo",
 			API: 2,
-			version:"1.7.5",
+			version:"1.7.3",
 
 			//called when the tween renders for the first time. This is where initial values should be recorded and any setup routines should run.
 			init: function(target, value, tween) {
@@ -37,7 +36,6 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 				if (typeof(value) !== "object") {
 					value = {y:value}; //if we don't receive an object as the parameter, assume the user intends "y".
 				}
-				this.vars = value;
 				this._autoKill = (value.autoKill !== false);
 				this.x = this.xPrev = this.getX();
 				this.y = this.yPrev = this.getY();
@@ -75,9 +73,6 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 					}
 					if (this.skipX && this.skipY) {
 						this._tween.kill();
-						if (this.vars.onAutoKill) {
-							this.vars.onAutoKill.apply(this.vars.onAutoKillScope || this._tween, this.vars.onAutoKillParams || []);
-						}
 					}
 				}
 				if (this._wdw) {
@@ -117,4 +112,4 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 		return this._super._kill.call(this, lookup);
 	};
 
-}); if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); }
+}); if (window._gsDefine) { window._gsQueue.pop()(); }

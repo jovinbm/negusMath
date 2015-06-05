@@ -20,8 +20,6 @@ angular.module('mainApp')
             $rootScope.main = {
                 currentTime: "",
 
-                clientIsRegistered: false,
-
                 showLoadingBannerDir: false,
 
                 showLoadingBanner: function () {
@@ -75,7 +73,6 @@ angular.module('mainApp')
                     .success(function (resp) {
                         $scope.userData = globals.userData(resp.userData);
                         $rootScope.main.broadcastUserData();
-                        $rootScope.main.clientIsRegistered = $scope.userData.isRegistered;
 
                         if ($scope.userData.isRegistered) {
                             //join a socketRoom for websocket connection, equivalent to user's uniqueCuid

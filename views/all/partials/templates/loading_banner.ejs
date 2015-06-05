@@ -1,0 +1,25 @@
+<script type="text/ng-template" id="views/all/partials/templates/loading_banner.html">
+
+    <div id="loading-splash-card"
+         ng-show="$root.main.showLoadingBannerDir">
+        <div class="panel-body">
+            <div class="card"
+                 id="loading-card">
+
+                <div class="card-content text-center" id="loading-card-content">
+
+                    <h3 class="loading-text text-outputs">LOADING...</h3>
+
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-warning progress-bar-striped" role="progressbar"
+                             ng-attr-aria-valuenow="{{isLoadingPercentage}}"
+                             aria-valuemin="0" aria-valuemax="100"
+                             ng-attr-style="{{'width: ' + isLoadingPercentage + '%;'}}">
+                            <span class="sr-only">60% Complete</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>

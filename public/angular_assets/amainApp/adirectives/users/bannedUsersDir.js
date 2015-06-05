@@ -1,5 +1,5 @@
 angular.module('mainApp')
-    .directive('bannedUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
+    .directive('bannedUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/banned_users.html',
             restrict: 'AE',
@@ -13,14 +13,16 @@ angular.module('mainApp')
                 $scope.bannedUsers = UserService.getBannedUsers();
 
                 function getBannedUsers() {
-                    UserService.getBannedUsersFromServer()
-                        .success(function (resp) {
-                            $scope.bannedUsers = UserService.updateBannedUsers(resp.usersArray);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.getBannedUsersFromServer()
+                            .success(function (resp) {
+                                $scope.bannedUsers = UserService.updateBannedUsers(resp.usersArray);
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 }
 
                 getBannedUsers();

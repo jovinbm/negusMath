@@ -1,22 +1,20 @@
 /*!
- * VERSION: beta 1.4.1
- * DATE: 2014-07-17
+ * VERSION: beta 1.4.0
+ * DATE: 2013-02-27
  * UPDATES AND DOCS AT: http://www.greensock.com
  *
- * @license Copyright (c) 2008-2015, GreenSock. All rights reserved.
- * This work is subject to the terms at http://greensock.com/standard-license or for
+ * @license Copyright (c) 2008-2014, GreenSock. All rights reserved.
+ * This work is subject to the terms at http://www.greensock.com/terms_of_use.html or for
  * Club GreenSock members, the software agreement that was issued with your membership.
  * 
  * @author: Jack Doyle, jack@greensock.com
  **/
-var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(global) !== "undefined") ? global : this || window; //helps ensure compatibility with AMD/RequireJS and CommonJS/Node
-(_gsScope._gsQueue || (_gsScope._gsQueue = [])).push( function() {
+(window._gsQueue || (window._gsQueue = [])).push( function() {
 
 	"use strict";
 
-		var RoundPropsPlugin = _gsScope._gsDefine.plugin({
+		var RoundPropsPlugin = window._gsDefine.plugin({
 				propName: "roundProps",
-				version: "1.4.1",
 				priority: -1,
 				API: 2,
 
@@ -72,4 +70,4 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 			this._overwriteProps.push(p);
 		};
 
-}); if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); }
+}); if (window._gsDefine) { window._gsQueue.pop()(); }

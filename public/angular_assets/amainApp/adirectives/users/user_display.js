@@ -1,5 +1,5 @@
 angular.module('mainApp')
-    .directive('userDisplay', ['$rootScope', 'UserService', 'socketService', function ($rootScope, UserService, socketService) {
+    .directive('userDisplay', ['$rootScope', 'UserService', 'socketService', 'globals', function ($rootScope, UserService, socketService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/user_display.html',
             restrict: 'AE',
@@ -23,58 +23,68 @@ angular.module('mainApp')
 
                 //user manipulation functions
                 $scope.addAdminPrivileges = function (userUniqueCuid) {
-                    UserService.addAdminPrivileges(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.addAdminPrivileges(userUniqueCuid)
+                            .success(function (resp) {
+                                $rootScope.$broadcast('userChanges');
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 };
 
                 $scope.removeAdminPrivileges = function (userUniqueCuid) {
-                    UserService.removeAdminPrivileges(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.removeAdminPrivileges(userUniqueCuid)
+                            .success(function (resp) {
+                                $rootScope.$broadcast('userChanges');
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 };
 
                 $scope.approveUser = function (userUniqueCuid) {
-                    UserService.approveUser(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.approveUser(userUniqueCuid)
+                            .success(function (resp) {
+                                $rootScope.$broadcast('userChanges');
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 };
 
                 $scope.banUser = function (userUniqueCuid) {
-                    UserService.banUser(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.banUser(userUniqueCuid)
+                            .success(function (resp) {
+                                $rootScope.$broadcast('userChanges');
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 };
 
                 $scope.unBanUser = function (userUniqueCuid) {
-                    UserService.unBanUser(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.unBanUser(userUniqueCuid)
+                            .success(function (resp) {
+                                $rootScope.$broadcast('userChanges');
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 };
             }
         }

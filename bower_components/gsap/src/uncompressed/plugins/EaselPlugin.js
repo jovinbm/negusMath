@@ -1,16 +1,15 @@
 /*!
  * VERSION: 0.1.6
- * DATE: 2014-07-17
+ * DATE: 2014-04-08
  * UPDATES AND DOCS AT: http://www.greensock.com
  *
- * @license Copyright (c) 2008-2015, GreenSock. All rights reserved.
- * This work is subject to the terms at http://greensock.com/standard-license or for
+ * @license Copyright (c) 2008-2014, GreenSock. All rights reserved.
+ * This work is subject to the terms at http://www.greensock.com/terms_of_use.html or for
  * Club GreenSock members, the software agreement that was issued with your membership.
  * 
  * @author: Jack Doyle, jack@greensock.com
  **/
-var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(global) !== "undefined") ? global : this || window; //helps ensure compatibility with AMD/RequireJS and CommonJS/Node
-(_gsScope._gsQueue || (_gsScope._gsQueue = [])).push( function() {
+(window._gsQueue || (window._gsQueue = [])).push( function() {
 
 	"use strict";
 
@@ -55,7 +54,7 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 		},
 		_parseColorFilter = function(t, v, pg) {
 			if (!_ColorFilter) {
-				_ColorFilter = (_gsScope.ColorFilter || _gsScope.createjs.ColorFilter);
+				_ColorFilter = (window.ColorFilter || window.createjs.ColorFilter);
 				if (!_ColorFilter) {
 					throw("EaselPlugin error: The EaselJS ColorFilter JavaScript file wasn't loaded.");
 				}
@@ -176,7 +175,7 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 
 		_parseColorMatrixFilter = function(t, v, pg) {
 			if (!_ColorMatrixFilter) {
-				_ColorMatrixFilter = (_gsScope.ColorMatrixFilter || _gsScope.createjs.ColorMatrixFilter);
+				_ColorMatrixFilter = (window.ColorMatrixFilter || window.createjs.ColorMatrixFilter);
 				if (!_ColorMatrixFilter) {
 					throw("EaselPlugin error: The EaselJS ColorMatrixFilter JavaScript file wasn't loaded.");
 				}
@@ -226,7 +225,7 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 		};
 
 
-	_gsScope._gsDefine.plugin({
+	window._gsDefine.plugin({
 		propName: "easel",
 		priority: -1,
 		version: "0.1.6",
@@ -297,4 +296,4 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 
 	});
 
-}); if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); }
+}); if (window._gsDefine) { window._gsQueue.pop()(); }

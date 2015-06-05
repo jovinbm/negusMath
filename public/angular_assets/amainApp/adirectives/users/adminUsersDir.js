@@ -1,5 +1,5 @@
 angular.module('mainApp')
-    .directive('adminUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
+    .directive('adminUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/admin_users.html',
             restrict: 'AE',
@@ -11,14 +11,16 @@ angular.module('mainApp')
                 $scope.adminUsers = UserService.getAdminUsers();
 
                 function getAdminUsers() {
-                    UserService.getAdminUsersFromServer()
-                        .success(function (resp) {
-                            $scope.adminUsers = UserService.updateAdminUsers(resp.usersArray);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.getAdminUsersFromServer()
+                            .success(function (resp) {
+                                $scope.adminUsers = UserService.updateAdminUsers(resp.usersArray);
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 }
 
                 getAdminUsers();

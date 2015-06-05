@@ -1,5 +1,5 @@
 angular.module('mainApp')
-    .directive('newPostDirectiveScope', ['$filter', '$rootScope', 'PostService', function ($filter, $rootScope, PostService) {
+    .directive('newPostDirectiveScope', ['$filter', '$rootScope', 'PostService', 'globals', function ($filter, $rootScope, PostService, globals) {
         return {
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
@@ -40,7 +40,7 @@ angular.module('mainApp')
                 };
 
                 $scope.submitNewPost = function () {
-                    if ($scope.validateForm(true)) {
+                    if ($scope.validateForm(true) && globals.checkAccountStatus()) {
                         var newPost = {
                             postHeading: $scope.newPostModel.postHeading,
                             postContent: $scope.newPostModel.postContent,
@@ -67,7 +67,7 @@ angular.module('mainApp')
             }
         }
     }])
-    .directive('newPostDirective', ['$filter', '$rootScope', 'PostService', function ($filter, $rootScope, PostService) {
+    .directive('newPostDirective', ['$filter', '$rootScope', 'PostService', 'globals', function ($filter, $rootScope, PostService, globals) {
         return {
             templateUrl: 'views/all/partials/views/home/new_post.html',
             restrict: 'AE',

@@ -1,8 +1,8 @@
 angular.module('mainApp')
-    .directive('newPostUploader', ['$rootScope', 'uploadService', function ($rootScope, uploadService) {
+    .directive('newPostUploader', ['$rootScope', 'uploadService', 'globals', function ($rootScope, uploadService, globals) {
         return {
 
-            templateUrl: 'views/general/templates/new_post_uploader.html',
+            templateUrl: 'views/all/partials/templates/new_post_uploader.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.selectedFileType = {
@@ -42,59 +42,65 @@ angular.module('mainApp')
                 };
 
                 function uploadPostImage(fields, file) {
-                    uploadService.uploadPostImage(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.editPostModel.postUploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadPostImage(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.editPostModel.postUploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
 
                 function uploadPdf(fields, file) {
-                    uploadService.uploadPdf(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.editPostModel.postUploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadPdf(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.editPostModel.postUploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
 
                 function uploadZip(fields, file) {
-                    uploadService.uploadZip(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.editPostModel.postUploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadZip(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.editPostModel.postUploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
             }
         }
     }])
-    .directive('editPostUploader', ['$rootScope', 'uploadService', function ($rootScope, uploadService) {
+    .directive('editPostUploader', ['$rootScope', 'uploadService', 'globals', function ($rootScope, uploadService, globals) {
         return {
 
-            templateUrl: 'views/general/templates/edit_post_uploader.html',
+            templateUrl: 'views/all/partials/templates/edit_post_uploader.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.selectedFileType = {
@@ -134,59 +140,65 @@ angular.module('mainApp')
                 };
 
                 function uploadPostImage(fields, file) {
-                    uploadService.uploadPostImage(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.editPostModel.postUploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadPostImage(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.editPostModel.postUploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
 
                 function uploadPdf(fields, file) {
-                    uploadService.uploadPdf(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.editPostModel.postUploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadPdf(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.editPostModel.postUploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
 
                 function uploadZip(fields, file) {
-                    uploadService.uploadZip(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.editPostModel.postUploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadZip(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.editPostModel.postUploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
             }
         }
     }])
-    .directive('uploaderDirective', ['$rootScope', 'uploadService', function ($rootScope, uploadService) {
+    .directive('uploaderDirective', ['$rootScope', 'uploadService', 'globals', function ($rootScope, uploadService, globals) {
         return {
 
-            templateUrl: 'views/general/templates/simple_uploader.html',
+            templateUrl: 'views/all/partials/templates/simple_uploader.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.selectedFileType = {
@@ -227,51 +239,57 @@ angular.module('mainApp')
                 };
 
                 function uploadPostImage(fields, file) {
-                    uploadService.uploadPostImage(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.uploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadPostImage(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.uploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
 
                 function uploadPdf(fields, file) {
-                    uploadService.uploadPdf(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.uploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadPdf(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.uploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
 
                 function uploadZip(fields, file) {
-                    uploadService.uploadZip(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.uploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadZip(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.uploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
             }
         }

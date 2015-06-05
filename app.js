@@ -74,11 +74,17 @@ function getTheUser(req) {
 app.use(compression());
 app.use(favicon(__dirname + '/public/favicon.ico'));
 
+//skip sessions for these routes
 app.use("/bower_components", express.static(path.join(__dirname, '/bower_components')));
 app.use("/public", express.static(path.join(__dirname, '/public')));
 app.use("/uploads", express.static(path.join(__dirname, '/uploads')));
 app.use("/views", express.static(path.join(__dirname, '/views')));
 app.use("/error", express.static(path.join(__dirname, '/public/error')));
+
+//app.post('/contactUs', basicAPI.contactUs);
+app.get('/socket.io/socket.io.js', function (req, res) {
+    res.sendfile("socket.io/socket.io.js");
+});
 
 //prerender-node
 app.use(require('prerender-node').set('prerenderServiceUrl', 'https://jbmprerender.herokuapp.com/'));
@@ -108,11 +114,6 @@ io.on('connection', function (socket) {
         socket.join(room);
         socket.emit('joined');
     });
-});
-
-//app.post('/contactUs', basicAPI.contactUs);
-app.get('/socket.io/socket.io.js', function (req, res) {
-    res.sendfile("socket.io/socket.io.js");
 });
 
 //getting files

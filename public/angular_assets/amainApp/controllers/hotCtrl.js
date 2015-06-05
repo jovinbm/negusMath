@@ -1,6 +1,6 @@
 angular.module('mainApp')
-    .controller('PopularStoriesController', ['$q', '$log', '$scope', '$rootScope', 'PopularStoriesService',
-        function ($q, $log, $scope, $rootScope, PopularStoriesService) {
+    .controller('PopularStoriesController', ['$q', '$log', '$scope', '$rootScope', 'PopularStoriesService', 'globals',
+        function ($q, $log, $scope, $rootScope, PopularStoriesService, globals) {
 
             $scope.popularStories = PopularStoriesService.getPopularStories();
 

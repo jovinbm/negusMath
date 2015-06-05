@@ -1,22 +1,21 @@
 /*!
- * VERSION: beta 1.15.2
- * DATE: 2015-01-27
- * UPDATES AND DOCS AT: http://greensock.com
+ * VERSION: beta 1.9.3
+ * DATE: 2013-04-02
+ * UPDATES AND DOCS AT: http://www.greensock.com
  *
- * @license Copyright (c) 2008-2015, GreenSock. All rights reserved.
- * This work is subject to the terms at http://greensock.com/standard-license or for
+ * @license Copyright (c) 2008-2014, GreenSock. All rights reserved.
+ * This work is subject to the terms at http://www.greensock.com/terms_of_use.html or for
  * Club GreenSock members, the software agreement that was issued with your membership.
  * 
  * @author: Jack Doyle, jack@greensock.com
  **/
-var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(global) !== "undefined") ? global : this || window; //helps ensure compatibility with AMD/RequireJS and CommonJS/Node
-(_gsScope._gsQueue || (_gsScope._gsQueue = [])).push( function() {
+(window._gsQueue || (window._gsQueue = [])).push( function() {
 
 	"use strict";
 
-	_gsScope._gsDefine("easing.Back", ["easing.Ease"], function(Ease) {
+	window._gsDefine("easing.Back", ["easing.Ease"], function(Ease) {
 		
-		var w = (_gsScope.GreenSockGlobals || _gsScope),
+		var w = (window.GreenSockGlobals || window),
 			gs = w.com.greensock,
 			_2PI = Math.PI * 2,
 			_HALF_PI = Math.PI / 2,
@@ -274,10 +273,9 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 		//Elastic
 		_createElastic = function(n, f, def) {
 			var C = _class("easing." + n, function(amplitude, period) {
-					this._p1 = (amplitude >= 1) ? amplitude : 1; //note: if amplitude is < 1, we simply adjust the period for a more natural feel. Otherwise the math doesn't work right and the curve starts at 1.
-					this._p2 = (period || def) / (amplitude < 1 ? amplitude : 1);
+					this._p1 = amplitude || 1;
+					this._p2 = period || def;
 					this._p3 = this._p2 / _2PI * (Math.asin(1 / this._p1) || 0);
-					this._p2 = _2PI / this._p2; //precalculate to optimize
 				}, true),
 				p = C.prototype = new Ease();
 			p.constructor = C;
@@ -289,13 +287,13 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 		};
 		_wrap("Elastic",
 			_createElastic("ElasticOut", function(p) {
-				return this._p1 * Math.pow(2, -10 * p) * Math.sin( (p - this._p3) * this._p2 ) + 1;
+				return this._p1 * Math.pow(2, -10 * p) * Math.sin( (p - this._p3) * _2PI / this._p2 ) + 1;
 			}, 0.3),
 			_createElastic("ElasticIn", function(p) {
-				return -(this._p1 * Math.pow(2, 10 * (p -= 1)) * Math.sin( (p - this._p3) * this._p2 ));
+				return -(this._p1 * Math.pow(2, 10 * (p -= 1)) * Math.sin( (p - this._p3) * _2PI / this._p2 ));
 			}, 0.3),
 			_createElastic("ElasticInOut", function(p) {
-				return ((p *= 2) < 1) ? -0.5 * (this._p1 * Math.pow(2, 10 * (p -= 1)) * Math.sin( (p - this._p3) * this._p2)) : this._p1 * Math.pow(2, -10 *(p -= 1)) * Math.sin( (p - this._p3) * this._p2 ) * 0.5 + 1;
+				return ((p *= 2) < 1) ? -0.5 * (this._p1 * Math.pow(2, 10 * (p -= 1)) * Math.sin( (p - this._p3) * _2PI / this._p2)) : this._p1 * Math.pow(2, -10 *(p -= 1)) * Math.sin( (p - this._p3) * _2PI / this._p2 ) *0.5 + 1;
 			}, 0.45)
 		);
 
@@ -342,4 +340,4 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 		
 	}, true);
 
-}); if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); }
+}); if (window._gsDefine) { window._gsQueue.pop()(); }

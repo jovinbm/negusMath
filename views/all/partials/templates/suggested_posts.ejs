@@ -1,12 +1,9 @@
-<div post-stream-scope>
+<script type="text/ng-template" id="views/all/partials/templates/suggested_posts.html">
     <div>
-        <div class="panel-heading"><i class="fa fa-leanpub"></i> LATEST POSTS <span
-                class="pull-right hidden-xs hidden-sm"
-                ng-bind="$root.main.currentTime"></span>
-        </div>
+        <div class="panel-heading"><i class="fa fa-leanpub"></i> SUGGESTED POSTS</div>
 
-        <div ng-repeat="(pageNumber, posts) in allPosts">
-            <div ng-repeat="post in posts">
+        <div ng-show="suggestedPosts.length > 0">
+            <div ng-repeat="post in suggestedPosts">
                 <div class="card">
 
                     <div class="card-content">
@@ -19,8 +16,8 @@
                         <h3 class="text-muted postBy">
                             <small>
                                 <a class="btn-link"
-                                   ng-bind-html="post.authorName"></a> on <span
-                                    ng-bind-html="post.postDate"></span>
+                                   ng-bind-html="post.authorName"></a> on
+                                <span ng-bind-html="post.postDate"></span>
                             </small>
                             <br/>
                             <small class="text-muted"
@@ -44,32 +41,11 @@
                 </div>
                 <br/>
             </div>
-
-            <!--index + 1 since it starts from 0 and my pages start from 1-->
-            <div ng-hide="allPosts.hasOwnProperty($index + 2) || allPosts[$index + 1].length == 0 || allPosts[$index + 1].length < 10"
-                 class="text-center">
-                <a href ng-click="showMore($index + 2)"
-                   class="btn btn-sm btn-info">Show More</a>
-            </div>
-
-            <div class="alert alert-success"
-                 ng-show="allPosts[$index + 1].length == 0 || allPosts[$index + 1].length < 10">
-                <strong>No more posts to show...</strong>
-            </div>
         </div>
 
-        <!--<li>-->
-        <!--<div post-stream-pager></div>-->
-        <!--</li>-->
+        <div class="alert alert-success"
+             ng-show="suggestedPosts.length == 0">
+            <strong>We don't any suggestions for you yet...</strong>
+        </div>
     </div>
-</div>
-
-
-<div>
-    <br/>
-    <br/>
-    <br/>
-    <br/>
-
-    <div suggested-posts></div>
-</div>
+</script>

@@ -1,6 +1,6 @@
 angular.module('mainApp')
-    .controller('EditPostController', ['$q', '$filter', '$log', '$window', '$location', '$scope', '$rootScope', 'globals', 'PostService', 'fN',
-        function ($q, $filter, $log, $window, $location, $scope, $rootScope, globals, PostService, fN) {
+    .controller('EditPostController', ['$q', '$filter', '$log', '$window', '$location', '$scope', '$rootScope', 'globals', 'PostService',
+        function ($q, $filter, $log, $window, $location, $scope, $rootScope, globals, PostService) {
 
             $rootScope.main.goToTop();
 
@@ -60,7 +60,7 @@ angular.module('mainApp')
             };
 
             $scope.submitPostUpdate = function () {
-                if ($scope.validateEditForm(true)) {
+                if ($scope.validateEditForm(true) && globals.checkAccountStatus()) {
                     PostService.submitPostUpdate($scope.editPostModel)
                         .success(function (resp) {
                             $rootScope.main.responseStatusHandler(resp);

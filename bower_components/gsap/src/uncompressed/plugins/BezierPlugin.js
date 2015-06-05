@@ -1,16 +1,15 @@
 /*!
- * VERSION: beta 1.3.4
- * DATE: 2014-11-15
+ * VERSION: beta 1.3.2
+ * DATE: 2014-04-08
  * UPDATES AND DOCS AT: http://www.greensock.com
  *
- * @license Copyright (c) 2008-2015, GreenSock. All rights reserved.
- * This work is subject to the terms at http://greensock.com/standard-license or for
+ * @license Copyright (c) 2008-2014, GreenSock. All rights reserved.
+ * This work is subject to the terms at http://www.greensock.com/terms_of_use.html or for
  * Club GreenSock members, the software agreement that was issued with your membership.
  * 
  * @author: Jack Doyle, jack@greensock.com
  **/
-var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(global) !== "undefined") ? global : this || window; //helps ensure compatibility with AMD/RequireJS and CommonJS/Node
-(_gsScope._gsQueue || (_gsScope._gsQueue = [])).push( function() {
+(window._gsQueue || (window._gsQueue = [])).push( function() {
 
 	"use strict";
 
@@ -19,7 +18,6 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 			_r2 = [],
 			_r3 = [],
 			_corProps = {},
-			_globals = _gsScope._gsDefine.globals,
 			Segment = function(a, b, c, d) {
 				this.a = a;
 				this.b = b;
@@ -305,10 +303,10 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 
 
 
-			BezierPlugin = _gsScope._gsDefine.plugin({
+			BezierPlugin = window._gsDefine.plugin({
 					propName: "bezier",
 					priority: -1,
-					version: "1.3.4",
+					version: "1.3.2",
 					API: 2,
 					global:true,
 
@@ -500,7 +498,7 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 		};
 
 		BezierPlugin._cssRegister = function() {
-			var CSSPlugin = _globals.CSSPlugin;
+			var CSSPlugin = window._gsDefine.globals.CSSPlugin;
 			if (!CSSPlugin) {
 				return;
 			}
@@ -579,18 +577,4 @@ var _gsScope = (typeof(module) !== "undefined" && module.exports && typeof(globa
 			return this._super._kill.call(this, lookup);
 		};
 
-}); if (_gsScope._gsDefine) { _gsScope._gsQueue.pop()(); }
-
-//export to AMD/RequireJS and CommonJS/Node (precursor to full modular build system coming at a later date)
-(function(name) {
-	"use strict";
-	var getGlobal = function() {
-		return (_gsScope.GreenSockGlobals || _gsScope)[name];
-	};
-	if (typeof(define) === "function" && define.amd) { //AMD
-		define(["TweenLite"], getGlobal);
-	} else if (typeof(module) !== "undefined" && module.exports) { //node
-		require("../TweenLite.js");
-		module.exports = getGlobal();
-	}
-}("BezierPlugin"));
+}); if (window._gsDefine) { window._gsQueue.pop()(); }

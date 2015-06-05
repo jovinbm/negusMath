@@ -14,8 +14,6 @@
     <!--AngularJS SCRIPTS-->
     <!--<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.8/angular.min.js"></script>-->
     <script type="text/javascript" src="/bower_components/angular/angular.min.js"></script>
-    <!--<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.3.8/angular-animate.min.js"></script>-->
-    <script type="text/javascript" src="/bower_components/angular-animate/angular-animate.min.js"></script>
 
     <!--bootstrap-->
     <!--<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootswatch/3.3.2/paper/bootstrap.min.css">-->
@@ -94,6 +92,33 @@
     <div ui-view></div>
 </div>
 
+<!--including all templates-->
+<% include partials/templates/admin_users.ejs %>
+<% include partials/templates/all_users.ejs %>
+<% include partials/templates/banned_users.ejs %>
+<% include partials/templates/edit_post_uploader.ejs %>
+<% include partials/templates/loading_banner.ejs %>
+<% include partials/templates/new_post_banner.ejs %>
+<% include partials/templates/new_post_uploader.ejs %>
+<% include partials/templates/pager.ejs %>
+<% include partials/templates/post_content.ejs %>
+<% include partials/templates/post_summary.ejs %>
+<% include partials/templates/post_tags.ejs %>
+<% include partials/templates/simple_uploader.ejs %>
+<% include partials/templates/suggested_posts.ejs %>
+<% include partials/templates/unApproved_users.ejs %>
+<% include partials/templates/user_display.ejs %>
+<% include partials/templates/user_statistics.ejs %>
+
+<% include partials/views/home/edit_post.ejs %>
+<% include partials/views/home/full_post.ejs %>
+<% include partials/views/home/home.ejs %>
+<% include partials/views/home/new_post.ejs %>
+<% include partials/views/home/post_stream.ejs %>
+
+<% include partials/views/users/users.ejs %>
+
+<% include ../search/search_results.ejs %>
 
 <!-- JAVASCRIPT -->
 

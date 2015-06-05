@@ -1,0 +1,71 @@
+<script type="text/ng-template" id="views/search/search_results.html">
+    <div ng-controller="SearchController">
+
+        <div class="ng-cloak">
+            <div class="panel-heading"><i class="fa fa-leanpub"></i> SEARCH RESULTS <span
+                        class="pull-right"><a href ng-click="back()"><i class="fa fa-arrow-left"></i> BACK</a></span>
+            </div>
+
+            <div ng-repeat="(pageNumber, posts) in mainSearchResultsPosts">
+                <div ng-repeat="post in posts">
+                    <div class="card">
+
+                        <div class="card-content">
+
+                            <h2 class="text-outputs postHeading"><a ng-href="{{post.postPath}}"
+                                                                    ng-click="$root.main.goToTop()"
+                                                                    ng-bind-html="post.postHeading"></a>
+                            </h2>
+
+                            <h3 class="text-muted postBy">
+                                <small><a class="btn-link"
+                                          ng-bind-html="post.authorName"></a>
+                                    on <span ng-bind-html="post.postDate"></span>
+                                </small>
+                                <br/>
+                                <small class="text-muted"
+                                       ng-bind-html="post.timeAgo">
+                                </small>
+                            </h3>
+
+                            <div post-summary model="post.postSummary"></div>
+
+
+                        </div>
+                        <div class="card-action clearfix">
+                            <div post-tags model="post.postTags"></div>
+                            <div class="pull-right">
+                                <a ng-href="{{post.postPath}}"
+                                   ng-click="$root.main.goToTop()"
+                                   class="btn btn-default btn-sm">Read More</a>
+                            </div>
+
+                        </div>
+                    </div>
+                    <br/>
+                </div>
+
+                <!--index + 1 since it starts from 0 and my pages start from 1-->
+                <div ng-hide="mainSearchResultsPosts.hasOwnProperty($index + 2) || mainSearchResultsPosts[$index + 1].length == 0 || mainSearchResultsPosts[$index + 1].length < 10"
+                     class="text-center">
+                    <a href ng-click="showMore($index + 2)"
+                       class="btn btn-sm btn-default">Show More</a>
+                </div>
+
+            </div>
+            <!--<li>-->
+            <!--<div main-search-results-pager></div>-->
+            <!--</li>-->
+        </div>
+
+        <div>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+
+            <div suggested-posts></div>
+        </div>
+
+    </div>
+</script>

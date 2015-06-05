@@ -49,7 +49,7 @@ module.exports = {
             theUser: req.user,
             accountStatusBanner: middleware.returnAccountStatusBanner(req.user)
         };
-        res.render('all/adminHome.ejs', main);
+        res.render('all/main.ejs', main);
     },
 
     renderEmail: function (req, res) {

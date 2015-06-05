@@ -1,5 +1,5 @@
 angular.module('mainApp')
-    .directive('universalSearchBoxScope', ['$window', '$location', '$rootScope', function ($window, $location, $rootScope) {
+    .directive('universalSearchBoxScope', ['$window', '$location', '$rootScope', 'globals', function ($window, $location, $rootScope, globals) {
         return {
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {

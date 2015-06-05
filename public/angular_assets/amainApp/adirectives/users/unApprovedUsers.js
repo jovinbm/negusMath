@@ -1,5 +1,5 @@
 angular.module('mainApp')
-    .directive('unApprovedUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
+    .directive('unApprovedUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/unApproved_users.html',
             restrict: 'AE',
@@ -11,14 +11,16 @@ angular.module('mainApp')
                 $scope.usersNotApproved = UserService.getUsersNotApproved();
 
                 function getUsersNotApproved() {
-                    UserService.getUsersNotApprovedFromServer()
-                        .success(function (resp) {
-                            $scope.usersNotApproved = UserService.updateUsersNotApproved(resp.usersArray);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.getUsersNotApprovedFromServer()
+                            .success(function (resp) {
+                                $scope.usersNotApproved = UserService.updateUsersNotApproved(resp.usersArray);
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 }
 
                 getUsersNotApproved();

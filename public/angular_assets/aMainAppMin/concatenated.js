@@ -7,7 +7,6 @@ angular.module('mainApp', [
     'ui.router',
     'duScroll',
     'ngFx',
-    'ngAnimate',
     'textAngular',
     'ngSanitize',
     'angularUtils.directives.dirDisqus',
@@ -16,12 +15,6 @@ angular.module('mainApp', [
     'ngFileUpload'
 ])
     .run(function ($templateCache, $http, $rootScope, $state, $stateParams) {
-
-        //views
-        $http.get('views/all/partials/views/home/home.html', {cache: $templateCache});
-        $http.get('views/all/partials/views/home/post_stream.html', {cache: $templateCache});
-        $http.get('views/all/partials/views/home/full_post.html', {cache: $templateCache});
-
         $rootScope.$state = $state;
         $rootScope.$stateParams = $stateParams;
         $rootScope.Utils = {
@@ -72,6 +65,343 @@ angular.module('mainApp', [
             .html5Mode(false)
             .hashPrefix('!');
     }]);
+angular.module('mainApp')
+    .controller('PopularStoriesController', ['$q', '$log', '$scope', '$rootScope', 'PopularStoriesService', 'globals',
+        function ($q, $log, $scope, $rootScope, PopularStoriesService, globals) {
+
+            $scope.popularStories = PopularStoriesService.getPopularStories();
+
+            function getPopularStories() {
+                PopularStoriesService.getPopularStoriesFromServer()
+                    .success(function (resp) {
+                        $scope.popularStories = PopularStoriesService.updatePopularStories(resp.popularStories);
+                    })
+                    .error(function (errResp) {
+                        $scope.popularStories = PopularStoriesService.updatePopularStories([]);
+                        $rootScope.main.responseStatusHandler(errResp);
+                    });
+            }
+
+            getPopularStories();
+
+            //===============socket listeners===============
+
+            $rootScope.$on('reconnect', function () {
+                getPopularStories();
+            });
+        }
+    ]);
+angular.module('mainApp')
+    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'socketService', 'globals', '$document',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, socketService, globals, $document) {
+
+            //index page url
+            $scope.indexPageUrl = globals.allData.indexPageUrl;
+
+            //website host
+            $rootScope.currentHost = globals.getLocationHost();
+
+            //disqus
+            $scope.showDisqus = $location.host().search("negusmath") !== -1;
+
+            //scrolling functions
+            var duration = 0; //milliseconds
+            var offset = 40; //pixels; adjust for floating menu, context etc
+            //Scroll to #some-id with 30 px "padding"
+            //Note: Use this in a directive, not with document.getElementById
+
+            $rootScope.main = {
+                currentTime: "",
+
+                showLoadingBannerDir: false,
+
+                showLoadingBanner: function () {
+                    this.showLoadingBannerDir = true;
+                },
+
+                hideLoadingBanner: function () {
+                    this.showLoadingBannerDir = false;
+                },
+
+                goToTop: function () {
+                    var someElement = angular.element(document.getElementById('top'));
+                    $document.scrollToElement(someElement, 80, duration);
+                },
+
+                broadcastUserData: function () {
+                    $rootScope.$broadcast('userDataChanges');
+                },
+
+                responseStatusHandler: function (resp) {
+                    $filter('responseFilter')(resp);
+                },
+
+                clearBanners: function () {
+                    $rootScope.$broadcast('clearBanners');
+                },
+
+                isLoading: true,
+
+                startLoading: function () {
+                    this.isLoading = true;
+                },
+                finishedLoading: function () {
+                    $rootScope.isLoading = false;
+                }
+            };
+
+            //=====================time functions=======================
+            //set current Date
+            $scope.currentTime = moment().format("ddd, MMM D, H:mm");
+            var updateCurrentTime = function () {
+                $scope.currentTime = moment().format("ddd, MMM D, H:mm");
+            };
+            $interval(updateCurrentTime, 20000, 0, true);
+
+            //======================end time functions===================
+
+            //initial requests
+            function initialRequests() {
+                socketService.getUserData()
+                    .success(function (resp) {
+                        $scope.userData = globals.userData(resp.userData);
+                        $rootScope.main.broadcastUserData();
+
+                        if ($scope.userData.isRegistered) {
+                            //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
+                            socket.emit('joinRoom', {
+                                room: resp.userData.uniqueCuid
+                            });
+                        }
+
+                        $rootScope.main.responseStatusHandler(resp);
+                    })
+                    .error(function (errResponse) {
+                        $rootScope.main.responseStatusHandler(errResponse);
+                    });
+            }
+
+            initialRequests();
+
+            //$scope functions to be used in other controllers and directives
+            //back navigation functionality
+            var history = [];
+            $rootScope.stateHistory = [];
+            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+                history.push($location.$$path);
+                //push the previous state also
+                var temp = {};
+                temp[fromState.name] = fromParams;
+                $rootScope.stateHistory.push(temp);
+            });
+            $rootScope.back = function () {
+                var prevUrl = history.length > 1 ? history.splice(-2)[0] : "/";
+                $location.path(prevUrl);
+            };
+
+            $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+                $rootScope.main.clearBanners();
+                $rootScope.clearToasts();
+
+                //variable to keep track of when the user is editing the post
+                $rootScope.isEditingPost = false;
+            });
+
+            //===============socket listeners===============
+
+            $rootScope.$on('reconnect', function () {
+                initialRequests();
+            });
+        }
+    ]);
+angular.module('mainApp')
+    .controller('EditPostController', ['$q', '$filter', '$log', '$window', '$location', '$scope', '$rootScope', 'globals', 'PostService',
+        function ($q, $filter, $log, $window, $location, $scope, $rootScope, globals, PostService) {
+
+            $rootScope.main.goToTop();
+
+            $scope.editPostModel = PostService.getCurrentEditPostModel();
+
+            function getFullEditPostModel() {
+                PostService.getCurrentEditPostModelFromServer($rootScope.$stateParams.postIndex)
+                    .success(function (resp) {
+                        $rootScope.main.responseStatusHandler(resp);
+                        if (Object.keys(resp.thePost).length > 0) {
+                            $scope.editPostModel = PostService.updateCurrentEditPostModel(resp.thePost);
+                            globals.changeDocumentTitle($scope.editPostModel.postHeading);
+                        } else {
+                            //empty the post
+                            $scope.editPostModel = PostService.updateCurrentEditPostModel({});
+                        }
+                    })
+                    .error(function (errResponse) {
+                        $rootScope.main.responseStatusHandler(errResponse);
+                        //empty the post
+                        $scope.editPostModel = PostService.updateCurrentEditPostModel({});
+                    });
+            }
+
+            getFullEditPostModel();
+
+            $scope.cancelPostUpdate = function () {
+                $rootScope.showToast('success', 'Update cancelled');
+                if ($location.port()) {
+                    $window.location.href = "http://" + $location.host() + ":" + $location.port() + $scope.editPostModel.postPath;
+                } else {
+                    $window.location.href = "http://" + $location.host() + $scope.editPostModel.postPath
+                }
+            };
+
+            $scope.validateEditForm = function (notify) {
+                var errors = 0;
+                if (!$filter("validatePostHeading")($scope.editPostModel.postHeading, notify)) {
+                    errors++;
+                }
+                if (errors == 0) {
+                    if (!$filter("validatePostContent")($scope.editPostModel.postContent, notify)) {
+                        errors++;
+                    }
+                }
+                if (errors == 0) {
+                    if (!$filter("validatePostSummary")($scope.editPostModel.postSummary, notify)) {
+                        errors++;
+                    }
+                }
+                if (errors == 0) {
+                    if (!$filter("validatePostTags")($scope.editPostModel.postTags, notify)) {
+                        errors++;
+                    }
+                }
+                return errors == 0;
+            };
+
+            $scope.submitPostUpdate = function () {
+                if ($scope.validateEditForm(true) && globals.checkAccountStatus()) {
+                    PostService.submitPostUpdate($scope.editPostModel)
+                        .success(function (resp) {
+                            $rootScope.main.responseStatusHandler(resp);
+                            $rootScope.showToast('success', 'Saved');
+                            if ($location.port()) {
+                                $window.location.href = "http://" + $location.host() + ":" + $location.port() + $scope.editPostModel.postPath;
+                            } else {
+                                $window.location.href = "http://" + $location.host() + $scope.editPostModel.postPath
+                            }
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                }
+            };
+        }
+    ]);
+angular.module('mainApp')
+    .controller('SearchController', ['$q', '$log', '$scope', '$rootScope', 'globals', 'PostService',
+        function ($q, $log, $scope, $rootScope, globals, PostService) {
+
+            $rootScope.main.goToTop();
+
+            $scope.mainSearchModel = {
+                queryString: $rootScope.$stateParams.queryString || '',
+                postSearchUniqueCuid: "",
+                requestedPage: 1
+            };
+
+            //change to default document title
+            globals.changeDocumentTitle($rootScope.$stateParams.queryString + " - NegusMath Search");
+
+            $scope.mainSearchResultsPosts = PostService.getAllMainSearchResults();
+            $scope.mainSearchResultsCount = 0;
+
+            function getMainSearchResults(pageNumber) {
+                $scope.mainSearchModel = {
+                    queryString: $rootScope.$stateParams.queryString || '',
+                    postSearchUniqueCuid: $scope.mainSearchModel.postSearchUniqueCuid,
+                    requestedPage: pageNumber
+                };
+
+                PostService.mainSearch($scope.mainSearchModel)
+                    .success(function (resp) {
+                        //the response is the resultValue
+                        if (resp.results.totalResults > 0) {
+                            var theResult = resp.results;
+                            $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults(theResult.postsArray, pageNumber);
+                            $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(theResult.totalResults);
+                            $scope.mainSearchModel.postSearchUniqueCuid = theResult.searchUniqueCuid;
+
+                            var responseMimic1 = {
+                                banner: true,
+                                bannerClass: 'alert alert-dismissible alert-success',
+                                msg: "The search returned " + $scope.mainSearchResultsCount + " results"
+                            };
+                            $rootScope.main.responseStatusHandler(responseMimic1);
+                        } else {
+                            //empty the postsArray
+                            $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults([], pageNumber);
+                            $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(0);
+                            var responseMimic2 = {
+                                banner: true,
+                                bannerClass: 'alert alert-dismissible alert-success',
+                                msg: "The search returned 0 results"
+                            };
+                            $rootScope.main.responseStatusHandler(responseMimic2);
+                        }
+                    })
+                    .error(function (errResp) {
+                        $rootScope.main.responseStatusHandler(errResp);
+                        //empty the postsArray
+                        $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults([], pageNumber);
+                        $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(0);
+                    });
+            }
+
+            getMainSearchResults(1);
+
+            $scope.showMore = function (pageNumber) {
+                getMainSearchResults(pageNumber);
+            };
+
+            //===============socket listeners===============
+
+            $rootScope.$on('reconnect', function () {
+                if ($rootScope.$state.current.name == 'home.search') {
+                    getMainSearchResults($rootScope.$stateParams.pageNumber);
+                }
+            });
+        }
+    ]);
+angular.module('mainApp')
+    .controller('UserManagerController', ['$q', '$scope', '$rootScope', 'UserService', 'globals',
+        function ($q, $scope, $rootScope, UserService, globals) {
+
+            $rootScope.main.goToTop();
+
+            $scope.usersCount = UserService.getUsersCount();
+
+            function getUsersCount() {
+                if (globals.checkAccountStatus()) {
+                    UserService.getUsersCountFromServer()
+                        .success(function (resp) {
+                            $scope.usersCount = UserService.updateUsersCount(resp.usersCount);
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                }
+            }
+
+            getUsersCount();
+
+            //===============socket listeners===============
+
+            $rootScope.$on('userChanges', function () {
+                getUsersCount();
+            });
+
+            $rootScope.$on('reconnect', function () {
+            });
+        }
+    ]);
 angular.module('mainApp')
     .directive('logoutScope', ['$rootScope', 'logoutService', function ($rootScope, logoutService) {
         return {
@@ -729,344 +1059,6 @@ angular.module('mainApp')
         }
     }]);
 angular.module('mainApp')
-    .controller('PopularStoriesController', ['$q', '$log', '$scope', '$rootScope', 'PopularStoriesService',
-        function ($q, $log, $scope, $rootScope, PopularStoriesService) {
-
-            $scope.popularStories = PopularStoriesService.getPopularStories();
-
-            function getPopularStories() {
-                PopularStoriesService.getPopularStoriesFromServer()
-                    .success(function (resp) {
-                        $scope.popularStories = PopularStoriesService.updatePopularStories(resp.popularStories);
-                    })
-                    .error(function (errResp) {
-                        $scope.popularStories = PopularStoriesService.updatePopularStories([]);
-                        $rootScope.main.responseStatusHandler(errResp);
-                    });
-            }
-
-            getPopularStories();
-
-            //===============socket listeners===============
-
-            $rootScope.$on('reconnect', function () {
-                getPopularStories();
-            });
-        }
-    ]);
-angular.module('mainApp')
-    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'socketService', 'globals', '$document',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, socketService, globals, $document) {
-
-            //index page url
-            $scope.indexPageUrl = globals.allData.indexPageUrl;
-
-            //website host
-            $rootScope.currentHost = globals.getLocationHost();
-
-            //disqus
-            $scope.showDisqus = $location.host().search("negusmath") !== -1;
-
-            //scrolling functions
-            var duration = 0; //milliseconds
-            var offset = 40; //pixels; adjust for floating menu, context etc
-            //Scroll to #some-id with 30 px "padding"
-            //Note: Use this in a directive, not with document.getElementById
-
-            $rootScope.main = {
-                currentTime: "",
-
-                clientIsRegistered: false,
-
-                showLoadingBannerDir: false,
-
-                showLoadingBanner: function () {
-                    this.showLoadingBannerDir = true;
-                },
-
-                hideLoadingBanner: function () {
-                    this.showLoadingBannerDir = false;
-                },
-
-                goToTop: function () {
-                    var someElement = angular.element(document.getElementById('top'));
-                    $document.scrollToElement(someElement, 80, duration);
-                },
-
-                broadcastUserData: function () {
-                    $rootScope.$broadcast('userDataChanges');
-                },
-
-                responseStatusHandler: function (resp) {
-                    $filter('responseFilter')(resp);
-                },
-
-                clearBanners: function () {
-                    $rootScope.$broadcast('clearBanners');
-                },
-
-                isLoading: true,
-
-                startLoading: function () {
-                    this.isLoading = true;
-                },
-                finishedLoading: function () {
-                    $rootScope.isLoading = false;
-                }
-            };
-
-            //=====================time functions=======================
-            //set current Date
-            $scope.currentTime = moment().format("ddd, MMM D, H:mm");
-            var updateCurrentTime = function () {
-                $scope.currentTime = moment().format("ddd, MMM D, H:mm");
-            };
-            $interval(updateCurrentTime, 20000, 0, true);
-
-            //======================end time functions===================
-
-            //initial requests
-            function initialRequests() {
-                socketService.getUserData()
-                    .success(function (resp) {
-                        $scope.userData = globals.userData(resp.userData);
-                        $rootScope.main.broadcastUserData();
-                        $rootScope.main.clientIsRegistered = $scope.userData.isRegistered;
-
-                        if ($scope.userData.isRegistered) {
-                            //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
-                            socket.emit('joinRoom', {
-                                room: resp.userData.uniqueCuid
-                            });
-                        }
-
-                        $rootScope.main.responseStatusHandler(resp);
-                    })
-                    .error(function (errResponse) {
-                        $rootScope.main.responseStatusHandler(errResponse);
-                    });
-            }
-
-            initialRequests();
-
-            //$scope functions to be used in other controllers and directives
-            //back navigation functionality
-            var history = [];
-            $rootScope.stateHistory = [];
-            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
-                history.push($location.$$path);
-                //push the previous state also
-                var temp = {};
-                temp[fromState.name] = fromParams;
-                $rootScope.stateHistory.push(temp);
-            });
-            $rootScope.back = function () {
-                var prevUrl = history.length > 1 ? history.splice(-2)[0] : "/";
-                $location.path(prevUrl);
-            };
-
-            $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
-                $rootScope.main.clearBanners();
-                $rootScope.clearToasts();
-
-                //variable to keep track of when the user is editing the post
-                $rootScope.isEditingPost = false;
-            });
-
-            //===============socket listeners===============
-
-            $rootScope.$on('reconnect', function () {
-                initialRequests();
-            });
-        }
-    ]);
-angular.module('mainApp')
-    .controller('EditPostController', ['$q', '$filter', '$log', '$window', '$location', '$scope', '$rootScope', 'globals', 'PostService', 'fN',
-        function ($q, $filter, $log, $window, $location, $scope, $rootScope, globals, PostService, fN) {
-
-            $rootScope.main.goToTop();
-
-            $scope.editPostModel = PostService.getCurrentEditPostModel();
-
-            function getFullEditPostModel() {
-                PostService.getCurrentEditPostModelFromServer($rootScope.$stateParams.postIndex)
-                    .success(function (resp) {
-                        $rootScope.main.responseStatusHandler(resp);
-                        if (Object.keys(resp.thePost).length > 0) {
-                            $scope.editPostModel = PostService.updateCurrentEditPostModel(resp.thePost);
-                            globals.changeDocumentTitle($scope.editPostModel.postHeading);
-                        } else {
-                            //empty the post
-                            $scope.editPostModel = PostService.updateCurrentEditPostModel({});
-                        }
-                    })
-                    .error(function (errResponse) {
-                        $rootScope.main.responseStatusHandler(errResponse);
-                        //empty the post
-                        $scope.editPostModel = PostService.updateCurrentEditPostModel({});
-                    });
-            }
-
-            getFullEditPostModel();
-
-            $scope.cancelPostUpdate = function () {
-                $rootScope.showToast('success', 'Update cancelled');
-                if ($location.port()) {
-                    $window.location.href = "http://" + $location.host() + ":" + $location.port() + $scope.editPostModel.postPath;
-                } else {
-                    $window.location.href = "http://" + $location.host() + $scope.editPostModel.postPath
-                }
-            };
-
-            $scope.validateEditForm = function (notify) {
-                var errors = 0;
-                if (!$filter("validatePostHeading")($scope.editPostModel.postHeading, notify)) {
-                    errors++;
-                }
-                if (errors == 0) {
-                    if (!$filter("validatePostContent")($scope.editPostModel.postContent, notify)) {
-                        errors++;
-                    }
-                }
-                if (errors == 0) {
-                    if (!$filter("validatePostSummary")($scope.editPostModel.postSummary, notify)) {
-                        errors++;
-                    }
-                }
-                if (errors == 0) {
-                    if (!$filter("validatePostTags")($scope.editPostModel.postTags, notify)) {
-                        errors++;
-                    }
-                }
-                return errors == 0;
-            };
-
-            $scope.submitPostUpdate = function () {
-                if ($scope.validateEditForm(true)) {
-                    PostService.submitPostUpdate($scope.editPostModel)
-                        .success(function (resp) {
-                            $rootScope.main.responseStatusHandler(resp);
-                            $rootScope.showToast('success', 'Saved');
-                            if ($location.port()) {
-                                $window.location.href = "http://" + $location.host() + ":" + $location.port() + $scope.editPostModel.postPath;
-                            } else {
-                                $window.location.href = "http://" + $location.host() + $scope.editPostModel.postPath
-                            }
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                }
-            };
-        }
-    ]);
-angular.module('mainApp')
-    .controller('SearchController', ['$q', '$log', '$scope', '$rootScope', 'globals', 'PostService',
-        function ($q, $log, $scope, $rootScope, globals, PostService) {
-
-            $rootScope.main.goToTop();
-
-            $scope.mainSearchModel = {
-                queryString: $rootScope.$stateParams.queryString || '',
-                postSearchUniqueCuid: "",
-                requestedPage: 1
-            };
-
-            //change to default document title
-            globals.changeDocumentTitle($rootScope.$stateParams.queryString + " - NegusMath Search");
-
-            $scope.mainSearchResultsPosts = PostService.getAllMainSearchResults();
-            $scope.mainSearchResultsCount = 0;
-
-            function getMainSearchResults(pageNumber) {
-                $scope.mainSearchModel = {
-                    queryString: $rootScope.$stateParams.queryString || '',
-                    postSearchUniqueCuid: $scope.mainSearchModel.postSearchUniqueCuid,
-                    requestedPage: pageNumber
-                };
-
-                PostService.mainSearch($scope.mainSearchModel)
-                    .success(function (resp) {
-                        //the response is the resultValue
-                        if (resp.results.totalResults > 0) {
-                            var theResult = resp.results;
-                            $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults(theResult.postsArray, pageNumber);
-                            $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(theResult.totalResults);
-                            $scope.mainSearchModel.postSearchUniqueCuid = theResult.searchUniqueCuid;
-
-                            var responseMimic1 = {
-                                banner: true,
-                                bannerClass: 'alert alert-dismissible alert-success',
-                                msg: "The search returned " + $scope.mainSearchResultsCount + " results"
-                            };
-                            $rootScope.main.responseStatusHandler(responseMimic1);
-                        } else {
-                            //empty the postsArray
-                            $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults([], pageNumber);
-                            $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(0);
-                            var responseMimic2 = {
-                                banner: true,
-                                bannerClass: 'alert alert-dismissible alert-success',
-                                msg: "The search returned 0 results"
-                            };
-                            $rootScope.main.responseStatusHandler(responseMimic2);
-                        }
-                    })
-                    .error(function (errResp) {
-                        $rootScope.main.responseStatusHandler(errResp);
-                        //empty the postsArray
-                        $scope.mainSearchResultsPosts[pageNumber] = PostService.updateMainSearchResults([], pageNumber);
-                        $scope.mainSearchResultsCount = PostService.updateMainSearchResultsCount(0);
-                    });
-            }
-
-            getMainSearchResults(1);
-
-            $scope.showMore = function (pageNumber) {
-                getMainSearchResults(pageNumber);
-            };
-
-            //===============socket listeners===============
-
-            $rootScope.$on('reconnect', function () {
-                if ($rootScope.$state.current.name == 'home.search') {
-                    getMainSearchResults($rootScope.$stateParams.pageNumber);
-                }
-            });
-        }
-    ]);
-angular.module('mainApp')
-    .controller('UserManagerController', ['$q', '$scope', '$rootScope', 'UserService',
-        function ($q, $scope, $rootScope, UserService) {
-
-            $rootScope.main.goToTop();
-
-            $scope.usersCount = UserService.getUsersCount();
-
-            function getUsersCount() {
-                UserService.getUsersCountFromServer()
-                    .success(function (resp) {
-                        $scope.usersCount = UserService.updateUsersCount(resp.usersCount);
-                        $rootScope.main.responseStatusHandler(resp);
-                    })
-                    .error(function (errResponse) {
-                        $rootScope.main.responseStatusHandler(errResponse);
-                    })
-            }
-
-            getUsersCount();
-
-            //===============socket listeners===============
-
-            $rootScope.$on('userChanges', function () {
-                getUsersCount();
-            });
-
-            $rootScope.$on('reconnect', function () {
-            });
-        }
-    ]);
-angular.module('mainApp')
 
     .factory('fN', [function () {
         return {
@@ -1083,8 +1075,8 @@ angular.module('mainApp')
     }]);
 angular.module('mainApp')
 
-    .factory('globals', ['$q', '$location',
-        function ($q, $location) {
+    .factory('globals', ['$q', '$location', '$rootScope',
+        function ($q, $location, $rootScope) {
             var userData = {};
             var allData = {
                 documentTitle: "Negus Math - College Level Advanced Mathematics for Kenya Students",
@@ -1125,6 +1117,80 @@ angular.module('mainApp')
                     } else {
                         return "http://" + $location.host();
                     }
+                },
+
+                checkAccountStatus: function () {
+                    function getStatus(userData) {
+                        if (userData && Object.keys(userData)) {
+                            if (userData.isRegistered) {
+                                if (!userData.emailIsConfirmed) {
+                                    return {
+                                        show: true,
+                                        bannerClass: "alert alert-warning",
+                                        msg: "Please confirm your account by clicking the confirmation link we sent on your email. Please also check your spam folder",
+                                        showResendEmail: true,
+                                        accountStatus: false
+                                    };
+                                } else if (userData.isApproved === false) {
+                                    return {
+                                        show: true,
+                                        bannerClass: "alert alert-warning",
+                                        msg: "Your account is awaiting approval from the administrators. Please allow up to 3 business days. You will get an email notification as soon as your account is approved.",
+                                        showResendEmail: false,
+                                        accountStatus: false
+                                    };
+                                } else if (userData.isBanned) {
+                                    if (userData.isBanned.status === true) {
+                                        //checking banned status
+                                        return {
+                                            show: true,
+                                            bannerClass: "alert alert-warning",
+                                            msg: "Your have been banned from this service. Please contact the administrators for more information",
+                                            showResendEmail: false,
+                                            accountStatus: false
+                                        };
+                                    } else {
+                                        return {
+                                            show: false,
+                                            bannerClass: "",
+                                            msg: "",
+                                            showResendEmail: false,
+                                            accountStatus: true
+                                        };
+                                    }
+                                } else {
+                                    return {
+                                        show: false,
+                                        bannerClass: "",
+                                        msg: "",
+                                        showResendEmail: false,
+                                        accountStatus: true
+                                    };
+                                }
+                            } else {
+                                return {
+                                    show: true,
+                                    bannerClass: "alert alert-warning",
+                                    msg: "You are not registered. Please reload this page to create an account",
+                                    showResendEmail: false,
+                                    accountStatus: false
+                                };
+                            }
+                        } else {
+                            //userData might not have loaded yet here, forgive this part
+                            return {
+                                show: false,
+                                bannerClass: "",
+                                msg: "",
+                                showResendEmail: false,
+                                accountStatus: true
+                            };
+                        }
+                    }
+
+                    var theStatus = getStatus(userData);
+                    $rootScope.$broadcast('universalBanner', theStatus);
+                    return theStatus.accountStatus;
                 }
             };
         }]);
@@ -1170,8 +1236,8 @@ angular.module('mainApp')
             };
         }]);
 angular.module('mainApp')
-    .factory('PostService', ['$filter', '$http', '$window', '$rootScope', 'socket',
-        function ($filter, $http, $window, $rootScope, socket) {
+    .factory('PostService', ['$filter', '$http', '$window', '$rootScope', 'socket', 'globals',
+        function ($filter, $http, $window, $rootScope, socket, globals) {
 
             var post = {};
             var editPostModel = {};
@@ -1766,7 +1832,7 @@ angular.module('mainApp')
         }
     }]);
 angular.module('mainApp')
-    .directive('newPostDirectiveScope', ['$filter', '$rootScope', 'PostService', function ($filter, $rootScope, PostService) {
+    .directive('newPostDirectiveScope', ['$filter', '$rootScope', 'PostService', 'globals', function ($filter, $rootScope, PostService, globals) {
         return {
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
@@ -1807,7 +1873,7 @@ angular.module('mainApp')
                 };
 
                 $scope.submitNewPost = function () {
-                    if ($scope.validateForm(true)) {
+                    if ($scope.validateForm(true) && globals.checkAccountStatus()) {
                         var newPost = {
                             postHeading: $scope.newPostModel.postHeading,
                             postContent: $scope.newPostModel.postContent,
@@ -1834,7 +1900,7 @@ angular.module('mainApp')
             }
         }
     }])
-    .directive('newPostDirective', ['$filter', '$rootScope', 'PostService', function ($filter, $rootScope, PostService) {
+    .directive('newPostDirective', ['$filter', '$rootScope', 'PostService', 'globals', function ($filter, $rootScope, PostService, globals) {
         return {
             templateUrl: 'views/all/partials/views/home/new_post.html',
             restrict: 'AE',
@@ -1847,7 +1913,7 @@ angular.module('mainApp')
     .directive('postStreamPager', ['$rootScope', 'PostService', function ($rootScope, PostService) {
         return {
 
-            templateUrl: 'views/general/templates/pager.html',
+            templateUrl: 'views/all/partials/templates/pager.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.pagingMaxSize = 5;
@@ -1883,7 +1949,7 @@ angular.module('mainApp')
     .directive('mainSearchResultsPager', ['$rootScope', 'PostService', function ($rootScope, PostService) {
         return {
 
-            templateUrl: 'views/general/templates/pager.html',
+            templateUrl: 'views/all/partials/templates/pager.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.pagingMaxSize = 5;
@@ -2169,9 +2235,9 @@ angular.module('mainApp')
         }
     }]);
 angular.module('mainApp')
-    .directive('suggestedPosts', ['$rootScope', 'PostService', '$timeout', function ($rootScope, PostService, $timeout) {
+    .directive('suggestedPosts', ['$rootScope', 'PostService', '$timeout', 'globals', function ($rootScope, PostService, $timeout, globals) {
         return {
-            templateUrl: 'views/general/templates/suggested_posts.html',
+            templateUrl: 'views/all/partials/templates/suggested_posts.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.suggestedPosts = PostService.getSuggestedPosts();
@@ -2198,7 +2264,7 @@ angular.module('mainApp')
         }
     }]);
 angular.module('mainApp')
-    .directive('trashPostDir', ['$rootScope', 'PostService', function ($rootScope, PostService) {
+    .directive('trashPostDir', ['$rootScope', 'PostService', 'globals', function ($rootScope, PostService, globals) {
         return {
             template: ' <a class="btn-link btn btn-default btn-sm" href ng-click="trashPost(post.postUniqueCuid)">Delete</a>',
             restrict: 'AE',
@@ -2207,7 +2273,7 @@ angular.module('mainApp')
             },
             link: function ($scope, $element, $attrs) {
                 $scope.trashPost = function (postUniqueCuid) {
-                    if (postUniqueCuid) {
+                    if (postUniqueCuid && globals.checkAccountStatus()) {
                         PostService.trashPost(postUniqueCuid)
                             .success(function (resp) {
                                 $rootScope.main.responseStatusHandler(resp);
@@ -2223,7 +2289,7 @@ angular.module('mainApp')
         }
     }])
 angular.module('mainApp')
-    .directive('universalBannerScope', ['$rootScope', function ($rootScope) {
+    .directive('universalBannerScope', 'globals', ['$rootScope', function ($rootScope, globals) {
         return {
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
@@ -2248,7 +2314,7 @@ angular.module('mainApp')
         }
     }]);
 angular.module('mainApp')
-    .directive('universalSearchBoxScope', ['$window', '$location', '$rootScope', function ($window, $location, $rootScope) {
+    .directive('universalSearchBoxScope', ['$window', '$location', '$rootScope', 'globals', function ($window, $location, $rootScope, globals) {
         return {
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
@@ -2289,10 +2355,10 @@ angular.module('mainApp')
         }
     }]);
 angular.module('mainApp')
-    .directive('newPostUploader', ['$rootScope', 'uploadService', function ($rootScope, uploadService) {
+    .directive('newPostUploader', ['$rootScope', 'uploadService', 'globals', function ($rootScope, uploadService, globals) {
         return {
 
-            templateUrl: 'views/general/templates/new_post_uploader.html',
+            templateUrl: 'views/all/partials/templates/new_post_uploader.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.selectedFileType = {
@@ -2332,59 +2398,65 @@ angular.module('mainApp')
                 };
 
                 function uploadPostImage(fields, file) {
-                    uploadService.uploadPostImage(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.editPostModel.postUploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadPostImage(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.editPostModel.postUploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
 
                 function uploadPdf(fields, file) {
-                    uploadService.uploadPdf(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.editPostModel.postUploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadPdf(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.editPostModel.postUploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
 
                 function uploadZip(fields, file) {
-                    uploadService.uploadZip(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.editPostModel.postUploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadZip(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.editPostModel.postUploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
             }
         }
     }])
-    .directive('editPostUploader', ['$rootScope', 'uploadService', function ($rootScope, uploadService) {
+    .directive('editPostUploader', ['$rootScope', 'uploadService', 'globals', function ($rootScope, uploadService, globals) {
         return {
 
-            templateUrl: 'views/general/templates/edit_post_uploader.html',
+            templateUrl: 'views/all/partials/templates/edit_post_uploader.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.selectedFileType = {
@@ -2424,59 +2496,65 @@ angular.module('mainApp')
                 };
 
                 function uploadPostImage(fields, file) {
-                    uploadService.uploadPostImage(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.editPostModel.postUploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadPostImage(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.editPostModel.postUploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
 
                 function uploadPdf(fields, file) {
-                    uploadService.uploadPdf(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.editPostModel.postUploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadPdf(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.editPostModel.postUploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
 
                 function uploadZip(fields, file) {
-                    uploadService.uploadZip(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.editPostModel.postUploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadZip(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.editPostModel.postUploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
             }
         }
     }])
-    .directive('uploaderDirective', ['$rootScope', 'uploadService', function ($rootScope, uploadService) {
+    .directive('uploaderDirective', ['$rootScope', 'uploadService', 'globals', function ($rootScope, uploadService, globals) {
         return {
 
-            templateUrl: 'views/general/templates/simple_uploader.html',
+            templateUrl: 'views/all/partials/templates/simple_uploader.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.selectedFileType = {
@@ -2517,57 +2595,63 @@ angular.module('mainApp')
                 };
 
                 function uploadPostImage(fields, file) {
-                    uploadService.uploadPostImage(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.uploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadPostImage(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.uploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
 
                 function uploadPdf(fields, file) {
-                    uploadService.uploadPdf(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.uploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadPdf(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.uploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
 
                 function uploadZip(fields, file) {
-                    uploadService.uploadZip(fields, file)
-                        .progress(function (evt) {
-                            $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
-                        })
-                        .success(function (data, status, headers, config) {
-                            $rootScope.main.responseStatusHandler(data);
-                            $scope.uploads.push(data.fileData);
-                            $scope.hideProgressBars();
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                            $scope.hideProgressBars();
-                        });
+                    if (globals.checkAccountStatus()) {
+                        uploadService.uploadZip(fields, file)
+                            .progress(function (evt) {
+                                $scope.uploading.percent = parseInt(100.0 * evt.loaded / evt.total);
+                            })
+                            .success(function (data, status, headers, config) {
+                                $rootScope.main.responseStatusHandler(data);
+                                $scope.uploads.push(data.fileData);
+                                $scope.hideProgressBars();
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                                $scope.hideProgressBars();
+                            });
+                    }
                 }
             }
         }
     }]);
 angular.module('mainApp')
-    .directive('adminUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
+    .directive('adminUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/admin_users.html',
             restrict: 'AE',
@@ -2579,14 +2663,16 @@ angular.module('mainApp')
                 $scope.adminUsers = UserService.getAdminUsers();
 
                 function getAdminUsers() {
-                    UserService.getAdminUsersFromServer()
-                        .success(function (resp) {
-                            $scope.adminUsers = UserService.updateAdminUsers(resp.usersArray);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.getAdminUsersFromServer()
+                            .success(function (resp) {
+                                $scope.adminUsers = UserService.updateAdminUsers(resp.usersArray);
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 }
 
                 getAdminUsers();
@@ -2601,7 +2687,7 @@ angular.module('mainApp')
         }
     }]);
 angular.module('mainApp')
-    .directive('allUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
+    .directive('allUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/all_users.html',
             restrict: 'AE',
@@ -2615,14 +2701,16 @@ angular.module('mainApp')
                 $scope.allUsers = UserService.getAllUsers();
 
                 function getAllUsers() {
-                    UserService.getAllUsersFromServer()
-                        .success(function (resp) {
-                            $scope.allUsers = UserService.updateAllUsers(resp.usersArray);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.getAllUsersFromServer()
+                            .success(function (resp) {
+                                $scope.allUsers = UserService.updateAllUsers(resp.usersArray);
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 }
 
                 getAllUsers();
@@ -2637,7 +2725,7 @@ angular.module('mainApp')
         }
     }]);
 angular.module('mainApp')
-    .directive('bannedUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
+    .directive('bannedUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/banned_users.html',
             restrict: 'AE',
@@ -2651,14 +2739,16 @@ angular.module('mainApp')
                 $scope.bannedUsers = UserService.getBannedUsers();
 
                 function getBannedUsers() {
-                    UserService.getBannedUsersFromServer()
-                        .success(function (resp) {
-                            $scope.bannedUsers = UserService.updateBannedUsers(resp.usersArray);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.getBannedUsersFromServer()
+                            .success(function (resp) {
+                                $scope.bannedUsers = UserService.updateBannedUsers(resp.usersArray);
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 }
 
                 getBannedUsers();
@@ -2673,7 +2763,7 @@ angular.module('mainApp')
         }
     }]);
 angular.module('mainApp')
-    .directive('unApprovedUsers', ['$q', '$log', '$rootScope', 'UserService', function ($q, $log, $rootScope, UserService) {
+    .directive('unApprovedUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/unApproved_users.html',
             restrict: 'AE',
@@ -2685,14 +2775,16 @@ angular.module('mainApp')
                 $scope.usersNotApproved = UserService.getUsersNotApproved();
 
                 function getUsersNotApproved() {
-                    UserService.getUsersNotApprovedFromServer()
-                        .success(function (resp) {
-                            $scope.usersNotApproved = UserService.updateUsersNotApproved(resp.usersArray);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.getUsersNotApprovedFromServer()
+                            .success(function (resp) {
+                                $scope.usersNotApproved = UserService.updateUsersNotApproved(resp.usersArray);
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 }
 
                 getUsersNotApproved();
@@ -2707,7 +2799,7 @@ angular.module('mainApp')
         }
     }]);
 angular.module('mainApp')
-    .directive('userDisplay', ['$rootScope', 'UserService', 'socketService', function ($rootScope, UserService, socketService) {
+    .directive('userDisplay', ['$rootScope', 'UserService', 'socketService', 'globals', function ($rootScope, UserService, socketService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/user_display.html',
             restrict: 'AE',
@@ -2731,64 +2823,74 @@ angular.module('mainApp')
 
                 //user manipulation functions
                 $scope.addAdminPrivileges = function (userUniqueCuid) {
-                    UserService.addAdminPrivileges(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.addAdminPrivileges(userUniqueCuid)
+                            .success(function (resp) {
+                                $rootScope.$broadcast('userChanges');
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 };
 
                 $scope.removeAdminPrivileges = function (userUniqueCuid) {
-                    UserService.removeAdminPrivileges(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.removeAdminPrivileges(userUniqueCuid)
+                            .success(function (resp) {
+                                $rootScope.$broadcast('userChanges');
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 };
 
                 $scope.approveUser = function (userUniqueCuid) {
-                    UserService.approveUser(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.approveUser(userUniqueCuid)
+                            .success(function (resp) {
+                                $rootScope.$broadcast('userChanges');
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 };
 
                 $scope.banUser = function (userUniqueCuid) {
-                    UserService.banUser(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.banUser(userUniqueCuid)
+                            .success(function (resp) {
+                                $rootScope.$broadcast('userChanges');
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 };
 
                 $scope.unBanUser = function (userUniqueCuid) {
-                    UserService.unBanUser(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.$broadcast('userChanges');
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
+                    if (globals.checkAccountStatus()) {
+                        UserService.unBanUser(userUniqueCuid)
+                            .success(function (resp) {
+                                $rootScope.$broadcast('userChanges');
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResponse) {
+                                $rootScope.main.responseStatusHandler(errResponse);
+                            })
+                    }
                 };
             }
         }
     }]);
 angular.module('mainApp')
-    .directive('usersCount', ['$q', '$log', '$rootScope', function ($q, $log, $rootScope) {
+    .directive('usersCount', ['$q', '$log', '$rootScope', 'globals', function ($q, $log, $rootScope, globals) {
         return {
             templateUrl: 'views/all/partials/templates/user_statistics.html',
             restrict: 'AE',

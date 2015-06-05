@@ -7,7 +7,6 @@ angular.module('mainApp', [
     'ui.router',
     'duScroll',
     'ngFx',
-    'ngAnimate',
     'textAngular',
     'ngSanitize',
     'angularUtils.directives.dirDisqus',
@@ -16,12 +15,6 @@ angular.module('mainApp', [
     'ngFileUpload'
 ])
     .run(function ($templateCache, $http, $rootScope, $state, $stateParams) {
-
-        //views
-        $http.get('views/all/partials/views/home/home.html', {cache: $templateCache});
-        $http.get('views/all/partials/views/home/post_stream.html', {cache: $templateCache});
-        $http.get('views/all/partials/views/home/full_post.html', {cache: $templateCache});
-
         $rootScope.$state = $state;
         $rootScope.$stateParams = $stateParams;
         $rootScope.Utils = {

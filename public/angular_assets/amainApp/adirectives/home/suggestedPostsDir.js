@@ -1,7 +1,7 @@
 angular.module('mainApp')
-    .directive('suggestedPosts', ['$rootScope', 'PostService', '$timeout', function ($rootScope, PostService, $timeout) {
+    .directive('suggestedPosts', ['$rootScope', 'PostService', '$timeout', 'globals', function ($rootScope, PostService, $timeout, globals) {
         return {
-            templateUrl: 'views/general/templates/suggested_posts.html',
+            templateUrl: 'views/all/partials/templates/suggested_posts.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.suggestedPosts = PostService.getSuggestedPosts();
