@@ -42,6 +42,7 @@ function getPostPath(postIndex) {
 function makeVideoIframesResponsive(post, posts) {
     var theElement;
     var imgElement;
+    var imgWithClass;
     var imgWrappedInDiv;
 
     if (post) {
@@ -71,9 +72,8 @@ function makeVideoIframesResponsive(post, posts) {
             if (imgElement.length > 0) {
 
                 //add class and wrap in div
-                imgWrappedInDiv = imgElement
-                    .addClass('embed-responsive-item')
-                    .wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
+                mgWithClass = imgElement.addClass('embed-responsive-item');
+                imgWrappedInDiv = imgWithClass.wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
 
                 //replace in original
                 theElement.find('img').replaceWith(imgWrappedInDiv);
@@ -92,9 +92,8 @@ function makeVideoIframesResponsive(post, posts) {
             if (imgElement.length > 0) {
 
                 //add class and wrap in div
-                imgWrappedInDiv = imgElement
-                    .addClass('embed-responsive-item')
-                    .wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
+                imgWithClass = imgElement.addClass('embed-responsive-item');
+                imgWrappedInDiv = imgWithClass.wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
 
                 //replace in original
                 theElement.find('img').replaceWith(imgWrappedInDiv);
@@ -108,6 +107,7 @@ function makeVideoIframesResponsive(post, posts) {
 function getVideoResponsiveVersion(textString) {
     var theElement;
     var imgElement;
+    var imgWithClass;
     var imgWrappedInDiv;
 
     if (textString) {
@@ -121,9 +121,8 @@ function getVideoResponsiveVersion(textString) {
         if (imgElement.length > 0) {
 
             //add class and wrap in div
-            imgWrappedInDiv = imgElement
-                .addClass('embed-responsive-item')
-                .wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
+            imgWithClass = imgElement.addClass('embed-responsive-item');
+            imgWrappedInDiv = imgWithClass.wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
 
             //replace in original
             theElement.find('img').replaceWith(imgWrappedInDiv);
