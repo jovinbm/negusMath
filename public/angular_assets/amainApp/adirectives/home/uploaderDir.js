@@ -49,7 +49,7 @@ angular.module('mainApp')
                             })
                             .success(function (data, status, headers, config) {
                                 $rootScope.main.responseStatusHandler(data);
-                                $scope.editPostModel.postUploads.push(data.fileData);
+                                $scope.newPostModel.postUploads.push(data.fileData);
                                 $scope.hideProgressBars();
                             })
                             .error(function (errResponse) {
@@ -67,7 +67,7 @@ angular.module('mainApp')
                             })
                             .success(function (data, status, headers, config) {
                                 $rootScope.main.responseStatusHandler(data);
-                                $scope.editPostModel.postUploads.push(data.fileData);
+                                $scope.newPostModel.postUploads.push(data.fileData);
                                 $scope.hideProgressBars();
                             })
                             .error(function (errResponse) {
@@ -85,7 +85,7 @@ angular.module('mainApp')
                             })
                             .success(function (data, status, headers, config) {
                                 $rootScope.main.responseStatusHandler(data);
-                                $scope.editPostModel.postUploads.push(data.fileData);
+                                $scope.newPostModel.postUploads.push(data.fileData);
                                 $scope.hideProgressBars();
                             })
                             .error(function (errResponse) {

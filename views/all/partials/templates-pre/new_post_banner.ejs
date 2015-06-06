@@ -1,0 +1,16 @@
+<script type="text/ng-template" id="views/all/partials/templates/new_post_banner.html">
+
+    <div class="container"
+         ng-if="newPostBanner.show">
+        <div class="row">
+            <div class="col-lg-12 allBannerOuterDivs">
+                <div ng-class="newPostBanner.bannerClass">
+                    <button type="button" class="close" data-dismiss="alert">×</button>
+                    <strong ng-bind="newPostBanner.msg"></strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</script>

@@ -1,4 +1,15 @@
 angular.module('mainApp')
+    .directive('postHeading', [function () {
+        return {
+            templateUrl: 'views/all/partials/templates/post_content.html',
+            scope: {
+                postContent: '=model'
+            },
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+            }
+        }
+    }])
     .directive('postContent', [function () {
         return {
             templateUrl: 'views/all/partials/templates/post_content.html',

@@ -4,8 +4,8 @@ angular.module('mainApp')
             templateUrl: 'views/all/partials/templates/suggested_posts.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
-                $scope.suggestedPosts = PostService.getSuggestedPosts();
                 $rootScope.main.goToTop();
+                $scope.suggestedPosts = PostService.getSuggestedPosts();
 
                 function getSuggestedPosts() {
                     PostService.getSuggestedPostsFromServer()

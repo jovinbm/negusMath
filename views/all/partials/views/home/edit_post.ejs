@@ -1,104 +1,106 @@
 <script type="text/ng-template" id="views/all/partials/views/home/edit_post.html">
     <div ng-controller="EditPostController">
 
-    <div class="container">
-        <div class="row">
+        <div class="container">
+            <div class="row">
 
-            <div class="col-lg-9 no-padding-left">
+                <div class="col-lg-9 no-padding-left">
 
-                <div class="panel panel-default">
+                    <div class="panel panel-default">
 
-                    <div class="panel-heading"><a href ng-click="back()"><i class="fa fa-arrow-left"></i> BACK</a><span class="pull-right hidden-sm hidden-xs" ng-bind-html="post.postDate"></span>
-                    </div>
+                        <div class="panel-heading"><a href ng-click="back()"><i class="fa fa-arrow-left"></i>
+                                BACK</a><span class="pull-right hidden-sm hidden-xs"
+                                              ng-bind-html="post.postDate"></span>
+                        </div>
 
-                    <div class="panel-body">
+                        <div class="panel-body">
 
-                        <div class="card">
+                            <div class="card">
 
-                            <div class="card-content">
+                                <div class="card-content">
 
-                                <form name="editPostForm">
+                                    <form name="editPostForm">
 
-                                    <div class="padding-bottom-15">
+                                        <div class="padding-bottom-15">
 
-                                        <!--Heading field-->
-                                        <div class="form-group">
-                                            <label for="editPostHeading"><strong>Heading</strong></label>
-                                            <input type="text"
-                                                   class="form-control"
-                                                   id="editPostHeading"
-                                                   placeholder="Enter heading"
-                                                   ng-model="editPostModel.postHeading"
-                                                   name="editPostHeading">
+                                            <!--Heading field-->
+                                            <div class="form-group">
+                                                <label for="editPostHeading"><strong>Heading</strong></label>
+                                                <input type="text"
+                                                       class="form-control"
+                                                       id="editPostHeading"
+                                                       placeholder="Enter heading"
+                                                       ng-model="editPostModel.postHeading"
+                                                       name="editPostHeading">
 
-                                            <div heading-messages model="editPostModel.postHeading"></div>
+                                                <div heading-messages model="editPostModel.postHeading"></div>
+                                            </div>
+
                                         </div>
 
-                                    </div>
+                                        <div class="form-group">
+                                            <p><strong>Content</strong></p>
 
-                                    <div class="form-group">
-                                        <p><strong>Content</strong></p>
+                                            <text-angular
+                                                    name="editPostMainContent"
+                                                    ng-model="editPostModel.postContent"></text-angular>
+                                            <div content-messages model="editPostModel.postContent"></div>
+                                        </div>
 
-                                        <text-angular
-                                                name="editPostMainContent"
-                                                ng-model="editPostModel.postContent"></text-angular>
-                                        <div content-messages model="editPostModel.postContent"></div>
-                                    </div>
+                                        <div class="form-group">
+                                            <p><strong>Post Summary</strong></p>
 
-                                    <div class="form-group">
-                                        <p><strong>Post Summary</strong></p>
+                                            <text-angular
+                                                    name="editPostSummary"
+                                                    ng-model="editPostModel.postSummary">
+                                            </text-angular>
+                                            <div summary-messages model="editPostModel.postSummary"></div>
+                                            <small class="form-help-notice">The post summary represents the post
+                                                in the list
+                                                of all posts. Limited to 2000 characters. Users will be able to
+                                                click a 'read more' link to see the main content of the post
+                                            </small>
+                                        </div>
 
-                                        <text-angular
-                                                name="editPostSummary"
-                                                ng-model="editPostModel.postSummary">
-                                        </text-angular>
-                                        <div summary-messages model="editPostModel.postSummary"></div>
-                                        <small class="form-help-notice">The post summary represents the post
-                                            in the list
-                                            of all posts. Limited to 2000 characters. Users will be able to
-                                            click a 'read more' link to see the main content of the post
-                                        </small>
-                                    </div>
+                                        <div class="form-group">
+                                            <p><strong>Tags</strong></p>
 
-                                    <div class="form-group">
-                                        <p><strong>Tags</strong></p>
+                                            <tags-input name="editPostTags"
+                                                        ng-model="editPostModel.postTags"
+                                                        placeholder="Add tags"
+                                                        min-length="3"
+                                                        max-length="30"
+                                                        max-tags="5">
+                                            </tags-input>
+                                            <div tag-messages model="editPostModel.postTags"></div>
+                                            <small class="form-help-notice">Enter up to five tags</small>
 
-                                        <tags-input name="editPostTags"
-                                                    ng-model="editPostModel.postTags"
-                                                    placeholder="Add tags"
-                                                    min-length="3"
-                                                    max-length="30"
-                                                    max-tags="5">
-                                        </tags-input>
-                                        <div tag-messages model="editPostModel.postTags"></div>
-                                        <small class="form-help-notice">Enter up to five tags</small>
+                                        </div>
 
-                                    </div>
+                                    </form>
 
-                                </form>
-
-                            </div>
-
-                            <div class="card-action clearfix">
-
-                                <div class="pull-right">
-                                    <a class="btn btn-default btn-sm"
-                                       href ng-click="cancelPostUpdate(); $root.main.goToTop()">Cancel</a>
-                                    <a class="btn btn-default btn-sm"
-                                       href ng-click="submitPostUpdate(); $root.main.goToTop();">Save</a>
                                 </div>
 
+                                <div class="card-action clearfix">
+
+                                    <div class="pull-right">
+                                        <a class="btn btn-default btn-sm"
+                                           href ng-click="cancelPostUpdate();">Cancel</a>
+                                        <a class="btn btn-default btn-sm"
+                                           href ng-click="submitPostUpdate();">Save</a>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="no-padding-side col-lg-3">
-                <div edit-post-uploader></div>
-            </div>
+                <div class="no-padding-side col-lg-3">
+                    <div edit-post-uploader></div>
+                </div>
 
+            </div>
         </div>
     </div>
-</div>
 </script>

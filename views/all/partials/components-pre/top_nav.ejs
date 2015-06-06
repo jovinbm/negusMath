@@ -1,0 +1,100 @@
+<!--start of nav-->
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <!--button to target the navbar-right which will appear on collapse of navbar items-->
+            <button type="button" class='navbar-toggle collapsed' data-toggle="collapse"
+                    data-target=".navHeaderCollapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href ng-click="$root.main.goToTop();"
+               class="navbar-brand">
+                <i class="fa fa-leanpub"></i>
+                NEGUS
+            </a>
+        </div>
+
+        <!--this navbar will be collapsed on mobile-->
+        <div class="collapse navbar-collapse navHeaderCollapse">
+            <ul class="nav navbar-nav navbar-right">
+
+                <% if(state == 'home') { %>
+                <li class="active">
+                    <% } else { %>
+                <li>
+                    <% } %>
+                    <a href="/">Home
+                    </a>
+                </li>
+
+                <% if (theUser && theUser.isRegistered && theUser.isAdmin && accountStatusBanner.accountStatus) { %>
+                <% if(state == 'manage-users') { %>
+                <li class="active">
+                    <% } else { %>
+                <li>
+                    <% } %>
+                    <a href="/manage/users">Users</a>
+                </li>
+
+                <% } %>
+
+                <li>
+                    <a href="/index">About</a>
+                </li>
+
+                <% if (theUser && theUser.isRegistered) { %>
+
+                <li class="dropdown">
+
+                    <a href="#"
+                       target="_self"
+                       class="dropdown-toggle" data-toggle="dropdown">
+                        <%= theUser.firstName %>
+                        <b class="caret"></b>
+                    </a>
+
+                    <ul class="dropdown-menu">
+                        <li logout-scope>
+                            <a href="#"
+                               target="_self"
+                               ng-click="logoutClient()">Logout
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+
+                <% } %>
+
+            </ul>
+
+            <% if (theUser && theUser.isRegistered && theUser.isAdmin && accountStatusBanner.accountStatus) { %>
+            <% if(state != 'new-post'){ %>
+            <div>
+                <a type="button"
+                   class="btn btn-primary btn-sm navbar-btn pull-right"
+                   href="/new/Post"
+                   role="button">
+                    <i class="fa fa-pencil"></i> New Post
+                </a>
+            </div>
+            <% } %>
+
+            <% if(state == 'new-post'){ %>
+            <div>
+                <a type="button"
+                   class="btn btn-warning btn-sm navbar-btn pull-right"
+                   role="button"
+                   ng-click="$root.back();">
+                    <i class="fa fa-pencil"></i> Cancel
+                </a>
+            </div>
+            <% } %>
+
+            <% } %>
+
+        </div>
+    </div>
+</nav>
+<!--end of nav-->

@@ -1,13 +1,18 @@
 angular.module('mainApp')
-
     .factory('socket', ['$log', '$location', '$rootScope',
         function ($log, $location, $rootScope) {
             var url;
-            if ($location.port()) {
-                url = $location.host() + ":" + $location.port();
+
+            if (document.location.hostname.search("negusmath") !== -1) {
+                url = "//www.negusmath.com";
             } else {
-                url = $location.host();
+                if ($location.port()) {
+                    url = 'http://localhost' + ":" + $location.port();
+                } else {
+                    url = 'http://localhost';
+                }
             }
+
             var socket = io.connect(url);
             //return socket;
             return {
@@ -40,12 +45,12 @@ angular.module('mainApp')
                     });
                 }
             };
-        }])
+        }
+    ])
 
 
     .factory('socketService', ['$log', '$http', '$rootScope',
-        function ($log, $http) {
-
+        function ($log, $http, $rootScope) {
             return {
 
                 getUserData: function () {
@@ -73,4 +78,5 @@ angular.module('mainApp')
                     return $http.post('/api/logoutClient');
                 }
             }
-        }]);
+        }
+    ]);

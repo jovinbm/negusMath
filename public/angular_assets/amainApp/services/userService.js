@@ -105,4 +105,5 @@ angular.module('mainApp')
                     })
                 }
             };
-        }]);
+        }
+    ]);

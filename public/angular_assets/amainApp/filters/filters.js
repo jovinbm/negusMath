@@ -1,5 +1,5 @@
 angular.module('mainApp')
-    .filter("timeago", function () {
+    .filter("timeago", [function () {
         //time: the time
         //local: compared to what time? default: now
         //raw: whether you want in a format of "5 minutes ago", or "5 minutes"
@@ -54,7 +54,7 @@ angular.module('mainApp')
             }
             return (time <= local) ? span + ' ago' : 'in ' + span;
         }
-    })
+    }])
     .filter("getTimeAgo", ['$filter', function ($filter) {
         //takes in a post or an array of posts, and adds a timeAgo key in them
         return function (createdAt) {

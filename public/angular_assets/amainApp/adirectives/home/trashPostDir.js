@@ -22,4 +22,4 @@ angular.module('mainApp')
                 }
             }
         }
-    }])
+    }]);

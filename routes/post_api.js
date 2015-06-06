@@ -160,18 +160,11 @@ module.exports = {
         var module = 'mainSearch';
         receivedLogger(module);
         if (req.body.queryString && req.body.requestedPage) {
-            var quantity = 100;
+            var quantity = 20;
             var requestedPage = req.body.requestedPage;
             var queryString = req.body.queryString;
-            var searchUniqueCuid;
 
-            if (req.body.searchUniqueCuid) {
-                searchUniqueCuid = req.body.searchUniqueCuid;
-            } else {
-                searchUniqueCuid = null;
-            }
-
-            post_handler.mainSearch(req, res, queryString, quantity, searchUniqueCuid, requestedPage);
+            post_handler.mainSearch(req, res, queryString, quantity, requestedPage);
         } else {
             consoleLogger(errorLogger(module, 'Some request fields missing'));
             res.status(500).send({

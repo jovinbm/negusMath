@@ -21,3 +21,15 @@
 //reset account
 
 //improve search algorithm, there is a lot of blocking code, make sure trashed post are not shown on search results
+
+//consider error codes when rendering pre
+
+//remove ng=cloak on prerenderd page
+
+//change titles of prerendered pages
+
+//remove unnecessary goToTops
+
+//provide e.g edited post has been saved info banner on redirected page
+
+//refill searchbox after searching and redirecting

@@ -1,0 +1,65 @@
+<script type="text/ng-template" id="views/all/partials/templates/user_display.html">
+    <tr ng-class="{'warning': user.isBanned.status, 'success': user.isAdmin}">
+        <td><a href ng-click="isCollapsed = !isCollapsed">{{user.firstName + ' ' + user.lastName}}</a>
+            <small class="very-small-font"
+                   ng-show="user.isAdmin">(admin)
+            </small>
+            <small class="very-small-font"
+                   ng-show="user.isBanned.status">(banned)
+            </small>
+        </td>
+
+        <td>
+            <div ng-hide="user.isBanned.status">
+                <a class="btn btn-xs btn-default"
+                   href ng-click="banUser(user.uniqueCuid)">Ban user</a>
+            </div>
+            <div ng-show="user.isBanned.status">
+                <a class="btn btn-xs btn-default"
+                   href ng-click="unBanUser(user.uniqueCuid)">Reactivate</a>
+            </div>
+        </td>
+        <td>
+            <div ng-hide="user.isApproved">
+                <a class="btn btn-xs btn-default"
+                   ng-disabled="user.isBanned.status === true"
+                   href ng-click="approveUser(user.uniqueCuid)">Approve</a>
+            </div>
+            <div ng-show="user.isApproved">
+                <a class="btn btn-xs btn-default disabled">Approved</a>
+            </div>
+        </td>
+        <td>
+            <div ng-hide="user.isAdmin">
+                <a class="btn btn-xs btn-default"
+                   ng-disabled="user.isBanned.status === true || user.isApproved === false || user.isAdmin === true"
+                   href ng-click="addAdminPrivileges(user.uniqueCuid)">Make Admin</a>
+            </div>
+            <div ng-show="user.isAdmin">
+                <a class="btn btn-xs btn-default"
+                   href ng-click="removeAdminPrivileges(user.uniqueCuid)">Remove Admin</a>
+            </div>
+        </td>
+
+    </tr>
+
+    <tr collapse="isCollapsed">
+        <td colspan="4">
+            <ul class="list-unstyled animated fadeIn small-font">
+                <li class="list-unstyled clearfix"><strong>Unique ID:</strong> {{user.uniqueCuid}}</li>
+                <li class="list-unstyled clearfix"><strong>Email:</strong> <a
+                            ng-href="mailto:{{user.email}}" target="_blank">{{user.email}}</a>
+                    <small class="very-small-font"
+                           ng-show="user.emailIsConfirmed">(confirmed)
+                    </small>
+                    <small class="very-small-font"
+                           ng-show="!user.emailIsConfirmed">(not confirmed) <a style="text-decoration: underline" href
+                                                                               ng-click="resendConfirmationEmail(user.uniqueCuid)">Resend
+                            email</a>
+                    </small>
+                </li>
+                <li class="list-unstyled clearfix"><strong>Username:</strong> {{user.username}}</li>
+            </ul>
+        </td>
+    </tr>
+</script>

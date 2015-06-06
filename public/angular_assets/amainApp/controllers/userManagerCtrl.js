@@ -2,8 +2,6 @@ angular.module('mainApp')
     .controller('UserManagerController', ['$q', '$scope', '$rootScope', 'UserService', 'globals',
         function ($q, $scope, $rootScope, UserService, globals) {
 
-            $rootScope.main.goToTop();
-
             $scope.usersCount = UserService.getUsersCount();
 
             function getUsersCount() {

@@ -1,5 +1,5 @@
 angular.module('mainApp')
-    .directive('universalBannerScope', 'globals', ['$rootScope', function ($rootScope, globals) {
+    .directive('universalBannerScope', ['$rootScope', 'globals', function ($rootScope, globals) {
         return {
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {

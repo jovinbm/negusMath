@@ -2,16 +2,11 @@ angular.module('mainApp')
     .controller('SearchController', ['$q', '$log', '$scope', '$rootScope', 'globals', 'PostService',
         function ($q, $log, $scope, $rootScope, globals, PostService) {
 
-            $rootScope.main.goToTop();
-
             $scope.mainSearchModel = {
                 queryString: $rootScope.$stateParams.queryString || '',
                 postSearchUniqueCuid: "",
                 requestedPage: 1
             };
-
-            //change to default document title
-            globals.changeDocumentTitle($rootScope.$stateParams.queryString + " - NegusMath Search");
 
             $scope.mainSearchResultsPosts = PostService.getAllMainSearchResults();
             $scope.mainSearchResultsCount = 0;
@@ -58,7 +53,6 @@ angular.module('mainApp')
                     });
             }
 
-            getMainSearchResults(1);
 
             $scope.showMore = function (pageNumber) {
                 getMainSearchResults(pageNumber);
@@ -67,9 +61,6 @@ angular.module('mainApp')
             //===============socket listeners===============
 
             $rootScope.$on('reconnect', function () {
-                if ($rootScope.$state.current.name == 'home.search') {
-                    getMainSearchResults($rootScope.$stateParams.pageNumber);
-                }
             });
         }
     ]);

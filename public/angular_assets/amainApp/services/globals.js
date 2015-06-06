@@ -1,5 +1,4 @@
 angular.module('mainApp')
-
     .factory('globals', ['$q', '$location', '$rootScope',
         function ($q, $location, $rootScope) {
             var userData = {};
@@ -37,16 +36,20 @@ angular.module('mainApp')
                 },
 
                 getLocationHost: function () {
-                    if ($location.port()) {
-                        return "http://" + $location.host() + ":" + $location.port();
+                    if (document.location.hostname.search("negusmath") !== -1) {
+                        return "//www.negusmath.com";
                     } else {
-                        return "http://" + $location.host();
+                        if ($location.port()) {
+                            return 'http://localhost' + ":" + $location.port();
+                        } else {
+                            return 'http://localhost';
+                        }
                     }
                 },
 
                 checkAccountStatus: function () {
                     function getStatus(userData) {
-                        if (userData && Object.keys(userData)) {
+                        if (userData && Object.keys(userData) > 0) {
                             if (userData.isRegistered) {
                                 if (!userData.emailIsConfirmed) {
                                     return {
@@ -93,6 +96,7 @@ angular.module('mainApp')
                                     };
                                 }
                             } else {
+                                console.log(userData);
                                 return {
                                     show: true,
                                     bannerClass: "alert alert-warning",
@@ -118,4 +122,5 @@ angular.module('mainApp')
                     return theStatus.accountStatus;
                 }
             };
-        }]);
+        }
+    ]);

@@ -3,10 +3,10 @@ angular.module('mainApp')
         return {
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
-                globals.defaultDocumentTitle();
-
-                $scope.allPosts = PostService.getAllPosts();
                 $rootScope.main.goToTop();
+
+                globals.defaultDocumentTitle();
+                $scope.allPosts = PostService.getAllPosts();
                 $scope.allPostsCount = PostService.getAllPostsCount();
 
                 function getPagePosts(pageNumber) {
@@ -52,7 +52,7 @@ angular.module('mainApp')
                 $scope.showMore = function (pageNumber) {
                     getPagePosts(pageNumber);
                 };
-                getPagePosts(1);
+                getPagePosts(2);
 
                 //===============socket listeners===============
 

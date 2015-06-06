@@ -45,16 +45,20 @@ angular.module('mainApp')
                             postHeading: $scope.newPostModel.postHeading,
                             postContent: $scope.newPostModel.postContent,
                             postSummary: $scope.newPostModel.postSummary,
-                            postTags: $scope.newPostModel.postTags
+                            postTags: $scope.newPostModel.postTags,
+                            postUploads: $scope.newPostModel.postUploads
                         };
+
                         PostService.submitNewPost(newPost).
                             success(function (resp) {
+                                var thePost = resp.thePost;
                                 $rootScope.main.responseStatusHandler(resp);
                                 $scope.newPostModel.postHeading = "";
                                 $scope.newPostModel.postContent = "";
                                 $scope.newPostModel.postSummary = "";
                                 $scope.newPostModel.postTags = [];
-                                $rootScope.back();
+                                $scope.newPostModel.postUploads = [];
+                                $rootScope.main.redirectToPage('/post/' + thePost.postIndex);
                             })
                             .error(function (errResponse) {
                                 $rootScope.main.responseStatusHandler(errResponse);

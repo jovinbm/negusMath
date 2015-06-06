@@ -52,9 +52,15 @@ angular.module('mainApp')
                 startLoading: function () {
                     this.isLoading = true;
                 },
+
                 finishedLoading: function () {
                     $rootScope.isLoading = false;
+                },
+
+                redirectToPage: function (pathWithFirstSlash) {
+                    $window.location.href = globals.getLocationHost() + pathWithFirstSlash;
                 }
+
             };
 
             //=====================time functions=======================
@@ -101,7 +107,12 @@ angular.module('mainApp')
                 temp[fromState.name] = fromParams;
                 $rootScope.stateHistory.push(temp);
             });
+
             $rootScope.back = function () {
+                window.history.back();
+            };
+
+            $rootScope.backAngular = function () {
                 var prevUrl = history.length > 1 ? history.splice(-2)[0] : "/";
                 $location.path(prevUrl);
             };

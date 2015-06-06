@@ -6,7 +6,9 @@ var dbUrl = databaseURL3;
 
 //THE APP
 var express = require('express');
+var params = require('express-params');
 var app = require('express')();
+params.extend(app);
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 var port = process.env.PORT || 2000;
@@ -81,11 +83,6 @@ app.use("/uploads", express.static(path.join(__dirname, '/uploads')));
 app.use("/views", express.static(path.join(__dirname, '/views')));
 app.use("/error", express.static(path.join(__dirname, '/public/error')));
 
-//app.post('/contactUs', basicAPI.contactUs);
-app.get('/socket.io/socket.io.js', function (req, res) {
-    res.sendfile("socket.io/socket.io.js");
-});
-
 //prerender-node
 app.use(require('prerender-node').set('prerenderServiceUrl', 'https://jbmprerender.herokuapp.com/'));
 
@@ -116,9 +113,22 @@ io.on('connection', function (socket) {
     });
 });
 
+//app.post('/contactUs', basicAPI.contactUs);
+app.get('/socket.io/socket.io.js', function (req, res) {
+    res.sendfile("socket.io/socket.io.js");
+});
+
 //getting files
-app.get('/', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.renderHome_Html);
 app.get('/index', routes.index_Html);
+app.get('/', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.renderHome_Html);
+app.param('postIndex', /^[0-9]+$/);
+app.get('/post/:postIndex', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.renderIndividualPost);
+app.get('/manage/users', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, routes.manage_users);
+app.get('/new/post', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, routes.new_post);
+app.get('/edit/post/:postIndex', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, routes.edit_post);
+app.param('pageNumber', /^[0-9]+$/);
+app.get('/search/posts/:queryString/:pageNumber', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, routes.search_posts);
+
 
 //email api
 app.get('/email_archive/:templateGroup', routes.renderEmail);

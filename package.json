@@ -26,6 +26,7 @@
     "ejs": "^1.0.0",
     "email-templates": "^2.0.0-beta",
     "express": "4.9.8",
+    "express-params": "0.0.3",
     "express-session": "1.9.3",
     "gulp": "^3.4.0",
     "gulp-concat": "^2.5.2",

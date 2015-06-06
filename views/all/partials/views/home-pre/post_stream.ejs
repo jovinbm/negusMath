@@ -1,0 +1,101 @@
+<div post-stream-scope>
+    <div>
+        <div class="panel-heading"><i class="fa fa-leanpub"></i> LATEST POSTS
+        </div>
+
+        <% allPosts.forEach(function(post, index){ %>
+        <div class="card">
+
+            <div class="card-content">
+
+                <h2 class="text-outputs postHeading"><a href="<%= post.postPath %>">
+                        <%= post.postHeading %>
+                    </a>
+                </h2>
+
+                <h3 class="text-muted postBy">
+                    <small>
+                        <a class="btn-link">
+                            <%= post.authorName %>
+                        </a> on <span>
+                            <%= post.postDate %>
+                        </span>
+                    </small>
+                    <br/>
+                    <small class="text-muted"
+                           data-livestamp="<%= post.createdAt %>">
+                    </small>
+                </h3>
+
+                <div>
+                    <%- post.postSummary %>
+                </div>
+
+
+            </div>
+            <div class="card-action clearfix">
+
+                <div class="pull-right">
+                    <a href="<%= post.postPath %>"
+                       class="btn btn-default btn-sm">Read More</a>
+                </div>
+
+            </div>
+        </div>
+        <br/>
+        <% }) %>
+
+        <div ng-repeat="(pageNumber, posts) in allPosts">
+            <div ng-repeat="post in posts">
+                <div class="card">
+
+                    <div class="card-content">
+
+                        <h2 class="text-outputs postHeading"><a ng-href="{{post.postPath}}"
+                                                                ng-bind-html="post.postHeading"></a>
+                        </h2>
+
+                        <h3 class="text-muted postBy">
+                            <small>
+                                <a class="btn-link"
+                                   ng-bind-html="post.authorName"></a> on <span
+                                        ng-bind-html="post.postDate"></span>
+                            </small>
+                            <br/>
+                            <small class="text-muted"
+                                   ng-bind-html="post.timeAgo">
+                            </small>
+                        </h3>
+
+                        <div post-summary model="post.postSummary"></div>
+
+
+                    </div>
+                    <div class="card-action clearfix">
+
+                        <div class="pull-right">
+                            <a ng-href="{{post.postPath}}"
+                               class="btn btn-default btn-sm">Read More</a>
+                        </div>
+
+                    </div>
+                </div>
+                <br/>
+            </div>
+        </div>
+
+        <% if (allPosts.length >= 10) { %>
+        <div class="text-center">
+            <a href ng-click="showMore($index + 2)"
+               class="btn btn-sm btn-info">Show More</a>
+        </div>
+        <% } %>
+
+        <% if (allPosts.length < 10) { %>
+        <div class="alert alert-success">
+            <strong>No more posts to show...</strong>
+        </div>
+        <% } %>
+
+    </div>
+</div>

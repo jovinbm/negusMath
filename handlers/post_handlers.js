@@ -35,7 +35,11 @@ module.exports = {
 
         //theNewPost consists of the theNewPost.heading and theNewPost.content
 
-        forms.validateNewPost(req, res, theNewPost, postValidated);
+        if (req && res) {
+            forms.validateNewPost(req, res, theNewPost, postValidated);
+        } else {
+            postValidated();
+        }
 
         function postValidated() {
             postDB.makeNewPost(req, res, theNewPost, made);
@@ -45,11 +49,8 @@ module.exports = {
 
                 function saved(savedPost) {
                     consoleLogger(successLogger(module));
-                    ioJs.emitToAll('newPost', {
-                        "post": savedPost,
-                        "postsCount": savedPost.postIndex
-                    });
                     res.status(200).send({
+                        thePost: savedPost,
                         code: 200,
                         notify: true,
                         type: 'success',
@@ -76,7 +77,11 @@ module.exports = {
 
         //theNewPost consists of the theNewPost.heading and theNewPost.content
 
-        forms.validateNewPost(req, res, thePost, postValidated);
+        if (req && res) {
+            forms.validateNewPost(req, res, thePost, postValidated);
+        } else {
+            postValidated();
+        }
 
         function postValidated() {
             postDB.makePostUpdate(req, res, thePost, made);
@@ -110,7 +115,7 @@ module.exports = {
         }
     },
 
-    getPosts: function (req, res, page) {
+    getPosts: function (req, res, page, callBack) {
         var module = 'getPosts';
         receivedLogger(module);
 
@@ -123,22 +128,42 @@ module.exports = {
             temp['postsCount'] = postsCount;
             temp['postsArray'] = postsArray;
             consoleLogger(successLogger(module));
-            res.status(200).send(temp);
+            if (res) {
+                res.status(200).send(temp);
+            }
+
+            if (callBack) {
+                temp.code = 200;
+                callBack(temp);
+            }
         }
 
         function error_neg_1() {
             consoleLogger(errorLogger(module));
-            res.status(500).send({
-                code: 500,
-                banner: true,
-                bannerClass: 'alert alert-dismissible alert-warning',
-                msg: 'Failed to retrieve your personalized posts. Please reload this page',
-                disable: true
-            });
+            if (res) {
+                res.status(500).send({
+                    code: 500,
+                    banner: true,
+                    bannerClass: 'alert alert-dismissible alert-warning',
+                    msg: 'Failed to retrieve posts. Please reload this page',
+                    disable: true
+                });
+            }
+
+            if (callBack) {
+                var temp = {
+                    code: 500,
+                    banner: true,
+                    bannerClass: 'alert alert-dismissible alert-warning',
+                    msg: 'Failed to retrieve posts. Please reload this page',
+                    disable: true
+                };
+                callBack(temp);
+            }
         }
     },
 
-    getSuggestedPosts: function (req, res, quantity) {
+    getSuggestedPosts: function (req, res, quantity, callBack) {
         var module = 'getSuggestedPosts';
         receivedLogger(module);
 
@@ -148,55 +173,106 @@ module.exports = {
             var temp = {};
             temp['postsArray'] = postsArray;
             consoleLogger(successLogger(module));
-            res.status(200).send(temp);
+            if (res) {
+                res.status(200).send(temp);
+            }
+
+            if (callBack) {
+                temp.code = 200;
+                callBack(temp);
+            }
         }
 
         function error() {
             var temp = {};
             temp['postsArray'] = [];
             consoleLogger(successLogger(module));
-            res.status(200).send(temp);
+            if (res) {
+                res.status(200).send(temp);
+            }
+
+            if (callBack) {
+                temp.code = 200;
+                callBack(temp);
+            }
         }
     },
 
 
-    getPost: function (req, res, postIndex) {
+    getPost: function (req, res, postIndex, callBack) {
         var module = 'getPost';
         receivedLogger(module);
 
         postDB.getPost(postIndex, error_neg_1, postNotFoundError, success);
 
         function success(thePost) {
-            res.status(200).send({
-                thePost: thePost
-            });
+            consoleLogger(successLogger(module));
+            if (res) {
+                res.status(200).send({
+                    thePost: thePost
+                });
+            }
+
+            if (callBack) {
+                var temp = {
+                    code: 200,
+                    thePost: thePost
+                };
+                callBack(temp);
+            }
         }
 
         function error_neg_1() {
             consoleLogger(errorLogger(module));
-            res.status(500).send({
-                code: 500,
-                banner: true,
-                bannerClass: 'alert alert-dismissible alert-warning',
-                msg: 'Failed to retrieve this post. Please try again or reload this page',
-                disable: true
-            });
+            if (res) {
+                res.status(500).send({
+                    code: 500,
+                    banner: true,
+                    bannerClass: 'alert alert-dismissible alert-warning',
+                    msg: 'Failed to retrieve this post. Please try again or reload this page',
+                    disable: true
+                });
+            }
+
+            if (callBack) {
+                var temp = {
+                    code: 500,
+                    banner: true,
+                    bannerClass: 'alert alert-dismissible alert-warning',
+                    msg: 'Failed to retrieve this post. Please try again or reload this page',
+                    disable: true
+                };
+                callBack(temp);
+            }
         }
 
         function postNotFoundError() {
             //redirects user to home and puts a banner to show that the post is not available
             consoleLogger(errorLogger(module, 'Requested post not found'));
-            res.status(200).send({
-                thePost: {},
-                code: 200,
-                banner: true,
-                bannerClass: 'alert alert-dismissible alert-warning',
-                msg: "The post you're looking for is either deleted or has never existed before"
-            });
+            if (res) {
+                res.status(200).send({
+                    thePost: {},
+                    code: 200,
+                    banner: true,
+                    bannerClass: 'alert alert-dismissible alert-warning',
+                    msg: "The post you're looking for is either deleted or has never existed before"
+                });
+            }
+
+            if (callBack) {
+                var temp = {
+                    thePost: {},
+                    code: 200,
+                    banner: true,
+                    bannerClass: 'alert alert-dismissible alert-warning',
+                    msg: "The post you're looking for is either deleted or has never existed before"
+                };
+                callBack(temp);
+            }
         }
     },
 
-    getPopularStories: function (req, res, quantity) {
+    getPopularStories: function (req, res, quantity, callBack) {
         var module = 'getPopularStories';
         receivedLogger(module);
 
@@ -204,19 +280,48 @@ module.exports = {
 
         function success(popularStoriesArray) {
             consoleLogger(successLogger(module));
-            res.status(200).send({
-                popularStories: popularStoriesArray
-            });
+            if (res) {
+                res.status(200).send({
+                    popularStories: popularStoriesArray
+                });
+            }
+
+            if (callBack) {
+                var temp = {
+                    code: 200,
+                    popularStories: popularStoriesArray
+                };
+                callBack(temp);
+            }
         }
 
         function error() {
             consoleLogger(errorLogger(module));
-            res.status(500).send({
-                code: 500,
-                notify: true,
-                type: 'warning',
-                msg: 'Failed to retrieve this weeks top posts. Please reload page '
-            });
+            if (res) {
+                res.status(500).send({
+                    code: 500,
+                    notify: true,
+                    type: 'warning',
+                    msg: 'Failed to retrieve this weeks top posts. Please reload page '
+                });
+            } else {
+                return {
+                    code: 500,
+                    notify: true,
+                    type: 'warning',
+                    msg: 'Failed to retrieve this weeks top posts. Please reload page '
+                }
+            }
+
+            if (callBack) {
+                var temp = {
+                    code: 500,
+                    notify: true,
+                    type: 'warning',
+                    msg: 'Failed to retrieve this weeks top posts. Please reload page '
+                };
+                callBack(temp);
+            }
         }
     },
 
@@ -272,37 +377,59 @@ module.exports = {
     },
 
 
-    mainSearch: function (req, res, queryString, quantity, searchUniqueCuid, requestedPage) {
+    mainSearch: function (req, res, queryString, quantity, requestedPage, callBack) {
         var module = 'mainSearch';
         receivedLogger(module);
 
-        forms.validateMainSearchQuery(req, res, queryString, mainSearchQueryValidated);
+        if (req && res) {
+            forms.validateMainSearchQuery(req, res, queryString, mainSearchQueryValidated);
+        } else {
+            mainSearchQueryValidated();
+        }
 
         function mainSearchQueryValidated() {
 
-            postDB.mainSearch(queryString, quantity, searchUniqueCuid, requestedPage, error, error, success);
+            postDB.mainSearch(queryString, quantity, requestedPage, error, error, success);
 
-            function success(resultValue) {
-                //gets a return value with the postUniqueCuids
-                postDB.getPostsWithUniqueCuids(resultValue.postUniqueCuids, error, found, found);
+            function success(resultObject) {
+                consoleLogger(successLogger(module));
 
-                function found(postsArray) {
-                    resultValue["postsArray"] = postsArray;
-                    consoleLogger(successLogger(module));
+                if (res) {
                     res.status(200).send({
-                        results: resultValue
+                        code: 200,
+                        results: resultObject
                     });
+                }
+
+                if (callBack) {
+                    var temp = {
+                        code: 200,
+                        results: resultObject
+                    };
+                    callBack(temp);
                 }
             }
 
             function error() {
                 consoleLogger(errorLogger(module));
-                res.status(500).send({
-                    code: 500,
-                    notify: true,
-                    type: 'warning',
-                    msg: 'Something went wrong while trying to fetch the results. Please try again'
-                });
+                if (res) {
+                    res.status(500).send({
+                        code: 500,
+                        notify: true,
+                        type: 'warning',
+                        msg: 'Something went wrong while trying to fetch the results. Please try again'
+                    });
+                }
+
+                if (callBack) {
+                    var temp = {
+                        code: 500,
+                        notify: true,
+                        type: 'warning',
+                        msg: 'Something went wrong while trying to fetch the results. Please try again'
+                    };
+                    callBack(temp);
+                }
             }
         }
     }

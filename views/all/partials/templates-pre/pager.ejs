@@ -1,0 +1,14 @@
+<script type="text/ng-template" id="views/all/partials/templates/pager.html">
+    <div class="text-center">
+        <pagination total-items="pagingTotalCount"
+                    items-per-page="itemsPerPage"
+                    ng-model="currentPage"
+                    ng-change="goToPage()"
+                    max-size="pagingMaxSize"
+                    class="pagination-sm"
+                    boundary-links="true"
+                    rotate="false"
+                    num-pages="numPages">
+        </pagination>
+    </div>
+</script>

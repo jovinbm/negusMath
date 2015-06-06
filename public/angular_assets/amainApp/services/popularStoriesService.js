@@ -23,4 +23,5 @@ angular.module('mainApp')
                     return popularStoriesArray;
                 }
             };
-        }]);
+        }
+    ]);

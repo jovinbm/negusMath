@@ -206,4 +206,5 @@ angular.module('mainApp')
                     return $http.post('/api/unTrashPost');
                 }
             };
-        }]);
+        }
+    ]);
