@@ -39,99 +39,32 @@ function getPostPath(postIndex) {
     return '/post/' + postIndex;
 }
 
-function makeVideoIframesResponsive(post, posts) {
-    var theElement;
-    var imgElement;
-    var imgWithClass;
-    var imgWrappedInDiv;
-
-    if (post) {
-        if (Object.keys(post).length > 0) {
-            return makeResp(post);
-        } else {
-            return post;
-        }
-    } else if (posts) {
-        posts.forEach(function (post, index) {
-            if (Object.keys(post).length > 0) {
-                posts[index] = makeResp(post);
-            }
-        });
-        return posts;
-    }
-
-    function makeResp(post) {
-        if (post.postSummary) {
-            //convert the element to string
-            theElement = $("<div>" + post.postSummary + "</div>");
-
-            //find the video iframe elements
-            imgElement = $('img.ta-insert-video', theElement);
-
-            //only perform operation if there are iframes available
-            if (imgElement.length > 0) {
-
-                //add class and wrap in div
-                mgWithClass = imgElement.addClass('embed-responsive-item');
-                imgWrappedInDiv = imgWithClass.wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
-
-                //replace in original
-                theElement.find('img').replaceWith(imgWrappedInDiv);
-            }
-            post.postSummary = theElement.html();
-
-        }
-        if (post.postContent) {
-            //convert the element to string
-            theElement = $("<div>" + post.postContent + "</div>");
-
-            //find the video iframe elements
-            imgElement = $('img.ta-insert-video', theElement);
-
-            //only perform operation if there are iframes available
-            if (imgElement.length > 0) {
-
-                //add class and wrap in div
-                imgWithClass = imgElement.addClass('embed-responsive-item');
-                imgWrappedInDiv = imgWithClass.wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
-
-                //replace in original
-                theElement.find('img').replaceWith(imgWrappedInDiv);
-            }
-            post.postContent = theElement.html();
-        }
-        return post;
-    }
-}
 
 function getVideoResponsiveVersion(textString) {
     var theElement;
     var imgElement;
-    var imgWithClass;
-    var imgWrappedInDiv;
+    var iframeElement = $("<div class='embed-responsive embed-responsive-16by9'>" +
+        "<iframe class='embed-responsive-item' allowfullscreen='true' frameborder='0'></iframe>" +
+        "</div>");
 
     if (textString) {
         //convert the element to string
         theElement = $("<div>" + textString + "</div>");
 
         //find the video iframe elements
-        imgElement = $('img.ta-insert-video', theElement);
-
-        //only perform operation if there are iframes available
-        if (imgElement.length > 0) {
-
-            //add class and wrap in div
-            imgWithClass = imgElement.addClass('embed-responsive-item');
-            imgWrappedInDiv = imgWithClass.wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
+        $('img.ta-insert-video', theElement).each(function () {
+            var videoSource = $(this).attr('ta-insert-video');
+            $('iframe', iframeElement).attr('src', videoSource);
 
             //replace in original
-            theElement.find('img').replaceWith(imgWrappedInDiv);
-        }
+            $(this).replaceWith(iframeElement);
+        });
         return theElement.html();
     } else {
         return textString;
     }
 }
+
 
 function preparePosts(post, posts, callBack) {
     if (post) {

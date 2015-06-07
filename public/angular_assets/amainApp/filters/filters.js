@@ -289,6 +289,40 @@ angular.module('mainApp')
             }
         }
     }])
+    .filter("preparePostSummary", ['$filter', function ($filter) {
+        //making embedded videos responsive in postContent
+        return function (postSummary) {
+
+            console.log("postSummary called");
+
+            function prepare(postContent) {
+                return $filter('highlightText')($filter('getVideoResponsiveVersion')(postSummary), true);
+            }
+
+            if (postSummary) {
+                return prepare(postSummary);
+            } else {
+
+                return postSummary;
+            }
+        }
+    }])
+    .filter("preparePostContent", ['$filter', function ($filter) {
+        //making embedded videos responsive in postContent
+        return function (postContent) {
+
+            function prepare(postContent) {
+                return $filter('highlightText')($filter('getVideoResponsiveVersion')(postContent), true);
+            }
+
+            if (postContent) {
+                return prepare(postContent);
+            } else {
+
+                return postContent;
+            }
+        }
+    }])
     .filter("removeHighlights", ['$filter', function ($filter) {
         //making embedded videos responsive
         return function (post, posts) {

@@ -1,5 +1,5 @@
 angular.module('mainApp')
-    .directive('postHeading', [function () {
+    .directive('postContent', ['$filter', function ($filter) {
         return {
             templateUrl: 'views/all/partials/templates/post_content.html',
             scope: {
@@ -7,17 +7,7 @@ angular.module('mainApp')
             },
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
-            }
-        }
-    }])
-    .directive('postContent', [function () {
-        return {
-            templateUrl: 'views/all/partials/templates/post_content.html',
-            scope: {
-                postContent: '=model'
-            },
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
+                $scope.postContent = $filter('preparePostContent')($scope.postContent);
             }
         }
     }])
@@ -29,6 +19,7 @@ angular.module('mainApp')
             },
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
+                $scope.postSummary = $filter('preparePostContent')($scope.postSummary)
             }
         }
     }])
