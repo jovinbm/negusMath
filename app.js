@@ -121,6 +121,8 @@ app.get('/socket.io/socket.io.js', function (req, res) {
 //getting files
 app.get('/index', routes.index_Html);
 app.get('/', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.renderHome_Html);
+app.param('pageNumber', /^[0-9]+$/);
+app.get('/partial/posts/:pageNumber', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.renderPosts_partial);
 app.param('postIndex', /^[0-9]+$/);
 app.get('/post/:postIndex', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.renderIndividualPost);
 app.get('/manage/users', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, routes.manage_users);
@@ -128,6 +130,7 @@ app.get('/new/post', middleware.ensureAuthenticatedAngular, middleware.addUserDa
 app.get('/edit/post/:postIndex', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, routes.edit_post);
 app.param('pageNumber', /^[0-9]+$/);
 app.get('/search/posts/:queryString/:pageNumber', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, routes.search_posts);
+app.get('/partial/search/posts/:queryString/:pageNumber', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, routes.search_posts_partial);
 
 
 //email api

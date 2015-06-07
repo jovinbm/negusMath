@@ -56,7 +56,7 @@ angular.module('mainApp', [
         //        })
         //        .state("otherwise", {url: '/home'});
 
-        $locationProvider
-            .html5Mode(false)
-            .hashPrefix('!');
+        //$locationProvider
+        //    .html5Mode(false)
+        //    .hashPrefix('!');
     }]);

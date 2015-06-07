@@ -6,8 +6,6 @@ angular.module('mainApp')
             var editPostModel = {};
             var allPosts = {};
             var allPostsCount = 0;
-            var mainSearchResultsPosts = {};
-            var mainSearchResultsPostsCount = 0;
             var suggestedPosts = {};
             var suggestedPostsCount = 0;
 
@@ -39,10 +37,9 @@ angular.module('mainApp')
                     return allPostsCount;
                 },
 
-                getPostsFromServer: function (pageNumber) {
-                    return $http.post('/api/getPosts', {
-                        page: pageNumber
-                    })
+                getPostsFromServer: function (getModelObject) {
+                    var pageNumber = getModelObject.requestedPage;
+                    return $http.get('/partial/posts/' + pageNumber)
                 },
 
                 updatePosts: function (postsArray, pageNumber) {
@@ -139,30 +136,10 @@ angular.module('mainApp')
                     return editPostModel;
                 },
 
-                getAllMainSearchResults: function () {
-                    return mainSearchResultsPosts;
-                },
-
-                getMainSearchResultsCount: function (pageNumber) {
-                    return mainSearchResultsPostsCount[pageNumber];
-                },
-
-                mainSearch: function (searchObject) {
-                    return $http.post('/api/mainSearch', searchObject);
-                },
-
-                updateMainSearchResults: function (resultsArray, pageNumber) {
-                    if (resultsArray == []) {
-                        mainSearchResultsPosts[pageNumber] = [];
-                    } else {
-                        mainSearchResultsPosts[pageNumber] = $filter('preparePosts')(null, resultsArray);
-                    }
-                    return mainSearchResultsPosts[pageNumber];
-                },
-
-                updateMainSearchResultsCount: function (newCount) {
-                    mainSearchResultsPostsCount = newCount;
-                    return mainSearchResultsPostsCount;
+                postSearch: function (searchObject) {
+                    var queryString = searchObject.queryString;
+                    var pageNumber = searchObject.requestedPage;
+                    return $http.get('/partial/search/posts/' + queryString + '/' + pageNumber);
                 },
 
                 getSuggestedPosts: function () {

@@ -91,10 +91,8 @@ module.exports = {
 
                 function updated(updatedPost) {
                     consoleLogger(successLogger(module));
-                    ioJs.emitToAll('postUpdate', {
-                        "post": updatedPost
-                    });
                     res.status(200).send({
+                        thePost: updatedPost,
                         code: 200,
                         notify: true,
                         type: 'success',
@@ -115,11 +113,11 @@ module.exports = {
         }
     },
 
-    getPosts: function (req, res, page, callBack) {
+    getPosts: function (req, res, page, quantity, callBack) {
         var module = 'getPosts';
         receivedLogger(module);
 
-        var limit = 10;
+        var limit = quantity;
 
         postDB.getPosts(-1, page, limit, error_neg_1, error_neg_1, success);
 

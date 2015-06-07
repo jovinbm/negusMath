@@ -13,7 +13,6 @@ angular.module('mainApp')
                                 $rootScope.main.responseStatusHandler(resp);
                                 if (Object.keys(resp.thePost).length > 0) {
                                     $scope.editPostModel = PostService.updateCurrentEditPostModel(resp.thePost);
-                                    console.log($scope.editPostModel);
                                 } else {
                                     //empty the post
                                     $scope.editPostModel = PostService.updateCurrentEditPostModel({});
@@ -67,7 +66,7 @@ angular.module('mainApp')
                                 .success(function (resp) {
                                     $rootScope.main.responseStatusHandler(resp);
                                     $rootScope.showToast('success', 'Saved');
-                                    $rootScope.main.redirectToPage('/post/' + thePost.postIndex);
+                                    $rootScope.main.redirectToPage('/post/' + resp.thePost.postIndex);
                                 })
                                 .error(function (errResponse) {
                                     $rootScope.main.responseStatusHandler(errResponse);

@@ -89,7 +89,7 @@ module.exports = {
         var module = 'getPosts';
         receivedLogger(module);
         var errors = 0;
-        Post.find({isTrashed: false}, {_id: 0})
+        Post.find({}, {_id: 0})
             .sort({postIndex: sort})
             .skip((page - 1) * 10)
             .limit(limit)
@@ -108,7 +108,7 @@ module.exports = {
                 function doneTags(postsArray) {
                     if (errors == 0) {
                         var postsCount = 0;
-                        Post.count({isTrashed: false}, function (err, count) {
+                        Post.count({}, function (err, count) {
                             if (err) {
                                 consoleLogger(errorLogger(module, 'Failed to count posts', err));
                                 error_neg_1(-1, err);
@@ -471,9 +471,13 @@ module.exports = {
         var module = 'mainSearch';
         receivedLogger(module);
 
+
+        //number of posts to return
         var options = {
-            limit: quantity
+            limit: 100,
+            filter: {isTrashed: false}
         };
+
 
         Post.textSearch(queryString, options, function (err, output) {
             if (err) {
@@ -487,7 +491,7 @@ module.exports = {
 
                 //prepare an object that contains pages and postUniqueCuids of the current search results: 10 post uniqueCuids for each page key
                 var resultObject = {
-                    page: 1,
+                    page: requestedPage,
                     totalPages: 1,
                     totalResults: 0,
                     posts: []
@@ -497,7 +501,7 @@ module.exports = {
                 //check to see that there are results
                 if (resultObject.totalResults > 0) {
                     for (var i = 0, j = 1; i < resultObject.totalResults; i++, j++) {
-                        if (j > 20) {
+                        if (j > quantity) {
                             resultObject.totalPages++;
                             j = 1;
                         }
@@ -512,7 +516,7 @@ module.exports = {
                     resultObject.page = 1;
                 }
 
-                for (var k = ((requestedPage - 1) * quantity), numPosts = 0; numPosts < quantity; k++, numPosts++) {
+                for (var k = ((resultObject.page - 1) * quantity), numPosts = 0; numPosts < quantity; k++, numPosts++) {
                     if (k < resultObject.totalResults) {
                         resultObject.posts.push(output.results[k].obj);
                     }

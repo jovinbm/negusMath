@@ -1,20 +1,32 @@
 <% if(partial == false) { %>
-<% var obj2 = {
-    limit: limit,
+<% var obj = {
+    limit: 10,
+    queryString: queryString,
     pageNumber: pageNumber,
-    totalPostResults: postsCount,
-    totalPostResultsPages: postsCount / limit
+    postResultPage: postResultPage,
+    totalPostResultsPages: totalPostResultsPages,
+    totalPostResults: totalPostResults
 } %>
 
-<div post-stream-scope
-     ng-init="model = '<%= JSON.stringify(obj2) %>'">
+<div post-search-scope
+     ng-init="model = '<%= JSON.stringify(obj) %>'">
+
     <div>
-        <div class="panel-heading"><i class="fa fa-leanpub"></i> LATEST POSTS
+        <div class="panel-heading"><i class="fa fa-leanpub"></i> SEARCH RESULTS
+            <span class="pull-right"><a href ng-click="$root.main.back()"><i
+                            class="fa fa-arrow-left"></i> BACK</a></span>
         </div>
 
-        <div id="appendPreviousPosts"></div>
+        <div class="allBannerOuterDivs">
+            <div class="alert alert-success">
+                <strong>Your search returned <%= totalPostResults %> results</strong>
+            </div>
+        </div>
 
-        <% allPosts.forEach(function(post, index){ %>
+        <div id="appendPreviousPostSearch"></div>
+
+        <% postResults.forEach(function(post, index){ %>
+
         <div class="card">
 
             <div class="card-content">
@@ -46,6 +58,9 @@
             </div>
             <div class="card-action clearfix">
 
+                <% var postTags = post.postTags %>
+                <% include ../all/partials/templates-pre/post_tags.ejs %>
+
                 <div class="pull-right">
                     <a href="<%= post.postPath %>"
                        class="btn btn-default btn-sm">Read More</a>
@@ -56,22 +71,22 @@
         <br/>
         <% }) %>
 
-        <div id="appendNextPosts"></div>
+        <div id="appendNextPostSearch"></div>
 
         <div class="ng-cloak">
-            <% if ( totalPostResults > 0 && totalPostResultsPages > 1 && pageNumber < totalPostResultsPages ) { %>
+            <% if ( totalPostResults > 0 && totalPostResultsPages > 1 && postResultPage < totalPostResultsPages ) { %>
 
-            <div ng-if="theModel2.totalPostResults > 0 && theModel2.totalPostResultsPages > 1 && theModel2.pageNumber < theModel2.totalPostResultsPages">
+            <div ng-if="theModel.totalPostResults > 0 && theModel.totalPostResultsPages > 1 && theModel.pageNumber < theModel.totalPostResultsPages">
                 <div class="text-center">
                     <button ng-click="showMore()"
-                            id="showMoreBtn2"
+                            id="showMoreBtn"
                             class="btn btn-md btn-info">Show More
                     </button>
 
                 </div>
             </div>
 
-            <div ng-if="theModel2.totalPostResults > 0 && theModel2.totalPostResultsPages > 0 && theModel2.pageNumber >= theModel2.totalPostResultsPages">
+            <div ng-if="theModel.totalPostResults > 0 && theModel.totalPostResultsPages > 0 && theModel.pageNumber >= theModel.totalPostResultsPages">
                 <div class="alert alert-success">
                     <strong>No more posts to show...</strong>
                 </div>
@@ -79,7 +94,7 @@
 
             <% } %>
 
-            <% if (totalPostResults > 0 && totalPostResultsPages > 0 && pageNumber == totalPostResultsPages) { %>
+            <% if (totalPostResults > 0 && totalPostResultsPages > 0 && postResultPage == totalPostResultsPages) { %>
 
             <div>
                 <div class="alert alert-success">
@@ -91,6 +106,7 @@
         </div>
 
     </div>
+
 </div>
 
 <div>
@@ -102,11 +118,12 @@
     <div suggested-posts></div>
 </div>
 
-<% } else if(partial == true){ %>
 
-<div id="appendPreviousPosts"></div>
+<% }else if (partial == true) { %>
 
-<% allPosts.forEach(function(post, index){ %>
+<div id="appendPreviousPostSearch"></div>
+
+<% postResults.forEach(function(post, index){ %>
 
 <div class="card">
 
@@ -139,16 +156,20 @@
     </div>
     <div class="card-action clearfix">
 
+        <% var postTags = post.postTags %>
+        <% include ../all/partials/templates-pre/post_tags.ejs %>
+
         <div class="pull-right">
             <a href="<%= post.postPath %>"
                class="btn btn-default btn-sm">Read More</a>
         </div>
 
     </div>
+
 </div>
 <br/>
 <% }) %>
 
-<div id="appendNextPosts"></div>
+<div id="appendNextPostSearch"></div>
 
 <% } %>

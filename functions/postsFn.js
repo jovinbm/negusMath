@@ -79,10 +79,8 @@ function preparePosts(post, posts, callBack) {
             if (Object.keys(post).length > 0) {
                 posts[index] = prepare(post);
             }
-            if (index == posts.length - 1) {
-                callBack(posts);
-            }
         });
+        callBack(posts);
     }
 
     function prepare(post) {
@@ -112,10 +110,8 @@ function preparePostsNoChange(post, posts, callBack) {
             if (Object.keys(post).length > 0) {
                 posts[index] = prepare(post);
             }
-            if (index == posts.length - 1) {
-                callBack(posts);
-            }
         });
+        callBack(posts);
     }
 
     function prepare(post) {

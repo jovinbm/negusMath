@@ -11,7 +11,7 @@ angular.module('mainApp')
             }
         }
     }])
-    .directive('postSummary', [function () {
+    .directive('postSummary', ['$filter',function ($filter) {
         return {
             templateUrl: 'views/all/partials/templates/post_summary.html',
             scope: {
@@ -23,7 +23,7 @@ angular.module('mainApp')
             }
         }
     }])
-    .directive('postTags', [function () {
+    .directive('postTags', ['$filter',function ($filter) {
         return {
             templateUrl: 'views/all/partials/templates/post_tags.html',
             scope: {

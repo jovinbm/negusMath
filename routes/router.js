@@ -46,6 +46,7 @@ module.exports = {
         var main = {
             title: 'Negus Math - College Level Advanced Mathematics for Kenya Students',
             theUser: req.user,
+            partial: false,
             accountStatusBanner: middleware.returnAccountStatusBanner(req.user)
         };
         res.render('index/index.ejs', main);
@@ -59,13 +60,20 @@ module.exports = {
         var main = {
             title: 'Negus Math - HomePage',
             state: 'home',
+            partial: false,
             theUser: req.user,
-            accountStatusBanner: middleware.returnAccountStatusBanner(req.user)
+            accountStatusBanner: middleware.returnAccountStatusBanner(req.user),
         };
 
-        post_handler.getPosts(null, null, 1, gotPosts);
+        main.limit = 10;
+        main.pageNumber = 1;
+
+        post_handler.getPosts(null, null, main.pageNumber, main.limit, gotPosts);
         function gotPosts(rawPosts) {
             main.postsCount = rawPosts.postsCount;
+            main.totalPostResults = rawPosts.postsCount;
+            main.totalPostResultsPages = rawPosts.postsCount / main.limit;
+
             postsFn.preparePosts(null, rawPosts.postsArray, postsPrepared);
 
             function postsPrepared(posts) {
@@ -93,6 +101,46 @@ module.exports = {
         }
     },
 
+    renderPosts_partial: function (req, res) {
+        var module = 'renderPosts_partial';
+        receivedLogger(module);
+
+        var main = {
+            title: 'Negus Math - HomePage',
+            state: 'home',
+            partial: true,
+            theUser: req.user,
+            accountStatusBanner: middleware.returnAccountStatusBanner(req.user)
+        };
+
+        if (req.params.pageNumber) {
+            main.limit = 10;
+            main.pageNumber = parseInt(req.params.pageNumber);
+
+            post_handler.getPosts(null, null, main.pageNumber, main.limit, gotPosts);
+            function gotPosts(rawPosts) {
+                main.postsCount = rawPosts.postsCount;
+                main.totalPostResults = rawPosts.postsCount;
+                main.totalPostResultsPages = rawPosts.postsCount / main.limit;
+
+                postsFn.preparePosts(null, rawPosts.postsArray, postsPrepared);
+
+                function postsPrepared(posts) {
+                    main.allPosts = posts;
+                    res.render('all/partials/views/home-pre/post_stream.ejs', main);
+                }
+            }
+        } else {
+            consoleLogger(errorLogger(module, 'Some request fields missing'));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'error',
+                msg: 'An error has occurred. Please try again'
+            });
+        }
+    },
+
     renderIndividualPost: function (req, res) {
         var module = 'renderIndividualPost';
         receivedLogger(module);
@@ -100,6 +148,7 @@ module.exports = {
         var main = {
             title: 'Negus Math - Post',
             state: 'post',
+            partial: false,
             theUser: req.user,
             accountStatusBanner: middleware.returnAccountStatusBanner(req.user)
         };
@@ -137,6 +186,7 @@ module.exports = {
         }
     },
 
+
     manage_users: function (req, res) {
         var module = 'manage_users';
         receivedLogger(module);
@@ -144,6 +194,7 @@ module.exports = {
         var main = {
             title: 'Manage Users - NegusMath',
             state: 'manage-users',
+            partial: false,
             theUser: req.user,
             accountStatusBanner: middleware.returnAccountStatusBanner(req.user)
         };
@@ -158,6 +209,7 @@ module.exports = {
         var main = {
             title: 'New Post - NegusMath',
             state: 'new-post',
+            partial: false,
             theUser: req.user,
             accountStatusBanner: middleware.returnAccountStatusBanner(req.user)
         };
@@ -172,6 +224,7 @@ module.exports = {
         var main = {
             title: 'Edit Post - NegusMath',
             state: 'edit-post',
+            partial: false,
             theUser: req.user,
             accountStatusBanner: middleware.returnAccountStatusBanner(req.user)
         };
@@ -197,15 +250,16 @@ module.exports = {
         var main = {
             title: 'Search - NegusMath',
             state: 'search-posts',
+            partial: false,
             theUser: req.user,
             accountStatusBanner: middleware.returnAccountStatusBanner(req.user)
         };
 
         if (req.params.queryString && req.params.pageNumber) {
-            main.limit = 20;
+            main.limit = 10;
             main.queryString = req.params.queryString;
             main.title = main.queryString + ' - NegusMath Search';
-            main.pageNumber = req.params.pageNumber;
+            main.pageNumber = parseInt(req.params.pageNumber);
 
             post_handler.mainSearch(null, null, main.queryString, main.limit, main.pageNumber, searchFinished);
 
@@ -237,6 +291,50 @@ module.exports = {
                             }
                         }
                     }
+                }
+            }
+
+        } else {
+            consoleLogger(errorLogger(module, 'Some request fields missing'));
+            res.status(500).send({
+                code: 500,
+                notify: true,
+                type: 'error',
+                msg: 'An error has occurred. Please try again'
+            });
+        }
+    },
+
+    search_posts_partial: function (req, res) {
+        var module = 'search_posts_partial';
+        receivedLogger(module);
+
+        var main = {
+            title: 'Search - NegusMath',
+            state: 'search-posts',
+            partial: true,
+            theUser: req.user,
+            accountStatusBanner: middleware.returnAccountStatusBanner(req.user)
+        };
+
+        if (req.params.queryString && req.params.pageNumber) {
+            main.limit = 10;
+            main.queryString = req.params.queryString;
+            main.title = main.queryString + ' - NegusMath Search';
+            main.pageNumber = parseInt(req.params.pageNumber);
+
+            post_handler.mainSearch(null, null, main.queryString, main.limit, main.pageNumber, searchFinished);
+
+            function searchFinished(searchResults) {
+                main.postResultPage = searchResults.results.page;
+                main.totalPostResultsPages = searchResults.results.totalPages;
+                main.totalPostResults = searchResults.results.totalResults;
+
+                postsFn.preparePosts(null, searchResults.results.posts, postsPrepared);
+
+                function postsPrepared(posts) {
+                    main.postResults = posts;
+                    res.render('search-pre/search_results.ejs', main);
                 }
             }
 

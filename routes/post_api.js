@@ -33,7 +33,8 @@ module.exports = {
         receivedLogger(module);
         if (req.body.page) {
             var page = req.body.page;
-            post_handler.getPosts(req, res, page);
+            var quantity = 10;
+            post_handler.getPosts(req, res, page, quantity);
         } else {
             consoleLogger(errorLogger(module, 'Some request fields missing'));
             res.status(500).send({
@@ -160,11 +161,11 @@ module.exports = {
         var module = 'mainSearch';
         receivedLogger(module);
         if (req.body.queryString && req.body.requestedPage) {
-            var quantity = 20;
+            var limit = 10;
             var requestedPage = req.body.requestedPage;
             var queryString = req.body.queryString;
 
-            post_handler.mainSearch(req, res, queryString, quantity, requestedPage);
+            post_handler.mainSearch(req, res, queryString, limit, requestedPage);
         } else {
             consoleLogger(errorLogger(module, 'Some request fields missing'));
             res.status(500).send({
