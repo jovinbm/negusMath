@@ -89,7 +89,7 @@ module.exports = {
         var module = 'getPosts';
         receivedLogger(module);
         var errors = 0;
-        Post.find({}, {_id: 0})
+        Post.find({isTrashed: false}, {_id: 0})
             .sort({postIndex: sort})
             .skip((page - 1) * 10)
             .limit(limit)
@@ -108,7 +108,7 @@ module.exports = {
                 function doneTags(postsArray) {
                     if (errors == 0) {
                         var postsCount = 0;
-                        Post.count({}, function (err, count) {
+                        Post.count({isTrashed: false}, function (err, count) {
                             if (err) {
                                 consoleLogger(errorLogger(module, 'Failed to count posts', err));
                                 error_neg_1(-1, err);
