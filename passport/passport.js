@@ -34,55 +34,58 @@ module.exports = function (passport, LocalStrategy) {
             var module = 'LocalStrategy';
             receivedLogger(module);
 
-            var formValidationState = forms.passportValidateUsernameAndPassword(username, password);
-            if (formValidationState == 1) {
-                //this function returns a status of 1 if the user does not exist, and (-1,theUser) if the
-                //user exists
-                //else (-1,err) if there was an error while executing db operations
-                userDB.findUserWithUsername(username, errorDbUsername, errorDbUsername, successDbUsername);
+            forms.passportValidateUsernameAndPassword(username, password, validationDone);
 
-                function successDbUsername(status, theUser) {
-                    if (status == -1) {
+            function validationDone(formValidationState) {
+                if (formValidationState == 1) {
+                    //this function BELOW returns a status of 1 if the user does not exist, and (-1,theUser) if the
+                    //user exists
+                    //else (-1,err) if there was an error while executing db operations
+                    userDB.findUserWithUsername(username, errorDbUsername, errorDbUsername, successDbUsername);
 
-                        //means the user exists
-                        bcrypt.compare(password, theUser.password, function (err, res) {
-                            if (err) {
+                    function successDbUsername(status, theUser) {
+                        if (status == -1) {
 
-                                consoleLogger(errorLogger(module, 'error comparing passwords', err));
-                                done("A problem occurred when trying to log you in. Please try again", false, "A problem occurred when trying to log you in. Please try again");
+                            //means the user exists
+                            bcrypt.compare(password, theUser.password, function (err, res) {
+                                if (err) {
 
-                            } else if (res) {
+                                    consoleLogger(errorLogger(module, 'error comparing passwords', err));
+                                    done("A problem occurred when trying to log you in. Please try again", false, "A problem occurred when trying to log you in. Please try again");
 
-                                //means the password checks with hash
-                                done(null, theUser, null);
+                                } else if (res) {
 
-                            } else {
+                                    //means the password checks with hash
+                                    done(null, theUser, null);
 
-                                //passwords don't check
-                                consoleLogger(errorLogger(module, 'Failed! User local strategy authentication failed'));
-                                done('The password you entered is incorrect. Please try again', false, 'The password you entered is incorrect. Please try again');
+                                } else {
 
-                            }
+                                    //passwords don't check
+                                    consoleLogger(errorLogger(module, 'Failed! User local strategy authentication failed'));
+                                    done('The password you entered is incorrect. Please try again', false, 'The password you entered is incorrect. Please try again');
 
-                        });
+                                }
 
-                    } else {
+                            });
 
-                        //means user does not exist(status here is 1, theUser is empty
-                        consoleLogger(errorLogger(module, 'Failed! the account the user tried to sign in to was not found'));
-                        done('We could not find a registered user with the credentials you provided. Please check and try again or create a new account', false, 'We could not find a registered user with the credentials you provided. Please check and try again');
+                        } else {
+
+                            //means user does not exist(status here is 1, theUser is empty
+                            consoleLogger(errorLogger(module, 'Failed! the account the user tried to sign in to was not found'));
+                            done('We could not find a registered user with the credentials you provided. Please check and try again or create a new account', false, 'We could not find a registered user with the credentials you provided. Please check and try again');
+                        }
+
                     }
 
-                }
+                    function errorDbUsername() {
+                        consoleLogger(errorLogger(module, 'Error while trying to find user'));
+                        done("A problem occurred when trying to log you in. Please try again", false, "A problem occurred when trying to log you in. Please try again");
+                    }
 
-                function errorDbUsername() {
-                    consoleLogger(errorLogger(module, 'Error while trying to find user'));
-                    done("A problem occurred when trying to log you in. Please try again", false, "A problem occurred when trying to log you in. Please try again");
+                } else {
+                    consoleLogger(errorLogger(module, 'Failed! User local strategy authentication failed, username and(or) password required'));
+                    done('Username and(or) password required. Please check if you have entered valid data and try again', false, 'Username and(or) password required. Please try again');
                 }
-
-            } else {
-                consoleLogger(errorLogger(module, 'Failed! User local strategy authentication failed, username and(or) password required'));
-                done('Username and(or) password required. Please check if you have entered valid data and try again', false, 'Username and(or) password required. Please try again');
             }
         }));
 

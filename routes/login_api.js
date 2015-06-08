@@ -109,40 +109,25 @@ module.exports = {
                     });
                 }
 
-                //before logging the user in, remove him from his current session which might be a random tracking session
-                if (req.isAuthenticated()) {
-                    req.session.destroy(function (err) {
-                        if (err) {
-                            consoleLogger(errorLogger(module, 'req,session.destroy failed while trying to delete the users session before logging the user back in'))
-                        }
-                        continueLoggingIn();
-                    });
-                } else {
-                    continueLoggingIn();
-                }
-
-                function continueLoggingIn() {
-                    req.logIn(user, function (err) {
-                        if (err) {
-                            consoleLogger(errorLogger('req.login', err, err));
-                            return res.status(500).send({
-                                code: 500,
-                                signInBanner: true,
-                                bannerClass: 'alert alert-dismissible alert-warning',
-                                msg: "A problem occurred when trying to log you in. Please try again"
-                            });
-                        } else {
-                            consoleLogger(successLogger(module));
-                            var redirectPage = '/index';
-                            return res.status(200).send({
-                                code: 200,
-                                msg: "You have successfully logged in",
-                                redirect: true,
-                                redirectPage: redirectPage
-                            });
-                        }
-                    });
-                }
+                req.logIn(user, function (err) {
+                    if (err) {
+                        consoleLogger(errorLogger('req.login', err, err));
+                        return res.status(500).send({
+                            code: 500,
+                            signInBanner: true,
+                            bannerClass: 'alert alert-dismissible alert-warning',
+                            msg: "A problem occurred when trying to log you in. Please try again"
+                        });
+                    } else {
+                        consoleLogger(successLogger(module));
+                        return res.status(200).send({
+                            code: 200,
+                            msg: "You have successfully logged in",
+                            redirect: true,
+                            redirectPage: '/index'
+                        });
+                    }
+                });
             })(req, res, next);
         } else {
             res.status(401).send({

@@ -283,7 +283,7 @@ module.exports = {
         }
     },
 
-    passportValidateUsernameAndPassword: function (username, password) {
+    passportValidateUsernameAndPassword: function (username, password, callBack) {
         var module = 'passportValidateUsernameAndPassword';
         receivedLogger(module);
         //this function does not respond to the request itself, rather it returns a status of 1 or -1
@@ -331,10 +331,10 @@ module.exports = {
 
         if (errors == 0) {
             consoleLogger(successLogger(module));
-            return 1;
+            callBack(1);
         } else {
             consoleLogger(errorLogger(module));
-            return -1;
+            callBack(-1);
         }
     },
 
