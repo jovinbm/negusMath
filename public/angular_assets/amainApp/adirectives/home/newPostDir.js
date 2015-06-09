@@ -4,8 +4,6 @@ angular.module('app')
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
 
-                $rootScope.main.goToTop();
-
                 $scope.newPostModel = {
                     postHeading: "",
                     postContent: "",

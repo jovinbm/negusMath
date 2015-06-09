@@ -3,7 +3,6 @@ angular.module('app')
         return {
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
-                $rootScope.main.goToTop();
 
                 $scope.main = {
                     post: PostService.getCurrentPost($rootScope.$stateParams.postIndex),

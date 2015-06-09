@@ -405,7 +405,6 @@ angular.module('app')
             templateUrl: 'views/all/partials/templates/suggested_posts.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
-                $rootScope.main.goToTop();
 
                 $scope.suggestedPosts = [];
                 $scope.suggestedPostsCount = 0;
@@ -1479,7 +1478,6 @@ angular.module('app')
         return {
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
-                $rootScope.main.goToTop();
 
                 $scope.main = {
                     post: PostService.getCurrentPost($rootScope.$stateParams.postIndex),
@@ -1546,8 +1544,6 @@ angular.module('app')
         return {
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
-
-                $rootScope.main.goToTop();
 
                 $scope.newPostModel = {
                     postHeading: "",
@@ -2545,48 +2541,6 @@ angular.module('app')
         }
     }]);
 angular.module('app')
-    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'socketService', 'globals', '$document',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, socketService, globals, $document) {
-        }
-    ]);
-
-angular.module('app')
-    .controller('SearchController', ['$q', '$log', '$scope', '$rootScope', 'globals', 'PostService',
-        function ($q, $log, $scope, $rootScope, globals, PostService) {
-        }
-    ]);
-angular.module('app')
-    .controller('UserManagerController', ['$q', '$scope', '$rootScope', 'UserService', 'globals',
-        function ($q, $scope, $rootScope, UserService, globals) {
-
-            $scope.usersCount = UserService.getUsersCount();
-
-            function getUsersCount() {
-                if (globals.checkAccountStatus()) {
-                    UserService.getUsersCountFromServer()
-                        .success(function (resp) {
-                            $scope.usersCount = UserService.updateUsersCount(resp.usersCount);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                }
-            }
-
-            getUsersCount();
-
-            //===============socket listeners===============
-
-            $rootScope.$on('userChanges', function () {
-                getUsersCount();
-            });
-
-            $rootScope.$on('reconnect', function () {
-            });
-        }
-    ]);
-angular.module('app')
     .filter("validatePostHeading", ['$rootScope', function ($rootScope) {
         return function (postHeading, broadcast) {
             var errors = 0;
@@ -2816,6 +2770,48 @@ angular.module('app')
             return messages;
         }
     }]);
+angular.module('app')
+    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'socketService', 'globals', '$document',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, socketService, globals, $document) {
+        }
+    ]);
+
+angular.module('app')
+    .controller('SearchController', ['$q', '$log', '$scope', '$rootScope', 'globals', 'PostService',
+        function ($q, $log, $scope, $rootScope, globals, PostService) {
+        }
+    ]);
+angular.module('app')
+    .controller('UserManagerController', ['$q', '$scope', '$rootScope', 'UserService', 'globals',
+        function ($q, $scope, $rootScope, UserService, globals) {
+
+            $scope.usersCount = UserService.getUsersCount();
+
+            function getUsersCount() {
+                if (globals.checkAccountStatus()) {
+                    UserService.getUsersCountFromServer()
+                        .success(function (resp) {
+                            $scope.usersCount = UserService.updateUsersCount(resp.usersCount);
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                }
+            }
+
+            getUsersCount();
+
+            //===============socket listeners===============
+
+            $rootScope.$on('userChanges', function () {
+                getUsersCount();
+            });
+
+            $rootScope.$on('reconnect', function () {
+            });
+        }
+    ]);
 angular.module('app')
     .factory('PostService', ['$filter', '$http', '$window', '$rootScope', 'socket', 'globals',
         function ($filter, $http, $window, $rootScope, socket, globals) {

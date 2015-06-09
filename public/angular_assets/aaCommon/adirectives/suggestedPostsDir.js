@@ -4,7 +4,6 @@ angular.module('app')
             templateUrl: 'views/all/partials/templates/suggested_posts.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
-                $rootScope.main.goToTop();
 
                 $scope.suggestedPosts = [];
                 $scope.suggestedPostsCount = 0;
