@@ -10,6 +10,7 @@
                 <span class="icon-bar"></span>
             </button>
             <a href ng-click="$root.main.goToTop();"
+               target="_self"
                class="navbar-brand">
                 <i class="fa fa-leanpub"></i>
                 NEGUS
@@ -25,7 +26,8 @@
                     <% } else { %>
                 <li>
                     <% } %>
-                    <a href="/">Home
+                    <a href="/"
+                       target="_self">Home
                     </a>
                 </li>
 
@@ -35,13 +37,15 @@
                     <% } else { %>
                 <li>
                     <% } %>
-                    <a href="/manage/users">Users</a>
+                    <a href="/manage/users"
+                       target="_self">Users</a>
                 </li>
 
                 <% } %>
 
                 <li>
-                    <a href="/index">About</a>
+                    <a href="/index"
+                       target="_self">About</a>
                 </li>
 
                 <% if (theUser && theUser.isRegistered) { %>
@@ -75,6 +79,7 @@
                 <a type="button"
                    class="btn btn-primary btn-sm navbar-btn pull-right"
                    href="/new/Post"
+                   target="_self"
                    role="button">
                     <i class="fa fa-pencil"></i> New Post
                 </a>
@@ -86,7 +91,8 @@
                 <a type="button"
                    class="btn btn-warning btn-sm navbar-btn pull-right"
                    role="button"
-                   ng-click="$root.back();">
+                   ng-click="$root.back();"
+                   target="_self">
                     <i class="fa fa-pencil"></i> Cancel
                 </a>
             </div>

@@ -68,13 +68,4 @@ angular.module('app')
                 }
             }
         }
-    }])
-    .directive('newPostDirective', ['$filter', '$rootScope', 'PostService', 'globals', function ($filter, $rootScope, PostService, globals) {
-        return {
-            templateUrl: 'views/all/partials/views/home/new_post.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                //new_post depends on newPostDirectiveScope
-            }
-        }
     }]);

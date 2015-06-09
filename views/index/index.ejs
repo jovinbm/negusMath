@@ -35,6 +35,7 @@
                 <span class="icon-bar"></span>
             </button>
             <a href="#top"
+               target="_self"
                du-smooth-scroll du-scrollspy
                class="navbar-brand">
                 <i class="fa fa-leanpub"></i>
@@ -47,6 +48,7 @@
             <ul class="nav navbar-nav navbar-right">
                 <li>
                     <a href="#services"
+                       target="_self"
                        du-smooth-scroll>About</a>
                 </li>
 
@@ -71,11 +73,13 @@
 
                 <li>
                     <a href="#login"
+                       target="_self"
                        du-smooth-scroll
                        ng-click="changeUserLoginState('register')">Register</a>
                 </li>
                 <li>
                     <a href="#login"
+                       target="_self"
                        du-smooth-scroll
                        ng-click="changeUserLoginState('signIn')">Sign In</a>
                 </li>
@@ -85,6 +89,8 @@
         </div>
     </div>
 </nav>
+
+<div notifications-bar class="notifications" closeIcon="fa fa-times-circle"></div>
 
 <div id="top"></div>
 
@@ -98,10 +104,12 @@
 
             <div>
                 <a href="#services"
+                   target="_self"
                    du-smooth-scroll
                    class="btn btn-md btn-default btn-config">ABOUT
                 </a>
                 <a href="#contact"
+                   target="_self"
                    du-smooth-scroll
                    class="btn btn-md btn-default btn-config">CONTACT
                 </a>
@@ -111,11 +119,13 @@
 
             <div>
                 <a href="#login"
+                   target="_self"
                    du-smooth-scroll
                    ng-click="changeUserLoginState('register')"
                    class="btn btn-md btn-default btn-config">REGISTER
                 </a>
                 <a href="#login"
+                   target="_self"
                    du-smooth-scroll
                    ng-click="changeUserLoginState('signIn')"
                    class="btn btn-md btn-default btn-config">SIGN IN
@@ -130,6 +140,7 @@
 
             <div>
                 <a href="/"
+                   target="_self"
                    class="btn btn-xl">Continue to the forums
                 </a>
             </div>

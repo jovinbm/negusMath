@@ -29,6 +29,8 @@ function getTheUser(req) {
 module.exports = {
 
     getUsersCount: function (req, res) {
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getUsersCount';
         receivedLogger(module);
 
@@ -45,13 +47,16 @@ module.exports = {
             consoleLogger(errorLogger(module));
             res.status(500).send({
                 code: 500,
-                banner: true,
-                bannerClass: 'alert alert-dismissible alert-warning'
+                notify: true,
+                type: 'warning',
+                msg: 'An error occurred while retrieving number of users'
             });
         }
     },
 
     getAllUsers: function (req, res) {
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getAllUsers';
         receivedLogger(module);
 
@@ -76,6 +81,8 @@ module.exports = {
     },
 
     getAdminUsers: function (req, res) {
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getAdminUsers';
         receivedLogger(module);
 
@@ -100,6 +107,8 @@ module.exports = {
     },
 
     addAdminPrivileges: function (req, res, userUniqueCuid) {
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'addAdminPrivileges';
         receivedLogger(module);
 
@@ -140,6 +149,8 @@ module.exports = {
     },
 
     removeAdminPrivileges: function (req, res, userUniqueCuid) {
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'removeAdminPrivileges';
         receivedLogger(module);
 
@@ -180,6 +191,8 @@ module.exports = {
     },
 
     getLocalUsers: function (req, res) {
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getLocalUsers';
         receivedLogger(module);
 
@@ -204,6 +217,8 @@ module.exports = {
     },
 
     getApprovedUsers: function (req, res) {
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getApprovedUsers';
         receivedLogger(module);
 
@@ -228,6 +243,8 @@ module.exports = {
     },
 
     approveUser: function (req, res, userUniqueCuid) {
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'approveUser';
         receivedLogger(module);
 
@@ -269,6 +286,8 @@ module.exports = {
     },
 
     getUsersNotApproved: function (req, res) {
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getUsersNotApproved';
         receivedLogger(module);
 
@@ -293,6 +312,8 @@ module.exports = {
     },
 
     getBannedUsers: function (req, res) {
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getBannedUsers';
         receivedLogger(module);
 
@@ -317,6 +338,8 @@ module.exports = {
     },
 
     banUser: function (req, res, userUniqueCuid) {
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'banUser';
         receivedLogger(module);
 
@@ -357,6 +380,8 @@ module.exports = {
     },
 
     unBanUser: function (req, res, userUniqueCuid) {
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'unBanUser';
         receivedLogger(module);
 
@@ -397,6 +422,8 @@ module.exports = {
     },
 
     getUsersNotBanned: function (req, res) {
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getUsersNotBanned';
         receivedLogger(module);
 

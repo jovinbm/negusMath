@@ -61,49 +61,6 @@ angular.module('app')
             }
         }
     }])
-    .directive('loadingBanner', ['$rootScope', function ($rootScope) {
-        var controller = ['$scope', '$rootScope', 'cfpLoadingBar', function ($scope, $rootScope, cfpLoadingBar) {
-
-            $rootScope.isLoading = true;
-            $rootScope.isLoadingPercentage = 0;
-            $rootScope.changeIsLoadingPercentage = function (num) {
-                $rootScope.isLoadingPercentage = num;
-            };
-
-            $rootScope.$on('cfpLoadingBar:loading', function (event, resp) {
-                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
-            });
-
-            $rootScope.$on('cfpLoadingBar:loaded', function (event, resp) {
-                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
-            });
-
-            $rootScope.$on('cfpLoadingBar:completed', function (event, resp) {
-                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
-            });
-
-            $rootScope.isLoadingTrue = function () {
-                $rootScope.isLoading = true;
-            };
-            $rootScope.isLoadingFalse = function () {
-                $rootScope.isLoading = false;
-            };
-
-            $rootScope.$on('isLoadingTrue', function () {
-                $rootScope.isLoading = true;
-            });
-
-            $rootScope.$on('isLoadingFalse', function () {
-                $rootScope.isLoading = false;
-            });
-        }];
-
-        return {
-            templateUrl: 'views/all/partials/templates/loading_banner.html',
-            restrict: 'AE',
-            controller: controller
-        }
-    }])
     .directive('signInBannerScope', ['$rootScope', function ($rootScope) {
         return {
             restrict: 'AE',

@@ -39,3 +39,5 @@
 //render error page or redirect to error page when error occurrs e.g in routerjs when rendering
 
 //when redirecting the user to login, save their last page
+
+//implement validate params -- github express validate starred repo

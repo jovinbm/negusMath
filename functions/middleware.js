@@ -27,7 +27,39 @@ function getTheUser(req) {
     return basic.getTheUser(req);
 }
 
+function getFullQueryWithQMark(req) {
+    if (req.originalUrl) {
+        if (req.originalUrl.indexOf('?') != -1) {
+            return req.originalUrl.substr(req.originalUrl.indexOf('?'));
+        } else {
+            return '?'
+        }
+    } else {
+        return '?'
+    }
+}
+
 module.exports = {
+
+    addLastPage: function (req, res, next) {
+        var module = "addLastPage";
+        receivedLogger(module);
+
+        if (req.session) {
+            switch (req.route.path) {
+                case "/partial/posts":
+                    req.session.lastPage = '/posts' + getFullQueryWithQMark(req);
+                    break;
+                case "/partial/search/posts":
+                    req.session.lastPage = '/search/posts' + getFullQueryWithQMark(req);
+                    break;
+                default:
+                    req.session.lastPage = req.originalUrl;
+            }
+        }
+        console.log('********************* ' + req.session.lastPage);
+        next();
+    },
 
     //authenticates requests
     ensureAuthenticated: function (req, res, next) {
@@ -53,12 +85,9 @@ module.exports = {
             consoleLogger(errorLogger(module, 'user authentication failed'));
             res.status(401).send({
                 code: 401,
-                notify: true,
-                type: 'error',
-                banner: true,
-                bannerClass: 'alert alert-dismissible alert-warning',
-                msg: 'You are not logged in. Please reload page',
-                disable: true
+                dialog: true,
+                id: 'sign-in',
+                msg: 'You are not logged in. Please reload page'
             });
         }
     },
@@ -158,8 +187,8 @@ module.exports = {
             consoleLogger(errorLogger(module, errorMessage));
             res.status(401).send({
                 code: 401,
-                banner: true,
-                bannerClass: 'alert alert-dismissible alert-warning',
+                dialog: true,
+                id: 'not-authorized',
                 msg: errorMessage
             });
         }
@@ -188,13 +217,18 @@ module.exports = {
             next();
         } else {
             consoleLogger(errorLogger(module, 'User is not admin'));
+            //res.status(401).send({
+            //    code: 401,
+            //    dialog: true,
+            //    id: 'not-authorized',
+            //    msg: 'You are not authorized to access this page/feature.'
+            //});
+
             res.status(401).send({
                 code: 401,
-                notify: true,
-                type: 'warning',
-                banner: true,
-                bannerClass: 'alert alert-dismissible alert-warning',
-                msg: 'You are not authorized to access this page/feature.'
+                dialog: true,
+                id: 'sign-in',
+                msg: 'You are not logged in. Please reload page'
             });
         }
     }

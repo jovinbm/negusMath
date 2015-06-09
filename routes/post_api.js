@@ -29,6 +29,9 @@ module.exports = {
 
 
     getPosts: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getPosts';
         receivedLogger(module);
         if (req.body.page) {
@@ -40,7 +43,7 @@ module.exports = {
             res.status(500).send({
                 code: 500,
                 notify: true,
-                type: 'error',
+                type: 'warning',
                 msg: 'An error has occurred. Please reload page',
                 disable: true
             });
@@ -48,6 +51,9 @@ module.exports = {
     },
 
     getSuggestedPosts: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getSuggestedPosts';
         receivedLogger(module);
         var quantity = 4;
@@ -55,6 +61,9 @@ module.exports = {
     },
 
     getPost: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getPost';
         receivedLogger(module);
         if (req.body.postIndex) {
@@ -65,8 +74,8 @@ module.exports = {
             res.status(500).send({
                 code: 500,
                 notify: true,
-                type: 'error',
-                msg: 'An error has occurred. Please reload page',
+                type: 'warning',
+                msg: 'An error has occurred while retrieving the post. Please reload page',
                 disable: true
             });
         }
@@ -91,7 +100,7 @@ module.exports = {
             res.status(500).send({
                 code: 500,
                 notify: true,
-                type: 'error',
+                type: 'warning',
                 msg: 'An error has occurred. Please try again'
             });
         }
@@ -108,7 +117,7 @@ module.exports = {
             res.status(500).send({
                 code: 500,
                 notify: true,
-                type: 'error',
+                type: 'warning',
                 msg: 'An error has occurred. Please try again'
             });
         }
@@ -125,7 +134,7 @@ module.exports = {
             res.status(500).send({
                 code: 500,
                 notify: true,
-                type: 'error',
+                type: 'warning',
                 msg: 'An error has occurred. Please try again'
             });
         }
@@ -142,7 +151,7 @@ module.exports = {
             res.status(500).send({
                 code: 500,
                 notify: true,
-                type: 'error',
+                type: 'warning',
                 msg: 'An error has occurred. Please try again'
             });
         }
@@ -171,7 +180,7 @@ module.exports = {
             res.status(500).send({
                 code: 500,
                 notify: true,
-                type: 'error',
+                type: 'warning',
                 msg: 'An error has occurred. Please try again'
             });
         }

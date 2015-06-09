@@ -35,6 +35,9 @@ function getTheUser(req) {
 module.exports = {
 
     getUserData: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getUserData';
         receivedLogger(module);
 
@@ -44,6 +47,7 @@ module.exports = {
             req.user.password = "";
 
             consoleLogger(successLogger(module));
+
             return res.status(200).send({
                 userData: req.user
             });
@@ -60,6 +64,9 @@ module.exports = {
 
 
     localUserLogin: function (req, res, next) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'app.post /localUserLogin';
         receivedLogger(module);
         if (req.body.username && req.body.password) {
@@ -94,12 +101,22 @@ module.exports = {
                         });
                     } else {
                         consoleLogger(successLogger(module));
-                        return res.status(200).send({
-                            code: 200,
-                            msg: "You have successfully logged in",
-                            redirect: true,
-                            redirectPage: '/index'
-                        });
+                        if (req.body.isDialog) {
+                            return res.status(200).send({
+                                code: 200,
+                                msg: "You have successfully logged in",
+                                redirect: true,
+                                redirectPage: basic.getLastPage(req) || '/index'
+                            });
+                        } else {
+                            return res.status(200).send({
+                                code: 200,
+                                msg: "You have successfully logged in",
+                                redirect: true,
+                                redirectPage: '/index'
+                            });
+                        }
+
                     }
                 });
             })(req, res, next);
@@ -118,6 +135,9 @@ module.exports = {
 
 
     createAccount: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = "createAccount";
 
         //the request argument are passed to the form validator which ensures that they are not null or undefined
@@ -227,11 +247,19 @@ module.exports = {
 
 
                             function successSave() {
-                                res.status(200).send({
-                                    code: 200,
-                                    redirect: true,
-                                    redirectPage: '/index'
-                                });
+                                if (req.body.isDialog) {
+                                    res.status(200).send({
+                                        code: 200,
+                                        redirect: true,
+                                        redirectPage: basic.getLastPage(req) || '/index'
+                                    });
+                                } else {
+                                    res.status(200).send({
+                                        code: 200,
+                                        redirect: true,
+                                        redirectPage: '/index'
+                                    });
+                                }
 
                                 //send a welcome email
                                 emailModule.sendWelcomeEmail(theUser);

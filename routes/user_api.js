@@ -36,24 +36,36 @@ function checkUserUniqueCuid(req) {
 module.exports = {
 
     getUsersCount: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getUsersCount';
         receivedLogger(module);
         user_handler.getUsersCount(req, res);
     },
 
     getAllUsers: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getAllUsers';
         receivedLogger(module);
         user_handler.getAllUsers(req, res);
     },
 
     getAdminUsers: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getAdminUsers';
         receivedLogger(module);
         user_handler.getAdminUsers(req, res);
     },
 
     addAdminPrivileges: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'addAdminPrivileges';
         receivedLogger(module);
 
@@ -65,13 +77,16 @@ module.exports = {
             res.status(500).send({
                 code: 500,
                 notify: true,
-                type: 'error',
+                type: 'warning',
                 msg: 'An error has occurred. Please try again'
             });
         }
     },
 
     removeAdminPrivileges: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'removeAdminPrivileges';
         receivedLogger(module);
 
@@ -83,25 +98,34 @@ module.exports = {
             res.status(500).send({
                 code: 500,
                 notify: true,
-                type: 'error',
+                type: 'warning',
                 msg: 'An error has occurred. Please try again'
             });
         }
     },
 
     getLocalUsers: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getLocalUsers';
         receivedLogger(module);
         user_handler.getLocalUsers(req, res);
     },
 
     getApprovedUsers: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getApprovedUsers';
         receivedLogger(module);
         user_handler.getApprovedUsers(req, res);
     },
 
     approveUser: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'approveUser';
         receivedLogger(module);
 
@@ -113,25 +137,34 @@ module.exports = {
             res.status(500).send({
                 code: 500,
                 notify: true,
-                type: 'error',
+                type: 'warning',
                 msg: 'An error has occurred. Please try again'
             });
         }
     },
 
     getUsersNotApproved: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getUsersNotApproved';
         receivedLogger(module);
         user_handler.getUsersNotApproved(req, res);
     },
 
     getBannedUsers: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getBannedUsers';
         receivedLogger(module);
         user_handler.getBannedUsers(req, res);
     },
 
     banUser: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'banUser';
         receivedLogger(module);
 
@@ -143,13 +176,16 @@ module.exports = {
             res.status(500).send({
                 code: 500,
                 notify: true,
-                type: 'error',
+                type: 'warning',
                 msg: 'An error has occurred. Please try again'
             });
         }
     },
 
     unBanUser: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'unBanUser';
         receivedLogger(module);
 
@@ -161,13 +197,16 @@ module.exports = {
             res.status(500).send({
                 code: 500,
                 notify: true,
-                type: 'error',
+                type: 'warning',
                 msg: 'An error has occurred. Please try again'
             });
         }
     },
 
     getUsersNotBanned: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'getUsersNotBanned';
         receivedLogger(module);
         user_handler.getUsersNotBanned(req, res);

@@ -10,7 +10,7 @@ angular.module('app')
 
                 $scope.performMainSearch = function () {
                     if ($scope.mainSearchModel.queryString.length > 0) {
-                        $rootScope.main.redirectToPage('/search/posts/' + $scope.mainSearchModel.queryString + '/' + $scope.mainSearchModel.requestedPage);
+                        $rootScope.main.redirectToPage('/search/posts?q=' + $scope.mainSearchModel.queryString + '&page=' + parseInt($scope.mainSearchModel.requestedPage));
                     }
                 };
             }

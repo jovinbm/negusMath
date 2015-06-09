@@ -5,7 +5,7 @@ angular.module('app')
 
             function broadcastShowToast(type, text) {
                 if (broadcast) {
-                    $rootScope.showToast(type, text);
+                    $rootScope.main.showToast(type, text);
                 }
             }
 
@@ -59,7 +59,7 @@ angular.module('app')
         return function (postContent, broadcast) {
             function broadcastShowToast(type, text) {
                 if (broadcast) {
-                    $rootScope.showToast(type, text);
+                    $rootScope.main.showToast(type, text);
                 }
             }
 
@@ -95,7 +95,7 @@ angular.module('app')
 
             function broadcastShowToast(type, text) {
                 if (broadcast) {
-                    $rootScope.showToast(type, text);
+                    $rootScope.main.showToast(type, text);
                 }
             }
 
@@ -153,7 +153,7 @@ angular.module('app')
 
             function broadcastShowToast(type, text) {
                 if (broadcast) {
-                    $rootScope.showToast(type, text);
+                    $rootScope.main.showToast(type, text);
                 }
             }
 

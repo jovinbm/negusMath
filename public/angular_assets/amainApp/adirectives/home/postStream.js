@@ -41,13 +41,4 @@ angular.module('app')
                 };
             }
         }
-    }])
-    .directive('postStream', ['$q', '$log', '$rootScope', 'globals', 'PostService', function ($q, $log, $rootScope, globals, PostService) {
-        return {
-            templateUrl: 'views/all/partials/views/home/post_stream.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                //post_stream depends on postStreamScope
-            }
-        }
     }]);

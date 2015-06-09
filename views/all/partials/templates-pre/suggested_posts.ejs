@@ -1,5 +1,5 @@
 <script type="text/ng-template" id="views/all/partials/templates/suggested_posts.html">
-    <div>
+    <div class="ng-cloak">
         <div class="panel-heading"><i class="fa fa-leanpub"></i> SUGGESTED POSTS</div>
 
         <div ng-show="suggestedPosts.length > 0">
@@ -9,6 +9,7 @@
                     <div class="card-content">
 
                         <h2 class="text-outputs postHeading"><a ng-href="{{post.postPath}}"
+                                                                target="_self"
                                                                 ng-bind-html="post.postHeading"></a>
                         </h2>
 
@@ -32,6 +33,7 @@
 
                         <div class="pull-right">
                             <a ng-href="{{post.postPath}}"
+                               target="_self"
                                class="btn btn-default btn-sm">Read More</a>
                         </div>
 

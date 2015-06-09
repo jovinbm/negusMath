@@ -29,7 +29,7 @@ angular.module('app')
 
 
                     $scope.cancelPostUpdate = function () {
-                        $rootScope.showToast('success', 'Update cancelled');
+                        $rootScope.main.showToast('success', 'Update cancelled');
                         if ($location.port()) {
                             $window.location.href = "http://" + $location.host() + ":" + $location.port() + $scope.editPostModel.postPath;
                         } else {
@@ -65,7 +65,6 @@ angular.module('app')
                             PostService.submitPostUpdate($scope.editPostModel)
                                 .success(function (resp) {
                                     $rootScope.main.responseStatusHandler(resp);
-                                    $rootScope.showToast('success', 'Saved');
                                     $rootScope.main.redirectToPage('/post/' + resp.thePost.postIndex);
                                 })
                                 .error(function (errResponse) {

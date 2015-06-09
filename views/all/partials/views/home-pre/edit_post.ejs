@@ -8,7 +8,8 @@
                 <div class="panel panel-default">
 
                     <div class="panel-heading">
-                        <a ng-click="$root.main.back()"><i class="fa fa-arrow-left"></i> BACK</a>
+                        <a ng-click="back()"
+                           target="_self"><i class="fa fa-arrow-left"></i> BACK</a>
                     </div>
 
                     <div class="panel-body">
@@ -83,9 +84,11 @@
 
                                 <div class="pull-right">
                                     <a class="btn btn-default btn-sm"
-                                       href ng-click="cancelPostUpdate();">Cancel</a>
+                                       href ng-click="cancelPostUpdate();"
+                                       target="_self">Cancel</a>
                                     <a class="btn btn-default btn-sm"
-                                       href ng-click="submitPostUpdate();">Save</a>
+                                       href ng-click="submitPostUpdate();"
+                                       target="_self">Save</a>
                                 </div>
 
                             </div>

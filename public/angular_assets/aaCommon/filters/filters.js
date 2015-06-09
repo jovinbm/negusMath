@@ -410,14 +410,35 @@ angular.module('app')
             }
         }
     }])
-    .filter("responseFilter", ['$q', '$log', '$window', '$rootScope', function ($q, $log, $window, $rootScope) {
-        //making embedded videos responsive
+    .filter("responseFilter", ['$q', '$log', '$window', '$rootScope', 'notifications', 'ngDialog', function ($q, $log, $window, $rootScope, notifications, ngDialog) {
         return function (resp) {
             function makeBanner(show, bannerClass, msg) {
                 return {
                     show: show ? true : false,
                     bannerClass: bannerClass,
                     msg: msg
+                }
+            }
+
+            function showNotificationBar(type, msg) {
+                switch (type) {
+                    case "success":
+                        notifications.showSuccess({
+                            message: msg
+                        });
+                        break;
+                    case "warning":
+                        notifications.showWarning({
+                            message: msg
+                        });
+                        break;
+                    case "error":
+                        notifications.showError({
+                            message: msg
+                        });
+                        break;
+                    default:
+                    //toastr.clear();
                 }
             }
 
@@ -430,7 +451,21 @@ angular.module('app')
                 if (resp.notify) {
                     if (resp.type && resp.msg) {
                         $rootScope.showToast(resp.type, resp.msg);
-                        //$rootScope.showNotfBanner(resp.type, resp.msg);
+                        //showNotificationBar(resp.type, resp.msg);
+                    }
+                }
+                if (resp.dialog) {
+                    if (resp.id) {
+                        switch (resp.id) {
+                            case "not-authorized":
+                                not_authorized_dialog();
+                                break;
+                            case "sign-in":
+                                sign_in_dialog();
+                                break;
+                            default:
+                            //do nothing
+                        }
                     }
                 }
                 if (resp.banner) {
@@ -461,5 +496,37 @@ angular.module('app')
             }
 
             return true;
+
+            function not_authorized_dialog() {
+                ngDialog.open({
+                    template: '/dialog/not-authorized.html',
+                    className: 'ngdialog-theme-default',
+                    overlay: true,
+                    showClose: false,
+                    closeByEscape: true,
+                    closeByDocument: true,
+                    cache: false,
+                    trapFocus: true,
+                    preserveFocus: true
+                })
+            }
+
+            function sign_in_dialog() {
+                ngDialog.openConfirm({
+                    template: '/dialog/sign-in.html',
+                    className: 'ngdialog-theme-default',
+                    overlay: true,
+                    showClose: false,
+                    closeByEscape: false,
+                    closeByDocument: false,
+                    cache: true,
+                    trapFocus: true,
+                    preserveFocus: true
+                }).then(function () {
+                    //do nothing
+                }, function () {
+                    $rootScope.main.redirectToPage('/index');
+                });
+            }
         }
     }]);

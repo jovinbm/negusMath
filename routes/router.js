@@ -41,6 +41,9 @@ function getTheUser(req) {
 
 module.exports = {
     index_Html: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'index_Html';
         receivedLogger(module);
 
@@ -55,6 +58,9 @@ module.exports = {
     },
 
     render_not_found: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'render_not_found';
         receivedLogger(module);
 
@@ -69,6 +75,9 @@ module.exports = {
     },
 
     render_not_authorized_access_page: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'render_not_authorized_access_page';
         receivedLogger(module);
 
@@ -83,6 +92,9 @@ module.exports = {
     },
 
     render_not_logged_in: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'render_not_logged_in';
         receivedLogger(module);
 
@@ -97,6 +109,9 @@ module.exports = {
     },
 
     render_error_500: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'render_error_500';
         receivedLogger(module);
 
@@ -111,6 +126,9 @@ module.exports = {
     },
 
     renderHome_Html: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'renderHome_Html';
         receivedLogger(module);
 
@@ -124,7 +142,12 @@ module.exports = {
             };
 
             main.limit = 10;
-            main.pageNumber = 1;
+
+            if (req.query.page) {
+                main.pageNumber = parseInt(req.query.page);
+            } else {
+                main.pageNumber = 1;
+            }
 
             post_handler.getPosts(null, null, main.pageNumber, main.limit, gotPosts);
             function gotPosts(obj) {
@@ -179,6 +202,9 @@ module.exports = {
     },
 
     renderPosts_partial: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'renderPosts_partial';
         receivedLogger(module);
 
@@ -190,9 +216,9 @@ module.exports = {
             accountStatusBanner: account.returnAccountStatusBanner(req.user)
         };
 
-        if (req.params.pageNumber) {
+        if (req.query.page) {
             main.limit = 10;
-            main.pageNumber = parseInt(req.params.pageNumber);
+            main.pageNumber = parseInt(req.query.page);
 
             post_handler.getPosts(null, null, main.pageNumber, main.limit, gotPosts);
             function gotPosts(obj) {
@@ -220,13 +246,16 @@ module.exports = {
             res.status(500).send({
                 code: 500,
                 notify: true,
-                type: 'error',
+                type: 'warning',
                 msg: 'An error has occurred. Please try again'
             });
         }
     },
 
     renderIndividualPost: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'renderIndividualPost';
         receivedLogger(module);
 
@@ -289,6 +318,9 @@ module.exports = {
 
 
     manage_users: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'manage_users';
         receivedLogger(module);
 
@@ -304,6 +336,9 @@ module.exports = {
     },
 
     new_post: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'new_post';
         receivedLogger(module);
 
@@ -319,6 +354,9 @@ module.exports = {
     },
 
     edit_post: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'edit_post';
         receivedLogger(module);
 
@@ -352,6 +390,9 @@ module.exports = {
     },
 
     search_posts: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'search_posts';
         receivedLogger(module);
 
@@ -363,11 +404,11 @@ module.exports = {
             accountStatusBanner: account.returnAccountStatusBanner(req.user)
         };
 
-        if (req.params.queryString) {
+        if (req.query.q) {
             main.limit = 10;
-            main.queryString = req.params.queryString;
+            main.queryString = req.query.q;
             main.title = main.queryString + ' - NegusMath Search';
-            main.pageNumber = parseInt(req.params.pageNumber) || 1;
+            main.pageNumber = parseInt(req.query.page) || 1;
 
             post_handler.mainSearch(null, null, main.queryString, main.limit, main.pageNumber, searchFinished);
 
@@ -419,11 +460,14 @@ module.exports = {
         }
 
         function error() {
-            res.redirect('/error/500');
+            res.redirect('/');
         }
     },
 
     search_posts_partial: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'search_posts_partial';
         receivedLogger(module);
 
@@ -435,11 +479,11 @@ module.exports = {
             accountStatusBanner: account.returnAccountStatusBanner(req.user)
         };
 
-        if (req.params.queryString) {
+        if (req.query.q) {
             main.limit = 10;
-            main.queryString = req.params.queryString;
+            main.queryString = req.query.q;
             main.title = main.queryString + ' - NegusMath Search';
-            main.pageNumber = parseInt(req.params.pageNumber) || 1;
+            main.pageNumber = parseInt(req.query.page) || 1;
 
             post_handler.mainSearch(null, null, main.queryString, main.limit, main.pageNumber, searchFinished);
 
@@ -469,13 +513,50 @@ module.exports = {
             res.status(500).send({
                 code: 500,
                 notify: true,
-                type: 'error',
+                type: 'warning',
                 msg: 'An error has occurred. Please try again'
             });
         }
     },
 
+    dialog_not_authorized: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
+        var module = 'dialog_not_authorized';
+        receivedLogger(module);
+
+        var main = {
+            title: 'Negus Math - College Level Advanced Mathematics for Kenya Students',
+            theUser: req.user,
+            partial: false,
+            accountStatusBanner: account.returnAccountStatusBanner(req.user)
+        };
+        res.render('dialogs/not-authorized-dialog.ejs', main);
+
+    },
+
+    dialog_sign_in: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
+        var module = 'dialog_sign_in';
+        receivedLogger(module);
+
+        var main = {
+            title: 'Negus Math - College Level Advanced Mathematics for Kenya Students',
+            theUser: req.user,
+            partial: false,
+            accountStatusBanner: account.returnAccountStatusBanner(req.user)
+        };
+        res.render('dialogs/sign-in-dialog.ejs', main);
+
+    },
+
     renderEmail: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'renderEmail';
         receivedLogger(module);
 

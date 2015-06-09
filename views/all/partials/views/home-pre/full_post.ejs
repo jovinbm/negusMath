@@ -1,7 +1,8 @@
 <div>
     <div class="panel panel-default">
         <div>
-            <div class="panel-heading"><a href ng-click="back()"><i class="fa fa-arrow-left"></i> BACK</a></div>
+            <div class="panel-heading"><a href ng-click="back()"
+                                          target="_self"><i class="fa fa-arrow-left"></i> BACK</a></div>
 
             <% if(post.postUniqueCuid) { %>
             <div class="panel-body">
@@ -9,7 +10,8 @@
 
                     <div class="card-content">
 
-                        <h2 class="text-outputs postHeading"><a href="<%= post.postPath %>">
+                        <h2 class="text-outputs postHeading"><a href="<%= post.postPath %>"
+                                                                target="_self">
                                 <%= post.postHeading %>
                             </a>
                         </h2>
@@ -41,11 +43,13 @@
 
                             <div ng-init="postUniqueCuid = '<%- post.postUniqueCuid %>'">
                                 <a class="btn-link btn btn-default btn-sm"
-                                   href="<%= '/edit/post/' + post.postIndex %>">Edit
+                                   href="<%= '/edit/post/' + post.postIndex %>"
+                                   target="_self">Edit
                                 </a>
 
                                 <a class="btn-link btn btn-default btn-sm"
-                                   ng-click="trashPost(postUniqueCuid)">Delete
+                                   ng-click="trashPost(postUniqueCuid)"
+                                   target="_self">Delete
                                 </a>
                             </div>
                         </div>

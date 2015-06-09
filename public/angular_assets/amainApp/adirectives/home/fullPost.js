@@ -54,13 +54,4 @@ angular.module('app')
                 });
             }
         }
-    }])
-    .directive('fullPost', ['$q', '$log', '$rootScope', 'globals', 'PostService', function ($q, $log, $rootScope, globals, PostService) {
-        return {
-            templateUrl: 'views/all/partials/views/home/full_post.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                //full_post.html depends on fullPostScope
-            }
-        }
     }]);

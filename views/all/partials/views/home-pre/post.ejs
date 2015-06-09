@@ -54,7 +54,8 @@
                             <% popularStories.forEach(function(popular, index){ %>
                             <li class="list-group-item post">
                                 <p class="text-outputs">
-                                    <a href="<%= popular.postPath %>">
+                                    <a href="<%= popular.postPath %>"
+                                       target="_self">
                                         <%= popular.postHeading %>
                                     </a> <br/>
                                 <h6 class="text-muted">

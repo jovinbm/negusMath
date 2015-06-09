@@ -14,15 +14,15 @@ angular.module('app')
 
                     if (!name || name.length == 0) {
                         ++errors;
-                        $rootScope.showToast('warning', "Please enter your name");
+                        $rootScope.main.showToast('warning', "Please enter your name");
                         return -1
                     } else if (!email || email.length == 0) {
                         ++errors;
-                        $rootScope.showToast('warning', "Please enter a valid email");
+                        $rootScope.main.showToast('warning', "Please enter a valid email");
                         return -1
                     } else if (!message || message.length == 0) {
                         ++errors;
-                        $rootScope.showToast('warning', "Message field is empty");
+                        $rootScope.main.showToast('warning', "Message field is empty");
                         return -1;
                     } else if (errors == 0) {
                         return 1;

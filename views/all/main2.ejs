@@ -26,6 +26,7 @@
 <div toastr-directive></div>
 
 <% include partials/components-pre/top_nav.ejs %>
+<div notifications-bar class="notifications" closeIcon="fa fa-times-circle"></div>
 
 <div>
 
@@ -80,10 +81,8 @@
 <% include partials/templates/all_users.ejs %>
 <% include partials/templates/banned_users.ejs %>
 <% include partials/templates/edit_post_uploader.ejs %>
-<% include partials/templates/loading_banner.ejs %>
 <% include partials/templates/new_post_banner.ejs %>
 <% include partials/templates/new_post_uploader.ejs %>
-<% include partials/templates/pager.ejs %>
 <% include partials/templates/post_content.ejs %>
 <% include partials/templates/post_summary.ejs %>
 <% include partials/templates/post_tags.ejs %>
@@ -92,11 +91,6 @@
 <% include partials/templates/unApproved_users.ejs %>
 <% include partials/templates/user_display.ejs %>
 <% include partials/templates/user_statistics.ejs %>
-
-<% include partials/views/home/edit_post.ejs %>
-<% include partials/views/home/full_post.ejs %>
-<% include partials/views/home/new_post.ejs %>
-<% include partials/views/home/post_stream.ejs %>
 
 <!-- JAVASCRIPT -->
 

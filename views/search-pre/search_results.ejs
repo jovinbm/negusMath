@@ -13,7 +13,8 @@
 
     <div>
         <div class="panel-heading"><i class="fa fa-leanpub"></i> SEARCH RESULTS
-            <span class="pull-right"><a href ng-click="$root.main.back()"><i
+            <span class="pull-right"><a href ng-click="$root.main.back()"
+                                        target="_self"><i
                             class="fa fa-arrow-left"></i> BACK</a></span>
         </div>
 
@@ -31,7 +32,8 @@
 
             <div class="card-content">
 
-                <h2 class="text-outputs postHeading"><a href="<%= post.postPath %>">
+                <h2 class="text-outputs postHeading"><a href="<%= post.postPath %>"
+                                                        target="_self">
                         <%= post.postHeading %>
                     </a>
                 </h2>
@@ -63,7 +65,8 @@
 
                 <div class="pull-right">
                     <a href="<%= post.postPath %>"
-                       class="btn btn-default btn-sm">Read More</a>
+                       class="btn btn-default btn-sm"
+                       target="_self">Read More</a>
                 </div>
 
             </div>
@@ -129,7 +132,8 @@
 
     <div class="card-content">
 
-        <h2 class="text-outputs postHeading"><a href="<%= post.postPath %>">
+        <h2 class="text-outputs postHeading"><a href="<%= post.postPath %>"
+                                                target="_self">
                 <%= post.postHeading %>
             </a>
         </h2>
@@ -161,6 +165,7 @@
 
         <div class="pull-right">
             <a href="<%= post.postPath %>"
+               target="_self"
                class="btn btn-default btn-sm">Read More</a>
         </div>
 

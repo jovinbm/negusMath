@@ -43,5 +43,17 @@ module.exports = {
         } else {
             return false;
         }
+    },
+
+    getLastPage: function (req) {
+        if (req.session) {
+            if (req.session.lastPage) {
+                return req.session.lastPage;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 };

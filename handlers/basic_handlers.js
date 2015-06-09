@@ -61,7 +61,7 @@ module.exports = {
             res.status(500).send({
                 code: 500,
                 notify: true,
-                type: 'success',
+                type: 'warning',
                 msg: 'An error occurred. Please try again'
             });
         }

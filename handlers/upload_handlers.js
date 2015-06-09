@@ -33,6 +33,8 @@ function getTheUser(req) {
 
 module.exports = {
     uploadPostImageToS3: function (req, res, file) {
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'uploadPostImageToS3';
         receivedLogger(module);
         var finalFilePath = 'images/post_images/' + file.name;
@@ -87,6 +89,8 @@ module.exports = {
     },
 
     uploadPdfToS3: function (req, res, file) {
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'uploadPdfToS3';
         receivedLogger(module);
         var finalFilePath = 'pdf_files/' + file.name;
@@ -141,6 +145,8 @@ module.exports = {
     },
 
     uploadZipToS3: function (req, res, file) {
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'uploadZipToS3';
         receivedLogger(module);
         var finalFilePath = 'zip_files/' + file.name;

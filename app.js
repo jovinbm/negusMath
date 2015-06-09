@@ -118,18 +118,19 @@ app.use(passport.session());
 require('./passport/passport.js')(passport, LocalStrategy);
 
 //getting files
-app.get('/index', routes.index_Html);
-app.get('/', routes.renderHome_Html);
-app.param('pageNumber', /^[0-9]+$/);
-app.get('/partial/posts/:pageNumber', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, routes.renderPosts_partial);
+app.get('/index', middleware.addLastPage, routes.index_Html);
+app.get('/', middleware.addLastPage, routes.renderHome_Html);
+app.get('/posts', middleware.addLastPage, middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, routes.renderHome_Html);
+app.get('/partial/posts', middleware.addLastPage, middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, routes.renderPosts_partial);
 app.param('postIndex', /^[0-9]+$/);
-app.get('/post/:postIndex', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.renderIndividualPost);
-app.get('/manage/users', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, middleware.checkUserIsAdmin, routes.manage_users);
-app.get('/new/post', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, middleware.checkUserIsAdmin, routes.new_post);
-app.get('/edit/post/:postIndex', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, middleware.checkUserIsAdmin, routes.edit_post);
-app.param('pageNumber', /^[0-9]+$/);
-app.get('/search/posts/:queryString/:pageNumber', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.search_posts);
-app.get('/partial/search/posts/:queryString/:pageNumber', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, routes.search_posts_partial);
+app.get('/post/:postIndex', middleware.addLastPage, middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.renderIndividualPost);
+app.get('/manage/users', middleware.addLastPage, middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, middleware.checkUserIsAdmin, routes.manage_users);
+app.get('/new/post', middleware.addLastPage, middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, middleware.checkUserIsAdmin, routes.new_post);
+app.get('/edit/post/:postIndex', middleware.addLastPage, middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, middleware.checkUserIsAdmin, routes.edit_post);
+app.get('/search/posts', middleware.addLastPage, middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.search_posts);
+app.get('/partial/search/posts', middleware.addLastPage, middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, routes.search_posts_partial);
+app.get('/dialog/not-authorized.html', routes.dialog_not_authorized);
+app.get('/dialog/sign-in.html', routes.dialog_sign_in);
 
 
 //email api
@@ -202,9 +203,7 @@ function clientErrorHandler(err, req, res, next) {
             code: 500,
             notify: true,
             type: 'error',
-            banner: true,
-            bannerClass: 'alert alert-dismissible alert-warning',
-            msg: 'An error occurred. Please try again or reload page',
+            msg: 'An unknown error occurred. Please try again or reload page',
             disable: true
         });
     } else {

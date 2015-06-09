@@ -1,3 +1,4 @@
+//angular sanitize included in textAngular
 angular.module('app')
     .run(['$templateCache', '$http', '$rootScope', '$state', '$stateParams', function ($templateCache, $http, $rootScope, $state, $stateParams) {
         $rootScope.$state = $state;
@@ -7,7 +8,8 @@ angular.module('app')
         };
     }])
 
-    .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
+    .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', 'notificationsConfigProvider', function ($stateProvider, $urlRouterProvider, $locationProvider, notificationsConfigProvider) {
+        $locationProvider.html5Mode(true);
         //    $urlRouterProvider
         //        .when("/home/stream/", '/home/stream/1')
         //        .when("/home/post/", '/home')
@@ -44,5 +46,9 @@ angular.module('app')
         //$locationProvider
         //    .html5Mode(false)
         //    .hashPrefix('!');
+
+        notificationsConfigProvider.setAutoHide(true);
+        notificationsConfigProvider.setHideDelay(10000);
+        notificationsConfigProvider.setAcceptHTML(true);
     }])
     .value('duScrollOffset', 60);

@@ -34,6 +34,9 @@ function getTheUser(req) {
 
 module.exports = {
     uploadPostImage: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'uploadPostImage';
         receivedLogger(module);
 
@@ -67,6 +70,9 @@ module.exports = {
     },
 
     uploadPdf: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'uploadPdf';
         receivedLogger(module);
 
@@ -100,6 +106,9 @@ module.exports = {
     },
 
     uploadZip: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
+        var forms = require('../functions/forms.js');
         var module = 'uploadZip';
         receivedLogger(module);
 

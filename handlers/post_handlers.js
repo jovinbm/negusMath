@@ -30,6 +30,7 @@ module.exports = {
 
 
     newPost: function (req, res, theNewPost) {
+        var forms = require('../functions/forms.js');
         var module = 'newPost';
         receivedLogger(module);
 
@@ -66,12 +67,13 @@ module.exports = {
                 code: 500,
                 notify: true,
                 type: 'warning',
-                msg: 'Failed to createPost. Please try again'
+                msg: 'Failed to create post. Please try again'
             });
         }
     },
 
     updatePost: function (req, res, thePost) {
+        var forms = require('../functions/forms.js');
         var module = 'updatePost';
         receivedLogger(module);
 
@@ -114,6 +116,7 @@ module.exports = {
     },
 
     getPosts: function (req, res, page, quantity, callBack) {
+        var forms = require('../functions/forms.js');
         var module = 'getPosts';
         receivedLogger(module);
 
@@ -139,8 +142,8 @@ module.exports = {
             if (res) {
                 res.status(500).send({
                     code: 500,
-                    banner: true,
-                    bannerClass: 'alert alert-dismissible alert-warning',
+                    notify: true,
+                    type: 'warning',
                     msg: 'Failed to retrieve posts. Please reload this page',
                     disable: true
                 });
@@ -149,8 +152,8 @@ module.exports = {
             if (callBack) {
                 var temp = {
                     code: 500,
-                    banner: true,
-                    bannerClass: 'alert alert-dismissible alert-warning',
+                    notify: true,
+                    type: 'warning',
                     msg: 'Failed to retrieve posts. Please reload this page',
                     disable: true
                 };
@@ -160,6 +163,7 @@ module.exports = {
     },
 
     getSuggestedPosts: function (req, res, quantity, callBack) {
+        var forms = require('../functions/forms.js');
         var module = 'getSuggestedPosts';
         receivedLogger(module);
 
@@ -196,6 +200,7 @@ module.exports = {
 
 
     getPost: function (req, res, postIndex, callBack) {
+        var forms = require('../functions/forms.js');
         var module = 'getPost';
         receivedLogger(module);
 
@@ -223,8 +228,8 @@ module.exports = {
             if (res) {
                 res.status(500).send({
                     code: 500,
-                    banner: true,
-                    bannerClass: 'alert alert-dismissible alert-warning',
+                    notify: true,
+                    type: 'warning',
                     msg: 'Failed to retrieve this post. Please try again or reload this page',
                     disable: true
                 });
@@ -233,8 +238,8 @@ module.exports = {
             if (callBack) {
                 var temp = {
                     code: 500,
-                    banner: true,
-                    bannerClass: 'alert alert-dismissible alert-warning',
+                    notify: true,
+                    type: 'warning',
                     msg: 'Failed to retrieve this post. Please try again or reload this page',
                     disable: true
                 };
@@ -249,8 +254,8 @@ module.exports = {
                 res.status(200).send({
                     thePost: {},
                     code: 200,
-                    banner: true,
-                    bannerClass: 'alert alert-dismissible alert-warning',
+                    notify: true,
+                    type: 'warning',
                     msg: "The post you're looking for is either deleted or has never existed before"
                 });
             }
@@ -259,8 +264,8 @@ module.exports = {
                 var temp = {
                     thePost: {},
                     code: 200,
-                    banner: true,
-                    bannerClass: 'alert alert-dismissible alert-warning',
+                    notify: true,
+                    type: 'warning',
                     msg: "The post you're looking for is either deleted or has never existed before"
                 };
                 callBack(temp);
@@ -269,6 +274,7 @@ module.exports = {
     },
 
     getPopularStories: function (req, res, quantity, callBack) {
+        var forms = require('../functions/forms.js');
         var module = 'getPopularStories';
         receivedLogger(module);
 
@@ -315,6 +321,7 @@ module.exports = {
     },
 
     trashPost: function (req, res, postUniqueCuid) {
+        var forms = require('../functions/forms.js');
         var module = 'trashPost';
         receivedLogger(module);
 
@@ -332,6 +339,7 @@ module.exports = {
     },
 
     unTrashPost: function (req, res, postUniqueCuid) {
+        var forms = require('../functions/forms.js');
         var module = 'unTrashPost';
         receivedLogger(module);
 
@@ -349,6 +357,7 @@ module.exports = {
     },
 
     deletePost: function (req, res, postUniqueCuid) {
+        var forms = require('../functions/forms.js');
         var module = 'deletePost';
         receivedLogger(module);
 
@@ -367,6 +376,7 @@ module.exports = {
 
 
     mainSearch: function (req, res, queryString, quantity, requestedPage, callBack) {
+        var forms = require('../functions/forms.js');
         var module = 'mainSearch';
         receivedLogger(module);
 

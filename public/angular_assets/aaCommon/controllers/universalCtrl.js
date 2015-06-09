@@ -1,6 +1,6 @@
 angular.module('app')
-    .controller('UniversalController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'socketService', 'globals', '$document',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, socketService, globals, $document) {
+    .controller('UniversalController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'socketService', 'globals', '$document', 'notifications',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, socketService, globals, $document, notifications) {
 
             //index page url
             $scope.indexPageUrl = globals.allData.indexPageUrl;
@@ -43,6 +43,10 @@ angular.module('app')
                     $filter('responseFilter')(resp);
                 },
 
+                showToast: function (type, msg) {
+                    $rootScope.showToast(type, msg);
+                },
+
                 clearBanners: function () {
                     $rootScope.$broadcast('clearBanners');
                 },
@@ -59,6 +63,12 @@ angular.module('app')
 
                 redirectToPage: function (pathWithFirstSlash) {
                     $window.location.href = globals.getLocationHost() + pathWithFirstSlash;
+                },
+
+                showDialogBox: function (dialogId) {
+                    if ($rootScope.showDialog) {
+                        $rootScope.showDialog(dialogId);
+                    }
                 }
 
             };
@@ -120,31 +130,6 @@ angular.module('app')
                 $rootScope.main.clearBanners();
                 $rootScope.clearToasts();
             });
-
-            //notification banner
-            //$rootScope.showNotfBanner = function (type, text) {
-            //    console.log(type + ' ' + text);
-            //    switch (type) {
-            //        case "success":
-            //            notifications.showSuccess({
-            //                message: text
-            //            });
-            //            break;
-            //        case "warning":
-            //            notifications.showWarning({
-            //                message: text
-            //            });
-            //            break;
-            //        case "error":
-            //            notifications.showError({
-            //                message: text
-            //            });
-            //            break;
-            //        default:
-            //        //clears current list of toasts
-            //        //do nothing
-            //    }
-            //};
 
             //===============socket listeners===============
 

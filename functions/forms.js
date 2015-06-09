@@ -277,8 +277,8 @@ module.exports = {
             consoleLogger(errorLogger(module, errorMessage));
             res.status(401).send({
                 code: 401,
-                registrationBanner: true,
-                bannerClass: 'alert alert-dismissible alert-warning',
+                notify: true,
+                type: 'warning',
                 msg: errorMessage
             });
         }
@@ -485,8 +485,8 @@ module.exports = {
             consoleLogger(errorLogger(module, errorMessage));
             res.status(500).send({
                 code: 500,
-                banner: true,
-                bannerClass: 'alert alert-dismissible alert-warning',
+                notify: true,
+                type: 'warning',
                 msg: errorMessage
             });
         }
@@ -533,8 +533,8 @@ module.exports = {
             consoleLogger(errorLogger(module, errorMessage));
             res.status(500).send({
                 code: 500,
-                newPostBanner: true,
-                bannerClass: 'alert alert-dismissible alert-warning',
+                notify: true,
+                type: 'warning',
                 msg: errorMessage
             });
         }

@@ -10,6 +10,7 @@
                 <span class="icon-bar"></span>
             </button>
             <a href ng-click="$root.main.goToTop();"
+               target="_self"
                class="navbar-brand">
                 <i class="fa fa-leanpub"></i>
                 NEGUS
@@ -26,7 +27,8 @@
                 </li>
 
                 <li>
-                    <a ng-href="{{indexPageUrl}}">About</a>
+                    <a ng-href="{{indexPageUrl}}"
+                       target="_self">About</a>
                 </li>
 
                 <% if (theUser && theUser.isRegistered && theUser.isAdmin && accountStatusBanner.accountStatus) { %>
@@ -74,6 +76,7 @@
                 <a type="button"
                    class="btn btn-warning btn-sm navbar-btn pull-right ng-cloak"
                    href ng-click="$root.back()"
+                   target="_self"
                    role="button">
                     <i class="fa fa-pencil"></i> Cancel
                 </a>

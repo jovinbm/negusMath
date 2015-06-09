@@ -8,10 +8,12 @@ angular.module('app', [
     'ui.router',
     'duScroll',
     'ngFx',
+    'ngNotificationsBar',
     'textAngular',
     'angularUtils.directives.dirDisqus',
     'ngTagsInput',
     'ui.utils',
     'ngFileUpload',
-    'toastr'
+    'toastr',
+    'ngDialog'
 ]);

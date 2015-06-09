@@ -37,7 +37,8 @@ angular.module('app')
 
                 getPostsFromServer: function (getModelObject) {
                     var pageNumber = getModelObject.requestedPage;
-                    return $http.get('/partial/posts/' + pageNumber)
+                    History.pushState(null, null, "/posts?page=" + parseInt(pageNumber));
+                    return $http.get('/partial/posts?page=' + parseInt(pageNumber));
                 },
 
                 updatePosts: function (postsArray, pageNumber) {
@@ -137,7 +138,8 @@ angular.module('app')
                 postSearch: function (searchObject) {
                     var queryString = searchObject.queryString;
                     var pageNumber = searchObject.requestedPage;
-                    return $http.get('/partial/search/posts/' + queryString + '/' + pageNumber);
+                    History.pushState(null, null, "/search/posts?q=" + queryString + '&page=' + parseInt(pageNumber));
+                    return $http.get('/partial/search/posts?q=' + queryString + '&page=' + parseInt(pageNumber));
                 },
 
                 //admin actions

@@ -1,6 +1,7 @@
 <script type="text/ng-template" id="views/all/partials/templates/user_display.html">
     <tr ng-class="{'warning': user.isBanned.status, 'success': user.isAdmin}">
-        <td><a href ng-click="isCollapsed = !isCollapsed">{{user.firstName + ' ' + user.lastName}}</a>
+        <td><a href ng-click="isCollapsed = !isCollapsed"
+               target="_self">{{user.firstName + ' ' + user.lastName}}</a>
             <small class="very-small-font"
                    ng-show="user.isAdmin">(admin)
             </small>
@@ -12,18 +13,21 @@
         <td>
             <div ng-hide="user.isBanned.status">
                 <a class="btn btn-xs btn-default"
-                   href ng-click="banUser(user.uniqueCuid)">Ban user</a>
+                   href ng-click="banUser(user.uniqueCuid)"
+                   target="_self">Ban user</a>
             </div>
             <div ng-show="user.isBanned.status">
                 <a class="btn btn-xs btn-default"
-                   href ng-click="unBanUser(user.uniqueCuid)">Reactivate</a>
+                   href ng-click="unBanUser(user.uniqueCuid)"
+                   target="_self">Reactivate</a>
             </div>
         </td>
         <td>
             <div ng-hide="user.isApproved">
                 <a class="btn btn-xs btn-default"
                    ng-disabled="user.isBanned.status === true"
-                   href ng-click="approveUser(user.uniqueCuid)">Approve</a>
+                   href ng-click="approveUser(user.uniqueCuid)"
+                   target="_self">Approve</a>
             </div>
             <div ng-show="user.isApproved">
                 <a class="btn btn-xs btn-default disabled">Approved</a>
@@ -33,11 +37,13 @@
             <div ng-hide="user.isAdmin">
                 <a class="btn btn-xs btn-default"
                    ng-disabled="user.isBanned.status === true || user.isApproved === false || user.isAdmin === true"
-                   href ng-click="addAdminPrivileges(user.uniqueCuid)">Make Admin</a>
+                   href ng-click="addAdminPrivileges(user.uniqueCuid)"
+                   target="_self">Make Admin</a>
             </div>
             <div ng-show="user.isAdmin">
                 <a class="btn btn-xs btn-default"
-                   href ng-click="removeAdminPrivileges(user.uniqueCuid)">Remove Admin</a>
+                   href ng-click="removeAdminPrivileges(user.uniqueCuid)"
+                   target="_self">Remove Admin</a>
             </div>
         </td>
 
@@ -54,7 +60,8 @@
                     </small>
                     <small class="very-small-font"
                            ng-show="!user.emailIsConfirmed">(not confirmed) <a style="text-decoration: underline" href
-                                                                               ng-click="resendConfirmationEmail(user.uniqueCuid)">Resend
+                                                                               ng-click="resendConfirmationEmail(user.uniqueCuid)"
+                                                                               target="_self">Resend
                             email</a>
                     </small>
                 </li>

@@ -29,6 +29,8 @@ function getTheUser(req) {
 
 module.exports = {
     confirmEmail: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
         var module = 'confirmEmail';
         receivedLogger(module);
 
@@ -43,6 +45,8 @@ module.exports = {
     },
 
     resendConfirmationEmail: function (req, res) {
+        var account = require('../functions/account.js');
+        var middleware = require('../functions/middleware.js');
         var module = 'resendConfirmationEmail';
         receivedLogger(module);
 

@@ -1,0 +1,19 @@
+<div account-outer-dialog-scope>
+
+    <p class="text-center">Please sign in to continue</p>
+    <!--login form-->
+    <% include templates/sign_in.ejs %>
+    <!--end of login form-->
+
+
+    <!--registration form-->
+    <% include templates/create_account.ejs %>
+    <!--end of registration form-->
+
+    <div class="ngdialog-buttons">
+        <button type="button" class="ngdialog-button ngdialog-button-secondary" ng-click="closeThisDialog()">
+            Close
+        </button>
+    </div>
+
+</div>
