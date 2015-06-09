@@ -83,6 +83,19 @@ app.use("/uploads", express.static(path.join(__dirname, '/uploads')));
 app.use("/views", express.static(path.join(__dirname, '/views')));
 app.use("/error", express.static(path.join(__dirname, '/public/error')));
 
+//app.post('/contactUs', basicAPI.contactUs);
+app.get('/socket.io/socket.io.js', function (req, res) {
+    res.sendfile("socket.io/socket.io.js");
+});
+
+io.on('connection', function (socket) {
+    socket.on('joinRoom', function (data) {
+        var room = data.room;
+        socket.join(room);
+        socket.emit('joined');
+    });
+});
+
 //prerender-node
 app.use(require('prerender-node').set('prerenderServiceUrl', 'https://jbmprerender.herokuapp.com/'));
 
@@ -103,19 +116,6 @@ app.use(passport.session());
 
 //configure passport
 require('./passport/passport.js')(passport, LocalStrategy);
-
-io.on('connection', function (socket) {
-    socket.on('joinRoom', function (data) {
-        var room = data.room;
-        socket.join(room);
-        socket.emit('joined');
-    });
-});
-
-//app.post('/contactUs', basicAPI.contactUs);
-app.get('/socket.io/socket.io.js', function (req, res) {
-    res.sendfile("socket.io/socket.io.js");
-});
 
 //getting files
 app.get('/index', routes.index_Html);
