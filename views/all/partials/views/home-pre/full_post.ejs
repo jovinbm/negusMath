@@ -41,10 +41,12 @@
 
                             <div ng-init="postUniqueCuid = '<%- post.postUniqueCuid %>'">
                                 <a class="btn-link btn btn-default btn-sm"
-                                   href="<%= '/edit/post/' + post.postIndex %>">Edit</a>
+                                   href="<%= '/edit/post/' + post.postIndex %>">Edit
+                                </a>
 
                                 <a class="btn-link btn btn-default btn-sm"
-                                   ng-click="trashPost(postUniqueCuid)">Delete</a>
+                                   ng-click="trashPost(postUniqueCuid)">Delete
+                                </a>
                             </div>
                         </div>
 
@@ -53,14 +55,13 @@
                     </div>
                 </div>
 
-                <!--<div id="disqus-div">-->
-                <!--<dir-disqus disqus-shortname="negusmathproduction"-->
-                <!--disqus-identifier="{{main.post.postUniqueCuid}}"-->
-                <!--disqus-title="{{ main.post.postHeading }}"-->
-                <!--disqus-url="{{main.post.postAbsoluteUrl}}"-->
-                <!--ready-to-bind="{{main.postIsLoaded}}">-->
-                <!--</dir-disqus>-->
-                <!--</div>-->
+                <div id="disqus-div">
+                    <dir-disqus disqus-shortname="negusmathproduction"
+                                disqus-identifier="<%- post.postUniqueCuid %>"
+                                disqus-title="<%- post.postHeading %>"
+                                disqus-url="<%- post.postAbsoluteUrl %>"
+                    </dir-disqus>
+                </div>
             </div>
             <% } %>
 
