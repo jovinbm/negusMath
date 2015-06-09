@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .directive('bannedUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/banned_users.html',

@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .factory('PostService', ['$filter', '$http', '$window', '$rootScope', 'socket', 'globals',
         function ($filter, $http, $window, $rootScope, socket, globals) {
 
@@ -6,8 +6,6 @@ angular.module('mainApp')
             var editPostModel = {};
             var allPosts = {};
             var allPostsCount = 0;
-            var suggestedPosts = {};
-            var suggestedPostsCount = 0;
 
             socket.on('newPost', function (data) {
                 //data here has the keys post, postCount
@@ -140,23 +138,6 @@ angular.module('mainApp')
                     var queryString = searchObject.queryString;
                     var pageNumber = searchObject.requestedPage;
                     return $http.get('/partial/search/posts/' + queryString + '/' + pageNumber);
-                },
-
-                getSuggestedPosts: function () {
-                    return suggestedPosts;
-                },
-
-                getSuggestedPostsFromServer: function () {
-                    return $http.post('/api/getSuggestedPosts', {})
-                },
-
-                updateSuggestedPosts: function (suggestedPostsArray) {
-                    if (suggestedPostsArray == []) {
-                        suggestedPosts = [];
-                    } else {
-                        suggestedPosts = $filter('preparePostsNoChange')(null, suggestedPostsArray);
-                    }
-                    return suggestedPosts;
                 },
 
                 //admin actions

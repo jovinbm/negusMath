@@ -122,52 +122,6 @@ function preparePostsNoChange(post, posts, callBack) {
     }
 }
 
-function responseFilter(resp) {
-    function makeBanner(show, bannerClass, msg) {
-        return {
-            show: show ? true : false,
-            bannerClass: bannerClass,
-            msg: msg
-        }
-    }
-
-    if (resp) {
-        if (resp.redirect) {
-            if (resp.redirect) {
-                $window.location.href = resp.redirectPage;
-            }
-        }
-        if (resp.notify) {
-            if (resp.type && resp.msg) {
-                $rootScope.showToast(resp.type, resp.msg);
-            }
-        }
-        if (resp.banner) {
-            if (resp.bannerClass && resp.msg) {
-                $rootScope.$broadcast('universalBanner', makeBanner(true, resp.bannerClass, resp.msg));
-            }
-        }
-        if (resp.newPostBanner) {
-            if (resp.bannerClass && resp.msg) {
-                $rootScope.$broadcast('newPostBanner', makeBanner(true, resp.bannerClass, resp.msg));
-            }
-        }
-        if (resp.registrationBanner) {
-            if (resp.bannerClass && resp.msg) {
-                $rootScope.$broadcast('registrationBanner', makeBanner(true, resp.bannerClass, resp.msg));
-            }
-        }
-        if (resp.reason) {
-            $log.warn(resp.reason);
-        }
-    } else {
-        //do nothing
-    }
-
-    return true;
-}
-
-
 module.exports = {
     preparePosts: function (post, posts, callBack) {
         preparePosts(post, posts, callBack);

@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .directive('editPostDirectiveScope', ['$q', '$filter', '$log', '$window', '$location', '$rootScope', 'globals', 'PostService',
         function ($q, $filter, $log, $window, $location, $rootScope, globals, PostService) {
             return {

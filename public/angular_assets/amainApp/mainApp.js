@@ -1,25 +1,11 @@
-angular.module('mainApp', [
-    'ui.bootstrap',
-    'cfp.loadingBar',
-    'angulartics',
-    'angulartics.google.analytics',
-    'angularMoment',
-    'ui.router',
-    'duScroll',
-    'ngFx',
-    'textAngular',
-    'ngSanitize',
-    'angularUtils.directives.dirDisqus',
-    'ngTagsInput',
-    'ui.utils',
-    'ngFileUpload'
-])
+//angular sanitize included in textAngular
+angular.module('app')
     .run(['$templateCache', '$http', '$rootScope', '$state', '$stateParams', function ($templateCache, $http, $rootScope, $state, $stateParams) {
         $rootScope.$state = $state;
         $rootScope.$stateParams = $stateParams;
         $rootScope.Utils = {
             keys: Object.keys
-        }
+        };
     }])
 
     .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {

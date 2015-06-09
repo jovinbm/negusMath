@@ -8,6 +8,7 @@ var forms = require('../functions/forms.js');
 var fs = require('fs');
 var path = require('path');
 var s3 = require('../functions/s3.js');
+var account = require('../functions/account.js');
 
 var fileName = 'upload_handlers.js';
 
@@ -48,7 +49,7 @@ module.exports = {
                 msg: 'File successfully uploaded.'
             });
 
-            middleware.deleteFile(file.path, err_del, success_del);
+            account.deleteFile(file.path, err_del, success_del);
 
             function success_del() {
                 consoleLogger(successLogger(module, 'file successfully removed from file system'));
@@ -62,7 +63,7 @@ module.exports = {
         function error_neg_1() {
             consoleLogger(errorLogger(module));
             //remove file from filesystem
-            middleware.deleteFile(file.path, deleteError, deleteSuccess);
+            account.deleteFile(file.path, deleteError, deleteSuccess);
 
             function deleteSuccess() {
                 res.status(500).send({
@@ -102,7 +103,7 @@ module.exports = {
                 msg: 'File successfully uploaded.'
             });
 
-            middleware.deleteFile(file.path, err_del, success_del);
+            account.deleteFile(file.path, err_del, success_del);
 
             function success_del() {
                 consoleLogger(successLogger(module, 'file successfully removed from file system'));
@@ -116,7 +117,7 @@ module.exports = {
         function error_neg_1() {
             consoleLogger(errorLogger(module));
             //remove file from filesystem
-            middleware.deleteFile(file.path, deleteError, deleteSuccess);
+            account.deleteFile(file.path, deleteError, deleteSuccess);
 
             function deleteSuccess() {
                 res.status(500).send({
@@ -156,7 +157,7 @@ module.exports = {
                 msg: 'File successfully uploaded.'
             });
 
-            middleware.deleteFile(file.path, err_del, success_del);
+            account.deleteFile(file.path, err_del, success_del);
 
             function success_del() {
                 consoleLogger(successLogger(module, 'file successfully removed from file system'));
@@ -170,7 +171,7 @@ module.exports = {
         function error_neg_1() {
             consoleLogger(errorLogger(module));
             //remove file from filesystem
-            middleware.deleteFile(file.path, deleteError, deleteSuccess);
+            account.deleteFile(file.path, deleteError, deleteSuccess);
 
             function deleteSuccess() {
                 res.status(500).send({

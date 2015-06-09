@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .filter("validatePostHeading", ['$rootScope', function ($rootScope) {
         return function (postHeading, broadcast) {
             var errors = 0;

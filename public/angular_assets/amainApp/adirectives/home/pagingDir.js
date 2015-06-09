@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .directive('postStreamPager', ['$rootScope', 'PostService', function ($rootScope, PostService) {
         return {
 

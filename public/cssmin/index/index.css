@@ -134,13 +134,13 @@ div.card {
     margin-bottom: 0;
 }
 section#contact {
-    background-color: #222;
+    /*background-color: #222;*/
     background-position: center;
     background-repeat: no-repeat;
 }
 
 section#contact .section-heading {
-    color: #fff;
+    /*color: #fff;*/
 }
 
 section#contact .form-group {
@@ -672,7 +672,7 @@ body {
     padding-top: 60px;
 }
 section#login {
-    background-color: rgb(31, 168, 166);
+    /*background-color: rgb(31, 168, 166);*/
     background-position: center;
     background-repeat: no-repeat;
 }

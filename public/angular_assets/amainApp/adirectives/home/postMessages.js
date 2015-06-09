@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .directive('headingMessages', ['$filter', function ($filter) {
         return {
             template: '<span class="form-error-notice" ng-show="showSpan()">' +

@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .directive('trashPostDir', ['$rootScope', 'PostService', 'globals', function ($rootScope, PostService, globals) {
         return {
             template: ' <a class="btn-link btn btn-default btn-sm" href ng-click="trashPost(post.postUniqueCuid)">Delete</a>',

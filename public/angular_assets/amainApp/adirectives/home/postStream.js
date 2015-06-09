@@ -1,11 +1,10 @@
-angular.module('mainApp')
+angular.module('app')
     .directive('postStreamScope', ['$q', '$log', '$rootScope', 'globals', 'PostService', function ($q, $log, $rootScope, globals, PostService) {
         return {
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
 
                 $scope.theModel2 = JSON.parse($scope.model);
-                console.log($scope.theModel2);
 
                 function getPagePosts(pageNumber) {
 
@@ -17,6 +16,7 @@ angular.module('mainApp')
                         $scope.buttonLoading();
                         PostService.getPostsFromServer($scope.getModel)
                             .success(function (resp) {
+                                $rootScope.main.responseStatusHandler(resp);
                                 $scope.theModel2.pageNumber++;
                                 angular.element('#appendNextPosts').replaceWith(resp);
                                 $scope.finishedLoading();

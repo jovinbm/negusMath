@@ -9,6 +9,7 @@ var forms = require('../functions/forms.js');
 var fs = require('fs');
 var path = require('path');
 var s3 = require('../functions/s3.js');
+var account = require('../functions/account.js');
 
 var fileName = 'upload_api.js';
 
@@ -60,7 +61,7 @@ module.exports = {
                 code: 401,
                 notify: true,
                 type: 'warning',
-                msg: 'File should be less than ' + middleware.getHumanReadableFileSize(theFile.size)
+                msg: 'File should be less than ' + account.getHumanReadableFileSize(theFile.size)
             });
         }
     },
@@ -93,7 +94,7 @@ module.exports = {
                 code: 401,
                 notify: true,
                 type: 'warning',
-                msg: 'File should be less than ' + middleware.getHumanReadableFileSize(theFile.size)
+                msg: 'File should be less than ' + account.getHumanReadableFileSize(theFile.size)
             });
         }
     },
@@ -126,7 +127,7 @@ module.exports = {
                 code: 401,
                 notify: true,
                 type: 'warning',
-                msg: 'File should be less than ' + middleware.getHumanReadableFileSize(theFile.size)
+                msg: 'File should be less than ' + account.getHumanReadableFileSize(theFile.size)
             });
         }
     }

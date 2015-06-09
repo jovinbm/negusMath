@@ -117,9 +117,7 @@ module.exports = {
         var module = 'getPosts';
         receivedLogger(module);
 
-        var limit = quantity;
-
-        postDB.getPosts(-1, page, limit, error_neg_1, error_neg_1, success);
+        postDB.getPosts(-1, page, quantity, error_neg_1, error_neg_1, success);
 
         function success(postsArray, postsCount) {
             var temp = {};
@@ -302,13 +300,6 @@ module.exports = {
                     type: 'warning',
                     msg: 'Failed to retrieve this weeks top posts. Please reload page '
                 });
-            } else {
-                return {
-                    code: 500,
-                    notify: true,
-                    type: 'warning',
-                    msg: 'Failed to retrieve this weeks top posts. Please reload page '
-                }
             }
 
             if (callBack) {

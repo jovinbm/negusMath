@@ -33,3 +33,9 @@
 //provide e.g edited post has been saved info banner on redirected page
 
 //refill searchbox after searching and redirecting
+
+//deal with the 500 error responses
+
+//render error page or redirect to error page when error occurrs e.g in routerjs when rendering
+
+//when redirecting the user to login, save their last page

@@ -40,7 +40,13 @@ module.exports = {
 
         //check if the user with the uniqueCuid in the request exists
         if (req.isAuthenticated()) {
-            userDB.findUserWithUniqueCuid(req.user.uniqueCuid, serverError, serverError, success);
+            //remove private data
+            req.user.password = "";
+
+            consoleLogger(successLogger(module));
+            return res.status(200).send({
+                userData: req.user
+            });
         } else {
             //means this is just a random unregistered visitor
             consoleLogger(successLogger(module));
@@ -48,38 +54,6 @@ module.exports = {
                 userData: {
                     isRegistered: false
                 }
-            });
-        }
-
-        function success(theSavedUser) {
-            req.logIn(theSavedUser, function (err) {
-                if (err) {
-                    consoleLogger(errorLogger(module, err, err));
-                    return res.status(500).send({
-                        code: 500,
-                        notify: true,
-                        type: 'error',
-                        msg: "A problem occurred while retrieving your personalized settings. Please reload this page"
-                    });
-                } else {
-                    //remove private data
-                    theSavedUser.password = "";
-
-                    consoleLogger(successLogger(module));
-                    return res.status(200).send({
-                        userData: theSavedUser
-                    });
-                }
-            });
-        }
-
-        function serverError() {
-            consoleLogger(errorLogger(module));
-            res.status(500).send({
-                code: 500,
-                notify: true,
-                type: 'error',
-                msg: "A problem occurred while retrieving your personalized settings. Please reload this page"
             });
         }
     },
@@ -96,7 +70,7 @@ module.exports = {
                         code: 401,
                         signInBanner: true,
                         bannerClass: 'alert alert-dismissible alert-warning',
-                        msg: info || err
+                        msg: info.msg || 'An error occurred. Please try again.'
                     });
                 }
 
@@ -105,7 +79,7 @@ module.exports = {
                         code: 401,
                         signInBanner: true,
                         bannerClass: 'alert alert-dismissible alert-warning',
-                        msg: info || err
+                        msg: info.msg
                     });
                 }
 
@@ -129,6 +103,7 @@ module.exports = {
                     }
                 });
             })(req, res, next);
+
         } else {
             res.status(401).send({
                 code: 401,

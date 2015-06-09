@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .directive('userDisplay', ['$rootScope', 'UserService', 'socketService', 'globals', function ($rootScope, UserService, socketService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/user_display.html',

@@ -1,378 +1,129 @@
-angular.module('indexApp', [
+//angular sanitize included in textAngular
+angular.module('app', [
     'ui.bootstrap',
-    'angular-loading-bar',
+    'cfp.loadingBar',
     'angulartics',
     'angulartics.google.analytics',
     'angularMoment',
     'ui.router',
     'duScroll',
     'ngFx',
-    'ngAnimate',
-    'ui.utils'
-])
-    .run(function ($templateCache, $http) {
-        $rootScope.Utils = {
-            keys: Object.keys
-        }
-    });
+    'textAngular',
+    'angularUtils.directives.dirDisqus',
+    'ngTagsInput',
+    'ui.utils',
+    'ngFileUpload',
+    'toastr'
+]);
+angular.module('app')
+    .controller('PopularStoriesController', ['$q', '$log', '$scope', '$rootScope', 'PopularStoriesService', 'globals',
+        function ($q, $log, $scope, $rootScope, PopularStoriesService, globals) {
 
-//configuration of various modules
-angular.module('indexApp', ['duScroll'])
-    .value('duScrollOffset', 60);
-angular.module('indexApp')
-    .directive('accountOuterScope', ['$rootScope', function ($rootScope, logoutService) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                //variable to hold state between local login and creating a new account
-                //values =  signIn, register
-                $scope.userLoginState = 'signIn';
-                $scope.changeUserLoginState = function (newState) {
-                    $scope.userLoginState = newState;
-                };
+            $scope.popularStories = PopularStoriesService.getPopularStories();
+
+            function getPopularStories() {
+                PopularStoriesService.getPopularStoriesFromServer()
+                    .success(function (resp) {
+                        $rootScope.main.responseStatusHandler(resp);
+                        $scope.popularStories = PopularStoriesService.updatePopularStories(resp.popularStories);
+                    })
+                    .error(function (errResp) {
+                        $scope.popularStories = PopularStoriesService.updatePopularStories([]);
+                        $rootScope.main.responseStatusHandler(errResp);
+                    });
             }
-        }
-    }]);
-angular.module('indexApp')
-    .directive('signInBannerScope', ['$rootScope', function ($rootScope) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.signInBanner = {
-                    show: false,
-                    bannerClass: "",
-                    msg: ""
-                };
 
-                $rootScope.$on('signInBanner', function (event, banner) {
-                    $scope.signInBanner = banner;
-                });
+            getPopularStories();
 
-                $rootScope.$on('clearBanners', function () {
-                    $scope.signInBanner = {
-                        show: false,
-                        bannerClass: "",
-                        msg: ""
-                    };
-                })
-            }
-        }
-    }])
-    .directive('registrationBannerScope', ['$rootScope', function ($rootScope) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.registrationBanner = {
-                    show: false,
-                    bannerClass: "",
-                    msg: ""
-                };
+            //===============socket listeners===============
 
-                $rootScope.$on('registrationBanner', function (event, banner) {
-                    $scope.registrationBanner = banner;
-                });
-
-                $rootScope.$on('clearBanners', function () {
-                    $scope.registrationBanner = {
-                        show: false,
-                        bannerClass: "",
-                        msg: ""
-                    };
-                })
-            }
-        }
-    }])
-    .directive('toastrDirective', ['$rootScope', function ($rootScope) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $rootScope.showToast = function (toastType, text) {
-                    switch (toastType) {
-                        case "success":
-                            toastr.clear();
-                            toastr.success(text);
-                            break;
-                        case "warning":
-                            toastr.clear();
-                            toastr.warning(text, 'Warning', {
-                                closeButton: true,
-                                tapToDismiss: true
-                            });
-                            break;
-                        case "error":
-                            toastr.clear();
-                            toastr.error(text, 'Error', {
-                                closeButton: true,
-                                tapToDismiss: true,
-                                timeOut: false
-                            });
-                            break;
-                        default:
-                            //clears current list of toasts
-                            toastr.clear();
-                    }
-                };
-
-                $rootScope.clearToasts = function () {
-                    toastr.clear();
-                };
-            }
-        }
-    }])
-    .directive('loadingBanner', ['$rootScope', function ($rootScope) {
-        var controller = ['$scope', '$rootScope', 'cfpLoadingBar', function ($scope, $rootScope, cfpLoadingBar) {
-
-            $rootScope.isLoading = false;
-            $rootScope.isLoadingPercentage = 0;
-            $rootScope.changeIsLoadingPercentage = function (num) {
-                $rootScope.isLoadingPercentage = num;
-            };
-
-            //hides or shows the loading splash screen
-            $rootScope.showHideLoadingBanner = function (bool) {
-                if (bool) {
-                    $('#loading-splash-card').removeClass('hidden');
-                    $('.hideMobileLoading').addClass('hidden-xs hidden-sm');
-                } else {
-                    $('#loading-splash-card').addClass('hidden');
-                    $('.hideMobileLoading').removeClass('hidden-xs hidden-sm');
-                }
-            };
-
-            $rootScope.$on('cfpLoadingBar:loading', function (event, resp) {
-                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            $rootScope.$on('reconnect', function () {
+                getPopularStories();
             });
-
-            $rootScope.$on('cfpLoadingBar:loaded', function (event, resp) {
-                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
-            });
-
-            $rootScope.$on('cfpLoadingBar:completed', function (event, resp) {
-                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
-            });
-
-            $rootScope.isLoadingTrue = function () {
-                $rootScope.isLoading = true;
-            };
-            $rootScope.isLoadingFalse = function () {
-                $rootScope.isLoading = false;
-            };
-
-            $rootScope.$on('isLoadingTrue', function () {
-                $rootScope.isLoading = true;
-            });
-
-            $rootScope.$on('isLoadingFalse', function () {
-                $rootScope.isLoading = false;
-            });
-        }];
-
-        return {
-            templateUrl: 'views/client/partials/templates/loading_banner.html',
-            restrict: 'AE',
-            controller: controller
         }
-    }]);
-angular.module('indexApp')
-    .directive('contactUsScope', ['$rootScope', 'socketService', function ($rootScope, socketService) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.contactUsModel = {
-                    name: "",
-                    email: "",
-                    message: ""
-                };
+    ]);
+angular.module('app')
+    .controller('UniversalController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'socketService', 'globals', '$document',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, socketService, globals, $document) {
 
-                function validateContactUs(name, email, message) {
-                    var errors = 0;
-
-                    if (!name || name.length == 0) {
-                        ++errors;
-                        $rootScope.showToast('warning', "Please enter your name");
-                        return -1
-                    } else if (!email || email.length == 0) {
-                        ++errors;
-                        $rootScope.showToast('warning', "Please enter a valid email");
-                        return -1
-                    } else if (!message || message.length == 0) {
-                        ++errors;
-                        $rootScope.showToast('warning', "Message field is empty");
-                        return -1;
-                    } else if (errors == 0) {
-                        return 1;
-                    }
-                }
-
-                $scope.sendContactUs = function () {
-                    var formStatus = validateContactUs($scope.contactUsModel.name, $scope.contactUsModel.email, $scope.contactUsModel.message);
-                    if (formStatus == 1) {
-                        socketService.sendContactUs($scope.contactUsModel)
-                            .success(function (resp) {
-                                $scope.contactUsModel.name = "";
-                                $scope.contactUsModel.email = "";
-                                $scope.contactUsModel.message = "";
-                                $rootScope.responseStatusHandler(resp);
-                            })
-                            .error(function (errResp) {
-                                $rootScope.responseStatusHandler(errResp);
-                            });
-                    }
-                };
-            }
-        }
-    }]);
-angular.module('indexApp')
-    .directive('createAccountScope', ['$rootScope', 'socketService', function ($rootScope, socketService) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.registrationDetails = {
-                    email: "",
-                    firstName: "",
-                    lastName: "",
-                    username: "",
-                    password1: "",
-                    password2: "",
-                    invitationCode: ""
-                };
-
-                $scope.createAccount = function () {
-                    socketService.createAccount($scope.registrationDetails)
-                        .success(function (resp) {
-                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
-                            $rootScope.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $scope.registrationDetails.password1 = "";
-                            $scope.registrationDetails.password2 = "";
-                            $scope.registrationDetails.invitationCode = "";
-                            $rootScope.responseStatusHandler(errResponse);
-                        });
-                };
-            }
-        }
-    }]);
-angular.module('indexApp')
-    .directive('logoutScope', ['$rootScope', 'logoutService', function ($rootScope, logoutService) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.logoutClient = function () {
-                    logoutService.logoutClient()
-                        .success(function (resp) {
-                            $rootScope.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.responseStatusHandler(errResponse);
-                        });
-                };
-            }
-        }
-    }]);
-angular.module('indexApp')
-    .directive('resendEmailScope', ['$rootScope', 'socketService', function ($rootScope, socketService) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-
-                $scope.resendConfirmationEmail = function (userUniqueCuid) {
-                    console.log(userUniqueCuid);
-                    socketService.resendConfirmationEmail(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.responseStatusHandler(resp);
-                        })
-                        .error(function (err) {
-                            $rootScope.responseStatusHandler(err);
-                        })
-                };
-            }
-        }
-    }]);
-angular.module('indexApp')
-    .directive('signInScope', ['$rootScope', 'socketService', function ($rootScope, socketService) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.loginFormModel = {
-                    username: "",
-                    password: ""
-                };
-
-                $scope.submitLocalLoginForm = function () {
-                    socketService.localUserLogin($scope.loginFormModel)
-                        .success(function (resp) {
-                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
-                            $rootScope.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $scope.loginFormModel.password = "";
-                            $rootScope.responseStatusHandler(errResponse);
-                        });
-                };
-            }
-        }
-    }]);
-angular.module('indexApp')
-    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals',
-        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals) {
-
+            //index page url
             $scope.indexPageUrl = globals.allData.indexPageUrl;
 
-            //register error handler error handler
-            $rootScope.responseStatusHandler = function (resp) {
-                $filter('responseFilter')(resp);
-            };
+            //website host
+            $rootScope.currentHost = globals.getLocationHost();
 
-            //function that determines if it's okay for the user to proceed
-            $scope.checkAccountStatus = function (userData) {
-                if (userData) {
-                    if (userData.isRegistered) {
-                        if (userData.emailIsConfirmed == false) {
-                            return false;
-                        } else {
-                            if (userData.isApproved === false) {
-                                return false
-                            } else if (userData.isBanned) {
-                                if (userData.isBanned.status === true) {
-                                    //checking banned status
-                                    return false;
-                                } else {
-                                    return true;
-                                }
-                            } else {
-                                return true;
-                            }
-                        }
-                    } else {
-                        return false;
-                    }
-                } else {
-                    return false;
+            //disqus
+            $scope.showDisqus = $location.host().search("negusmath") !== -1;
+
+            //scrolling functions
+            var duration = 0; //milliseconds
+            var offset = 40; //pixels; adjust for floating menu, context etc
+            //Scroll to #some-id with 30 px "padding"
+            //Note: Use this in a directive, not with document.getElementById
+
+            $rootScope.main = {
+                currentTime: "",
+
+                showLoadingBannerDir: false,
+
+                showLoadingBanner: function () {
+                    this.showLoadingBannerDir = true;
+                },
+
+                hideLoadingBanner: function () {
+                    this.showLoadingBannerDir = false;
+                },
+
+                goToTop: function () {
+                    var someElement = angular.element(document.getElementById('top'));
+                    $document.scrollToElement(someElement, 80, duration);
+                },
+
+                broadcastUserData: function () {
+                    $rootScope.$broadcast('userDataChanges');
+                },
+
+                responseStatusHandler: function (resp) {
+                    $filter('responseFilter')(resp);
+                },
+
+                clearBanners: function () {
+                    $rootScope.$broadcast('clearBanners');
+                },
+
+                isLoading: true,
+
+                startLoading: function () {
+                    this.isLoading = true;
+                },
+
+                finishedLoading: function () {
+                    $rootScope.isLoading = false;
+                },
+
+                redirectToPage: function (pathWithFirstSlash) {
+                    $window.location.href = globals.getLocationHost() + pathWithFirstSlash;
                 }
+
             };
 
-            //this important function broadcasts the availability of the users data to directives that require
-            //it e.g. the account status directive
-            $scope.broadcastUserData = function () {
-                $rootScope.$broadcast('userDataChanges');
+            //=====================time functions=======================
+            //set current Date
+            $scope.currentTime = moment().format("ddd, MMM D, H:mm");
+            var updateCurrentTime = function () {
+                $scope.currentTime = moment().format("ddd, MMM D, H:mm");
             };
+            $interval(updateCurrentTime, 20000, 0, true);
 
-            $scope.clientIsRegistered = false;
-
-            //variable that holds the account status
-            $scope.accountStatusIsGood = false;
+            //======================end time functions===================
 
             //initial requests
             function initialRequests() {
                 socketService.getUserData()
                     .success(function (resp) {
+                        $rootScope.main.responseStatusHandler(resp);
                         $scope.userData = globals.userData(resp.userData);
-                        $scope.broadcastUserData();
-
-                        //important isRegistered variable
-                        $scope.clientIsRegistered = $scope.userData.isRegistered;
-                        $scope.accountStatusIsGood = $scope.checkAccountStatus($scope.userData);
+                        $rootScope.main.broadcastUserData();
 
                         if ($scope.userData.isRegistered) {
                             //join a socketRoom for websocket connection, equivalent to user's uniqueCuid
@@ -380,24 +131,74 @@ angular.module('indexApp')
                                 room: resp.userData.uniqueCuid
                             });
                         }
-                        $rootScope.responseStatusHandler(resp);
                     })
                     .error(function (errResponse) {
-                        $rootScope.responseStatusHandler(errResponse);
+                        $rootScope.main.responseStatusHandler(errResponse);
                     });
             }
 
             initialRequests();
 
+            //$scope functions to be used in other controllers and directives
+            //back navigation functionality
+            var history = [];
+            $rootScope.stateHistory = [];
+            $rootScope.$on('$stateChangeSuccess', function (event, toState, toParams, fromState, fromParams) {
+                history.push($location.$$path);
+                //push the previous state also
+                var temp = {};
+                temp[fromState.name] = fromParams;
+                $rootScope.stateHistory.push(temp);
+            });
+
+            $rootScope.back = function () {
+                window.history.back();
+            };
+
+            $rootScope.backAngular = function () {
+                var prevUrl = history.length > 1 ? history.splice(-2)[0] : "/";
+                $location.path(prevUrl);
+            };
+
+            $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+                $rootScope.main.clearBanners();
+                $rootScope.clearToasts();
+            });
+
+            //notification banner
+            //$rootScope.showNotfBanner = function (type, text) {
+            //    console.log(type + ' ' + text);
+            //    switch (type) {
+            //        case "success":
+            //            notifications.showSuccess({
+            //                message: text
+            //            });
+            //            break;
+            //        case "warning":
+            //            notifications.showWarning({
+            //                message: text
+            //            });
+            //            break;
+            //        case "error":
+            //            notifications.showError({
+            //                message: text
+            //            });
+            //            break;
+            //        default:
+            //        //clears current list of toasts
+            //        //do nothing
+            //    }
+            //};
+
             //===============socket listeners===============
 
-            $rootScope.$on('reconnectSuccess', function () {
+            $rootScope.$on('reconnect', function () {
                 initialRequests();
             });
         }
     ]);
-angular.module('indexApp')
-    .filter("timeago", function () {
+angular.module('app')
+    .filter("timeago", [function () {
         //time: the time
         //local: compared to what time? default: now
         //raw: whether you want in a format of "5 minutes ago", or "5 minutes"
@@ -452,20 +253,30 @@ angular.module('indexApp')
             }
             return (time <= local) ? span + ' ago' : 'in ' + span;
         }
-    })
+    }])
     .filter("getTimeAgo", ['$filter', function ($filter) {
         //takes in a post or an array of posts, and adds a timeAgo key in them
         return function (createdAt) {
             return $filter('timeago')(createdAt);
         }
     }])
-    .filter("getPostDate", ['$filter', function () {
+    .filter("getPostDate", [function () {
         //takes in a post or an array of posts, and adds a timeAgo key in them
         return function (createdAt) {
             return moment(createdAt).format("ddd, MMM D, H:mm");
         }
     }])
-    .filter("makeVideoIframesResponsive", ['$filter', function () {
+    .filter("getPostAbsoluteUrl", [function () {
+        return function (postIndex) {
+            return 'http://www.negusmath.com/#!/home/post/' + postIndex;
+        }
+    }])
+    .filter("getPostPath", [function () {
+        return function (postIndex) {
+            return '/#!/home/post/' + postIndex;
+        }
+    }])
+    .filter("makeVideoIframesResponsive", [function () {
         //making embedded videos responsive
         return function (post, posts) {
             var theElement;
@@ -473,9 +284,9 @@ angular.module('indexApp')
             var imgWrappedInDiv;
 
             function makeResp(post) {
-                if (post.postHeading) {
+                if (post.postSummary) {
                     //convert the element to string
-                    theElement = $("<div>" + post.postHeading + "</div>");
+                    theElement = $("<div>" + post.postSummary + "</div>");
 
                     //find the video iframe elements
                     imgElement = $('img.ta-insert-video', theElement);
@@ -491,7 +302,7 @@ angular.module('indexApp')
                         //replace in original
                         theElement.find('img').replaceWith(imgWrappedInDiv);
                     }
-                    post.postHeading = theElement.html();
+                    post.postSummary = theElement.html();
 
                 }
                 if (post.postContent) {
@@ -518,35 +329,80 @@ angular.module('indexApp')
             }
 
             if (post) {
-                return makeResp(post)
+                if (Object.keys(post).length > 0) {
+                    return makeResp(post);
+                } else {
+                    return post;
+                }
             } else if (posts) {
                 posts.forEach(function (post, index) {
-                    posts[index] = makeResp(post);
+                    if (Object.keys(post).length > 0) {
+                        posts[index] = makeResp(post);
+                    }
                 });
                 return posts;
             }
         }
     }])
-    .filter("highlightText", ['$filter', '$rootScope', function ($filter, $rootScope) {
+    .filter("getVideoResponsiveVersion", [function () {
         //making embedded videos responsive
-        return function (theElementString) {
+        return function (textString) {
+            var theElement;
+            var imgElement;
+            var imgWrappedInDiv;
 
+            function makeResp(textString) {
+                //convert the element to string
+                theElement = $("<div>" + textString + "</div>");
+
+                //find the video iframe elements
+                imgElement = $('img.ta-insert-video', theElement);
+
+                //only perform operation if there are iframes available
+                if (imgElement.length > 0) {
+
+                    //add class and wrap in div
+                    imgWrappedInDiv = imgElement
+                        .addClass('embed-responsive-item')
+                        .wrap("<div class='embed-responsive embed-responsive-16by9'></div>");
+
+                    //replace in original
+                    theElement.find('img').replaceWith(imgWrappedInDiv);
+                }
+                return theElement.html();
+            }
+
+            if (textString) {
+                return makeResp(textString)
+            } else {
+                return textString;
+            }
+        }
+    }])
+    .filter("highlightText", ['$rootScope', function ($rootScope) {
+        //making embedded videos responsive
+        //the highlight variable should be a boolean to make the function
+        //know if to highlight or not
+        //if false then the function will remove highlight
+        return function (theElementString, highlight) {
             //text is highlighted only if the present or previous state was search
             //this fn checks if the present or previous state was search, and returns an object with status false if not
             //if true, the returned object carries the queryString with it
+
             function checkSearchState() {
                 //check latest state
-                if ($rootScope.$state.current.name == 'search') {
+                if ($rootScope.$state.current.name == 'home.search') {
                     return {
                         status: true,
                         queryString: $rootScope.$stateParams.queryString || ""
                     }
                 } else if ($rootScope.stateHistory.length > 0) {
-                    if ($rootScope.stateHistory[$rootScope.stateHistory.length - 1].hasOwnProperty('search')) {
+                    //check if previous state was search and current state is post
+                    if ($rootScope.stateHistory[$rootScope.stateHistory.length - 1].hasOwnProperty('home.search') && $rootScope.$state.current.name == 'home.post') {
                         //checking the previous state
                         return {
                             status: true,
-                            queryString: $rootScope.stateHistory[$rootScope.stateHistory.length - 1]['search'].queryString
+                            queryString: $rootScope.stateHistory[$rootScope.stateHistory.length - 1]['home.search'].queryString
                         }
                     } else {
                         return {
@@ -561,19 +417,27 @@ angular.module('indexApp')
             }
 
             function highLightThisText(textToHighlight) {
-                var finalString = textToHighlight;
-                var highlightDetails = checkSearchState();
-                if (highlightDetails.status === true) {
-                    //highlight
-                    var theElement = $("<div>" + textToHighlight + "</div>");
-                    $(theElement).highlight(highlightDetails.queryString);
-                    finalString = theElement.html();
+                if (highlight) {
+                    var finalString = textToHighlight;
+                    var highlightDetails = checkSearchState();
+                    if (highlightDetails.status === true) {
+                        //highlight
+                        var theElement = $("<div>" + textToHighlight + "</div>");
+                        $(theElement).highlight(highlightDetails.queryString);
+                        finalString = theElement.html();
+                    } else {
+                        //remove highlight
+                        var theElement2 = $("<div>" + textToHighlight + "</div>");
+                        $(theElement2).removeHighlight();
+                        finalString = theElement2.html();
+                    }
                 } else {
                     //remove highlight
-                    var theElement2 = $("<div>" + textToHighlight + "</div>");
-                    $(theElement2).removeHighlight();
-                    finalString = theElement2.html();
+                    var theElement3 = $("<div>" + textToHighlight + "</div>");
+                    $(theElement3).removeHighlight();
+                    finalString = theElement3.html();
                 }
+
                 return finalString;
             }
 
@@ -581,10 +445,173 @@ angular.module('indexApp')
 
         }
     }])
-    .filter("responseFilter", ['$q', '$filter', '$log', '$interval', '$window', '$location', '$rootScope', 'globals', function ($q, $filter, $log, $interval, $window, $location, $rootScope, globals) {
+    .filter("preparePosts", ['$filter', function ($filter) {
+        //making embedded videos responsive
+        return function (post, posts) {
+            function highlightPostTags(postTags) {
+                if (postTags.length > 0) {
+                    postTags.forEach(function (tag, index) {
+                        postTags[index].text = $filter('highlightText')(tag.text, true);
+                    });
+                }
+
+                return postTags;
+            }
+
+            function prepare(post) {
+                post.timeAgo = $filter('getTimeAgo')(post.createdAt);
+                post.postDate = $filter('getPostDate')(post.createdAt);
+                post.postAbsoluteUrl = $filter('getPostAbsoluteUrl')(post.postIndex);
+                post.postPath = $filter('getPostPath')(post.postIndex);
+                post.postHeading = $filter('highlightText')(post.postHeading, true);
+                post.authorName = $filter('highlightText')(post.authorName, true);
+                post.postSummary = $filter('highlightText')($filter('getVideoResponsiveVersion')(post.postSummary), true);
+                post.postContent = $filter('highlightText')($filter('getVideoResponsiveVersion')(post.postContent), true);
+                post.postTags = highlightPostTags(post.postTags);
+
+                return post;
+            }
+
+            if (post) {
+                if (Object.keys(post).length > 0) {
+                    return prepare(post);
+                } else {
+                    return post;
+                }
+            } else if (posts) {
+                posts.forEach(function (post, index) {
+                    if (Object.keys(post).length > 0) {
+                        posts[index] = prepare(post);
+                    }
+                });
+                return posts;
+            }
+        }
+    }])
+    .filter("preparePostSummary", ['$filter', function ($filter) {
+        //making embedded videos responsive in postContent
+        return function (postSummary) {
+
+            console.log("postSummary called");
+
+            function prepare(postContent) {
+                return $filter('highlightText')($filter('getVideoResponsiveVersion')(postSummary), true);
+            }
+
+            if (postSummary) {
+                return prepare(postSummary);
+            } else {
+
+                return postSummary;
+            }
+        }
+    }])
+    .filter("preparePostContent", ['$filter', function ($filter) {
+        //making embedded videos responsive in postContent
+        return function (postContent) {
+
+            function prepare(postContent) {
+                return $filter('highlightText')($filter('getVideoResponsiveVersion')(postContent), true);
+            }
+
+            if (postContent) {
+                return prepare(postContent);
+            } else {
+
+                return postContent;
+            }
+        }
+    }])
+    .filter("preparePostSummary", ['$filter', function ($filter) {
+        //making embedded videos responsive in postContent
+        return function (postSummary) {
+
+            function prepare(postSummary) {
+                return $filter('highlightText')($filter('getVideoResponsiveVersion')(postSummary), true);
+            }
+
+            if (postSummary) {
+                return prepare(postSummary);
+            } else {
+
+                return postSummary;
+            }
+        }
+    }])
+    .filter("removeHighlights", ['$filter', function ($filter) {
+        //making embedded videos responsive
+        return function (post, posts) {
+            function removePostTagsHighlight(postTags) {
+                if (postTags.length > 0) {
+                    postTags.forEach(function (tag, index) {
+                        postTags[index].text = $filter('highlightText')(tag.text, false);
+                    });
+                }
+
+                return postTags;
+            }
+
+            function prepare(post) {
+                post.timeAgo = $filter('getTimeAgo')(post.createdAt);
+                post.postDate = $filter('getPostDate')(post.createdAt);
+                post.postAbsoluteUrl = $filter('getPostAbsoluteUrl')(post.postIndex);
+                post.postPath = $filter('getPostPath')(post.postIndex);
+                post.postHeading = $filter('highlightText')(post.postHeading, false);
+                post.authorName = $filter('highlightText')(post.authorName, false);
+                post.postSummary = $filter('highlightText')(post.postSummary, false);
+                post.postContent = $filter('highlightText')(post.postContent, false);
+                post.postTags = removePostTagsHighlight(post.postTags);
+
+                return post;
+            }
+
+            if (post) {
+                if (Object.keys(post).length > 0) {
+                    return prepare(post);
+                } else {
+                    return post;
+                }
+            } else if (posts) {
+                posts.forEach(function (post, index) {
+                    if (Object.keys(post).length > 0) {
+                        posts[index] = prepare(post);
+                    }
+                });
+                return posts;
+            }
+        }
+    }])
+    .filter("preparePostsNoChange", ['$filter', function ($filter) {
+        //does not change the post to make it responsive and does not highlight
+        return function (post, posts) {
+
+            function prepare(post) {
+                post.timeAgo = $filter('getTimeAgo')(post.createdAt);
+                post.postDate = $filter('getPostDate')(post.createdAt);
+                post.postAbsoluteUrl = $filter('getPostAbsoluteUrl')(post.postIndex);
+                post.postPath = $filter('getPostPath')(post.postIndex);
+                return post;
+            }
+
+            if (post) {
+                if (Object.keys(post).length > 0) {
+                    return prepare(post);
+                } else {
+                    return post;
+                }
+            } else if (posts) {
+                posts.forEach(function (post, index) {
+                    if (Object.keys(post).length > 0) {
+                        posts[index] = prepare(post);
+                    }
+                });
+                return posts;
+            }
+        }
+    }])
+    .filter("responseFilter", ['$q', '$log', '$window', '$rootScope', function ($q, $log, $window, $rootScope) {
         //making embedded videos responsive
         return function (resp) {
-
             function makeBanner(show, bannerClass, msg) {
                 return {
                     show: show ? true : false,
@@ -593,20 +620,16 @@ angular.module('indexApp')
                 }
             }
 
-            $rootScope.universalDisable = false;
-
-            if (resp) {
+            if (resp !== null && typeof resp === 'object') {
                 if (resp.redirect) {
                     if (resp.redirect) {
                         $window.location.href = resp.redirectPage;
                     }
                 }
-                if (resp.disable) {
-                    $rootScope.universalDisable = true;
-                }
                 if (resp.notify) {
                     if (resp.type && resp.msg) {
                         $rootScope.showToast(resp.type, resp.msg);
+                        //$rootScope.showNotfBanner(resp.type, resp.msg);
                     }
                 }
                 if (resp.banner) {
@@ -639,10 +662,465 @@ angular.module('indexApp')
             return true;
         }
     }]);
+angular.module('app')
+    .directive('accountOuterScope', ['$rootScope', function ($rootScope) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                //variable to hold state between local login and creating a new account
+                //values =  signIn, register
+                $scope.userLoginState = 'signIn';
+                $scope.changeUserLoginState = function (newState) {
+                    $scope.userLoginState = newState;
+                };
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('newPostBanner', ['$rootScope', function ($rootScope) {
+        return {
+            templateUrl: 'views/all/partials/templates/new_post_banner.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.newPostBanner = {
+                    show: false,
+                    bannerClass: "",
+                    msg: ""
+                };
 
+                $rootScope.$on('newPostBanner', function (event, banner) {
+                    $scope.newPostBanner = banner;
+                });
 
+                $rootScope.$on('clearBanners', function () {
+                    $scope.newPostBanner = {
+                        show: false,
+                        bannerClass: "",
+                        msg: ""
+                    };
+                })
+            }
+        }
+    }])
+    .directive('toastrDirective', ['$rootScope', 'toastr', function ($rootScope, toastr) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $rootScope.showToast = function (toastType, text) {
+                    switch (toastType) {
+                        case "success":
+                            toastr.clear();
+                            toastr.success(text);
+                            break;
+                        case "warning":
+                            toastr.clear();
+                            toastr.warning(text, 'Warning', {
+                                closeButton: true,
+                                tapToDismiss: true
+                            });
+                            break;
+                        case "error":
+                            toastr.clear();
+                            toastr.error(text, 'Error', {
+                                closeButton: true,
+                                tapToDismiss: true,
+                                timeOut: false
+                            });
+                            break;
+                        default:
+                            //clears current list of toasts
+                            toastr.clear();
+                    }
+                };
 
-angular.module('indexApp')
+                $rootScope.clearToasts = function () {
+                    toastr.clear();
+                };
+            }
+        }
+    }])
+    .directive('loadingBanner', ['$rootScope', function ($rootScope) {
+        var controller = ['$scope', '$rootScope', 'cfpLoadingBar', function ($scope, $rootScope, cfpLoadingBar) {
+
+            $rootScope.isLoading = true;
+            $rootScope.isLoadingPercentage = 0;
+            $rootScope.changeIsLoadingPercentage = function (num) {
+                $rootScope.isLoadingPercentage = num;
+            };
+
+            $rootScope.$on('cfpLoadingBar:loading', function (event, resp) {
+                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.$on('cfpLoadingBar:loaded', function (event, resp) {
+                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.$on('cfpLoadingBar:completed', function (event, resp) {
+                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.isLoadingTrue = function () {
+                $rootScope.isLoading = true;
+            };
+            $rootScope.isLoadingFalse = function () {
+                $rootScope.isLoading = false;
+            };
+
+            $rootScope.$on('isLoadingTrue', function () {
+                $rootScope.isLoading = true;
+            });
+
+            $rootScope.$on('isLoadingFalse', function () {
+                $rootScope.isLoading = false;
+            });
+        }];
+
+        return {
+            templateUrl: 'views/all/partials/templates/loading_banner.html',
+            restrict: 'AE',
+            controller: controller
+        }
+    }])
+    .directive('signInBannerScope', ['$rootScope', function ($rootScope) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.signInBanner = {
+                    show: false,
+                    bannerClass: "",
+                    msg: ""
+                };
+
+                $rootScope.$on('signInBanner', function (event, banner) {
+                    $scope.signInBanner = banner;
+                });
+
+                $rootScope.$on('clearBanners', function () {
+                    $scope.signInBanner = {
+                        show: false,
+                        bannerClass: "",
+                        msg: ""
+                    };
+                })
+            }
+        }
+    }])
+    .directive('registrationBannerScope', ['$rootScope', function ($rootScope) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.registrationBanner = {
+                    show: false,
+                    bannerClass: "",
+                    msg: ""
+                };
+
+                $rootScope.$on('registrationBanner', function (event, banner) {
+                    $scope.registrationBanner = banner;
+                });
+
+                $rootScope.$on('clearBanners', function () {
+                    $scope.registrationBanner = {
+                        show: false,
+                        bannerClass: "",
+                        msg: ""
+                    };
+                })
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('contactUsScope', ['$rootScope', '$http', function ($rootScope, $http) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.contactUsModel = {
+                    name: "",
+                    email: "",
+                    message: ""
+                };
+
+                function validateContactUs(name, email, message) {
+                    var errors = 0;
+
+                    if (!name || name.length == 0) {
+                        ++errors;
+                        $rootScope.showToast('warning', "Please enter your name");
+                        return -1
+                    } else if (!email || email.length == 0) {
+                        ++errors;
+                        $rootScope.showToast('warning', "Please enter a valid email");
+                        return -1
+                    } else if (!message || message.length == 0) {
+                        ++errors;
+                        $rootScope.showToast('warning', "Message field is empty");
+                        return -1;
+                    } else if (errors == 0) {
+                        return 1;
+                    }
+                }
+
+                $scope.sendContactUs = function () {
+                    var formStatus = validateContactUs($scope.contactUsModel.name, $scope.contactUsModel.email, $scope.contactUsModel.message);
+                    if (formStatus == 1) {
+                        sendContactUs($scope.contactUsModel)
+                            .success(function (resp) {
+                                $scope.contactUsModel.name = "";
+                                $scope.contactUsModel.email = "";
+                                $scope.contactUsModel.message = "";
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResp) {
+                                $rootScope.main.responseStatusHandler(errResp);
+                            });
+                    }
+                };
+
+                function sendContactUs(contactUsModel) {
+                    return $http.post('/contactUs', contactUsModel);
+                }
+            }
+        }
+    }])
+    .directive('contactUs', [function () {
+        return {
+            templateUrl: 'views/all/partials/components/contact_us.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                //depends on contactUsScope
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('createAccountScope', ['$rootScope', '$http', function ($rootScope, $http) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.registrationDetails = {
+                    email: "",
+                    firstName: "",
+                    lastName: "",
+                    username: "",
+                    password1: "",
+                    password2: "",
+                    invitationCode: ""
+                };
+
+                $scope.createAccount = function () {
+                    createAccount($scope.registrationDetails)
+                        .success(function (resp) {
+                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $scope.registrationDetails.password1 = "";
+                            $scope.registrationDetails.password2 = "";
+                            $scope.registrationDetails.invitationCode = "";
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        });
+                };
+
+                function createAccount(details) {
+                    return $http.post('/createAccount', details);
+                }
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('mainFooter', [function () {
+        return {
+            templateUrl: 'views/all/partials/components/main_footer.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('logoutScope', ['$rootScope', '$http', function ($rootScope, $http) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.logoutClient = function () {
+                    logoutClient()
+                        .success(function (resp) {
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        });
+                };
+
+                function logoutClient() {
+                    return $http.post('/api/logoutClient');
+                }
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('postContent', ['$filter', function ($filter) {
+        return {
+            templateUrl: 'views/all/partials/templates/post_content.html',
+            scope: {
+                postContent: '=model'
+            },
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.postContent = $filter('preparePostContent')($scope.postContent);
+            }
+        }
+    }])
+    .directive('postSummary', ['$filter',function ($filter) {
+        return {
+            templateUrl: 'views/all/partials/templates/post_summary.html',
+            scope: {
+                postSummary: '=model'
+            },
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.postSummary = $filter('preparePostSummary')($scope.postSummary);
+            }
+        }
+    }])
+    .directive('postTags', ['$filter',function ($filter) {
+        return {
+            templateUrl: 'views/all/partials/templates/post_tags.html',
+            scope: {
+                postTags: '=model'
+            },
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('resendEmailScope', ['$rootScope', '$http', function ($rootScope, $http) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+
+                $scope.resendConfirmationEmail = function (userUniqueCuid) {
+                    console.log(userUniqueCuid);
+                    resendConfirmationEmail(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (err) {
+                            $rootScope.main.responseStatusHandler(err);
+                        })
+                };
+
+                function resendConfirmationEmail(userUniqueCuid) {
+                    return $http.post('/resendConfirmationEmail', {
+                        userUniqueCuid: userUniqueCuid
+                    });
+                }
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('signInScope', ['$rootScope', '$http', function ($rootScope, $http) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.loginFormModel = {
+                    username: "",
+                    password: ""
+                };
+
+                $scope.submitLocalLoginForm = function () {
+                    localUserLogin($scope.loginFormModel)
+                        .success(function (resp) {
+                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $scope.loginFormModel.password = "";
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        });
+                };
+
+                function localUserLogin(loginData) {
+                    return $http.post('/localUserLogin', loginData);
+                }
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('suggestedPosts', ['$rootScope', '$filter', '$http', function ($rootScope, $filter, $http) {
+        return {
+            templateUrl: 'views/all/partials/templates/suggested_posts.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $rootScope.main.goToTop();
+
+                $scope.suggestedPosts = [];
+                $scope.suggestedPostsCount = 0;
+
+                function getSuggestedPosts() {
+                    getSuggestedPostsFromServer()
+                        .success(function (resp) {
+                            if (resp.postsArray.length > 0) {
+                                updateSuggestedPosts(resp.postsArray);
+                            } else {
+                                //do nothing
+                            }
+                            $rootScope.main.responseStatusHandler(resp);
+
+                        })
+                        .error(function (errResp) {
+                            $rootScope.main.responseStatusHandler(errResp);
+                        });
+                }
+
+                getSuggestedPosts();
+
+                function getSuggestedPostsFromServer() {
+                    return $http.post('/api/getSuggestedPosts', {})
+                }
+
+                function updateSuggestedPosts(suggestedPostsArray) {
+                    if (suggestedPostsArray == []) {
+                        $scope.suggestedPosts = [];
+                    } else {
+                        $scope.suggestedPosts = $filter('preparePostsNoChange')(null, suggestedPostsArray);
+                    }
+                }
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('titleDirective', ['globals', function (globals) {
+        return {
+            template: '<title ng-bind="defaultTitle">' + '</title>',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.defaultTitle = globals.getDocumentTitle();
+                $scope.$watch(globals.getDocumentTitle, function () {
+                    $scope.defaultTitle = globals.getDocumentTitle();
+                });
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('universalSearchBoxScope', ['$window', '$location', '$rootScope', 'globals', function ($window, $location, $rootScope, globals) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.mainSearchModel = {
+                    queryString: "",
+                    requestedPage: 1
+                };
+
+                $scope.performMainSearch = function () {
+                    if ($scope.mainSearchModel.queryString.length > 0) {
+                        $rootScope.main.redirectToPage('/search/posts/' + $scope.mainSearchModel.queryString + '/' + $scope.mainSearchModel.requestedPage);
+                    }
+                };
+            }
+        }
+    }]);
+angular.module('app')
 
     .factory('fN', ['$q', '$location', '$window', '$rootScope', 'socketService',
         function ($q, $location, $window, $rootScope, socketService) {
@@ -658,26 +1136,13 @@ angular.module('indexApp')
                 }
             };
         }]);
-angular.module('indexApp')
-
-    .factory('globals', ['$q', '$location', '$window', '$rootScope', 'socketService',
-        function ($q, $location, $window, $rootScope, socketService) {
+angular.module('app')
+    .factory('globals', ['$q', '$location', '$rootScope',
+        function ($q, $location, $rootScope) {
             var userData = {};
             var allData = {
                 documentTitle: "Negus Math - College Level Advanced Mathematics for Kenya Students",
                 indexPageUrl: $location.port() ? "http://" + $location.host() + ":" + $location.port() + "/index" : $scope.indexPageUrl = "http://" + $location.host() + "/index"
-            };
-
-            var universalBanner = {
-                show: false,
-                bannerClass: "",
-                msg: ""
-            };
-
-            var registrationBanner = {
-                show: false,
-                bannerClass: "",
-                msg: ""
             };
 
             return {
@@ -709,21 +1174,101 @@ angular.module('indexApp')
                 },
 
                 getLocationHost: function () {
-                    if ($location.port()) {
-                        return "http://" + $location.host() + ":" + $location.port();
+                    if (document.location.hostname.search("negusmath") !== -1) {
+                        return "//www.negusmath.com";
                     } else {
-                        return "http://" + $location.host();
+                        if ($location.port()) {
+                            return 'http://localhost' + ":" + $location.port();
+                        } else {
+                            return 'http://localhost';
+                        }
                     }
+                },
+
+                checkAccountStatus: function () {
+                    function getStatus(userData) {
+                        if (userData && Object.keys(userData) > 0) {
+                            if (userData.isRegistered) {
+                                if (!userData.emailIsConfirmed) {
+                                    return {
+                                        show: true,
+                                        bannerClass: "alert alert-warning",
+                                        msg: "Please confirm your account by clicking the confirmation link we sent on your email. Please also check your spam folder",
+                                        showResendEmail: true,
+                                        accountStatus: false
+                                    };
+                                } else if (userData.isApproved === false) {
+                                    return {
+                                        show: true,
+                                        bannerClass: "alert alert-warning",
+                                        msg: "Your account is awaiting approval from the administrators. Please allow up to 3 business days. You will get an email notification as soon as your account is approved.",
+                                        showResendEmail: false,
+                                        accountStatus: false
+                                    };
+                                } else if (userData.isBanned) {
+                                    if (userData.isBanned.status === true) {
+                                        //checking banned status
+                                        return {
+                                            show: true,
+                                            bannerClass: "alert alert-warning",
+                                            msg: "Your have been banned from this service. Please contact the administrators for more information",
+                                            showResendEmail: false,
+                                            accountStatus: false
+                                        };
+                                    } else {
+                                        return {
+                                            show: false,
+                                            bannerClass: "",
+                                            msg: "",
+                                            showResendEmail: false,
+                                            accountStatus: true
+                                        };
+                                    }
+                                } else {
+                                    return {
+                                        show: false,
+                                        bannerClass: "",
+                                        msg: "",
+                                        showResendEmail: false,
+                                        accountStatus: true
+                                    };
+                                }
+                            } else {
+                                console.log(userData);
+                                return {
+                                    show: true,
+                                    bannerClass: "alert alert-warning",
+                                    msg: "You are not registered. Please reload this page to create an account",
+                                    showResendEmail: false,
+                                    accountStatus: false
+                                };
+                            }
+                        } else {
+                            //userData might not have loaded yet here, forgive this part
+                            return {
+                                show: false,
+                                bannerClass: "",
+                                msg: "",
+                                showResendEmail: false,
+                                accountStatus: true
+                            };
+                        }
+                    }
+
+                    var theStatus = getStatus(userData);
+                    $rootScope.$broadcast('universalBanner', theStatus);
+                    return theStatus.accountStatus;
                 }
             };
-        }]);
-angular.module('indexApp')
-    .factory('mainService', ['$log', '$window', '$rootScope', 'socket', 'socketService', 'globals',
-        function ($log, $window, $rootScope, socket, socketService, globals) {
+        }
+    ]);
+angular.module('app')
+    .factory('mainService', ['$log', '$window', '$rootScope', 'socket',
+        function ($log, $window, $rootScope, socket) {
 
             socket.on('reconnect', function () {
                 $log.info("'reconnect sequence' triggered");
-                $rootScope.$broadcast('reconnectSuccess');
+                $rootScope.$broadcast('reconnect');
             });
 
             return {
@@ -731,9 +1276,36 @@ angular.module('indexApp')
                     return 1;
                 }
             };
-        }]);
-angular.module('indexApp')
+        }
+    ]);
+angular.module('app')
+    .factory('PopularStoriesService', ['$filter', '$log', '$http', '$window', '$rootScope', 'socket',
+        function ($filter, $log, $http, $window, $rootScope, socket) {
 
+            var popularStories = [];
+
+            return {
+
+                getPopularStories: function () {
+                    return popularStories;
+                },
+
+                getPopularStoriesFromServer: function () {
+                    return $http.post('/api/getPopularStories', {})
+                },
+
+                updatePopularStories: function (popularStoriesArray) {
+                    if (popularStoriesArray == []) {
+                        popularStories = [];
+                    } else {
+                        popularStories = $filter('preparePostsNoChange')(null, popularStoriesArray);
+                    }
+                    return popularStoriesArray;
+                }
+            };
+        }
+    ]);
+angular.module('app')
     .factory('socket', ['$log', '$location', '$rootScope',
         function ($log, $location, $rootScope) {
             var url;
@@ -780,7 +1352,8 @@ angular.module('indexApp')
                     });
                 }
             };
-        }])
+        }
+    ])
 
 
     .factory('socketService', ['$log', '$http', '$rootScope',
@@ -822,3 +1395,91 @@ angular.module('indexApp')
                 }
             }
         }]);
+angular.module('app')
+    .run(['$templateCache', '$http', '$rootScope', '$state', '$stateParams', function ($templateCache, $http, $rootScope, $state, $stateParams) {
+        $rootScope.$state = $state;
+        $rootScope.$stateParams = $stateParams;
+        $rootScope.Utils = {
+            keys: Object.keys
+        };
+    }])
+
+    .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
+        //    $urlRouterProvider
+        //        .when("/home/stream/", '/home/stream/1')
+        //        .when("/home/post/", '/home')
+        //        .when("/home/editPost/", '/home')
+        //        .when("/home/search/", '/home/')
+        //        .otherwise("/home");
+        //
+        //    $stateProvider
+        //        .state('home', {
+        //            url: '/home',
+        //        })
+        //        .state('home.post', {
+        //            url: '/post/:postIndex',
+        //            templateUrl: 'views/all/partials/views/home/full_post.html'
+        //        })
+        //        .state('home.newPost', {
+        //            url: '/newPost',
+        //            templateUrl: 'views/all/partials/views/home/new_post.html'
+        //        })
+        //        .state('home.editPost', {
+        //            url: '/editPost/:postIndex',
+        //            templateUrl: 'views/all/partials/views/home/edit_post.html'
+        //        })
+        //        .state('home.search', {
+        //            url: '/search/:queryString/:pageNumber',
+        //            templateUrl: 'views/search/search_results.html'
+        //        })
+        //        .state('users', {
+        //            url: '/users',
+        //            templateUrl: 'views/all/partials/views/users/users.html'
+        //        })
+        //        .state("otherwise", {url: '/home'});
+
+        //$locationProvider
+        //    .html5Mode(false)
+        //    .hashPrefix('!');
+    }])
+    .value('duScrollOffset', 60);
+angular.module('app')
+    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'mainService', 'socketService', 'globals',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, mainService, socketService, globals) {
+
+            //function that determines if it's okay for the user to proceed
+            $scope.checkAccountStatus = function (userData) {
+                if (userData) {
+                    if (userData.isRegistered) {
+                        if (userData.emailIsConfirmed == false) {
+                            return false;
+                        } else {
+                            if (userData.isApproved === false) {
+                                return false
+                            } else if (userData.isBanned) {
+                                if (userData.isBanned.status === true) {
+                                    //checking banned status
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            } else {
+                                return true;
+                            }
+                        }
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
+            };
+
+            //variable that holds the account status
+            $scope.accountStatusIsGood = false;
+
+            $rootScope.$on('userDataChanges', function () {
+                $scope.accountStatusIsGood = $scope.checkAccountStatus(globals.userData);
+            });
+        }
+    ]);

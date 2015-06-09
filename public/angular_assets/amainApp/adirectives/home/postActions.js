@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .directive('postActionsScope', ['$rootScope', 'PostService', 'globals', function ($rootScope, PostService, globals) {
         return {
             restrict: 'AE',

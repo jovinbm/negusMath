@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .directive('fullPostScope', ['$q', '$log', '$rootScope', 'globals', 'PostService', function ($q, $log, $rootScope, globals, PostService) {
         return {
             restrict: 'AE',

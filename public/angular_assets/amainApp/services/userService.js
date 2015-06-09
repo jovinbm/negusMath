@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .factory('UserService', ['$filter', '$http',
         function ($filter, $http) {
 

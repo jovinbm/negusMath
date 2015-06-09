@@ -36,7 +36,7 @@ gulp.task('minifyAllIndexCSS', function () {
 });
 
 gulp.task('minifyMainAppJS', function () {
-    return gulp.src('public/angular_assets/aMainApp/**/*.js')
+    return gulp.src(['public/angular_assets/aaCommon/**/*.js', 'public/angular_assets/aMainApp/**/*.js'])
         .pipe(sourcemaps.init())
         .pipe(concat('concatenated.js'))
         .pipe(gulp.dest('public/angular_assets/aMainAppMin'))
@@ -48,7 +48,7 @@ gulp.task('minifyMainAppJS', function () {
 });
 
 gulp.task('minifyIndexAppJS', function () {
-    return gulp.src('public/angular_assets/indexApp/**/*.js')
+    return gulp.src(['public/angular_assets/aaCommon/**/*.js', 'public/angular_assets/indexApp/**/*.js'])
         .pipe(sourcemaps.init())
         .pipe(concat('concatenated.js'))
         .pipe(gulp.dest('public/angular_assets/indexAppMin'))
@@ -74,6 +74,7 @@ gulp.task('watch', function () {
     gulp.watch('public/css/**/*.css', ['minifyAllMainCSS', 'minifyAllIndexCSS']);
     gulp.watch('public/angular_assets/amainApp/**/*.js', ['minifyMainAppJS']);
     gulp.watch('public/angular_assets/indexApp/**/*.js', ['minifyIndexAppJS']);
+    gulp.watch('public/angular_assets/aaCommon/**/*.js', ['minifyIndexAppJS', 'minifyMainAppJS']);
     gulp.watch('public/imgs/**/*', ['minifyAllImages']);
 });
 

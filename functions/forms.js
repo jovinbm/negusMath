@@ -5,6 +5,7 @@ var fs = require('fs');
 var cheerio = require('cheerio');
 var multer = require('multer');
 var middleware = require('../functions/middleware.js');
+var account = require('../functions/account.js');
 
 var fileName = 'forms_db.js';
 
@@ -577,7 +578,7 @@ module.exports = {
             });
 
             //file is not image, remove it
-            middleware.deleteFile(file.path, error_deleting, removed);
+            account.deleteFile(file.path, error_deleting, removed);
             function removed() {
                 consoleLogger(successLogger(module, "file successfully removed from filesystem"));
             }
@@ -626,7 +627,7 @@ module.exports = {
             });
 
             //file is not image, remove it
-            middleware.deleteFile(file.path, error_deleting, removed);
+            account.deleteFile(file.path, error_deleting, removed);
             function removed() {
                 consoleLogger(successLogger(module, "file successfully removed from filesystem"));
             }
@@ -675,7 +676,7 @@ module.exports = {
             });
 
             //file is not image, remove it
-            middleware.deleteFile(file.path, error_deleting, removed);
+            account.deleteFile(file.path, error_deleting, removed);
             function removed() {
                 consoleLogger(successLogger(module, "file successfully removed from filesystem"));
             }

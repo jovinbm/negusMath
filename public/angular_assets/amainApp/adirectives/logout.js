@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .directive('logoutScope', ['$rootScope', 'logoutService', function ($rootScope, logoutService) {
         return {
             restrict: 'AE',

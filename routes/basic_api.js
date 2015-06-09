@@ -2,6 +2,7 @@ var basic = require('../functions/basic.js');
 var basic_handlers = require('../handlers/basic_handlers.js');
 var userDB = require('../db/user_db.js');
 var emailModule = require('../functions/email.js');
+var account = require('../functions/account.js');
 var middleware = require('../functions/middleware.js');
 
 var fileName = 'basic_api.js';
@@ -47,7 +48,7 @@ module.exports = {
 
         if (req.body.userUniqueCuid) {
             var userUniqueCuid = req.body.userUniqueCuid;
-            middleware.returnUserWithUniqueCuid(userUniqueCuid, success);
+            account.returnUserWithUniqueCuid(userUniqueCuid, success);
 
             //success will be called with false in case of error
             function success(theUser) {

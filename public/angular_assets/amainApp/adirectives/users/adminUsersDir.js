@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .directive('adminUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/admin_users.html',

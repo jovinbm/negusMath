@@ -1,4 +1,5 @@
-angular.module('mainApp', [
+//angular sanitize included in textAngular
+angular.module('app', [
     'ui.bootstrap',
     'cfp.loadingBar',
     'angulartics',
@@ -8,76 +9,13 @@ angular.module('mainApp', [
     'duScroll',
     'ngFx',
     'textAngular',
-    'ngSanitize',
     'angularUtils.directives.dirDisqus',
     'ngTagsInput',
     'ui.utils',
-    'ngFileUpload'
-])
-    .run(['$templateCache', '$http', '$rootScope', '$state', '$stateParams', function ($templateCache, $http, $rootScope, $state, $stateParams) {
-        $rootScope.$state = $state;
-        $rootScope.$stateParams = $stateParams;
-        $rootScope.Utils = {
-            keys: Object.keys
-        }
-    }])
-
-    .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
-        //    $urlRouterProvider
-        //        .when("/home/stream/", '/home/stream/1')
-        //        .when("/home/post/", '/home')
-        //        .when("/home/editPost/", '/home')
-        //        .when("/home/search/", '/home/')
-        //        .otherwise("/home");
-        //
-        //    $stateProvider
-        //        .state('home', {
-        //            url: '/home',
-        //        })
-        //        .state('home.post', {
-        //            url: '/post/:postIndex',
-        //            templateUrl: 'views/all/partials/views/home/full_post.html'
-        //        })
-        //        .state('home.newPost', {
-        //            url: '/newPost',
-        //            templateUrl: 'views/all/partials/views/home/new_post.html'
-        //        })
-        //        .state('home.editPost', {
-        //            url: '/editPost/:postIndex',
-        //            templateUrl: 'views/all/partials/views/home/edit_post.html'
-        //        })
-        //        .state('home.search', {
-        //            url: '/search/:queryString/:pageNumber',
-        //            templateUrl: 'views/search/search_results.html'
-        //        })
-        //        .state('users', {
-        //            url: '/users',
-        //            templateUrl: 'views/all/partials/views/users/users.html'
-        //        })
-        //        .state("otherwise", {url: '/home'});
-
-        //$locationProvider
-        //    .html5Mode(false)
-        //    .hashPrefix('!');
-    }]);
-angular.module('mainApp')
-    .directive('logoutScope', ['$rootScope', 'logoutService', function ($rootScope, logoutService) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.logoutClient = function () {
-                    logoutService.logoutClient()
-                        .success(function (resp) {
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        });
-                };
-            }
-        }
-    }]);
-angular.module('mainApp')
+    'ngFileUpload',
+    'toastr'
+]);
+angular.module('app')
     .controller('PopularStoriesController', ['$q', '$log', '$scope', '$rootScope', 'PopularStoriesService', 'globals',
         function ($q, $log, $scope, $rootScope, PopularStoriesService, globals) {
 
@@ -86,6 +24,7 @@ angular.module('mainApp')
             function getPopularStories() {
                 PopularStoriesService.getPopularStoriesFromServer()
                     .success(function (resp) {
+                        $rootScope.main.responseStatusHandler(resp);
                         $scope.popularStories = PopularStoriesService.updatePopularStories(resp.popularStories);
                     })
                     .error(function (errResp) {
@@ -103,8 +42,8 @@ angular.module('mainApp')
             });
         }
     ]);
-angular.module('mainApp')
-    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'socketService', 'globals', '$document',
+angular.module('app')
+    .controller('UniversalController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'socketService', 'globals', '$document',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, socketService, globals, $document) {
 
             //index page url
@@ -182,6 +121,7 @@ angular.module('mainApp')
             function initialRequests() {
                 socketService.getUserData()
                     .success(function (resp) {
+                        $rootScope.main.responseStatusHandler(resp);
                         $scope.userData = globals.userData(resp.userData);
                         $rootScope.main.broadcastUserData();
 
@@ -191,8 +131,6 @@ angular.module('mainApp')
                                 room: resp.userData.uniqueCuid
                             });
                         }
-
-                        $rootScope.main.responseStatusHandler(resp);
                     })
                     .error(function (errResponse) {
                         $rootScope.main.responseStatusHandler(errResponse);
@@ -225,10 +163,32 @@ angular.module('mainApp')
             $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
                 $rootScope.main.clearBanners();
                 $rootScope.clearToasts();
-
-                //variable to keep track of when the user is editing the post
-                $rootScope.isEditingPost = false;
             });
+
+            //notification banner
+            //$rootScope.showNotfBanner = function (type, text) {
+            //    console.log(type + ' ' + text);
+            //    switch (type) {
+            //        case "success":
+            //            notifications.showSuccess({
+            //                message: text
+            //            });
+            //            break;
+            //        case "warning":
+            //            notifications.showWarning({
+            //                message: text
+            //            });
+            //            break;
+            //        case "error":
+            //            notifications.showError({
+            //                message: text
+            //            });
+            //            break;
+            //        default:
+            //        //clears current list of toasts
+            //        //do nothing
+            //    }
+            //};
 
             //===============socket listeners===============
 
@@ -237,44 +197,7 @@ angular.module('mainApp')
             });
         }
     ]);
-
-angular.module('mainApp')
-    .controller('SearchController', ['$q', '$log', '$scope', '$rootScope', 'globals', 'PostService',
-        function ($q, $log, $scope, $rootScope, globals, PostService) {
-        }
-    ]);
-angular.module('mainApp')
-    .controller('UserManagerController', ['$q', '$scope', '$rootScope', 'UserService', 'globals',
-        function ($q, $scope, $rootScope, UserService, globals) {
-
-            $scope.usersCount = UserService.getUsersCount();
-
-            function getUsersCount() {
-                if (globals.checkAccountStatus()) {
-                    UserService.getUsersCountFromServer()
-                        .success(function (resp) {
-                            $scope.usersCount = UserService.updateUsersCount(resp.usersCount);
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        })
-                }
-            }
-
-            getUsersCount();
-
-            //===============socket listeners===============
-
-            $rootScope.$on('userChanges', function () {
-                getUsersCount();
-            });
-
-            $rootScope.$on('reconnect', function () {
-            });
-        }
-    ]);
-angular.module('mainApp')
+angular.module('app')
     .filter("timeago", [function () {
         //time: the time
         //local: compared to what time? default: now
@@ -599,6 +522,22 @@ angular.module('mainApp')
             }
         }
     }])
+    .filter("preparePostSummary", ['$filter', function ($filter) {
+        //making embedded videos responsive in postContent
+        return function (postSummary) {
+
+            function prepare(postSummary) {
+                return $filter('highlightText')($filter('getVideoResponsiveVersion')(postSummary), true);
+            }
+
+            if (postSummary) {
+                return prepare(postSummary);
+            } else {
+
+                return postSummary;
+            }
+        }
+    }])
     .filter("removeHighlights", ['$filter', function ($filter) {
         //making embedded videos responsive
         return function (post, posts) {
@@ -681,7 +620,7 @@ angular.module('mainApp')
                 }
             }
 
-            if (resp) {
+            if (resp !== null && typeof resp === 'object') {
                 if (resp.redirect) {
                     if (resp.redirect) {
                         $window.location.href = resp.redirectPage;
@@ -690,6 +629,7 @@ angular.module('mainApp')
                 if (resp.notify) {
                     if (resp.type && resp.msg) {
                         $rootScope.showToast(resp.type, resp.msg);
+                        //$rootScope.showNotfBanner(resp.type, resp.msg);
                     }
                 }
                 if (resp.banner) {
@@ -700,6 +640,11 @@ angular.module('mainApp')
                 if (resp.newPostBanner) {
                     if (resp.bannerClass && resp.msg) {
                         $rootScope.$broadcast('newPostBanner', makeBanner(true, resp.bannerClass, resp.msg));
+                    }
+                }
+                if (resp.signInBanner) {
+                    if (resp.bannerClass && resp.msg) {
+                        $rootScope.$broadcast('signInBanner', makeBanner(true, resp.bannerClass, resp.msg));
                     }
                 }
                 if (resp.registrationBanner) {
@@ -717,239 +662,468 @@ angular.module('mainApp')
             return true;
         }
     }]);
-angular.module('mainApp')
-    .filter("validatePostHeading", ['$rootScope', function ($rootScope) {
-        return function (postHeading, broadcast) {
-            var errors = 0;
-
-            function broadcastShowToast(type, text) {
-                if (broadcast) {
-                    $rootScope.showToast(type, text);
-                }
+angular.module('app')
+    .directive('accountOuterScope', ['$rootScope', function ($rootScope) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                //variable to hold state between local login and creating a new account
+                //values =  signIn, register
+                $scope.userLoginState = 'signIn';
+                $scope.changeUserLoginState = function (newState) {
+                    $scope.userLoginState = newState;
+                };
             }
-
-            if (postHeading) {
-                if (postHeading.length == 0) {
-                    errors++;
-                    broadcastShowToast('warning', 'The heading is required');
-                }
-                if (errors == 0) {
-                    if (postHeading.length < 10) {
-                        broadcastShowToast('warning', 'The minimum required length of the heading is 10 characters');
-                        errors++;
-                    }
-                }
-            } else {
-                errors++;
-                broadcastShowToast('warning', 'The heading is required');
-            }
-            return errors == 0;
-        }
-    }])
-    .filter("postHeadingMessages", [function () {
-        return function (postHeading) {
-            var messages = "";
-
-            function addMessage(newMessage) {
-                if (messages) {
-                    messages = messages + ": " + newMessage;
-                } else {
-                    messages = messages + newMessage;
-                }
-            }
-
-            if (postHeading) {
-                var postHeadingText = $("<div>" + postHeading + "</div>").text();
-
-                if (postHeadingText.length == 0) {
-                    addMessage('The is a required field');
-                }
-                if (postHeadingText.length > 0 && postHeadingText.length < 10) {
-                    addMessage('Minimum length required is 10 characters');
-                }
-            } else {
-                addMessage('The is a required field');
-            }
-            return messages;
-
-        }
-    }])
-    .filter("validatePostContent", ['$rootScope', function ($rootScope) {
-        return function (postContent, broadcast) {
-            function broadcastShowToast(type, text) {
-                if (broadcast) {
-                    $rootScope.showToast(type, text);
-                }
-            }
-
-            if (postContent) {
-                var postContentText = $("<div>" + postContent + "</div>").text();
-                if (postContentText.length == 0) {
-                    broadcastShowToast('warning', 'Please add some text to the post first');
-                }
-                return postContentText.length > 0;
-            } else {
-                broadcastShowToast('warning', 'Please add some text to the post first');
-                return false;
-            }
-        }
-    }])
-    .filter("postContentMessages", [function () {
-        return function (postContent) {
-            if (postContent) {
-                var postContentText = $("<div>" + postContent + "</div>").text();
-                if (postContentText.length == 0) {
-                    return "This is a required field"
-                } else {
-                    return "";
-                }
-            } else {
-                return "This is a required field"
-            }
-        }
-    }])
-    .filter("validatePostSummary", ['$rootScope', function ($rootScope) {
-        return function (postSummary, broadcast) {
-            var errors = 0;
-
-            function broadcastShowToast(type, text) {
-                if (broadcast) {
-                    $rootScope.showToast(type, text);
-                }
-            }
-
-            if (postSummary) {
-                var postSummaryText = $("<div>" + postSummary + "</div>").text();
-
-                if (postSummaryText.length == 0) {
-                    errors++;
-                    broadcastShowToast('warning', 'The post summary cannot be empty');
-                }
-                if (errors == 0) {
-                    if (postSummaryText.length > 2000) {
-                        errors++;
-                        broadcastShowToast('warning', 'The post summary cannot exceed 2000 characters');
-                    }
-                }
-            } else {
-                errors++;
-                broadcastShowToast('warning', 'The post summary cannot be empty');
-            }
-            return errors == 0;
-        }
-    }])
-    .filter("postSummaryMessages", [function () {
-        return function (postSummary) {
-            var messages = "";
-
-            function addMessage(newMessage) {
-                if (messages) {
-                    messages = messages + ": " + newMessage;
-                } else {
-                    messages = messages + newMessage;
-                }
-            }
-
-            if (postSummary) {
-                var postSummaryText = $("<div>" + postSummary + "</div>").text();
-
-                if (postSummaryText.length == 0) {
-                    addMessage('The post summary cannot be empty');
-                }
-                if (postSummaryText.length > 2000) {
-                    addMessage('The post summary cannot exceed 2000 characters');
-                }
-            } else {
-                addMessage('The post summary cannot be empty');
-            }
-            return messages;
-
-        }
-    }])
-    .filter("validatePostTags", ['$rootScope', function ($rootScope) {
-        return function (postTags, broadcast) {
-            var errors = 0;
-
-            function broadcastShowToast(type, text) {
-                if (broadcast) {
-                    $rootScope.showToast(type, text);
-                }
-            }
-
-            var numberOfTags = 0;
-
-            if (postTags) {
-                postTags.forEach(function (tag) {
-                    numberOfTags++;
-                    if (tag && tag.text) {
-                        if (errors == 0) {
-                            if (tag.text.length < 3) {
-                                errors++;
-                                broadcastShowToast('warning', 'Minimum required length for each tag is 3 characters');
-                            }
-                        }
-
-                        if (errors == 0) {
-                            if (tag.text.length > 30) {
-                                errors++;
-                                broadcastShowToast('warning', 'Maximum allowed length for each tag is 30 characters');
-                            }
-                        }
-                    }
-                });
-
-                if (errors == 0) {
-                    if (numberOfTags > 5) {
-                        errors++;
-                        broadcastShowToast('warning', 'Only a maximum of 5 tags are allowed per post');
-                    }
-                }
-            } else {
-                return true;
-            }
-
-            return errors == 0;
-        }
-    }])
-    .filter("postTagsMessages", [function () {
-        return function (postTags) {
-            var messages = "";
-
-            function addMessage(newMessage) {
-                if (messages) {
-                    messages = messages + ": " + newMessage;
-                } else {
-                    messages = messages + newMessage;
-                }
-            }
-
-            var numberOfTags = 0;
-
-            if (postTags) {
-                postTags.forEach(function (tag) {
-                    numberOfTags++;
-                    if (tag && tag.text) {
-                        if (tag.text.length < 3) {
-                            addMessage('Minimum required length for each tag is 3 characters');
-                        }
-
-                        if (tag.text.length > 30) {
-                            addMessage('Maximum allowed length for each tag is 30 characters');
-                        }
-                    }
-                });
-
-                if (numberOfTags > 5) {
-                    addMessage('Only a maximum of 5 tags are allowed per post');
-                }
-            }
-
-            return messages;
         }
     }]);
-angular.module('mainApp')
-    .factory('fN', [
-        function () {
+angular.module('app')
+    .directive('newPostBanner', ['$rootScope', function ($rootScope) {
+        return {
+            templateUrl: 'views/all/partials/templates/new_post_banner.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.newPostBanner = {
+                    show: false,
+                    bannerClass: "",
+                    msg: ""
+                };
+
+                $rootScope.$on('newPostBanner', function (event, banner) {
+                    $scope.newPostBanner = banner;
+                });
+
+                $rootScope.$on('clearBanners', function () {
+                    $scope.newPostBanner = {
+                        show: false,
+                        bannerClass: "",
+                        msg: ""
+                    };
+                })
+            }
+        }
+    }])
+    .directive('toastrDirective', ['$rootScope', 'toastr', function ($rootScope, toastr) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $rootScope.showToast = function (toastType, text) {
+                    switch (toastType) {
+                        case "success":
+                            toastr.clear();
+                            toastr.success(text);
+                            break;
+                        case "warning":
+                            toastr.clear();
+                            toastr.warning(text, 'Warning', {
+                                closeButton: true,
+                                tapToDismiss: true
+                            });
+                            break;
+                        case "error":
+                            toastr.clear();
+                            toastr.error(text, 'Error', {
+                                closeButton: true,
+                                tapToDismiss: true,
+                                timeOut: false
+                            });
+                            break;
+                        default:
+                            //clears current list of toasts
+                            toastr.clear();
+                    }
+                };
+
+                $rootScope.clearToasts = function () {
+                    toastr.clear();
+                };
+            }
+        }
+    }])
+    .directive('loadingBanner', ['$rootScope', function ($rootScope) {
+        var controller = ['$scope', '$rootScope', 'cfpLoadingBar', function ($scope, $rootScope, cfpLoadingBar) {
+
+            $rootScope.isLoading = true;
+            $rootScope.isLoadingPercentage = 0;
+            $rootScope.changeIsLoadingPercentage = function (num) {
+                $rootScope.isLoadingPercentage = num;
+            };
+
+            $rootScope.$on('cfpLoadingBar:loading', function (event, resp) {
+                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.$on('cfpLoadingBar:loaded', function (event, resp) {
+                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.$on('cfpLoadingBar:completed', function (event, resp) {
+                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.isLoadingTrue = function () {
+                $rootScope.isLoading = true;
+            };
+            $rootScope.isLoadingFalse = function () {
+                $rootScope.isLoading = false;
+            };
+
+            $rootScope.$on('isLoadingTrue', function () {
+                $rootScope.isLoading = true;
+            });
+
+            $rootScope.$on('isLoadingFalse', function () {
+                $rootScope.isLoading = false;
+            });
+        }];
+
+        return {
+            templateUrl: 'views/all/partials/templates/loading_banner.html',
+            restrict: 'AE',
+            controller: controller
+        }
+    }])
+    .directive('signInBannerScope', ['$rootScope', function ($rootScope) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.signInBanner = {
+                    show: false,
+                    bannerClass: "",
+                    msg: ""
+                };
+
+                $rootScope.$on('signInBanner', function (event, banner) {
+                    $scope.signInBanner = banner;
+                });
+
+                $rootScope.$on('clearBanners', function () {
+                    $scope.signInBanner = {
+                        show: false,
+                        bannerClass: "",
+                        msg: ""
+                    };
+                })
+            }
+        }
+    }])
+    .directive('registrationBannerScope', ['$rootScope', function ($rootScope) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.registrationBanner = {
+                    show: false,
+                    bannerClass: "",
+                    msg: ""
+                };
+
+                $rootScope.$on('registrationBanner', function (event, banner) {
+                    $scope.registrationBanner = banner;
+                });
+
+                $rootScope.$on('clearBanners', function () {
+                    $scope.registrationBanner = {
+                        show: false,
+                        bannerClass: "",
+                        msg: ""
+                    };
+                })
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('contactUsScope', ['$rootScope', '$http', function ($rootScope, $http) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.contactUsModel = {
+                    name: "",
+                    email: "",
+                    message: ""
+                };
+
+                function validateContactUs(name, email, message) {
+                    var errors = 0;
+
+                    if (!name || name.length == 0) {
+                        ++errors;
+                        $rootScope.showToast('warning', "Please enter your name");
+                        return -1
+                    } else if (!email || email.length == 0) {
+                        ++errors;
+                        $rootScope.showToast('warning', "Please enter a valid email");
+                        return -1
+                    } else if (!message || message.length == 0) {
+                        ++errors;
+                        $rootScope.showToast('warning', "Message field is empty");
+                        return -1;
+                    } else if (errors == 0) {
+                        return 1;
+                    }
+                }
+
+                $scope.sendContactUs = function () {
+                    var formStatus = validateContactUs($scope.contactUsModel.name, $scope.contactUsModel.email, $scope.contactUsModel.message);
+                    if (formStatus == 1) {
+                        sendContactUs($scope.contactUsModel)
+                            .success(function (resp) {
+                                $scope.contactUsModel.name = "";
+                                $scope.contactUsModel.email = "";
+                                $scope.contactUsModel.message = "";
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResp) {
+                                $rootScope.main.responseStatusHandler(errResp);
+                            });
+                    }
+                };
+
+                function sendContactUs(contactUsModel) {
+                    return $http.post('/contactUs', contactUsModel);
+                }
+            }
+        }
+    }])
+    .directive('contactUs', [function () {
+        return {
+            templateUrl: 'views/all/partials/components/contact_us.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                //depends on contactUsScope
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('createAccountScope', ['$rootScope', '$http', function ($rootScope, $http) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.registrationDetails = {
+                    email: "",
+                    firstName: "",
+                    lastName: "",
+                    username: "",
+                    password1: "",
+                    password2: "",
+                    invitationCode: ""
+                };
+
+                $scope.createAccount = function () {
+                    createAccount($scope.registrationDetails)
+                        .success(function (resp) {
+                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $scope.registrationDetails.password1 = "";
+                            $scope.registrationDetails.password2 = "";
+                            $scope.registrationDetails.invitationCode = "";
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        });
+                };
+
+                function createAccount(details) {
+                    return $http.post('/createAccount', details);
+                }
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('mainFooter', [function () {
+        return {
+            templateUrl: 'views/all/partials/components/main_footer.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('logoutScope', ['$rootScope', '$http', function ($rootScope, $http) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.logoutClient = function () {
+                    logoutClient()
+                        .success(function (resp) {
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        });
+                };
+
+                function logoutClient() {
+                    return $http.post('/api/logoutClient');
+                }
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('postContent', ['$filter', function ($filter) {
+        return {
+            templateUrl: 'views/all/partials/templates/post_content.html',
+            scope: {
+                postContent: '=model'
+            },
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.postContent = $filter('preparePostContent')($scope.postContent);
+            }
+        }
+    }])
+    .directive('postSummary', ['$filter',function ($filter) {
+        return {
+            templateUrl: 'views/all/partials/templates/post_summary.html',
+            scope: {
+                postSummary: '=model'
+            },
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.postSummary = $filter('preparePostSummary')($scope.postSummary);
+            }
+        }
+    }])
+    .directive('postTags', ['$filter',function ($filter) {
+        return {
+            templateUrl: 'views/all/partials/templates/post_tags.html',
+            scope: {
+                postTags: '=model'
+            },
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('resendEmailScope', ['$rootScope', '$http', function ($rootScope, $http) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+
+                $scope.resendConfirmationEmail = function (userUniqueCuid) {
+                    console.log(userUniqueCuid);
+                    resendConfirmationEmail(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (err) {
+                            $rootScope.main.responseStatusHandler(err);
+                        })
+                };
+
+                function resendConfirmationEmail(userUniqueCuid) {
+                    return $http.post('/resendConfirmationEmail', {
+                        userUniqueCuid: userUniqueCuid
+                    });
+                }
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('signInScope', ['$rootScope', '$http', function ($rootScope, $http) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.loginFormModel = {
+                    username: "",
+                    password: ""
+                };
+
+                $scope.submitLocalLoginForm = function () {
+                    localUserLogin($scope.loginFormModel)
+                        .success(function (resp) {
+                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $scope.loginFormModel.password = "";
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        });
+                };
+
+                function localUserLogin(loginData) {
+                    return $http.post('/localUserLogin', loginData);
+                }
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('suggestedPosts', ['$rootScope', '$filter', '$http', function ($rootScope, $filter, $http) {
+        return {
+            templateUrl: 'views/all/partials/templates/suggested_posts.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $rootScope.main.goToTop();
+
+                $scope.suggestedPosts = [];
+                $scope.suggestedPostsCount = 0;
+
+                function getSuggestedPosts() {
+                    getSuggestedPostsFromServer()
+                        .success(function (resp) {
+                            if (resp.postsArray.length > 0) {
+                                updateSuggestedPosts(resp.postsArray);
+                            } else {
+                                //do nothing
+                            }
+                            $rootScope.main.responseStatusHandler(resp);
+
+                        })
+                        .error(function (errResp) {
+                            $rootScope.main.responseStatusHandler(errResp);
+                        });
+                }
+
+                getSuggestedPosts();
+
+                function getSuggestedPostsFromServer() {
+                    return $http.post('/api/getSuggestedPosts', {})
+                }
+
+                function updateSuggestedPosts(suggestedPostsArray) {
+                    if (suggestedPostsArray == []) {
+                        $scope.suggestedPosts = [];
+                    } else {
+                        $scope.suggestedPosts = $filter('preparePostsNoChange')(null, suggestedPostsArray);
+                    }
+                }
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('titleDirective', ['globals', function (globals) {
+        return {
+            template: '<title ng-bind="defaultTitle">' + '</title>',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.defaultTitle = globals.getDocumentTitle();
+                $scope.$watch(globals.getDocumentTitle, function () {
+                    $scope.defaultTitle = globals.getDocumentTitle();
+                });
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('universalSearchBoxScope', ['$window', '$location', '$rootScope', 'globals', function ($window, $location, $rootScope, globals) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.mainSearchModel = {
+                    queryString: "",
+                    requestedPage: 1
+                };
+
+                $scope.performMainSearch = function () {
+                    if ($scope.mainSearchModel.queryString.length > 0) {
+                        $rootScope.main.redirectToPage('/search/posts/' + $scope.mainSearchModel.queryString + '/' + $scope.mainSearchModel.requestedPage);
+                    }
+                };
+            }
+        }
+    }]);
+angular.module('app')
+
+    .factory('fN', ['$q', '$location', '$window', '$rootScope', 'socketService',
+        function ($q, $location, $window, $rootScope, socketService) {
             return {
                 calcObjectLength: function (obj) {
                     var len = 0;
@@ -961,9 +1135,8 @@ angular.module('mainApp')
                     return len
                 }
             };
-        }
-    ]);
-angular.module('mainApp')
+        }]);
+angular.module('app')
     .factory('globals', ['$q', '$location', '$rootScope',
         function ($q, $location, $rootScope) {
             var userData = {};
@@ -1089,7 +1262,7 @@ angular.module('mainApp')
             };
         }
     ]);
-angular.module('mainApp')
+angular.module('app')
     .factory('mainService', ['$log', '$window', '$rootScope', 'socket',
         function ($log, $window, $rootScope, socket) {
 
@@ -1105,7 +1278,7 @@ angular.module('mainApp')
             };
         }
     ]);
-angular.module('mainApp')
+angular.module('app')
     .factory('PopularStoriesService', ['$filter', '$log', '$http', '$window', '$rootScope', 'socket',
         function ($filter, $log, $http, $window, $rootScope, socket) {
 
@@ -1132,194 +1305,7 @@ angular.module('mainApp')
             };
         }
     ]);
-angular.module('mainApp')
-    .factory('PostService', ['$filter', '$http', '$window', '$rootScope', 'socket', 'globals',
-        function ($filter, $http, $window, $rootScope, socket, globals) {
-
-            var post = {};
-            var editPostModel = {};
-            var allPosts = {};
-            var allPostsCount = 0;
-            var suggestedPosts = {};
-            var suggestedPostsCount = 0;
-
-            socket.on('newPost', function (data) {
-                //data here has the keys post, postCount
-                $rootScope.$broadcast('newPost', data);
-            });
-
-            socket.on('postUpdate', function (data) {
-                //data here has the keys post, postCount
-                $rootScope.$broadcast('postUpdate', data);
-            });
-
-            return {
-
-                getAllPosts: function () {
-                    return allPosts;
-                },
-
-                getPosts: function (pageNumber) {
-                    if (pageNumber) {
-                        return allPosts[pageNumber];
-                    } else {
-                        return [];
-                    }
-                },
-
-                getAllPostsCount: function () {
-                    return allPostsCount;
-                },
-
-                getPostsFromServer: function (getModelObject) {
-                    var pageNumber = getModelObject.requestedPage;
-                    return $http.get('/partial/posts/' + pageNumber)
-                },
-
-                updatePosts: function (postsArray, pageNumber) {
-                    if (postsArray == []) {
-                        allPosts[pageNumber] = [];
-                    } else {
-                        allPosts[pageNumber] = $filter('preparePosts')(null, postsArray);
-                    }
-                    return allPosts[pageNumber];
-                },
-
-                removePostWithUniqueCuid: function (postUniqueCuid) {
-                    var found = 0;
-                    for (var pageNumber in allPosts) {
-                        if (found == 0) {
-                            if (allPosts.hasOwnProperty(pageNumber)) {
-                                allPosts[pageNumber].forEach(function (post, index) {
-                                    if (found == 0) {
-                                        if (post.postUniqueCuid == postUniqueCuid) {
-                                            allPosts[pageNumber].splice(index, 1);
-                                            ++found;
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    }
-                },
-
-                updateAllPostsCount: function (newCount) {
-                    allPostsCount = newCount;
-                    return allPostsCount;
-                },
-
-                addNewToPosts: function (newPost) {
-                    function makePost(theNewPost) {
-                        if (newPost == {}) {
-                            theNewPost = {}
-                        } else {
-                            theNewPost = $filter('preparePosts')(theNewPost, null);
-                        }
-                        return theNewPost;
-                    }
-
-                    var tempPost = makePost(newPost);
-                    //unshift in firstPage
-                    allPosts['1'].unshift(tempPost);
-                    return allPosts;
-                },
-
-                getCurrentPost: function (postIndex) {
-                    if (postIndex) {
-                        return post[postIndex]
-                    } else {
-                        return {};
-                    }
-                },
-
-                getPostFromServer: function (postIndex) {
-                    return $http.post('/api/getPost', {
-                        postIndex: postIndex
-                    });
-                },
-
-                updatePost: function (newPost) {
-                    if (newPost == {}) {
-                        post = {}
-                    } else {
-                        post[newPost.postIndex] = $filter('preparePosts')(newPost, null);
-                    }
-                    return post[newPost.postIndex];
-                },
-
-                getCurrentEditPostModel: function () {
-                    if (editPostModel == {}) {
-                        return {}
-                    } else {
-                        return editPostModel;
-                    }
-                },
-
-                getCurrentEditPostModelFromServer: function (postIndex) {
-                    return $http.post('/api/getPost', {
-                        postIndex: postIndex
-                    });
-                },
-
-                updateCurrentEditPostModel: function (newPost) {
-                    if (newPost == {}) {
-                        editPostModel = {}
-                    } else {
-                        editPostModel = $filter('preparePostsNoChange')(newPost, null);
-                    }
-                    return editPostModel;
-                },
-
-                postSearch: function (searchObject) {
-                    var queryString = searchObject.queryString;
-                    var pageNumber = searchObject.requestedPage;
-                    return $http.get('/partial/search/posts/' + queryString + '/' + pageNumber);
-                },
-
-                getSuggestedPosts: function () {
-                    return suggestedPosts;
-                },
-
-                getSuggestedPostsFromServer: function () {
-                    return $http.post('/api/getSuggestedPosts', {})
-                },
-
-                updateSuggestedPosts: function (suggestedPostsArray) {
-                    if (suggestedPostsArray == []) {
-                        suggestedPosts = [];
-                    } else {
-                        suggestedPosts = $filter('preparePostsNoChange')(null, suggestedPostsArray);
-                    }
-                    return suggestedPosts;
-                },
-
-                //admin actions
-
-                submitNewPost: function (newPost) {
-                    return $http.post('/api/newPost', {
-                        newPost: newPost
-                    });
-                },
-
-                submitPostUpdate: function (post) {
-                    return $http.post('/api/updatePost', {
-                        postUpdate: post
-                    });
-                },
-
-                trashPost: function (postUniqueCuid) {
-                    return $http.post('/api/trashPost', {
-                        postUniqueCuid: postUniqueCuid
-                    });
-                },
-
-                unTrashPost: function (postUniqueCuid) {
-                    return $http.post('/api/unTrashPost');
-                }
-            };
-        }
-    ]);
-angular.module('mainApp')
+angular.module('app')
     .factory('socket', ['$log', '$location', '$rootScope',
         function ($log, $location, $rootScope) {
             var url;
@@ -1372,10 +1358,19 @@ angular.module('mainApp')
 
     .factory('socketService', ['$log', '$http', '$rootScope',
         function ($log, $http, $rootScope) {
+
             return {
 
                 getUserData: function () {
                     return $http.get('/api/getUserData');
+                },
+
+                createAccount: function (details) {
+                    return $http.post('/createAccount', details);
+                },
+
+                localUserLogin: function (loginData) {
+                    return $http.post('/localUserLogin', loginData);
                 },
 
                 resendConfirmationEmail: function (userUniqueCuid) {
@@ -1399,254 +1394,8 @@ angular.module('mainApp')
                     return $http.post('/api/logoutClient');
                 }
             }
-        }
-    ]);
-angular.module('mainApp')
-    .factory('uploadService', ['$q', '$location', 'Upload', 'globals',
-        function ($q, $location, Upload, globals) {
-            return {
-                uploadPostImage: function (fields, file) {
-                    return Upload.upload({
-                        url: globals.getLocationHost() + '/api/uploadPostImage',
-                        fields: fields,
-                        file: file
-                    });
-                },
-
-                uploadPdf: function (fields, file) {
-                    return Upload.upload({
-                        url: globals.getLocationHost() + '/api/uploadPdf',
-                        fields: fields,
-                        file: file
-                    });
-                },
-
-                uploadZip: function (fields, file) {
-                    return Upload.upload({
-                        url: globals.getLocationHost() + '/api/uploadZip',
-                        fields: fields,
-                        file: file
-                    });
-                }
-            }
-        }
-    ]);
-angular.module('mainApp')
-    .factory('UserService', ['$filter', '$http',
-        function ($filter, $http) {
-
-            var usersCount = {};
-            var allUsers = [];
-            var adminUsers = [];
-            var usersNotApproved = [];
-            var bannedUsers = [];
-
-            return {
-
-                getUsersCount: function () {
-                    return usersCount;
-                },
-
-                getUsersCountFromServer: function () {
-                    return $http.post('/api/getUsersCount', {})
-                },
-
-                updateUsersCount: function (newUsersCount) {
-                    usersCount = newUsersCount;
-                    return usersCount;
-                },
-
-                getAllUsers: function () {
-                    return allUsers;
-                },
-
-                getAllUsersFromServer: function () {
-                    return $http.post('/api/getAllUsers', {})
-                },
-
-                updateAllUsers: function (usersArray) {
-                    allUsers = usersArray;
-                    return allUsers;
-                },
-
-                getAdminUsers: function () {
-                    return adminUsers;
-                },
-
-                getAdminUsersFromServer: function () {
-                    return $http.post('/api/getAdminUsers', {})
-                },
-
-                updateAdminUsers: function (usersArray) {
-                    adminUsers = usersArray;
-                    return adminUsers;
-                },
-
-                getUsersNotApproved: function () {
-                    return usersNotApproved;
-                },
-
-                getUsersNotApprovedFromServer: function () {
-                    return $http.post('/api/getUsersNotApproved', {})
-                },
-
-                updateUsersNotApproved: function (usersArray) {
-                    usersNotApproved = usersArray;
-                    return usersNotApproved;
-                },
-
-                getBannedUsers: function () {
-                    return bannedUsers;
-                },
-
-                getBannedUsersFromServer: function () {
-                    return $http.post('/api/getBannedUsers', {})
-                },
-
-                updateBannedUsers: function (usersArray) {
-                    bannedUsers = usersArray;
-                    return bannedUsers;
-                },
-
-                addAdminPrivileges: function (userUniqueCuid) {
-                    return $http.post('/api/addAdminPrivileges', {
-                        userUniqueCuid: userUniqueCuid
-                    })
-                },
-
-                removeAdminPrivileges: function (userUniqueCuid) {
-                    return $http.post('/api/removeAdminPrivileges', {
-                        userUniqueCuid: userUniqueCuid
-                    })
-                },
-
-                approveUser: function (userUniqueCuid) {
-                    return $http.post('/api/approveUser', {
-                        userUniqueCuid: userUniqueCuid
-                    })
-                },
-
-                banUser: function (userUniqueCuid) {
-                    return $http.post('/api/banUser', {
-                        userUniqueCuid: userUniqueCuid
-                    })
-                },
-
-                unBanUser: function (userUniqueCuid) {
-                    return $http.post('/api/unBanUser', {
-                        userUniqueCuid: userUniqueCuid
-                    })
-                }
-            };
-        }
-    ]);
-angular.module('mainApp')
-    .directive('newPostBanner', ['$rootScope', function ($rootScope) {
-        return {
-            templateUrl: 'views/all/partials/templates/new_post_banner.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.newPostBanner = {
-                    show: false,
-                    bannerClass: "",
-                    msg: ""
-                };
-
-                $rootScope.$on('newPostBanner', function (event, banner) {
-                    $scope.newPostBanner = banner;
-                });
-
-                $rootScope.$on('clearBanners', function () {
-                    $scope.newPostBanner = {
-                        show: false,
-                        bannerClass: "",
-                        msg: ""
-                    };
-                })
-            }
-        }
-    }])
-    .directive('toastrDirective', ['$rootScope', function ($rootScope) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $rootScope.showToast = function (toastType, text) {
-                    switch (toastType) {
-                        case "success":
-                            toastr.clear();
-                            toastr.success(text);
-                            break;
-                        case "warning":
-                            toastr.clear();
-                            toastr.warning(text, 'Warning', {
-                                closeButton: true,
-                                tapToDismiss: true
-                            });
-                            break;
-                        case "error":
-                            toastr.clear();
-                            toastr.error(text, 'Error', {
-                                closeButton: true,
-                                tapToDismiss: true,
-                                timeOut: false
-                            });
-                            break;
-                        default:
-                            //clears current list of toasts
-                            toastr.clear();
-                    }
-                };
-
-                $rootScope.clearToasts = function () {
-                    toastr.clear();
-                };
-            }
-        }
-    }])
-    .directive('loadingBanner', ['$rootScope', function ($rootScope) {
-        var controller = ['$scope', '$rootScope', 'cfpLoadingBar', function ($scope, $rootScope, cfpLoadingBar) {
-
-            $rootScope.isLoading = true;
-            $rootScope.isLoadingPercentage = 0;
-            $rootScope.changeIsLoadingPercentage = function (num) {
-                $rootScope.isLoadingPercentage = num;
-            };
-
-            $rootScope.$on('cfpLoadingBar:loading', function (event, resp) {
-                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
-            });
-
-            $rootScope.$on('cfpLoadingBar:loaded', function (event, resp) {
-                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
-            });
-
-            $rootScope.$on('cfpLoadingBar:completed', function (event, resp) {
-                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
-            });
-
-            $rootScope.isLoadingTrue = function () {
-                $rootScope.isLoading = true;
-            };
-            $rootScope.isLoadingFalse = function () {
-                $rootScope.isLoading = false;
-            };
-
-            $rootScope.$on('isLoadingTrue', function () {
-                $rootScope.isLoading = true;
-            });
-
-            $rootScope.$on('isLoadingFalse', function () {
-                $rootScope.isLoading = false;
-            });
-        }];
-
-        return {
-            templateUrl: 'views/all/partials/templates/loading_banner.html',
-            restrict: 'AE',
-            controller: controller
-        }
-    }]);
-angular.module('mainApp')
+        }]);
+angular.module('app')
     .directive('editPostDirectiveScope', ['$q', '$filter', '$log', '$window', '$location', '$rootScope', 'globals', 'PostService',
         function ($q, $filter, $log, $window, $location, $rootScope, globals, PostService) {
             return {
@@ -1725,7 +1474,7 @@ angular.module('mainApp')
             }
         }
     ]);
-angular.module('mainApp')
+angular.module('app')
     .directive('fullPostScope', ['$q', '$log', '$rootScope', 'globals', 'PostService', function ($q, $log, $rootScope, globals, PostService) {
         return {
             restrict: 'AE',
@@ -1792,7 +1541,7 @@ angular.module('mainApp')
             }
         }
     }]);
-angular.module('mainApp')
+angular.module('app')
     .directive('newPostDirectiveScope', ['$filter', '$rootScope', 'PostService', 'globals', function ($filter, $rootScope, PostService, globals) {
         return {
             restrict: 'AE',
@@ -1874,7 +1623,7 @@ angular.module('mainApp')
             }
         }
     }]);
-angular.module('mainApp')
+angular.module('app')
     .directive('postStreamPager', ['$rootScope', 'PostService', function ($rootScope, PostService) {
         return {
 
@@ -1948,7 +1697,7 @@ angular.module('mainApp')
             }
         }
     }]);
-angular.module('mainApp')
+angular.module('app')
     .directive('postActionsScope', ['$rootScope', 'PostService', 'globals', function ($rootScope, PostService, globals) {
         return {
             restrict: 'AE',
@@ -1969,7 +1718,7 @@ angular.module('mainApp')
             }
         }
     }]);
-angular.module('mainApp')
+angular.module('app')
     .directive('headingMessages', ['$filter', function ($filter) {
         return {
             template: '<span class="form-error-notice" ng-show="showSpan()">' +
@@ -2034,14 +1783,13 @@ angular.module('mainApp')
             }
         }
     }]);
-angular.module('mainApp')
+angular.module('app')
     .directive('postStreamScope', ['$q', '$log', '$rootScope', 'globals', 'PostService', function ($q, $log, $rootScope, globals, PostService) {
         return {
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
 
                 $scope.theModel2 = JSON.parse($scope.model);
-                console.log($scope.theModel2);
 
                 function getPagePosts(pageNumber) {
 
@@ -2053,6 +1801,7 @@ angular.module('mainApp')
                         $scope.buttonLoading();
                         PostService.getPostsFromServer($scope.getModel)
                             .success(function (resp) {
+                                $rootScope.main.responseStatusHandler(resp);
                                 $scope.theModel2.pageNumber++;
                                 angular.element('#appendNextPosts').replaceWith(resp);
                                 $scope.finishedLoading();
@@ -2087,43 +1836,7 @@ angular.module('mainApp')
             }
         }
     }]);
-angular.module('mainApp')
-    .directive('postContent', ['$filter', function ($filter) {
-        return {
-            templateUrl: 'views/all/partials/templates/post_content.html',
-            scope: {
-                postContent: '=model'
-            },
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.postContent = $filter('preparePostContent')($scope.postContent);
-            }
-        }
-    }])
-    .directive('postSummary', ['$filter',function ($filter) {
-        return {
-            templateUrl: 'views/all/partials/templates/post_summary.html',
-            scope: {
-                postSummary: '=model'
-            },
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.postSummary = $filter('preparePostContent')($scope.postSummary)
-            }
-        }
-    }])
-    .directive('postTags', ['$filter',function ($filter) {
-        return {
-            templateUrl: 'views/all/partials/templates/post_tags.html',
-            scope: {
-                postTags: '=model'
-            },
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-            }
-        }
-    }]);
-angular.module('mainApp')
+angular.module('app')
     .directive('postSearchScope', ['$q', '$log', '$rootScope', 'globals', 'PostService', function ($q, $log, $rootScope, globals, PostService) {
 
         return {
@@ -2143,6 +1856,7 @@ angular.module('mainApp')
                         $scope.buttonLoading();
                         PostService.postSearch($scope.mainSearchModel)
                             .success(function (resp) {
+                                $rootScope.main.responseStatusHandler(resp);
                                 $scope.theModel.pageNumber++;
                                 angular.element('#appendNextPostSearch').replaceWith(resp);
                                 $scope.finishedLoading();
@@ -2169,106 +1883,7 @@ angular.module('mainApp')
             }
         }
     }]);
-angular.module('mainApp')
-    .directive('titleDirective', ['globals', function (globals) {
-        return {
-            template: '<title ng-bind="defaultTitle">' + '</title>',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.defaultTitle = globals.getDocumentTitle();
-                $scope.$watch(globals.getDocumentTitle, function () {
-                    $scope.defaultTitle = globals.getDocumentTitle();
-                });
-            }
-        }
-    }])
-    .directive('contactUs', ['$rootScope', 'socketService', function ($rootScope, socketService) {
-        return {
-            templateUrl: 'views/all/partials/components/contact_us.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.contactUsModel = {
-                    name: "",
-                    email: "",
-                    message: ""
-                };
-
-                function validateContactUs(name, email, message) {
-                    var errors = 0;
-
-                    if (!name || name.length == 0) {
-                        ++errors;
-                        $rootScope.showToast('warning', "Please enter your name");
-                        return -1
-                    } else if (!email || email.length == 0) {
-                        ++errors;
-                        $rootScope.showToast('warning', "Please enter a valid email");
-                        return -1
-                    } else if (!message || message.length == 0) {
-                        ++errors;
-                        $rootScope.showToast('warning', "Message field is empty");
-                        return -1;
-                    } else if (errors == 0) {
-                        return 1;
-                    }
-                }
-
-                $scope.sendContactUs = function () {
-                    var formStatus = validateContactUs($scope.contactUsModel.name, $scope.contactUsModel.email, $scope.contactUsModel.message);
-                    if (formStatus == 1) {
-                        socketService.sendContactUs($scope.contactUsModel)
-                            .success(function (resp) {
-                                $scope.contactUsModel.name = "";
-                                $scope.contactUsModel.email = "";
-                                $scope.contactUsModel.message = "";
-                                $rootScope.responseStatusHandler(resp);
-                            })
-                            .error(function (errResp) {
-                                $rootScope.responseStatusHandler(errResp);
-                            });
-                    }
-                };
-            }
-        }
-    }])
-    .directive('mainFooter', [function () {
-        return {
-            templateUrl: 'views/all/partials/components/main_footer.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-            }
-        }
-    }]);
-angular.module('mainApp')
-    .directive('suggestedPosts', ['$rootScope', 'PostService', '$timeout', 'globals', function ($rootScope, PostService, $timeout, globals) {
-        return {
-            templateUrl: 'views/all/partials/templates/suggested_posts.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $rootScope.main.goToTop();
-                $scope.suggestedPosts = PostService.getSuggestedPosts();
-
-                function getSuggestedPosts() {
-                    PostService.getSuggestedPostsFromServer()
-                        .success(function (resp) {
-                            if ((resp.postsArray.length > 0)) {
-                                $scope.suggestedPosts = PostService.updateSuggestedPosts(resp.postsArray);
-                            } else {
-                                $scope.suggestedPosts = PostService.getSuggestedPosts();
-                            }
-
-                        })
-                        .error(function (errResp) {
-                            $scope.suggestedPosts = PostService.getSuggestedPosts();
-                            $rootScope.main.responseStatusHandler(errResp);
-                        });
-                }
-
-                getSuggestedPosts();
-            }
-        }
-    }]);
-angular.module('mainApp')
+angular.module('app')
     .directive('trashPostDir', ['$rootScope', 'PostService', 'globals', function ($rootScope, PostService, globals) {
         return {
             template: ' <a class="btn-link btn btn-default btn-sm" href ng-click="trashPost(post.postUniqueCuid)">Delete</a>',
@@ -2293,7 +1908,7 @@ angular.module('mainApp')
             }
         }
     }]);
-angular.module('mainApp')
+angular.module('app')
     .directive('universalBannerScope', ['$rootScope', 'globals', function ($rootScope, globals) {
         return {
             restrict: 'AE',
@@ -2318,25 +1933,7 @@ angular.module('mainApp')
             }
         }
     }]);
-angular.module('mainApp')
-    .directive('universalSearchBoxScope', ['$window', '$location', '$rootScope', 'globals', function ($window, $location, $rootScope, globals) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.mainSearchModel = {
-                    queryString: "",
-                    requestedPage: 1
-                };
-
-                $scope.performMainSearch = function () {
-                    if ($scope.mainSearchModel.queryString.length > 0) {
-                        $rootScope.main.redirectToPage('/search/posts/' + $scope.mainSearchModel.queryString + '/' + $scope.mainSearchModel.requestedPage);
-                    }
-                };
-            }
-        }
-    }]);
-angular.module('mainApp')
+angular.module('app')
     .directive('newPostUploader', ['$rootScope', 'uploadService', 'globals', function ($rootScope, uploadService, globals) {
         return {
 
@@ -2632,7 +2229,7 @@ angular.module('mainApp')
             }
         }
     }]);
-angular.module('mainApp')
+angular.module('app')
     .directive('adminUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/admin_users.html',
@@ -2668,7 +2265,7 @@ angular.module('mainApp')
             }
         }
     }]);
-angular.module('mainApp')
+angular.module('app')
     .directive('allUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/all_users.html',
@@ -2706,7 +2303,7 @@ angular.module('mainApp')
             }
         }
     }]);
-angular.module('mainApp')
+angular.module('app')
     .directive('bannedUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/banned_users.html',
@@ -2744,7 +2341,7 @@ angular.module('mainApp')
             }
         }
     }]);
-angular.module('mainApp')
+angular.module('app')
     .directive('unApprovedUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/unApproved_users.html',
@@ -2780,7 +2377,7 @@ angular.module('mainApp')
             }
         }
     }]);
-angular.module('mainApp')
+angular.module('app')
     .directive('userDisplay', ['$rootScope', 'UserService', 'socketService', 'globals', function ($rootScope, UserService, socketService, globals) {
         return {
             templateUrl: 'views/all/partials/templates/user_display.html',
@@ -2871,7 +2468,7 @@ angular.module('mainApp')
             }
         }
     }]);
-angular.module('mainApp')
+angular.module('app')
     .directive('usersCount', ['$q', '$log', '$rootScope', 'globals', function ($q, $log, $rootScope, globals) {
         return {
             templateUrl: 'views/all/partials/templates/user_statistics.html',
@@ -2882,3 +2479,647 @@ angular.module('mainApp')
             }
         }
     }]);
+//angular sanitize included in textAngular
+angular.module('app')
+    .run(['$templateCache', '$http', '$rootScope', '$state', '$stateParams', function ($templateCache, $http, $rootScope, $state, $stateParams) {
+        $rootScope.$state = $state;
+        $rootScope.$stateParams = $stateParams;
+        $rootScope.Utils = {
+            keys: Object.keys
+        };
+    }])
+
+    .config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
+        //    $urlRouterProvider
+        //        .when("/home/stream/", '/home/stream/1')
+        //        .when("/home/post/", '/home')
+        //        .when("/home/editPost/", '/home')
+        //        .when("/home/search/", '/home/')
+        //        .otherwise("/home");
+        //
+        //    $stateProvider
+        //        .state('home', {
+        //            url: '/home',
+        //        })
+        //        .state('home.post', {
+        //            url: '/post/:postIndex',
+        //            templateUrl: 'views/all/partials/views/home/full_post.html'
+        //        })
+        //        .state('home.newPost', {
+        //            url: '/newPost',
+        //            templateUrl: 'views/all/partials/views/home/new_post.html'
+        //        })
+        //        .state('home.editPost', {
+        //            url: '/editPost/:postIndex',
+        //            templateUrl: 'views/all/partials/views/home/edit_post.html'
+        //        })
+        //        .state('home.search', {
+        //            url: '/search/:queryString/:pageNumber',
+        //            templateUrl: 'views/search/search_results.html'
+        //        })
+        //        .state('users', {
+        //            url: '/users',
+        //            templateUrl: 'views/all/partials/views/users/users.html'
+        //        })
+        //        .state("otherwise", {url: '/home'});
+
+        //$locationProvider
+        //    .html5Mode(false)
+        //    .hashPrefix('!');
+    }]);
+angular.module('app')
+    .directive('logoutScope', ['$rootScope', 'logoutService', function ($rootScope, logoutService) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.logoutClient = function () {
+                    logoutService.logoutClient()
+                        .success(function (resp) {
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        });
+                };
+            }
+        }
+    }]);
+angular.module('app')
+    .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'socketService', 'globals', '$document',
+        function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, socketService, globals, $document) {
+        }
+    ]);
+
+angular.module('app')
+    .controller('SearchController', ['$q', '$log', '$scope', '$rootScope', 'globals', 'PostService',
+        function ($q, $log, $scope, $rootScope, globals, PostService) {
+        }
+    ]);
+angular.module('app')
+    .controller('UserManagerController', ['$q', '$scope', '$rootScope', 'UserService', 'globals',
+        function ($q, $scope, $rootScope, UserService, globals) {
+
+            $scope.usersCount = UserService.getUsersCount();
+
+            function getUsersCount() {
+                if (globals.checkAccountStatus()) {
+                    UserService.getUsersCountFromServer()
+                        .success(function (resp) {
+                            $scope.usersCount = UserService.updateUsersCount(resp.usersCount);
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        })
+                }
+            }
+
+            getUsersCount();
+
+            //===============socket listeners===============
+
+            $rootScope.$on('userChanges', function () {
+                getUsersCount();
+            });
+
+            $rootScope.$on('reconnect', function () {
+            });
+        }
+    ]);
+angular.module('app')
+    .filter("validatePostHeading", ['$rootScope', function ($rootScope) {
+        return function (postHeading, broadcast) {
+            var errors = 0;
+
+            function broadcastShowToast(type, text) {
+                if (broadcast) {
+                    $rootScope.showToast(type, text);
+                }
+            }
+
+            if (postHeading) {
+                if (postHeading.length == 0) {
+                    errors++;
+                    broadcastShowToast('warning', 'The heading is required');
+                }
+                if (errors == 0) {
+                    if (postHeading.length < 10) {
+                        broadcastShowToast('warning', 'The minimum required length of the heading is 10 characters');
+                        errors++;
+                    }
+                }
+            } else {
+                errors++;
+                broadcastShowToast('warning', 'The heading is required');
+            }
+            return errors == 0;
+        }
+    }])
+    .filter("postHeadingMessages", [function () {
+        return function (postHeading) {
+            var messages = "";
+
+            function addMessage(newMessage) {
+                if (messages) {
+                    messages = messages + ": " + newMessage;
+                } else {
+                    messages = messages + newMessage;
+                }
+            }
+
+            if (postHeading) {
+                var postHeadingText = $("<div>" + postHeading + "</div>").text();
+
+                if (postHeadingText.length == 0) {
+                    addMessage('The is a required field');
+                }
+                if (postHeadingText.length > 0 && postHeadingText.length < 10) {
+                    addMessage('Minimum length required is 10 characters');
+                }
+            } else {
+                addMessage('The is a required field');
+            }
+            return messages;
+
+        }
+    }])
+    .filter("validatePostContent", ['$rootScope', function ($rootScope) {
+        return function (postContent, broadcast) {
+            function broadcastShowToast(type, text) {
+                if (broadcast) {
+                    $rootScope.showToast(type, text);
+                }
+            }
+
+            if (postContent) {
+                var postContentText = $("<div>" + postContent + "</div>").text();
+                if (postContentText.length == 0) {
+                    broadcastShowToast('warning', 'Please add some text to the post first');
+                }
+                return postContentText.length > 0;
+            } else {
+                broadcastShowToast('warning', 'Please add some text to the post first');
+                return false;
+            }
+        }
+    }])
+    .filter("postContentMessages", [function () {
+        return function (postContent) {
+            if (postContent) {
+                var postContentText = $("<div>" + postContent + "</div>").text();
+                if (postContentText.length == 0) {
+                    return "This is a required field"
+                } else {
+                    return "";
+                }
+            } else {
+                return "This is a required field"
+            }
+        }
+    }])
+    .filter("validatePostSummary", ['$rootScope', function ($rootScope) {
+        return function (postSummary, broadcast) {
+            var errors = 0;
+
+            function broadcastShowToast(type, text) {
+                if (broadcast) {
+                    $rootScope.showToast(type, text);
+                }
+            }
+
+            if (postSummary) {
+                var postSummaryText = $("<div>" + postSummary + "</div>").text();
+
+                if (postSummaryText.length == 0) {
+                    errors++;
+                    broadcastShowToast('warning', 'The post summary cannot be empty');
+                }
+                if (errors == 0) {
+                    if (postSummaryText.length > 2000) {
+                        errors++;
+                        broadcastShowToast('warning', 'The post summary cannot exceed 2000 characters');
+                    }
+                }
+            } else {
+                errors++;
+                broadcastShowToast('warning', 'The post summary cannot be empty');
+            }
+            return errors == 0;
+        }
+    }])
+    .filter("postSummaryMessages", [function () {
+        return function (postSummary) {
+            var messages = "";
+
+            function addMessage(newMessage) {
+                if (messages) {
+                    messages = messages + ": " + newMessage;
+                } else {
+                    messages = messages + newMessage;
+                }
+            }
+
+            if (postSummary) {
+                var postSummaryText = $("<div>" + postSummary + "</div>").text();
+
+                if (postSummaryText.length == 0) {
+                    addMessage('The post summary cannot be empty');
+                }
+                if (postSummaryText.length > 2000) {
+                    addMessage('The post summary cannot exceed 2000 characters');
+                }
+            } else {
+                addMessage('The post summary cannot be empty');
+            }
+            return messages;
+
+        }
+    }])
+    .filter("validatePostTags", ['$rootScope', function ($rootScope) {
+        return function (postTags, broadcast) {
+            var errors = 0;
+
+            function broadcastShowToast(type, text) {
+                if (broadcast) {
+                    $rootScope.showToast(type, text);
+                }
+            }
+
+            var numberOfTags = 0;
+
+            if (postTags) {
+                postTags.forEach(function (tag) {
+                    numberOfTags++;
+                    if (tag && tag.text) {
+                        if (errors == 0) {
+                            if (tag.text.length < 3) {
+                                errors++;
+                                broadcastShowToast('warning', 'Minimum required length for each tag is 3 characters');
+                            }
+                        }
+
+                        if (errors == 0) {
+                            if (tag.text.length > 30) {
+                                errors++;
+                                broadcastShowToast('warning', 'Maximum allowed length for each tag is 30 characters');
+                            }
+                        }
+                    }
+                });
+
+                if (errors == 0) {
+                    if (numberOfTags > 5) {
+                        errors++;
+                        broadcastShowToast('warning', 'Only a maximum of 5 tags are allowed per post');
+                    }
+                }
+            } else {
+                return true;
+            }
+
+            return errors == 0;
+        }
+    }])
+    .filter("postTagsMessages", [function () {
+        return function (postTags) {
+            var messages = "";
+
+            function addMessage(newMessage) {
+                if (messages) {
+                    messages = messages + ": " + newMessage;
+                } else {
+                    messages = messages + newMessage;
+                }
+            }
+
+            var numberOfTags = 0;
+
+            if (postTags) {
+                postTags.forEach(function (tag) {
+                    numberOfTags++;
+                    if (tag && tag.text) {
+                        if (tag.text.length < 3) {
+                            addMessage('Minimum required length for each tag is 3 characters');
+                        }
+
+                        if (tag.text.length > 30) {
+                            addMessage('Maximum allowed length for each tag is 30 characters');
+                        }
+                    }
+                });
+
+                if (numberOfTags > 5) {
+                    addMessage('Only a maximum of 5 tags are allowed per post');
+                }
+            }
+
+            return messages;
+        }
+    }]);
+angular.module('app')
+    .factory('PostService', ['$filter', '$http', '$window', '$rootScope', 'socket', 'globals',
+        function ($filter, $http, $window, $rootScope, socket, globals) {
+
+            var post = {};
+            var editPostModel = {};
+            var allPosts = {};
+            var allPostsCount = 0;
+
+            socket.on('newPost', function (data) {
+                //data here has the keys post, postCount
+                $rootScope.$broadcast('newPost', data);
+            });
+
+            socket.on('postUpdate', function (data) {
+                //data here has the keys post, postCount
+                $rootScope.$broadcast('postUpdate', data);
+            });
+
+            return {
+
+                getAllPosts: function () {
+                    return allPosts;
+                },
+
+                getPosts: function (pageNumber) {
+                    if (pageNumber) {
+                        return allPosts[pageNumber];
+                    } else {
+                        return [];
+                    }
+                },
+
+                getAllPostsCount: function () {
+                    return allPostsCount;
+                },
+
+                getPostsFromServer: function (getModelObject) {
+                    var pageNumber = getModelObject.requestedPage;
+                    return $http.get('/partial/posts/' + pageNumber)
+                },
+
+                updatePosts: function (postsArray, pageNumber) {
+                    if (postsArray == []) {
+                        allPosts[pageNumber] = [];
+                    } else {
+                        allPosts[pageNumber] = $filter('preparePosts')(null, postsArray);
+                    }
+                    return allPosts[pageNumber];
+                },
+
+                removePostWithUniqueCuid: function (postUniqueCuid) {
+                    var found = 0;
+                    for (var pageNumber in allPosts) {
+                        if (found == 0) {
+                            if (allPosts.hasOwnProperty(pageNumber)) {
+                                allPosts[pageNumber].forEach(function (post, index) {
+                                    if (found == 0) {
+                                        if (post.postUniqueCuid == postUniqueCuid) {
+                                            allPosts[pageNumber].splice(index, 1);
+                                            ++found;
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+                },
+
+                updateAllPostsCount: function (newCount) {
+                    allPostsCount = newCount;
+                    return allPostsCount;
+                },
+
+                addNewToPosts: function (newPost) {
+                    function makePost(theNewPost) {
+                        if (newPost == {}) {
+                            theNewPost = {}
+                        } else {
+                            theNewPost = $filter('preparePosts')(theNewPost, null);
+                        }
+                        return theNewPost;
+                    }
+
+                    var tempPost = makePost(newPost);
+                    //unshift in firstPage
+                    allPosts['1'].unshift(tempPost);
+                    return allPosts;
+                },
+
+                getCurrentPost: function (postIndex) {
+                    if (postIndex) {
+                        return post[postIndex]
+                    } else {
+                        return {};
+                    }
+                },
+
+                getPostFromServer: function (postIndex) {
+                    return $http.post('/api/getPost', {
+                        postIndex: postIndex
+                    });
+                },
+
+                updatePost: function (newPost) {
+                    if (newPost == {}) {
+                        post = {}
+                    } else {
+                        post[newPost.postIndex] = $filter('preparePosts')(newPost, null);
+                    }
+                    return post[newPost.postIndex];
+                },
+
+                getCurrentEditPostModel: function () {
+                    if (editPostModel == {}) {
+                        return {}
+                    } else {
+                        return editPostModel;
+                    }
+                },
+
+                getCurrentEditPostModelFromServer: function (postIndex) {
+                    return $http.post('/api/getPost', {
+                        postIndex: postIndex
+                    });
+                },
+
+                updateCurrentEditPostModel: function (newPost) {
+                    if (newPost == {}) {
+                        editPostModel = {}
+                    } else {
+                        editPostModel = $filter('preparePostsNoChange')(newPost, null);
+                    }
+                    return editPostModel;
+                },
+
+                postSearch: function (searchObject) {
+                    var queryString = searchObject.queryString;
+                    var pageNumber = searchObject.requestedPage;
+                    return $http.get('/partial/search/posts/' + queryString + '/' + pageNumber);
+                },
+
+                //admin actions
+
+                submitNewPost: function (newPost) {
+                    return $http.post('/api/newPost', {
+                        newPost: newPost
+                    });
+                },
+
+                submitPostUpdate: function (post) {
+                    return $http.post('/api/updatePost', {
+                        postUpdate: post
+                    });
+                },
+
+                trashPost: function (postUniqueCuid) {
+                    return $http.post('/api/trashPost', {
+                        postUniqueCuid: postUniqueCuid
+                    });
+                },
+
+                unTrashPost: function (postUniqueCuid) {
+                    return $http.post('/api/unTrashPost');
+                }
+            };
+        }
+    ]);
+angular.module('app')
+    .factory('uploadService', ['$q', '$location', 'Upload', 'globals',
+        function ($q, $location, Upload, globals) {
+            return {
+                uploadPostImage: function (fields, file) {
+                    return Upload.upload({
+                        url: globals.getLocationHost() + '/api/uploadPostImage',
+                        fields: fields,
+                        file: file
+                    });
+                },
+
+                uploadPdf: function (fields, file) {
+                    return Upload.upload({
+                        url: globals.getLocationHost() + '/api/uploadPdf',
+                        fields: fields,
+                        file: file
+                    });
+                },
+
+                uploadZip: function (fields, file) {
+                    return Upload.upload({
+                        url: globals.getLocationHost() + '/api/uploadZip',
+                        fields: fields,
+                        file: file
+                    });
+                }
+            }
+        }
+    ]);
+angular.module('app')
+    .factory('UserService', ['$filter', '$http',
+        function ($filter, $http) {
+
+            var usersCount = {};
+            var allUsers = [];
+            var adminUsers = [];
+            var usersNotApproved = [];
+            var bannedUsers = [];
+
+            return {
+
+                getUsersCount: function () {
+                    return usersCount;
+                },
+
+                getUsersCountFromServer: function () {
+                    return $http.post('/api/getUsersCount', {})
+                },
+
+                updateUsersCount: function (newUsersCount) {
+                    usersCount = newUsersCount;
+                    return usersCount;
+                },
+
+                getAllUsers: function () {
+                    return allUsers;
+                },
+
+                getAllUsersFromServer: function () {
+                    return $http.post('/api/getAllUsers', {})
+                },
+
+                updateAllUsers: function (usersArray) {
+                    allUsers = usersArray;
+                    return allUsers;
+                },
+
+                getAdminUsers: function () {
+                    return adminUsers;
+                },
+
+                getAdminUsersFromServer: function () {
+                    return $http.post('/api/getAdminUsers', {})
+                },
+
+                updateAdminUsers: function (usersArray) {
+                    adminUsers = usersArray;
+                    return adminUsers;
+                },
+
+                getUsersNotApproved: function () {
+                    return usersNotApproved;
+                },
+
+                getUsersNotApprovedFromServer: function () {
+                    return $http.post('/api/getUsersNotApproved', {})
+                },
+
+                updateUsersNotApproved: function (usersArray) {
+                    usersNotApproved = usersArray;
+                    return usersNotApproved;
+                },
+
+                getBannedUsers: function () {
+                    return bannedUsers;
+                },
+
+                getBannedUsersFromServer: function () {
+                    return $http.post('/api/getBannedUsers', {})
+                },
+
+                updateBannedUsers: function (usersArray) {
+                    bannedUsers = usersArray;
+                    return bannedUsers;
+                },
+
+                addAdminPrivileges: function (userUniqueCuid) {
+                    return $http.post('/api/addAdminPrivileges', {
+                        userUniqueCuid: userUniqueCuid
+                    })
+                },
+
+                removeAdminPrivileges: function (userUniqueCuid) {
+                    return $http.post('/api/removeAdminPrivileges', {
+                        userUniqueCuid: userUniqueCuid
+                    })
+                },
+
+                approveUser: function (userUniqueCuid) {
+                    return $http.post('/api/approveUser', {
+                        userUniqueCuid: userUniqueCuid
+                    })
+                },
+
+                banUser: function (userUniqueCuid) {
+                    return $http.post('/api/banUser', {
+                        userUniqueCuid: userUniqueCuid
+                    })
+                },
+
+                unBanUser: function (userUniqueCuid) {
+                    return $http.post('/api/unBanUser', {
+                        userUniqueCuid: userUniqueCuid
+                    })
+                }
+            };
+        }
+    ]);

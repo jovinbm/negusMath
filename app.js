@@ -90,14 +90,13 @@ app.use(logger('dev'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(methodOverride());
 app.use(bodyParser.json());
-app.use(cookieParser());
 app.use(session({
-    key: 'hstatickey',
-    cookie: {path: '/', httpOnly: true, secure: false, maxAge: 604800000000},
-    secret: 'hssjbm12234bsidh)))^Hjdsb',
-    store: new MongoStore({mongooseConnection: mongoose.connection}),
-    saveUninitialized: false,
-    resave: false
+    name: 'negusMath.id',
+    secret: 'hjfdsvjf324yo2340',
+    cookie: {path: '/', httpOnly: true, secure: false, maxAge: null},
+    saveUninitialized: true,
+    resave: false,
+    store: new MongoStore({mongooseConnection: mongoose.connection})
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -122,64 +121,72 @@ app.get('/socket.io/socket.io.js', function (req, res) {
 app.get('/index', routes.index_Html);
 app.get('/', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.renderHome_Html);
 app.param('pageNumber', /^[0-9]+$/);
-app.get('/partial/posts/:pageNumber', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.renderPosts_partial);
+app.get('/partial/posts/:pageNumber', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, routes.renderPosts_partial);
 app.param('postIndex', /^[0-9]+$/);
 app.get('/post/:postIndex', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.renderIndividualPost);
-app.get('/manage/users', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, routes.manage_users);
-app.get('/new/post', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, routes.new_post);
-app.get('/edit/post/:postIndex', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, routes.edit_post);
+app.get('/manage/users', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, middleware.checkUserIsAdmin, routes.manage_users);
+app.get('/new/post', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, middleware.checkUserIsAdmin, routes.new_post);
+app.get('/edit/post/:postIndex', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, middleware.checkUserIsAdmin, routes.edit_post);
 app.param('pageNumber', /^[0-9]+$/);
-app.get('/search/posts/:queryString/:pageNumber', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, routes.search_posts);
-app.get('/partial/search/posts/:queryString/:pageNumber', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, routes.search_posts_partial);
+app.get('/search/posts/:queryString/:pageNumber', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.search_posts);
+app.get('/partial/search/posts/:queryString/:pageNumber', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, routes.search_posts_partial);
 
 
 //email api
 app.get('/email_archive/:templateGroup', routes.renderEmail);
-app.post('/resendConfirmationEmail', middleware.ensureAuthenticatedAngular, middleware.addUserData, basicAPI.resendConfirmationEmail);
+app.post('/resendConfirmationEmail', middleware.ensureAuthenticatedXhr, middleware.addUserData, basicAPI.resendConfirmationEmail);
 app.get('/confirm_email/:hashedUniqueCuid', basicAPI.confirmEmail);
 
 //login api
 app.post('/createAccount', loginAPI.createAccount);
 app.post('/localUserLogin', loginAPI.localUserLogin);
+app.get('/pageNotFound', routes.render_not_found);
+app.get('/notAuthorizedPage', routes.render_not_authorized_access_page);
+app.get('/notLoggedIn', routes.render_not_logged_in);
+app.get('/error/500', routes.render_error_500);
 
 //logout api
-app.post('/api/logoutClient', middleware.ensureAuthenticatedAngular, middleware.addUserData, logoutAPI.logoutClient);
+app.post('/api/logoutClient', middleware.ensureAuthenticatedXhr, middleware.addUserData, logoutAPI.logoutClient);
 
 //info api
 app.get('/api/getUserData', loginAPI.getUserData);
 
 //post and search api
-app.post('/api/getPosts', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, postAPI.getPosts);
-app.post('/api/getSuggestedPosts', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, postAPI.getSuggestedPosts);
-app.post('/api/getPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, postAPI.getPost);
-app.post('/api/getPopularStories', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, postAPI.getPopularStories);
-app.post('/api/mainSearch', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, postAPI.mainSearch);
-app.post('/api/newPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, postAPI.newPost);
-app.post('/api/updatePost', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, postAPI.updatePost);
-app.post('/api/trashPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, postAPI.trashPost);
-app.post('/api/unTrashPost', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, postAPI.unTrashPost);
-app.post('/api/deletePost', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, postAPI.deletePost);
+app.post('/api/getPosts', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, postAPI.getPosts);
+app.post('/api/getSuggestedPosts', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, postAPI.getSuggestedPosts);
+app.post('/api/getPost', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, postAPI.getPost);
+app.post('/api/getPopularStories', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, postAPI.getPopularStories);
+app.post('/api/mainSearch', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, postAPI.mainSearch);
+app.post('/api/newPost', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, postAPI.newPost);
+app.post('/api/updatePost', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, postAPI.updatePost);
+app.post('/api/trashPost', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, postAPI.trashPost);
+app.post('/api/unTrashPost', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, postAPI.unTrashPost);
+app.post('/api/deletePost', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, postAPI.deletePost);
 
 
 //user management api
-app.post('/api/getUsersCount', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.getUsersCount);
-app.post('/api/getAllUsers', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.getAllUsers);
-app.post('/api/getAdminUsers', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.getAdminUsers);
-app.post('/api/addAdminPrivileges', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.addAdminPrivileges);
-app.post('/api/removeAdminPrivileges', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.removeAdminPrivileges);
-app.post('/api/getLocalUsers', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.getLocalUsers);
-app.post('/api/getApprovedUsers', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.getApprovedUsers);
-app.post('/api/approveUser', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.approveUser);
-app.post('/api/getUsersNotApproved', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.getUsersNotApproved);
-app.post('/api/getBannedUsers', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.getBannedUsers);
-app.post('/api/banUser', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.banUser);
-app.post('/api/unBanUser', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.unBanUser);
-app.post('/api/getUsersNotBanned', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, userAPI.getUsersNotBanned);
+app.post('/api/getUsersCount', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, userAPI.getUsersCount);
+app.post('/api/getAllUsers', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, userAPI.getAllUsers);
+app.post('/api/getAdminUsers', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, userAPI.getAdminUsers);
+app.post('/api/addAdminPrivileges', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, userAPI.addAdminPrivileges);
+app.post('/api/removeAdminPrivileges', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, userAPI.removeAdminPrivileges);
+app.post('/api/getLocalUsers', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, userAPI.getLocalUsers);
+app.post('/api/getApprovedUsers', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, userAPI.getApprovedUsers);
+app.post('/api/approveUser', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, userAPI.approveUser);
+app.post('/api/getUsersNotApproved', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, userAPI.getUsersNotApproved);
+app.post('/api/getBannedUsers', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, userAPI.getBannedUsers);
+app.post('/api/banUser', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, userAPI.banUser);
+app.post('/api/unBanUser', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, userAPI.unBanUser);
+app.post('/api/getUsersNotBanned', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, userAPI.getUsersNotBanned);
 
 //upload api
-app.post('/api/uploadPostImage', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, multer(upload_params.postImageParams()), uploadAPI.uploadPostImage);
-app.post('/api/uploadPdf', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, multer(upload_params.pdfParams()), uploadAPI.uploadPdf);
-app.post('/api/uploadZip', middleware.ensureAuthenticatedAngular, middleware.addUserData, middleware.checkAccountStatusAngular, middleware.checkUserIsAdmin, multer(upload_params.zipParams()), uploadAPI.uploadZip);
+app.post('/api/uploadPostImage', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, multer(upload_params.postImageParams()), uploadAPI.uploadPostImage);
+app.post('/api/uploadPdf', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, multer(upload_params.pdfParams()), uploadAPI.uploadPdf);
+app.post('/api/uploadZip', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, middleware.checkUserIsAdminXhr, multer(upload_params.zipParams()), uploadAPI.uploadZip);
+
+//not found
+app.get('*', routes.render_not_found);
+app.post('*', routes.render_not_found);
 
 //error handlers
 function logErrors(err, req, res, next) {
@@ -197,7 +204,7 @@ function clientErrorHandler(err, req, res, next) {
             type: 'error',
             banner: true,
             bannerClass: 'alert alert-dismissible alert-warning',
-            msg: 'An error occurred. Please reload page',
+            msg: 'An error occurred. Please try again or reload page',
             disable: true
         });
     } else {
@@ -207,13 +214,12 @@ function clientErrorHandler(err, req, res, next) {
 }
 
 function errorHandler(err, req, res, next) {
-    console.log("NON XHR ERROR HANDLED by errorHandler");
-    res.status(500);
-    res.sendFile(path.join(__dirname, './public/error/', '500.html'));
+    console.log("ERROR HANDLED by ERROR-HANDLER");
+    res.redirect('/error/500');
 }
 
 function resolveUploadErrors(err, req, res, next) {
-    if (err.customStatus = 'upload') {
+    if (err.customStatus == 'upload') {
         res.status(500).send({
             code: 500,
             notify: true,

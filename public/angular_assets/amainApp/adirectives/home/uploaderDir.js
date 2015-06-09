@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .directive('newPostUploader', ['$rootScope', 'uploadService', 'globals', function ($rootScope, uploadService, globals) {
         return {
 

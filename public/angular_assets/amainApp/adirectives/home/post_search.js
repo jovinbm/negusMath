@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .directive('postSearchScope', ['$q', '$log', '$rootScope', 'globals', 'PostService', function ($q, $log, $rootScope, globals, PostService) {
 
         return {
@@ -18,6 +18,7 @@ angular.module('mainApp')
                         $scope.buttonLoading();
                         PostService.postSearch($scope.mainSearchModel)
                             .success(function (resp) {
+                                $rootScope.main.responseStatusHandler(resp);
                                 $scope.theModel.pageNumber++;
                                 angular.element('#appendNextPostSearch').replaceWith(resp);
                                 $scope.finishedLoading();

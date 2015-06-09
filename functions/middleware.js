@@ -4,6 +4,8 @@ var consoleLogger = require('../functions/basic.js').consoleLogger;
 var fs = require('fs');
 var path = require('path');
 
+var routes = require('../routes/router.js');
+
 var fileName = 'middleware.js';
 
 var receivedLogger = function (module) {
@@ -37,12 +39,12 @@ module.exports = {
             next();
         } else {
             consoleLogger(errorLogger(module, 'user authentication failed'));
-            res.redirect('index');
+            routes.render_not_logged_in(req, res);
         }
     },
 
-    ensureAuthenticatedAngular: function (req, res, next) {
-        var module = "ensureAuthenticatedAngular";
+    ensureAuthenticatedXhr: function (req, res, next) {
+        var module = "ensureAuthenticatedXhr";
         receivedLogger(module);
         if (req.isAuthenticated()) {
             consoleLogger(successLogger(module));
@@ -56,9 +58,7 @@ module.exports = {
                 banner: true,
                 bannerClass: 'alert alert-dismissible alert-warning',
                 msg: 'You are not logged in. Please reload page',
-                disable: true,
-                redirect: true,
-                redirectPage: '/index'
+                disable: true
             });
         }
     },
@@ -92,38 +92,6 @@ module.exports = {
         }
     },
 
-    returnUserData: function (req, callback) {
-        var module = "returnUserData";
-        receivedLogger(module);
-        userDB.findUserWithUniqueCuid(req.user.uniqueCuid, error, error, success);
-
-        function success(userData) {
-            consoleLogger(successLogger(module));
-            callback(userData);
-        }
-
-        function error(status, err) {
-            consoleLogger(errorLogger(module, 'error retrieving user data', err));
-            callback(false);
-        }
-    },
-
-    returnUserWithUniqueCuid: function (userUniqueCuid, callback) {
-        var module = "returnUserWithUniqueCuid";
-        receivedLogger(module);
-        userDB.findUserWithUniqueCuid(userUniqueCuid, error, error, success);
-
-        function success(userData) {
-            consoleLogger(successLogger(module));
-            callback(userData);
-        }
-
-        function error(status, err) {
-            consoleLogger(errorLogger(module, 'error retrieving user data', err));
-            callback(false);
-        }
-    },
-
     checkAccountStatus: function (req, res, next) {
         var module = "checkAccountStatus";
         receivedLogger(module);
@@ -147,12 +115,12 @@ module.exports = {
 
         function error() {
             consoleLogger(errorLogger(module));
-            res.redirect('index');
+            routes.render_not_authorized_access_page(req, res);
         }
 
     },
 
-    checkAccountStatusAngular: function (req, res, next) {
+    checkAccountStatusXhr: function (req, res, next) {
         var module = "checkAccountStatusAngular";
         receivedLogger(module);
 
@@ -178,7 +146,7 @@ module.exports = {
                 error("You are not registered to use this website");
             }
         } else {
-            error("We could not find your records. Please reload page. If problem persists contact us for more informatiuon")
+            error("We could not find your records. Please reload page. If problem persists contact us for more information")
         }
 
         function success() {
@@ -192,82 +160,26 @@ module.exports = {
                 code: 401,
                 banner: true,
                 bannerClass: 'alert alert-dismissible alert-warning',
-                msg: errorMessage,
-                redirect: true,
-                redirectPage: '/index'
+                msg: errorMessage
             });
         }
 
     },
 
-    returnAccountStatusBanner: function (userData) {
-        if (userData) {
-            if (userData.isRegistered) {
-                if (!userData.emailIsConfirmed) {
-                    return {
-                        show: true,
-                        bannerClass: "alert alert-warning",
-                        msg: "Please confirm your account by clicking the confirmation link we sent on your email. Please also check your spam folder",
-                        showResendEmail: true,
-                        accountStatus: false
-                    };
-                } else if (userData.isApproved === false) {
-                    return {
-                        show: true,
-                        bannerClass: "alert alert-warning",
-                        msg: "Your account is awaiting approval from the administrators. Please allow up to 3 business days. You will get an email notification as soon as your account is approved.",
-                        showResendEmail: false,
-                        accountStatus: false
-                    };
-                } else if (userData.isBanned) {
-                    if (userData.isBanned.status === true) {
-                        //checking banned status
-                        return {
-                            show: true,
-                            bannerClass: "alert alert-warning",
-                            msg: "Your have been banned from this service. Please contact the administrators for more information",
-                            showResendEmail: false,
-                            accountStatus: false
-                        };
-                    } else {
-                        return {
-                            show: false,
-                            bannerClass: "",
-                            msg: "",
-                            showResendEmail: false,
-                            accountStatus: true
-                        };
-                    }
-                } else {
-                    return {
-                        show: false,
-                        bannerClass: "",
-                        msg: "",
-                        showResendEmail: false,
-                        accountStatus: true
-                    };
-                }
-            } else {
-                return {
-                    show: true,
-                    bannerClass: "alert alert-warning",
-                    msg: "You are not registered. Please reload this page",
-                    showResendEmail: false,
-                    accountStatus: false
-                };
-            }
+    checkUserIsAdmin: function (req, res, next) {
+        var module = "checkUserIsAdminXhr";
+        receivedLogger(module);
+
+        if (req.customData.theUser.isAdmin) {
+            consoleLogger(successLogger(module));
+            next();
         } else {
-            return {
-                show: false,
-                bannerClass: "",
-                msg: "",
-                showResendEmail: false,
-                accountStatus: true
-            };
+            consoleLogger(errorLogger(module, 'User is not admin'));
+            routes.render_not_authorized_access_page(req, res);
         }
     },
 
-    checkUserIsAdmin: function (req, res, next) {
+    checkUserIsAdminXhr: function (req, res, next) {
         var module = "checkUserIsAdmin";
         receivedLogger(module);
 
@@ -278,112 +190,12 @@ module.exports = {
             consoleLogger(errorLogger(module, 'User is not admin'));
             res.status(401).send({
                 code: 401,
+                notify: true,
+                type: 'warning',
                 banner: true,
                 bannerClass: 'alert alert-dismissible alert-warning',
-                msg: 'Authorization required. Please reload page to log in'
+                msg: 'You are not authorized to access this page/feature.'
             });
         }
-    },
-
-    checkUserIsAdminAndReturn: function (req, res, error, success) {
-        var module = "checkUserIsAdminAndReturn";
-        receivedLogger(module);
-
-        userDB.findUserWithUniqueCuid(req.user.uniqueCuid, error_not_found, error_not_found, found);
-
-        function found(userData) {
-            if (req.customData) {
-                req.customData.theUser = userData;
-            } else {
-                req.customData = {};
-                req.customData.theUser = userData;
-            }
-
-            if (userData.isAdmin) {
-                consoleLogger(successLogger(module, 'User is Admin'));
-                success({
-                    theUser: userData,
-                    isAdmin: true
-                });
-            } else {
-                consoleLogger(successLogger(module, 'User is NOT Admin'));
-                success({
-                    theUser: userData,
-                    isAdmin: false
-                });
-            }
-        }
-
-        function error_not_found(status, err) {
-            //log the user out
-            req.session.destroy(function (err) {
-                consoleLogger(errorLogger(module, 'error retrieving user data', err));
-                res.status(500).send({
-                    code: 500,
-                    notify: true,
-                    type: 'error',
-                    msg: 'An error occurred while retrieving your personalized info. Please reload the page'
-                });
-
-                error();
-            });
-        }
-    },
-
-    getHumanReadableFileSize: function (sizeInBytes) {
-        var module = 'getHumanReadableFileSize';
-        receivedLogger(module);
-        var sizes = {
-            TB: 1099511627776,
-            GB: 1073741824,
-            MB: 1048576,
-            KB: 1024
-        };
-        var ext = "";
-        var divider = "";
-        if (sizeInBytes > sizes.TB) {
-            ext = "TB";
-            divider = sizes.TB;
-        } else if (sizeInBytes > sizes.GB) {
-            ext = "GB";
-            divider = sizes.GB;
-        } else if (sizeInBytes > sizes.MB) {
-            ext = "MB";
-            divider = sizes.MB;
-        } else if (sizeInBytes > sizes.KB) {
-            ext = "KB";
-            divider = sizes.KB;
-        } else {
-            ext = "bytes";
-            divider = 1;
-        }
-
-        consoleLogger(successLogger(module));
-        return (sizeInBytes / divider) + " " + ext;
-    },
-
-    deleteFile: function (pathFromRoot, error_neg_1, success) {
-        var module = 'deleteFile';
-        receivedLogger(module);
-
-        var theFullPath = path.join(__dirname, '../', pathFromRoot);
-        fs.exists(theFullPath, function (exists) {
-            if (exists) {
-                fs.unlink(theFullPath, callback);
-                function callback(err) {
-                    if (err) {
-                        consoleLogger(errorLogger(module, err));
-                        error_neg_1();
-                    } else {
-                        consoleLogger(successLogger(module));
-                        success();
-                    }
-                }
-            } else {
-                //file already deleted
-                consoleLogger(successLogger(module));
-                success();
-            }
-        });
     }
 };

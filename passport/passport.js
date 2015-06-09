@@ -50,19 +50,26 @@ module.exports = function (passport, LocalStrategy) {
                             bcrypt.compare(password, theUser.password, function (err, res) {
                                 if (err) {
 
-                                    consoleLogger(errorLogger(module, 'error comparing passwords', err));
-                                    done("A problem occurred when trying to log you in. Please try again", false, "A problem occurred when trying to log you in. Please try again");
+                                    consoleLogger(errorLogger(module, 'error when trying to comparing passwords', err));
+                                    //syntax for done function: done(err, user, {additional info message});
+                                    //if no err, use null, if no additional message, just return the first 2 fields
+                                    //if no user, use false on user field
+                                    return done(err, false, {
+                                        msg: "A problem occurred when trying to log you in. Please try again"
+                                    });
 
                                 } else if (res) {
 
                                     //means the password checks with hash
-                                    done(null, theUser, null);
+                                    return done(null, theUser);
 
                                 } else {
 
                                     //passwords don't check
-                                    consoleLogger(errorLogger(module, 'Failed! User local strategy authentication failed'));
-                                    done('The password you entered is incorrect. Please try again', false, 'The password you entered is incorrect. Please try again');
+                                    consoleLogger(errorLogger(module, 'Failed! Password is Incorrect'));
+                                    return done(null, false, {
+                                        msg: 'The password you entered is incorrect. Please try again'
+                                    });
 
                                 }
 
@@ -72,19 +79,26 @@ module.exports = function (passport, LocalStrategy) {
 
                             //means user does not exist(status here is 1, theUser is empty
                             consoleLogger(errorLogger(module, 'Failed! the account the user tried to sign in to was not found'));
-                            done('We could not find a registered user with the credentials you provided. Please check and try again or create a new account', false, 'We could not find a registered user with the credentials you provided. Please check and try again');
+                            done(null, false, {
+                                msg: 'We could not find a registered user with the credentials you provided. Please check and try again'
+                            });
                         }
 
                     }
 
-                    function errorDbUsername() {
+                    function errorDbUsername(err) {
                         consoleLogger(errorLogger(module, 'Error while trying to find user'));
-                        done("A problem occurred when trying to log you in. Please try again", false, "A problem occurred when trying to log you in. Please try again");
+                        return done(err, false, {
+                            msg: "A problem occurred when trying to log you in. Please try again"
+                        });
                     }
 
                 } else {
+                    //form validation of the fields failed
                     consoleLogger(errorLogger(module, 'Failed! User local strategy authentication failed, username and(or) password required'));
-                    done('Username and(or) password required. Please check if you have entered valid data and try again', false, 'Username and(or) password required. Please try again');
+                    done(null, false, {
+                        msg: 'Username and(or) password required. Please try again'
+                    });
                 }
             }
         }));

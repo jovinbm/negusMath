@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .controller('UserManagerController', ['$q', '$scope', '$rootScope', 'UserService', 'globals',
         function ($q, $scope, $rootScope, UserService, globals) {
 

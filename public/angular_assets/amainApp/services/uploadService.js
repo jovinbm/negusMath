@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .factory('uploadService', ['$q', '$location', 'Upload', 'globals',
         function ($q, $location, Upload, globals) {
             return {

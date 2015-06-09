@@ -1,4 +1,4 @@
-angular.module('mainApp')
+angular.module('app')
     .directive('universalBannerScope', ['$rootScope', 'globals', function ($rootScope, globals) {
         return {
             restrict: 'AE',
