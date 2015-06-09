@@ -57,7 +57,6 @@ module.exports = {
                     req.session.lastPage = req.originalUrl;
             }
         }
-        console.log('********************* ' + req.session.lastPage);
         next();
     },
 
