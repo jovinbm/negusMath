@@ -119,7 +119,7 @@ app.get('/socket.io/socket.io.js', function (req, res) {
 
 //getting files
 app.get('/index', routes.index_Html);
-app.get('/', middleware.ensureAuthenticated, middleware.addUserData, middleware.checkAccountStatus, routes.renderHome_Html);
+app.get('/', routes.renderHome_Html);
 app.param('pageNumber', /^[0-9]+$/);
 app.get('/partial/posts/:pageNumber', middleware.ensureAuthenticatedXhr, middleware.addUserData, middleware.checkAccountStatusXhr, routes.renderPosts_partial);
 app.param('postIndex', /^[0-9]+$/);

@@ -114,18 +114,19 @@ module.exports = {
         var module = 'renderHome_Html';
         receivedLogger(module);
 
-        var main = {
-            title: 'Negus Math - HomePage',
-            state: 'home',
-            partial: false,
-            theUser: req.user,
-            accountStatusBanner: account.returnAccountStatusBanner(req.user)
-        };
+        if (req.isAuthenticated()) {
+            var main = {
+                title: 'Negus Math - HomePage',
+                state: 'home',
+                partial: false,
+                theUser: req.user,
+                accountStatusBanner: account.returnAccountStatusBanner(req.user)
+            };
 
-        main.limit = 10;
-        main.pageNumber = 1;
+            main.limit = 10;
+            main.pageNumber = 1;
 
-        post_handler.getPosts(null, null, main.pageNumber, main.limit, gotPosts);
+            post_handler.getPosts(null, null, main.pageNumber, main.limit, gotPosts);
             function gotPosts(obj) {
                 if (obj.code < 400) {
                     main.postsCount = obj.postsCount;
@@ -164,10 +165,13 @@ module.exports = {
                             }
                         }
                     }
-                }else {
+                } else {
                     error();
                 }
             }
+        } else {
+            res.redirect('/index');
+        }
 
         function error() {
             res.redirect('/error/500');
