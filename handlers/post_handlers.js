@@ -375,7 +375,7 @@ module.exports = {
     },
 
 
-    mainSearch: function (req, res, queryString, quantity, requestedPage, callBack) {
+    mainSearch: function (req, res, queryString, quantity, requestedPage, isPartial, callBack) {
         var forms = require('../functions/forms.js');
         var module = 'mainSearch';
         receivedLogger(module);
@@ -388,7 +388,7 @@ module.exports = {
 
         function mainSearchQueryValidated() {
 
-            postDB.mainSearch(queryString, quantity, requestedPage, error, error, success);
+            postDB.mainSearch(queryString, quantity, requestedPage, isPartial, error, error, success);
 
             function success(resultObject) {
                 consoleLogger(successLogger(module));

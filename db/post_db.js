@@ -467,7 +467,7 @@ module.exports = {
     },
 
     //searchForPosts: function (queryString, quantity, page, resultObject, error_neg_1, error_0, success) {
-    mainSearch: function (queryString, quantity, requestedPage, error_neg_1, error_0, success) {
+    mainSearch: function (queryString, quantity, requestedPage, isPartial, error_neg_1, error_0, success) {
         var module = 'mainSearch';
         receivedLogger(module);
 
@@ -516,9 +516,17 @@ module.exports = {
                     resultObject.page = 1;
                 }
 
-                for (var k = ((resultObject.page - 1) * quantity), numPosts = 0; numPosts < quantity; k++, numPosts++) {
-                    if (k < resultObject.totalResults) {
-                        resultObject.posts.push(output.results[k].obj);
+                if (isPartial) {
+                    for (var k = ((resultObject.page - 1) * quantity), numPosts = 0; numPosts < quantity; k++, numPosts++) {
+                        if (k < resultObject.totalResults) {
+                            resultObject.posts.push(output.results[k].obj);
+                        }
+                    }
+                } else {
+                    for (var p = 0; p < quantity * resultObject.page; p++) {
+                        if (p < resultObject.totalResults) {
+                            resultObject.posts.push(output.results[p].obj);
+                        }
                     }
                 }
 

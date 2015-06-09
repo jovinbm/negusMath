@@ -410,7 +410,7 @@ module.exports = {
             main.title = main.queryString + ' - NegusMath Search';
             main.pageNumber = parseInt(req.query.page) || 1;
 
-            post_handler.mainSearch(null, null, main.queryString, main.limit, main.pageNumber, searchFinished);
+            post_handler.mainSearch(null, null, main.queryString, main.limit, main.pageNumber, main.partial, searchFinished);
 
             function searchFinished(searchResults) {
                 if (searchResults.code < 400) {
@@ -485,7 +485,7 @@ module.exports = {
             main.title = main.queryString + ' - NegusMath Search';
             main.pageNumber = parseInt(req.query.page) || 1;
 
-            post_handler.mainSearch(null, null, main.queryString, main.limit, main.pageNumber, searchFinished);
+            post_handler.mainSearch(null, null, main.queryString, main.limit, main.pageNumber, main.partial, searchFinished);
 
             function searchFinished(searchResults) {
                 if (searchResults.code < 400) {
