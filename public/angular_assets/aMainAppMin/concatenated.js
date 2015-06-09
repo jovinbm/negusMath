@@ -16,6 +16,464 @@ angular.module('app', [
     'toastr'
 ]);
 angular.module('app')
+    .directive('accountOuterScope', ['$rootScope', function ($rootScope) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                //variable to hold state between local login and creating a new account
+                //values =  signIn, register
+                $scope.userLoginState = 'signIn';
+                $scope.changeUserLoginState = function (newState) {
+                    $scope.userLoginState = newState;
+                };
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('newPostBanner', ['$rootScope', function ($rootScope) {
+        return {
+            templateUrl: 'views/all/partials/templates/new_post_banner.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.newPostBanner = {
+                    show: false,
+                    bannerClass: "",
+                    msg: ""
+                };
+
+                $rootScope.$on('newPostBanner', function (event, banner) {
+                    $scope.newPostBanner = banner;
+                });
+
+                $rootScope.$on('clearBanners', function () {
+                    $scope.newPostBanner = {
+                        show: false,
+                        bannerClass: "",
+                        msg: ""
+                    };
+                })
+            }
+        }
+    }])
+    .directive('toastrDirective', ['$rootScope', 'toastr', function ($rootScope, toastr) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $rootScope.showToast = function (toastType, text) {
+                    switch (toastType) {
+                        case "success":
+                            toastr.clear();
+                            toastr.success(text);
+                            break;
+                        case "warning":
+                            toastr.clear();
+                            toastr.warning(text, 'Warning', {
+                                closeButton: true,
+                                tapToDismiss: true
+                            });
+                            break;
+                        case "error":
+                            toastr.clear();
+                            toastr.error(text, 'Error', {
+                                closeButton: true,
+                                tapToDismiss: true,
+                                timeOut: false
+                            });
+                            break;
+                        default:
+                            //clears current list of toasts
+                            toastr.clear();
+                    }
+                };
+
+                $rootScope.clearToasts = function () {
+                    toastr.clear();
+                };
+            }
+        }
+    }])
+    .directive('loadingBanner', ['$rootScope', function ($rootScope) {
+        var controller = ['$scope', '$rootScope', 'cfpLoadingBar', function ($scope, $rootScope, cfpLoadingBar) {
+
+            $rootScope.isLoading = true;
+            $rootScope.isLoadingPercentage = 0;
+            $rootScope.changeIsLoadingPercentage = function (num) {
+                $rootScope.isLoadingPercentage = num;
+            };
+
+            $rootScope.$on('cfpLoadingBar:loading', function (event, resp) {
+                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.$on('cfpLoadingBar:loaded', function (event, resp) {
+                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.$on('cfpLoadingBar:completed', function (event, resp) {
+                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
+            });
+
+            $rootScope.isLoadingTrue = function () {
+                $rootScope.isLoading = true;
+            };
+            $rootScope.isLoadingFalse = function () {
+                $rootScope.isLoading = false;
+            };
+
+            $rootScope.$on('isLoadingTrue', function () {
+                $rootScope.isLoading = true;
+            });
+
+            $rootScope.$on('isLoadingFalse', function () {
+                $rootScope.isLoading = false;
+            });
+        }];
+
+        return {
+            templateUrl: 'views/all/partials/templates/loading_banner.html',
+            restrict: 'AE',
+            controller: controller
+        }
+    }])
+    .directive('signInBannerScope', ['$rootScope', function ($rootScope) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.signInBanner = {
+                    show: false,
+                    bannerClass: "",
+                    msg: ""
+                };
+
+                $rootScope.$on('signInBanner', function (event, banner) {
+                    $scope.signInBanner = banner;
+                });
+
+                $rootScope.$on('clearBanners', function () {
+                    $scope.signInBanner = {
+                        show: false,
+                        bannerClass: "",
+                        msg: ""
+                    };
+                })
+            }
+        }
+    }])
+    .directive('registrationBannerScope', ['$rootScope', function ($rootScope) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.registrationBanner = {
+                    show: false,
+                    bannerClass: "",
+                    msg: ""
+                };
+
+                $rootScope.$on('registrationBanner', function (event, banner) {
+                    $scope.registrationBanner = banner;
+                });
+
+                $rootScope.$on('clearBanners', function () {
+                    $scope.registrationBanner = {
+                        show: false,
+                        bannerClass: "",
+                        msg: ""
+                    };
+                })
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('contactUsScope', ['$rootScope', '$http', function ($rootScope, $http) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.contactUsModel = {
+                    name: "",
+                    email: "",
+                    message: ""
+                };
+
+                function validateContactUs(name, email, message) {
+                    var errors = 0;
+
+                    if (!name || name.length == 0) {
+                        ++errors;
+                        $rootScope.showToast('warning', "Please enter your name");
+                        return -1
+                    } else if (!email || email.length == 0) {
+                        ++errors;
+                        $rootScope.showToast('warning', "Please enter a valid email");
+                        return -1
+                    } else if (!message || message.length == 0) {
+                        ++errors;
+                        $rootScope.showToast('warning', "Message field is empty");
+                        return -1;
+                    } else if (errors == 0) {
+                        return 1;
+                    }
+                }
+
+                $scope.sendContactUs = function () {
+                    var formStatus = validateContactUs($scope.contactUsModel.name, $scope.contactUsModel.email, $scope.contactUsModel.message);
+                    if (formStatus == 1) {
+                        sendContactUs($scope.contactUsModel)
+                            .success(function (resp) {
+                                $scope.contactUsModel.name = "";
+                                $scope.contactUsModel.email = "";
+                                $scope.contactUsModel.message = "";
+                                $rootScope.main.responseStatusHandler(resp);
+                            })
+                            .error(function (errResp) {
+                                $rootScope.main.responseStatusHandler(errResp);
+                            });
+                    }
+                };
+
+                function sendContactUs(contactUsModel) {
+                    return $http.post('/contactUs', contactUsModel);
+                }
+            }
+        }
+    }])
+    .directive('contactUs', [function () {
+        return {
+            templateUrl: 'views/all/partials/components/contact_us.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                //depends on contactUsScope
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('createAccountScope', ['$rootScope', '$http', function ($rootScope, $http) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.registrationDetails = {
+                    email: "",
+                    firstName: "",
+                    lastName: "",
+                    username: "",
+                    password1: "",
+                    password2: "",
+                    invitationCode: ""
+                };
+
+                $scope.createAccount = function () {
+                    createAccount($scope.registrationDetails)
+                        .success(function (resp) {
+                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $scope.registrationDetails.password1 = "";
+                            $scope.registrationDetails.password2 = "";
+                            $scope.registrationDetails.invitationCode = "";
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        });
+                };
+
+                function createAccount(details) {
+                    return $http.post('/createAccount', details);
+                }
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('mainFooter', [function () {
+        return {
+            templateUrl: 'views/all/partials/components/main_footer.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('logoutScope', ['$rootScope', '$http', function ($rootScope, $http) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.logoutClient = function () {
+                    logoutClient()
+                        .success(function (resp) {
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        });
+                };
+
+                function logoutClient() {
+                    return $http.post('/api/logoutClient');
+                }
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('postContent', ['$filter', function ($filter) {
+        return {
+            templateUrl: 'views/all/partials/templates/post_content.html',
+            scope: {
+                postContent: '=model'
+            },
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.postContent = $filter('preparePostContent')($scope.postContent);
+            }
+        }
+    }])
+    .directive('postSummary', ['$filter',function ($filter) {
+        return {
+            templateUrl: 'views/all/partials/templates/post_summary.html',
+            scope: {
+                postSummary: '=model'
+            },
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.postSummary = $filter('preparePostSummary')($scope.postSummary);
+            }
+        }
+    }])
+    .directive('postTags', ['$filter',function ($filter) {
+        return {
+            templateUrl: 'views/all/partials/templates/post_tags.html',
+            scope: {
+                postTags: '=model'
+            },
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('resendEmailScope', ['$rootScope', '$http', function ($rootScope, $http) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+
+                $scope.resendConfirmationEmail = function (userUniqueCuid) {
+                    console.log(userUniqueCuid);
+                    resendConfirmationEmail(userUniqueCuid)
+                        .success(function (resp) {
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (err) {
+                            $rootScope.main.responseStatusHandler(err);
+                        })
+                };
+
+                function resendConfirmationEmail(userUniqueCuid) {
+                    return $http.post('/resendConfirmationEmail', {
+                        userUniqueCuid: userUniqueCuid
+                    });
+                }
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('signInScope', ['$rootScope', '$http', function ($rootScope, $http) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.loginFormModel = {
+                    username: "",
+                    password: ""
+                };
+
+                $scope.submitLocalLoginForm = function () {
+                    localUserLogin($scope.loginFormModel)
+                        .success(function (resp) {
+                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $scope.loginFormModel.password = "";
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        });
+                };
+
+                function localUserLogin(loginData) {
+                    return $http.post('/localUserLogin', loginData);
+                }
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('suggestedPosts', ['$rootScope', '$filter', '$http', function ($rootScope, $filter, $http) {
+        return {
+            templateUrl: 'views/all/partials/templates/suggested_posts.html',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $rootScope.main.goToTop();
+
+                $scope.suggestedPosts = [];
+                $scope.suggestedPostsCount = 0;
+
+                function getSuggestedPosts() {
+                    getSuggestedPostsFromServer()
+                        .success(function (resp) {
+                            if (resp.postsArray.length > 0) {
+                                updateSuggestedPosts(resp.postsArray);
+                            } else {
+                                //do nothing
+                            }
+                            $rootScope.main.responseStatusHandler(resp);
+
+                        })
+                        .error(function (errResp) {
+                            $rootScope.main.responseStatusHandler(errResp);
+                        });
+                }
+
+                getSuggestedPosts();
+
+                function getSuggestedPostsFromServer() {
+                    return $http.post('/api/getSuggestedPosts', {})
+                }
+
+                function updateSuggestedPosts(suggestedPostsArray) {
+                    if (suggestedPostsArray == []) {
+                        $scope.suggestedPosts = [];
+                    } else {
+                        $scope.suggestedPosts = $filter('preparePostsNoChange')(null, suggestedPostsArray);
+                    }
+                }
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('titleDirective', ['globals', function (globals) {
+        return {
+            template: '<title ng-bind="defaultTitle">' + '</title>',
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.defaultTitle = globals.getDocumentTitle();
+                $scope.$watch(globals.getDocumentTitle, function () {
+                    $scope.defaultTitle = globals.getDocumentTitle();
+                });
+            }
+        }
+    }]);
+angular.module('app')
+    .directive('universalSearchBoxScope', ['$window', '$location', '$rootScope', 'globals', function ($window, $location, $rootScope, globals) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.mainSearchModel = {
+                    queryString: "",
+                    requestedPage: 1
+                };
+
+                $scope.performMainSearch = function () {
+                    if ($scope.mainSearchModel.queryString.length > 0) {
+                        $rootScope.main.redirectToPage('/search/posts/' + $scope.mainSearchModel.queryString + '/' + $scope.mainSearchModel.requestedPage);
+                    }
+                };
+            }
+        }
+    }]);
+angular.module('app')
     .controller('PopularStoriesController', ['$q', '$log', '$scope', '$rootScope', 'PopularStoriesService', 'globals',
         function ($q, $log, $scope, $rootScope, PopularStoriesService, globals) {
 
@@ -660,464 +1118,6 @@ angular.module('app')
             }
 
             return true;
-        }
-    }]);
-angular.module('app')
-    .directive('accountOuterScope', ['$rootScope', function ($rootScope) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                //variable to hold state between local login and creating a new account
-                //values =  signIn, register
-                $scope.userLoginState = 'signIn';
-                $scope.changeUserLoginState = function (newState) {
-                    $scope.userLoginState = newState;
-                };
-            }
-        }
-    }]);
-angular.module('app')
-    .directive('newPostBanner', ['$rootScope', function ($rootScope) {
-        return {
-            templateUrl: 'views/all/partials/templates/new_post_banner.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.newPostBanner = {
-                    show: false,
-                    bannerClass: "",
-                    msg: ""
-                };
-
-                $rootScope.$on('newPostBanner', function (event, banner) {
-                    $scope.newPostBanner = banner;
-                });
-
-                $rootScope.$on('clearBanners', function () {
-                    $scope.newPostBanner = {
-                        show: false,
-                        bannerClass: "",
-                        msg: ""
-                    };
-                })
-            }
-        }
-    }])
-    .directive('toastrDirective', ['$rootScope', 'toastr', function ($rootScope, toastr) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $rootScope.showToast = function (toastType, text) {
-                    switch (toastType) {
-                        case "success":
-                            toastr.clear();
-                            toastr.success(text);
-                            break;
-                        case "warning":
-                            toastr.clear();
-                            toastr.warning(text, 'Warning', {
-                                closeButton: true,
-                                tapToDismiss: true
-                            });
-                            break;
-                        case "error":
-                            toastr.clear();
-                            toastr.error(text, 'Error', {
-                                closeButton: true,
-                                tapToDismiss: true,
-                                timeOut: false
-                            });
-                            break;
-                        default:
-                            //clears current list of toasts
-                            toastr.clear();
-                    }
-                };
-
-                $rootScope.clearToasts = function () {
-                    toastr.clear();
-                };
-            }
-        }
-    }])
-    .directive('loadingBanner', ['$rootScope', function ($rootScope) {
-        var controller = ['$scope', '$rootScope', 'cfpLoadingBar', function ($scope, $rootScope, cfpLoadingBar) {
-
-            $rootScope.isLoading = true;
-            $rootScope.isLoadingPercentage = 0;
-            $rootScope.changeIsLoadingPercentage = function (num) {
-                $rootScope.isLoadingPercentage = num;
-            };
-
-            $rootScope.$on('cfpLoadingBar:loading', function (event, resp) {
-                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
-            });
-
-            $rootScope.$on('cfpLoadingBar:loaded', function (event, resp) {
-                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
-            });
-
-            $rootScope.$on('cfpLoadingBar:completed', function (event, resp) {
-                $rootScope.isLoadingPercentage = cfpLoadingBar.status() * 100
-            });
-
-            $rootScope.isLoadingTrue = function () {
-                $rootScope.isLoading = true;
-            };
-            $rootScope.isLoadingFalse = function () {
-                $rootScope.isLoading = false;
-            };
-
-            $rootScope.$on('isLoadingTrue', function () {
-                $rootScope.isLoading = true;
-            });
-
-            $rootScope.$on('isLoadingFalse', function () {
-                $rootScope.isLoading = false;
-            });
-        }];
-
-        return {
-            templateUrl: 'views/all/partials/templates/loading_banner.html',
-            restrict: 'AE',
-            controller: controller
-        }
-    }])
-    .directive('signInBannerScope', ['$rootScope', function ($rootScope) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.signInBanner = {
-                    show: false,
-                    bannerClass: "",
-                    msg: ""
-                };
-
-                $rootScope.$on('signInBanner', function (event, banner) {
-                    $scope.signInBanner = banner;
-                });
-
-                $rootScope.$on('clearBanners', function () {
-                    $scope.signInBanner = {
-                        show: false,
-                        bannerClass: "",
-                        msg: ""
-                    };
-                })
-            }
-        }
-    }])
-    .directive('registrationBannerScope', ['$rootScope', function ($rootScope) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.registrationBanner = {
-                    show: false,
-                    bannerClass: "",
-                    msg: ""
-                };
-
-                $rootScope.$on('registrationBanner', function (event, banner) {
-                    $scope.registrationBanner = banner;
-                });
-
-                $rootScope.$on('clearBanners', function () {
-                    $scope.registrationBanner = {
-                        show: false,
-                        bannerClass: "",
-                        msg: ""
-                    };
-                })
-            }
-        }
-    }]);
-angular.module('app')
-    .directive('contactUsScope', ['$rootScope', '$http', function ($rootScope, $http) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.contactUsModel = {
-                    name: "",
-                    email: "",
-                    message: ""
-                };
-
-                function validateContactUs(name, email, message) {
-                    var errors = 0;
-
-                    if (!name || name.length == 0) {
-                        ++errors;
-                        $rootScope.showToast('warning', "Please enter your name");
-                        return -1
-                    } else if (!email || email.length == 0) {
-                        ++errors;
-                        $rootScope.showToast('warning', "Please enter a valid email");
-                        return -1
-                    } else if (!message || message.length == 0) {
-                        ++errors;
-                        $rootScope.showToast('warning', "Message field is empty");
-                        return -1;
-                    } else if (errors == 0) {
-                        return 1;
-                    }
-                }
-
-                $scope.sendContactUs = function () {
-                    var formStatus = validateContactUs($scope.contactUsModel.name, $scope.contactUsModel.email, $scope.contactUsModel.message);
-                    if (formStatus == 1) {
-                        sendContactUs($scope.contactUsModel)
-                            .success(function (resp) {
-                                $scope.contactUsModel.name = "";
-                                $scope.contactUsModel.email = "";
-                                $scope.contactUsModel.message = "";
-                                $rootScope.main.responseStatusHandler(resp);
-                            })
-                            .error(function (errResp) {
-                                $rootScope.main.responseStatusHandler(errResp);
-                            });
-                    }
-                };
-
-                function sendContactUs(contactUsModel) {
-                    return $http.post('/contactUs', contactUsModel);
-                }
-            }
-        }
-    }])
-    .directive('contactUs', [function () {
-        return {
-            templateUrl: 'views/all/partials/components/contact_us.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                //depends on contactUsScope
-            }
-        }
-    }]);
-angular.module('app')
-    .directive('createAccountScope', ['$rootScope', '$http', function ($rootScope, $http) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.registrationDetails = {
-                    email: "",
-                    firstName: "",
-                    lastName: "",
-                    username: "",
-                    password1: "",
-                    password2: "",
-                    invitationCode: ""
-                };
-
-                $scope.createAccount = function () {
-                    createAccount($scope.registrationDetails)
-                        .success(function (resp) {
-                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $scope.registrationDetails.password1 = "";
-                            $scope.registrationDetails.password2 = "";
-                            $scope.registrationDetails.invitationCode = "";
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        });
-                };
-
-                function createAccount(details) {
-                    return $http.post('/createAccount', details);
-                }
-            }
-        }
-    }]);
-angular.module('app')
-    .directive('mainFooter', [function () {
-        return {
-            templateUrl: 'views/all/partials/components/main_footer.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-            }
-        }
-    }]);
-angular.module('app')
-    .directive('logoutScope', ['$rootScope', '$http', function ($rootScope, $http) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.logoutClient = function () {
-                    logoutClient()
-                        .success(function (resp) {
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        });
-                };
-
-                function logoutClient() {
-                    return $http.post('/api/logoutClient');
-                }
-            }
-        }
-    }]);
-angular.module('app')
-    .directive('postContent', ['$filter', function ($filter) {
-        return {
-            templateUrl: 'views/all/partials/templates/post_content.html',
-            scope: {
-                postContent: '=model'
-            },
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.postContent = $filter('preparePostContent')($scope.postContent);
-            }
-        }
-    }])
-    .directive('postSummary', ['$filter',function ($filter) {
-        return {
-            templateUrl: 'views/all/partials/templates/post_summary.html',
-            scope: {
-                postSummary: '=model'
-            },
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.postSummary = $filter('preparePostSummary')($scope.postSummary);
-            }
-        }
-    }])
-    .directive('postTags', ['$filter',function ($filter) {
-        return {
-            templateUrl: 'views/all/partials/templates/post_tags.html',
-            scope: {
-                postTags: '=model'
-            },
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-            }
-        }
-    }]);
-angular.module('app')
-    .directive('resendEmailScope', ['$rootScope', '$http', function ($rootScope, $http) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-
-                $scope.resendConfirmationEmail = function (userUniqueCuid) {
-                    console.log(userUniqueCuid);
-                    resendConfirmationEmail(userUniqueCuid)
-                        .success(function (resp) {
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (err) {
-                            $rootScope.main.responseStatusHandler(err);
-                        })
-                };
-
-                function resendConfirmationEmail(userUniqueCuid) {
-                    return $http.post('/resendConfirmationEmail', {
-                        userUniqueCuid: userUniqueCuid
-                    });
-                }
-            }
-        }
-    }]);
-angular.module('app')
-    .directive('signInScope', ['$rootScope', '$http', function ($rootScope, $http) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.loginFormModel = {
-                    username: "",
-                    password: ""
-                };
-
-                $scope.submitLocalLoginForm = function () {
-                    localUserLogin($scope.loginFormModel)
-                        .success(function (resp) {
-                            //the responseStatusHandler handles all basic response stuff including redirecting the user if a success is picked
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $scope.loginFormModel.password = "";
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        });
-                };
-
-                function localUserLogin(loginData) {
-                    return $http.post('/localUserLogin', loginData);
-                }
-            }
-        }
-    }]);
-angular.module('app')
-    .directive('suggestedPosts', ['$rootScope', '$filter', '$http', function ($rootScope, $filter, $http) {
-        return {
-            templateUrl: 'views/all/partials/templates/suggested_posts.html',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $rootScope.main.goToTop();
-
-                $scope.suggestedPosts = [];
-                $scope.suggestedPostsCount = 0;
-
-                function getSuggestedPosts() {
-                    getSuggestedPostsFromServer()
-                        .success(function (resp) {
-                            if (resp.postsArray.length > 0) {
-                                updateSuggestedPosts(resp.postsArray);
-                            } else {
-                                //do nothing
-                            }
-                            $rootScope.main.responseStatusHandler(resp);
-
-                        })
-                        .error(function (errResp) {
-                            $rootScope.main.responseStatusHandler(errResp);
-                        });
-                }
-
-                getSuggestedPosts();
-
-                function getSuggestedPostsFromServer() {
-                    return $http.post('/api/getSuggestedPosts', {})
-                }
-
-                function updateSuggestedPosts(suggestedPostsArray) {
-                    if (suggestedPostsArray == []) {
-                        $scope.suggestedPosts = [];
-                    } else {
-                        $scope.suggestedPosts = $filter('preparePostsNoChange')(null, suggestedPostsArray);
-                    }
-                }
-            }
-        }
-    }]);
-angular.module('app')
-    .directive('titleDirective', ['globals', function (globals) {
-        return {
-            template: '<title ng-bind="defaultTitle">' + '</title>',
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.defaultTitle = globals.getDocumentTitle();
-                $scope.$watch(globals.getDocumentTitle, function () {
-                    $scope.defaultTitle = globals.getDocumentTitle();
-                });
-            }
-        }
-    }]);
-angular.module('app')
-    .directive('universalSearchBoxScope', ['$window', '$location', '$rootScope', 'globals', function ($window, $location, $rootScope, globals) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.mainSearchModel = {
-                    queryString: "",
-                    requestedPage: 1
-                };
-
-                $scope.performMainSearch = function () {
-                    if ($scope.mainSearchModel.queryString.length > 0) {
-                        $rootScope.main.redirectToPage('/search/posts/' + $scope.mainSearchModel.queryString + '/' + $scope.mainSearchModel.requestedPage);
-                    }
-                };
-            }
         }
     }]);
 angular.module('app')
