@@ -10,6 +10,11 @@
     background-clip: padding-box;
 }
 
+.card-post-highlight {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
 .card span.card-title {
     color: #fff;
     font-size: 24px;
@@ -41,6 +46,10 @@
     border-radius: 0 0 2px 2px;
     background-clip: padding-box;
     box-sizing: border-box;
+}
+
+.card .card-content-post-highlight {
+    padding: 1em;
 }
 
 .card .card-content p {
