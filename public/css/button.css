@@ -3,7 +3,6 @@
     padding: 10px 10px;
     border-color: #fed136;
     border-radius: 3px;
-    text-transform: uppercase;
     font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 18px;
     font-weight: 700;
@@ -37,7 +36,6 @@
 .btn-create-account {
     padding: 20px 40px;
     border-radius: 3px;
-    text-transform: uppercase;
     font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 18px;
     font-weight: 700;
@@ -45,6 +43,5 @@
 }
 
 .btn-config {
-    text-transform: uppercase;
     font-family: Montserrat, "Helvetica Neue", Helvetica, Arial, sans-serif;
 }

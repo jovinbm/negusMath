@@ -2,3 +2,32 @@
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
     display: none !important;
 }
+
+.container {
+    width: 970px;
+    max-width: none !important;
+}
+
+/*disabling responsiveness*/
+.navbar-brand {
+    margin-left: -15px;
+}
+
+/*nav bar not collapse*/
+.navbar-fixed-top,
+.navbar-fixed-bottom {
+    min-width: 970px;
+}
+
+.navbar-nav {
+    float: left;
+    margin: 0;
+}
+
+.navbar-nav > li {
+    float: left;
+}
+
+.navbar-nav.navbar-right {
+    float: right;
+}

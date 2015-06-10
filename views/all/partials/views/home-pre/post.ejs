@@ -1,84 +1,12 @@
 <div class="container no-padding-left">
     <div class="row">
 
-        <div class="col-lg-8 postStream no-padding">
+        <div class="col-xs-8 postStream no-padding">
             <% include full_post.ejs %>
         </div>
 
-        <!--sidebar-->
-        <div class="col-lg-4 sideBarColumn col-lg-offset-0 no-padding-right">
-
-            <div class="panel panel-default">
-
-                <div class="panel-heading"><i class="fa fa-youtube-play"></i> VIDEOS
-                </div>
-
-                <div class="panel-body">
-                    <div class="card">
-
-                        <div class="card-content">
-                            <div class="embed-responsive embed-responsive-16by9">
-                                <iframe class="embed-responsive-item"
-                                        src="https://www.youtube.com/embed/PIVd4imGkjI"
-                                        frameborder="0"
-                                        allowfullscreen></iframe>
-                            </div>
-                        </div>
-                    </div>
-
-                    <br/>
-
-                    <div class="card">
-
-                        <div class="card-content">
-                            <div class="embed-responsive embed-responsive-16by9">
-                                <iframe class="embed-responsive-item"
-                                        src="https://www.youtube.com/embed/adKP2CzKaFM"
-                                        frameborder="0"
-                                        allowfullscreen></iframe>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div>
-                <div class="panel panel-default">
-
-                    <div class="panel-heading"><i class="fa fa-fire"></i> POPULAR STORIES
-                    </div>
-
-                    <div class="panel-body">
-
-                        <ul class="list-group no-margin-bottom">
-                            <% popularStories.forEach(function(popular, index){ %>
-                            <li class="list-group-item post">
-                                <p class="text-outputs">
-                                    <a href="<%= popular.postPath %>"
-                                       target="_self">
-                                        <%= popular.postHeading %>
-                                    </a> <br/>
-                                <h6 class="text-muted">
-                                    <small>
-                                        <a class="btn-link">
-                                            <%= popular.authorName %>
-                                        </a> on <span><%= popular.postDate %></span>
-                                    </small>
-                                    <br/>
-                                    <small class="text-muted"
-                                           data-livestamp="<%= popular.createdAt %>">
-                                    </small>
-                                </h6>
-                                </p>
-                            </li>
-                            <% }) %>
-                        </ul>
-
-                    </div>
-
-                </div>
-            </div>
-
+        <div class="col-xs-4 sideBarColumn col-xs-offset-0 no-padding-right">
+            <% include ../../components-pre/sideBar_colum_videos_popular.ejs %>
         </div>
     </div>
 

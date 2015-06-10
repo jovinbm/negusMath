@@ -2,7 +2,7 @@ angular.module('app')
     .directive('newPostUploader', ['$rootScope', 'uploadService', 'globals', function ($rootScope, uploadService, globals) {
         return {
 
-            templateUrl: 'views/all/partials/templates/new_post_uploader.html',
+            templateUrl: 'views/all/partials/templates/uploaders/new_post_uploader.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.selectedFileType = {
@@ -100,7 +100,7 @@ angular.module('app')
     .directive('editPostUploader', ['$rootScope', 'uploadService', 'globals', function ($rootScope, uploadService, globals) {
         return {
 
-            templateUrl: 'views/all/partials/templates/edit_post_uploader.html',
+            templateUrl: 'views/all/partials/templates/uploaders/edit_post_uploader.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.selectedFileType = {
@@ -198,7 +198,7 @@ angular.module('app')
     .directive('uploaderDirective', ['$rootScope', 'uploadService', 'globals', function ($rootScope, uploadService, globals) {
         return {
 
-            templateUrl: 'views/all/partials/templates/simple_uploader.html',
+            templateUrl: 'views/all/partials/templates/uploaders/simple_uploader.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.selectedFileType = {

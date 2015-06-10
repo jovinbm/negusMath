@@ -1,7 +1,7 @@
 angular.module('app')
     .directive('adminUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
-            templateUrl: 'views/all/partials/templates/admin_users.html',
+            templateUrl: 'views/all/partials/templates/users/admin_users.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
 

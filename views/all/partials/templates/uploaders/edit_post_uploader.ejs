@@ -1,4 +1,4 @@
-<script type="text/ng-template" id="views/all/partials/templates/new_post_uploader.html">
+<script type="text/ng-template" id="views/all/partials/templates/uploaders/edit_post_uploader.html">
     <div class="panel panel-default no-margin-bottom">
 
         <div class="panel-heading">Uploads</div>
@@ -8,9 +8,9 @@
             <div class="card">
 
                 <div class="card-content"
-                     ng-show="newPostModel.postUploads.length > 0">
+                     ng-show="editPostModel.postUploads.length > 0">
                     <ul class="list-unstyled">
-                        <li ng-repeat="file in newPostModel.postUploads">
+                        <li ng-repeat="file in editPostModel.postUploads">
                             {{file.originalname}} - <a ng-href="{{file.amazonS3Url}}"
                                                        target="_blank">Link</a>
                         </li>

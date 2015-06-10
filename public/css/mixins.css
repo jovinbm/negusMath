@@ -59,3 +59,28 @@
 .no-margin-bottom {
     margin-bottom: 0;
 }
+
+.no-border {
+    border: 0;
+}
+
+.no-border-side {
+    border-left: 0;
+    border-right: 0;
+}
+
+.no-border-left {
+    border-left: 0;
+}
+
+.no-border-right {
+    border-right: 0;
+}
+
+.no-border-top {
+    border-top: 0;
+}
+
+.no-border-bottom {
+    border-bottom: 0;
+}

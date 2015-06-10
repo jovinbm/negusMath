@@ -1,7 +1,7 @@
 angular.module('app')
     .directive('unApprovedUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
-            templateUrl: 'views/all/partials/templates/unApproved_users.html',
+            templateUrl: 'views/all/partials/templates/users/unApproved_users.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
 

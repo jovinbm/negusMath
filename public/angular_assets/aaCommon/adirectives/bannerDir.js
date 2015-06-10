@@ -1,7 +1,7 @@
 angular.module('app')
     .directive('newPostBanner', ['$rootScope', function ($rootScope) {
         return {
-            templateUrl: 'views/all/partials/templates/new_post_banner.html',
+            templateUrl: 'views/all/partials/templates/banners/new_post_banner.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.newPostBanner = {

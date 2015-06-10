@@ -47,7 +47,7 @@ angular.module('app')
 angular.module('app')
     .directive('newPostBanner', ['$rootScope', function ($rootScope) {
         return {
-            templateUrl: 'views/all/partials/templates/new_post_banner.html',
+            templateUrl: 'views/all/partials/templates/banners/new_post_banner.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.newPostBanner = {
@@ -322,7 +322,7 @@ angular.module('app')
 angular.module('app')
     .directive('postContent', ['$filter', function ($filter) {
         return {
-            templateUrl: 'views/all/partials/templates/post_content.html',
+            templateUrl: 'views/all/partials/templates/post-components/post_content.html',
             scope: {
                 postContent: '=model'
             },
@@ -332,9 +332,9 @@ angular.module('app')
             }
         }
     }])
-    .directive('postSummary', ['$filter',function ($filter) {
+    .directive('postSummary', ['$filter', function ($filter) {
         return {
-            templateUrl: 'views/all/partials/templates/post_summary.html',
+            templateUrl: 'views/all/partials/templates/post-components/post_summary.html',
             scope: {
                 postSummary: '=model'
             },
@@ -344,9 +344,9 @@ angular.module('app')
             }
         }
     }])
-    .directive('postTags', ['$filter',function ($filter) {
+    .directive('postTags', ['$filter', function ($filter) {
         return {
-            templateUrl: 'views/all/partials/templates/post_tags.html',
+            templateUrl: 'views/all/partials/templates/post-components/post_tags.html',
             scope: {
                 postTags: '=model'
             },
@@ -440,7 +440,7 @@ angular.module('app')
 angular.module('app')
     .directive('suggestedPosts', ['$rootScope', '$filter', '$http', function ($rootScope, $filter, $http) {
         return {
-            templateUrl: 'views/all/partials/templates/suggested_posts.html',
+            templateUrl: 'views/all/partials/templates/suggested/suggested_posts.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
 
@@ -1939,7 +1939,7 @@ angular.module('app')
     .directive('newPostUploader', ['$rootScope', 'uploadService', 'globals', function ($rootScope, uploadService, globals) {
         return {
 
-            templateUrl: 'views/all/partials/templates/new_post_uploader.html',
+            templateUrl: 'views/all/partials/templates/uploaders/new_post_uploader.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.selectedFileType = {
@@ -2037,7 +2037,7 @@ angular.module('app')
     .directive('editPostUploader', ['$rootScope', 'uploadService', 'globals', function ($rootScope, uploadService, globals) {
         return {
 
-            templateUrl: 'views/all/partials/templates/edit_post_uploader.html',
+            templateUrl: 'views/all/partials/templates/uploaders/edit_post_uploader.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.selectedFileType = {
@@ -2135,7 +2135,7 @@ angular.module('app')
     .directive('uploaderDirective', ['$rootScope', 'uploadService', 'globals', function ($rootScope, uploadService, globals) {
         return {
 
-            templateUrl: 'views/all/partials/templates/simple_uploader.html',
+            templateUrl: 'views/all/partials/templates/uploaders/simple_uploader.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $scope.selectedFileType = {
@@ -2234,7 +2234,7 @@ angular.module('app')
 angular.module('app')
     .directive('adminUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
-            templateUrl: 'views/all/partials/templates/admin_users.html',
+            templateUrl: 'views/all/partials/templates/users/admin_users.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
 
@@ -2270,7 +2270,7 @@ angular.module('app')
 angular.module('app')
     .directive('allUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
-            templateUrl: 'views/all/partials/templates/all_users.html',
+            templateUrl: 'views/all/partials/templates/users/all_users.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
 
@@ -2308,7 +2308,7 @@ angular.module('app')
 angular.module('app')
     .directive('bannedUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
-            templateUrl: 'views/all/partials/templates/banned_users.html',
+            templateUrl: 'views/all/partials/templates/users/banned_users.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
 
@@ -2346,7 +2346,7 @@ angular.module('app')
 angular.module('app')
     .directive('unApprovedUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
-            templateUrl: 'views/all/partials/templates/unApproved_users.html',
+            templateUrl: 'views/all/partials/templates/users/unApproved_users.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
 
@@ -2382,7 +2382,7 @@ angular.module('app')
 angular.module('app')
     .directive('userDisplay', ['$rootScope', 'UserService', 'socketService', 'globals', function ($rootScope, UserService, socketService, globals) {
         return {
-            templateUrl: 'views/all/partials/templates/user_display.html',
+            templateUrl: 'views/all/partials/templates/users/user_display.html',
             restrict: 'AE',
             scope: {
                 user: '='
@@ -2473,7 +2473,7 @@ angular.module('app')
 angular.module('app')
     .directive('usersCount', ['$q', '$log', '$rootScope', 'globals', function ($q, $log, $rootScope, globals) {
         return {
-            templateUrl: 'views/all/partials/templates/user_statistics.html',
+            templateUrl: 'views/all/partials/templates/users/user_statistics.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
                 $rootScope.$on('userChanges', function () {

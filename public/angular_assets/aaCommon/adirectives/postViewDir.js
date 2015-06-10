@@ -1,7 +1,7 @@
 angular.module('app')
     .directive('postContent', ['$filter', function ($filter) {
         return {
-            templateUrl: 'views/all/partials/templates/post_content.html',
+            templateUrl: 'views/all/partials/templates/post-components/post_content.html',
             scope: {
                 postContent: '=model'
             },
@@ -11,9 +11,9 @@ angular.module('app')
             }
         }
     }])
-    .directive('postSummary', ['$filter',function ($filter) {
+    .directive('postSummary', ['$filter', function ($filter) {
         return {
-            templateUrl: 'views/all/partials/templates/post_summary.html',
+            templateUrl: 'views/all/partials/templates/post-components/post_summary.html',
             scope: {
                 postSummary: '=model'
             },
@@ -23,9 +23,9 @@ angular.module('app')
             }
         }
     }])
-    .directive('postTags', ['$filter',function ($filter) {
+    .directive('postTags', ['$filter', function ($filter) {
         return {
-            templateUrl: 'views/all/partials/templates/post_tags.html',
+            templateUrl: 'views/all/partials/templates/post-components/post_tags.html',
             scope: {
                 postTags: '=model'
             },

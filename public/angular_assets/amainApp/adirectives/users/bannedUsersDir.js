@@ -1,7 +1,7 @@
 angular.module('app')
     .directive('bannedUsers', ['$q', '$log', '$rootScope', 'UserService', 'globals', function ($q, $log, $rootScope, UserService, globals) {
         return {
-            templateUrl: 'views/all/partials/templates/banned_users.html',
+            templateUrl: 'views/all/partials/templates/users/banned_users.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
 

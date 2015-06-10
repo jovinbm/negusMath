@@ -1,7 +1,7 @@
 angular.module('app')
     .directive('suggestedPosts', ['$rootScope', '$filter', '$http', function ($rootScope, $filter, $http) {
         return {
-            templateUrl: 'views/all/partials/templates/suggested_posts.html',
+            templateUrl: 'views/all/partials/templates/suggested/suggested_posts.html',
             restrict: 'AE',
             link: function ($scope, $element, $attrs) {
 
