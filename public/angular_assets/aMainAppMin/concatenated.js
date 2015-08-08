@@ -2535,6 +2535,23 @@ angular.module('app')
         notificationsConfigProvider.setAcceptHTML(true);
     }]);
 angular.module('app')
+    .directive('logoutScope', ['$rootScope', 'logoutService', function ($rootScope, logoutService) {
+        return {
+            restrict: 'AE',
+            link: function ($scope, $element, $attrs) {
+                $scope.logoutClient = function () {
+                    logoutService.logoutClient()
+                        .success(function (resp) {
+                            $rootScope.main.responseStatusHandler(resp);
+                        })
+                        .error(function (errResponse) {
+                            $rootScope.main.responseStatusHandler(errResponse);
+                        });
+                };
+            }
+        }
+    }]);
+angular.module('app')
     .controller('MainController', ['$q', '$filter', '$log', '$interval', '$window', '$location', '$scope', '$rootScope', 'socket', 'socketService', 'globals', '$document',
         function ($q, $filter, $log, $interval, $window, $location, $scope, $rootScope, socket, socketService, globals, $document) {
         }
@@ -2576,23 +2593,6 @@ angular.module('app')
             });
         }
     ]);
-angular.module('app')
-    .directive('logoutScope', ['$rootScope', 'logoutService', function ($rootScope, logoutService) {
-        return {
-            restrict: 'AE',
-            link: function ($scope, $element, $attrs) {
-                $scope.logoutClient = function () {
-                    logoutService.logoutClient()
-                        .success(function (resp) {
-                            $rootScope.main.responseStatusHandler(resp);
-                        })
-                        .error(function (errResponse) {
-                            $rootScope.main.responseStatusHandler(errResponse);
-                        });
-                };
-            }
-        }
-    }]);
 angular.module('app')
     .filter("validatePostHeading", ['$rootScope', function ($rootScope) {
         return function (postHeading, broadcast) {

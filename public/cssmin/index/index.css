@@ -558,7 +558,7 @@ header {
     text-align: center;
     color: #fff;
     background-attachment: scroll;
-    background-image: url(/public/imgsmin/cover/elimu_kenya.jpg);
+    background-image: url(/public/imgs/pop.jpeg);
     background-position: center center;
     background-repeat: none;
     -webkit-background-size: cover;
@@ -598,7 +598,6 @@ header .local_login_heading {
     font-weight: 700;
     line-height: 50px;
 }
-
 
 @media (min-width: 768px) {
     header .intro-text {
