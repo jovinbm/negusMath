@@ -3,14 +3,6 @@
     padding-right: 0.3em;
 }
 
-@media (max-width: 767px) {
-
-    .allBannerOuterDivs {
-        padding-left: 0.7em;
-        padding-right: 0.7em;
-    }
-}
-
 div.alert.alert-success, div.alert.alert-warning, div.alert.alert-info {
     margin-top: 0.5em;
     margin-bottom: 0.5em;
@@ -72,8 +64,8 @@ div#universalBanner {
 }
 
 .card {
-    margin-top: 10px;
-    margin-bottom: 10px;
+    /*margin-top: 10px;*/
+    /*margin-bottom: 10px;*/
     box-sizing: border-box;
     border-radius: 2px;
     background-clip: padding-box;
@@ -111,7 +103,7 @@ div#universalBanner {
 }
 
 .card .card-content {
-    padding: 16px;
+    padding: 8px;
     border-radius: 0 0 2px 2px;
     background-clip: padding-box;
     box-sizing: border-box;
@@ -127,11 +119,11 @@ div#universalBanner {
 
 .card .card-action {
     border-top: 1px solid rgba(160, 160, 160, 0.2);
-    padding: 16px;
+    padding: 7px;
 }
 
 .card .card-action a {
-    text-transform: uppercase;
+    /*text-transform: uppercase;*/
 }
 
 /*custom additions*/
@@ -561,18 +553,6 @@ section {
         padding-right: 0;
         background-color: #fff;
     }
-}
-div#loading-card {
-    display: table;
-    height: 90vh;
-    width: 100%;
-}
-
-div#loading-card-content {
-    display: table-cell;
-    vertical-align: middle;
-    /*height: 100%;*/
-    width: 100%;
 }
 body {
 }

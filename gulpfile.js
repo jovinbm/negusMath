@@ -11,8 +11,20 @@ var minifyCss = require('gulp-minify-css');
 var ext_replace = require('gulp-ext-replace');
 var imagemin = require('gulp-imagemin');
 var pngquant = require('imagemin-pngquant');
+var less = require('gulp-less');
+var path = require('path');
 
 // Concatenate & Minify JS
+
+gulp.task('compileBootstrap', function () {
+    return gulp.src('public/css-bootstrap/bootstrap-seed.less')
+        .pipe(less())
+        .pipe(rename('custom-bootstrap-default.min.css'))
+        .pipe(minifyCss())
+        .pipe(gulp.dest('public/cssmin'));
+});
+
+
 gulp.task('minifyAllMainCSS', function () {
     return gulp.src(['public/css/*.css', 'public/css/main/**/*.css'])
         .pipe(sourcemaps.init())
@@ -23,6 +35,7 @@ gulp.task('minifyAllMainCSS', function () {
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest('public/cssmin/main'));
 });
+
 
 gulp.task('minifyAllIndexCSS', function () {
     return gulp.src(['public/css/*.css', 'public/css/index/**/*.css'])
@@ -71,6 +84,7 @@ gulp.task('minifyAllImages', function () {
 
 // Watch Files For Changes
 gulp.task('watch', function () {
+    gulp.watch('public/css-bootstrap/less/**/*.less', ['compileBootstrap']);
     gulp.watch('public/css/**/*.css', ['minifyAllMainCSS', 'minifyAllIndexCSS']);
     gulp.watch('public/angular_assets/amainApp/**/*.js', ['minifyMainAppJS']);
     gulp.watch('public/angular_assets/indexApp/**/*.js', ['minifyIndexAppJS']);
@@ -79,4 +93,4 @@ gulp.task('watch', function () {
 });
 
 // Default Task
-gulp.task('default', ['minifyIndexAppJS', 'minifyMainAppJS', 'minifyAllMainCSS', 'minifyAllIndexCSS', 'minifyAllImages', 'watch']);
+gulp.task('default', ['compileBootstrap', 'minifyIndexAppJS', 'minifyMainAppJS', 'minifyAllMainCSS', 'minifyAllIndexCSS', 'minifyAllImages', 'watch']);

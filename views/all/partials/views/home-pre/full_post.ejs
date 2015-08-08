@@ -42,12 +42,12 @@
                              post-actions-scope>
 
                             <div ng-init="postUniqueCuid = '<%- post.postUniqueCuid %>'">
-                                <a class="btn-link btn btn-default btn-sm"
+                                <a class="btn-link btn btn-default btn-xs"
                                    href="<%= '/edit/post/' + post.postIndex %>"
                                    target="_self">Edit
                                 </a>
 
-                                <a class="btn-link btn btn-default btn-sm"
+                                <a class="btn-link btn btn-default btn-xs"
                                    ng-click="trashPost(postUniqueCuid)"
                                    target="_self">Delete
                                 </a>
