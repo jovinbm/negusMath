@@ -2,7 +2,7 @@ var envVariables = require('./environment_config.js');
 var databaseURL = envVariables.databaseURL();
 var databaseURL2 = envVariables.databaseURL2();
 var databaseURL3 = "mongodb://" + envVariables.math4Username() + ":" + envVariables.math4Password() + "@localhost:27017/math4";
-var dbUrl = databaseURL3;
+var dbUrl = databaseURL;
 
 //THE APP
 var express = require('express');
